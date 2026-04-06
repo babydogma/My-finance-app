@@ -491,10 +491,16 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function renderMonthlyStats() {
-    const { income, expense } = calculateMonthlyStats();
+  const { income, expense } = calculateMonthlyStats();
+
+  if (monthlyExpenseValueEl) {
     monthlyExpenseValueEl.textContent = formatMoney(expense);
+  }
+
+  if (monthlyIncomeValueEl) {
     monthlyIncomeValueEl.textContent = formatMoney(income);
   }
+}
 
   function renderBalanceResult() {
     if (!balanceResultValueEl || !balancePeriodLabelEl) return;
