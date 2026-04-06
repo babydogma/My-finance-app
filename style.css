@@ -1181,3 +1181,76 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   cursor: pointer;
   filter: invert(1) brightness(0.9);
 }
+
+/* =========================================================
+   HISTORY PERIOD FIX
+   ========================================================= */
+
+#historyView .history-filters {
+  gap: 10px;
+}
+
+#historyView .history-filter-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 2px;
+  scrollbar-width: none;
+}
+
+#historyView .history-filter-group::-webkit-scrollbar {
+  display: none;
+}
+
+/* кнопки периода */
+#historyView .history-filter-btn {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+/* строка с выбранным месяцем */
+#historyMonthInput {
+  flex: 0 0 auto;
+  width: 1px;
+  min-width: 1px;
+  max-width: 1px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* подпись выбранного периода */
+#historySelectedPeriodLabel {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  height: 34px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text);
+  font-size: 12.5px;
+  font-weight: 810;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+/* когда период выбран — пусть подпись идет сразу под кнопками, а не отдельной уродской строкой */
+#historyView .history-filters .history-filter-group:has(#historySelectedPeriodLabel) {
+  margin-top: -2px;
+}
+
+/* mobile polish */
+@media (max-width: 420px) {
+  #historySelectedPeriodLabel {
+    height: 32px;
+    padding: 0 12px;
+    font-size: 12px;
+  }
+}
