@@ -327,7 +327,7 @@ button {
 .list-card {
   min-height: 74px;
   padding: 10px 14px;
-  border-radius: 24px;
+  border-radius: 32px;
   gap: 12px;
   display: flex;
   align-items: center;
@@ -1031,11 +1031,11 @@ button {
     padding: 8px 6px;
   }
 
-      .list-card {
+     .list-card {
     min-height: 70px;
     padding: 9px 12px;
     gap: 10px;
-    border-radius: 22px;
+    border-radius: 28px;
   }
 
   .list-icon {
