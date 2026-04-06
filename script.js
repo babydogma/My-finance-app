@@ -30,12 +30,6 @@ function loadFromStorage() {
   }
 }
 
-function clearStorageIfNeeded() {
-  // ВРЕМЕННО: один раз очистит старые данные.
-  // После первого обновления страницы эту функцию и вызов можно удалить.
-  localStorage.removeItem("finance_transactions");
-}
-
 function calculateBalance() {
   return state.transactions.reduce((sum, transaction) => {
     if (transaction.type === "income") return sum + transaction.amount;
@@ -250,7 +244,7 @@ function renderBalance() {
     }
   });
 
-  clearStorageIfNeeded(); // ВРЕМЕННО. После первого обновления удалить.
+  
 loadFromStorage();
 renderTransactions();
 renderBalance();
