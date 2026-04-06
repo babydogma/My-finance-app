@@ -28,9 +28,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const accountsListEl = document.getElementById("accountsList");
   const categoriesListEl = document.getElementById("categoriesList");
   const transactionsListEl = document.getElementById("transactionsList");
+  const period7Btn = document.getElementById("period7Btn");
+const period30Btn = document.getElementById("period30Btn");
+const balanceResultValueEl = document.getElementById("balanceResultValue");
+const balancePeriodLabelEl = document.getElementById("balancePeriodLabel");
 
   let currentMode = "expense";
   let editingTransactionId = null;
+  let currentPeriodDays = 7;
 
   const defaultAccounts = [
     {
@@ -258,6 +263,31 @@ document.addEventListener("DOMContentLoaded", () => {
 
     return { income, expense };
   }
+  
+  function getPeriodTransactions(days) {
+  const now = Date.now();
+  const rangeStart = now - days * 24 * 60 * 60 * 1000;
+
+  return state.transactions.filter((transaction) => {
+    if (!transaction.createdAt) return false;
+    const transactionTime = new Date(transaction.createdAt).getTime();
+    return transactionTime >= rangeStart;
+  });
+}
+
+function calculatePeriodResult(days) {
+  const periodTransactions = getPeriodTransactions(days);
+
+  let income = 0;
+  let expense = 0;
+
+  periodTransactions.forEach((transaction) => {
+    if (transaction.type === "income") income += transaction.amount;
+    if (transaction.type === "expense") expense += transaction.amount;
+  });
+
+  return income - expense;
+}
 
   function calculateCategories() {
     const map = new Map();
@@ -292,6 +322,30 @@ document.addEventListener("DOMContentLoaded", () => {
     monthlyIncomeValueEl.textContent = formatMoney(expense);
     monthlyExpenseValueEl.textContent = formatMoney(income);
   }
+  
+  function renderBalanceResult() {
+  if (!balanceResultValueEl || !balancePeriodLabelEl) return;
+
+  const result = calculatePeriodResult(currentPeriodDays);
+
+  balanceResultValueEl.classList.remove("is-positive", "is-negative");
+
+  if (result > 0) {
+    balanceResultValueEl.textContent = `+${formatMoney(result)}`;
+    balanceResultValueEl.classList.add("is-positive");
+  } else if (result < 0) {
+    balanceResultValueEl.textContent = `−${formatMoney(Math.abs(result))}`;
+    balanceResultValueEl.classList.add("is-negative");
+  } else {
+    balanceResultValueEl.textContent = formatMoney(0);
+  }
+
+  balancePeriodLabelEl.textContent =
+    currentPeriodDays === 7 ? "за 7 дней" : "за месяц";
+
+  period7Btn?.classList.toggle("is-active", currentPeriodDays === 7);
+  period30Btn?.classList.toggle("is-active", currentPeriodDays === 30);
+}
 
   function renderAccounts() {
     accountsListEl.innerHTML = "";
@@ -478,6 +532,7 @@ document.addEventListener("DOMContentLoaded", () => {
         toAccount,
         amount,
         time: getCurrentTime(),
+        createdAt: new Date().toISOString(),
       };
     }
 
@@ -502,6 +557,7 @@ document.addEventListener("DOMContentLoaded", () => {
       account,
       amount,
       time: getCurrentTime(),
+      createdAt: new Date().toISOString(),
     };
   }
 
@@ -539,6 +595,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function renderAll() {
     renderBalance();
+    renderBalanceResult();
     renderMonthlyStats();
     renderAccounts();
     renderCategories();
@@ -561,6 +618,16 @@ document.addEventListener("DOMContentLoaded", () => {
       closeModal();
     }
   });
+  
+  period7Btn?.addEventListener("click", () => {
+  currentPeriodDays = 7;
+  renderBalanceResult();
+});
+
+period30Btn?.addEventListener("click", () => {
+  currentPeriodDays = 30;
+  renderBalanceResult();
+});
 
   loadFromStorage();
   renderAll();
