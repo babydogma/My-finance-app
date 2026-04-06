@@ -142,7 +142,7 @@ function getDateOnlyString(date) {
 }
 
 function getSafeBalance() {
-  return getAccountBalance("Сейф");
+  return getAccountBalance("Сейфы Яндекса");
 }
 
 function roundToTwo(num) {
@@ -291,7 +291,7 @@ function roundToTwo(num) {
       toAccountField.classList.add("hidden");
 
       fillExpenseCategorySelect();
-      accountSelect.value = "Яндекс Банк";
+      accountSelect.value = "Сейфы Яндекса";
     } else if (mode === "income") {
       modalTitle.textContent = "Добавить доход";
       saveBtn.textContent = "Сохранить доход";
@@ -742,7 +742,7 @@ function formatMonthLabel(monthValue) {
       id: crypto.randomUUID(),
       type: "income",
       title: "Проценты по сейфу",
-      account: "Сейф",
+      account: "Сейфы Яндекса",
       category_id: null,
       from_account: null,
       to_account: null,
