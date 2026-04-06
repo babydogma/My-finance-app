@@ -682,8 +682,9 @@ select {
   }
 
   .summary {
-    grid-template-columns: 1fr;
-  }
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
 
   .modal-actions--triple {
     grid-template-columns: 1fr;
@@ -773,7 +774,7 @@ select {
 .summary-card {
   padding: 14px;
   border-radius: 20px;
-  min-height: 112px;
+  min-height: 126px;
 }
 
 .summary-label {
