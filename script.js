@@ -100,11 +100,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   ];
 
   const state = {
-    transactions: [],
-    accounts: [],
-    categories: [],
-    budgetLimits: [],
-  };
+  transactions: [],
+  accounts: [],
+  categories: [],
+  budgetLimits: [],
+  appMeta: [],
+};
 
   function getCategoryById(categoryId) {
     return state.categories.find((item) => item.id === categoryId);
@@ -123,6 +124,26 @@ document.addEventListener("DOMContentLoaded", async () => {
   function getBudgetLimitByCategoryId(categoryId) {
     return state.budgetLimits.find((item) => item.category_id === categoryId);
   }
+  
+  function getAppMetaValue(key) {
+  const item = state.appMeta.find((entry) => entry.key === key);
+  return item ? item.value : "";
+}
+
+function getDateOnlyString(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function getSafeBalance() {
+  return getAccountBalance("Сейф");
+}
+
+function roundToTwo(num) {
+  return Math.round((num + Number.EPSILON) * 100) / 100;
+}
 
   function ensureUncategorizedCategory() {
     const exists = state.categories.some((item) => item.id === UNCATEGORIZED_ID);
@@ -617,6 +638,98 @@ commentInput.value = transaction.title === "Перевод" ? "" : transaction.t
   function getBudgetCategories() {
     return state.categories.filter((category) => category.id !== UNCATEGORIZED_ID);
   }
+  
+  async function applySafeInterestIfNeeded() {
+  const annualRate = 0.12;
+  const dailyRate = annualRate / 365;
+
+  const today = new Date();
+  const todayString = getDateOnlyString(today);
+
+  const lastAppliedDate = getAppMetaValue("safe_interest_last_applied_date");
+
+  if (lastAppliedDate === todayString) {
+    return;
+  }
+
+  let startDate;
+
+  if (!lastAppliedDate) {
+    startDate = new Date(today);
+    startDate.setDate(startDate.getDate() - 1);
+  } else {
+    startDate = new Date(`${lastAppliedDate}T00:00:00`);
+  }
+
+  const daysToApply = [];
+  const cursor = new Date(startDate);
+
+  while (true) {
+    cursor.setDate(cursor.getDate() + 1);
+    const cursorString = getDateOnlyString(cursor);
+
+    if (cursorString > todayString) break;
+    daysToApply.push(new Date(cursor));
+  }
+
+  if (!daysToApply.length) {
+    return;
+  }
+
+  for (const day of daysToApply) {
+    const safeBalance = getSafeBalance();
+
+    if (safeBalance <= 0) {
+      continue;
+    }
+
+    const interestAmount = roundToTwo(safeBalance * dailyRate);
+
+    if (interestAmount <= 0) {
+      continue;
+    }
+
+    const dayString = getDateOnlyString(day);
+
+    const interestTransaction = {
+      id: crypto.randomUUID(),
+      type: "income",
+      title: "Проценты по сейфу",
+      account: "Сейф",
+      category_id: null,
+      from_account: null,
+      to_account: null,
+      amount: interestAmount,
+      time_label: "00:01",
+      created_at: `${dayString}T00:01:00`,
+    };
+
+    const { error: insertError } = await supabaseClient
+      .from("transactions")
+      .insert(interestTransaction);
+
+    if (insertError) {
+      console.error(insertError);
+      alert("Ошибка начисления процентов по сейфу");
+      return;
+    }
+
+    state.transactions.push(interestTransaction);
+  }
+
+  const { error: metaError } = await supabaseClient
+    .from("app_meta")
+    .upsert({
+      key: "safe_interest_last_applied_date",
+      value: todayString,
+    });
+
+  if (metaError) {
+    console.error(metaError);
+    alert("Ошибка сохранения даты начисления процентов");
+    return;
+  }
+}
 
   function renderBalance() {
     const balance = calculateBalance();
@@ -1373,49 +1486,58 @@ const existingCreatedAt = `${selectedDate}T${preservedTime}`;
   }
 
   async function loadDataFromSupabase() {
-    const [
-      { data: accounts, error: accountsError },
-      { data: categories, error: categoriesError },
-      { data: transactions, error: transactionsError },
-      { data: budgetLimits, error: budgetLimitsError }
-    ] = await Promise.all([
-      supabaseClient.from("accounts").select("*").order("sort_order", { ascending: true }),
-      supabaseClient.from("categories").select("*").order("sort_order", { ascending: true }),
-      supabaseClient.from("transactions").select("*").order("created_at", { ascending: false }),
-      supabaseClient.from("budget_limits").select("*"),
-    ]);
+  const [
+    { data: accounts, error: accountsError },
+    { data: categories, error: categoriesError },
+    { data: transactions, error: transactionsError },
+    { data: budgetLimits, error: budgetLimitsError },
+    { data: appMeta, error: appMetaError }
+  ] = await Promise.all([
+    supabaseClient.from("accounts").select("*").order("sort_order", { ascending: true }),
+    supabaseClient.from("categories").select("*").order("sort_order", { ascending: true }),
+    supabaseClient.from("transactions").select("*").order("created_at", { ascending: false }),
+    supabaseClient.from("budget_limits").select("*"),
+    supabaseClient.from("app_meta").select("*"),
+  ]);
 
-    if (accountsError) {
-      console.error(accountsError);
-      alert("Ошибка загрузки счетов из Supabase");
-      return;
-    }
-
-    if (categoriesError) {
-      console.error(categoriesError);
-      alert("Ошибка загрузки категорий из Supabase");
-      return;
-    }
-
-    if (transactionsError) {
-      console.error(transactionsError);
-      alert("Ошибка загрузки операций из Supabase");
-      return;
-    }
-
-    if (budgetLimitsError) {
-      console.error(budgetLimitsError);
-      alert("Ошибка загрузки лимитов бюджета из Supabase");
-      return;
-    }
-
-    state.accounts = accounts || [];
-    state.categories = categories || [];
-    state.transactions = transactions || [];
-    state.budgetLimits = budgetLimits || [];
-
-    ensureUncategorizedCategory();
+  if (accountsError) {
+    console.error(accountsError);
+    alert("Ошибка загрузки счетов из Supabase");
+    return;
   }
+
+  if (categoriesError) {
+    console.error(categoriesError);
+    alert("Ошибка загрузки категорий из Supabase");
+    return;
+  }
+
+  if (transactionsError) {
+    console.error(transactionsError);
+    alert("Ошибка загрузки операций из Supabase");
+    return;
+  }
+
+  if (budgetLimitsError) {
+    console.error(budgetLimitsError);
+    alert("Ошибка загрузки лимитов бюджета из Supabase");
+    return;
+  }
+
+  if (appMetaError) {
+    console.error(appMetaError);
+    alert("Ошибка загрузки служебных данных приложения");
+    return;
+  }
+
+  state.accounts = accounts || [];
+  state.categories = categories || [];
+  state.transactions = transactions || [];
+  state.budgetLimits = budgetLimits || [];
+  state.appMeta = appMeta || [];
+
+  ensureUncategorizedCategory();
+}
 
   function renderAll() {
     ensureUncategorizedCategory();
@@ -1501,6 +1623,8 @@ const existingCreatedAt = `${selectedDate}T${preservedTime}`;
   });
 
   await loadDataFromSupabase();
-  renderAll();
-  showWalletView();
+await applySafeInterestIfNeeded();
+await loadDataFromSupabase();
+renderAll();
+showWalletView();
 });
