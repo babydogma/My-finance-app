@@ -171,7 +171,6 @@
         </div>
       </section>
 
-      <!-- ANALYTICS SUMMARY -->
       <section class="section">
         <div class="summary">
           <div class="summary-card">
@@ -193,7 +192,6 @@
         </div>
       </section>
 
-      <!-- PIE / DONUT -->
       <section class="section">
         <div class="section-head">
           <h2 class="section-title">Расходы по категориям</h2>
@@ -207,6 +205,20 @@
 
           <div class="analytics-legend" id="analyticsLegend"></div>
         </div>
+      </section>
+    </div>
+
+    <!-- BUDGET VIEW -->
+    <div id="budgetView" class="hidden">
+      <section class="section section--manager-top">
+        <div class="section-head">
+          <h2 class="section-title">Бюджет</h2>
+          <div class="section-note" id="budgetCountLabel">0 категорий</div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="list" id="budgetList"></div>
       </section>
     </div>
 
@@ -237,7 +249,7 @@
     </nav>
   </div>
 
-  <!-- MODAL -->
+  <!-- TRANSACTION MODAL -->
   <div class="modal hidden" id="transactionModal">
     <div class="modal-sheet">
       <div class="modal-handle"></div>
@@ -288,6 +300,24 @@
         <button class="btn btn-danger hidden" type="button" id="deleteTransactionBtn">Удалить</button>
         <button class="btn btn-secondary" type="button" id="closeModalBtn">Отмена</button>
         <button class="btn btn-primary" type="button" id="saveTransactionBtn">Сохранить</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BUDGET MODAL -->
+  <div class="modal hidden" id="budgetModal">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <h3 class="modal-title" id="budgetModalTitle">Лимит категории</h3>
+
+      <div class="field">
+        <input class="input" id="budgetAmountInput" type="number" placeholder="Лимит на месяц" />
+      </div>
+
+      <div class="modal-actions modal-actions--triple">
+        <button class="btn btn-danger hidden" type="button" id="deleteBudgetBtn">Удалить</button>
+        <button class="btn btn-secondary" type="button" id="closeBudgetModalBtn">Отмена</button>
+        <button class="btn btn-primary" type="button" id="saveBudgetBtn">Сохранить</button>
       </div>
     </div>
   </div>
