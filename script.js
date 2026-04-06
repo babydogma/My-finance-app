@@ -18,8 +18,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const monthlyExpenseValueEl = document.getElementById("monthlyExpenseValue");
   const monthlyIncomeValueEl = document.getElementById("monthlyIncomeValue");
   const accountsListEl = document.getElementById("accountsList");
-const categoriesListEl = document.getElementById("categoriesList");
-const transactionsListEl = document.getElementById("transactionsList");
+  const categoriesListEl = document.getElementById("categoriesList");
+  const transactionsListEl = document.getElementById("transactionsList");
 
   let currentMode = "expense";
 
@@ -28,7 +28,6 @@ const transactionsListEl = document.getElementById("transactionsList");
       id: "yandex",
       name: "Яндекс Банк",
       subtitle: "Основной счёт",
-      balance: 0,
       icon: "💳",
       color: "#35d07f",
     },
@@ -36,7 +35,6 @@ const transactionsListEl = document.getElementById("transactionsList");
       id: "cash",
       name: "Наличные",
       subtitle: "Кошелёк",
-      balance: 0,
       icon: "💵",
       color: "#4f8cff",
     },
@@ -44,7 +42,6 @@ const transactionsListEl = document.getElementById("transactionsList");
       id: "safe",
       name: "Сейф",
       subtitle: "Отложенные деньги",
-      balance: 0,
       icon: "🏦",
       color: "#e0b13f",
     },
@@ -65,27 +62,14 @@ const transactionsListEl = document.getElementById("transactionsList");
 
   function saveToStorage() {
     localStorage.setItem("finance_transactions", JSON.stringify(state.transactions));
-    localStorage.setItem("finance_accounts", JSON.stringify(state.accounts));
   }
 
   function loadFromStorage() {
     const transactionsData = localStorage.getItem("finance_transactions");
-    const accountsData = localStorage.getItem("finance_accounts");
 
     if (transactionsData) {
       state.transactions = JSON.parse(transactionsData);
     }
-
-    if (accountsData) {
-      state.accounts = JSON.parse(accountsData);
-    }
-  }
-
-  function resetAllDataOnce() {
-    // ВРЕМЕННО: один раз сотрёт старые сохранения.
-    // После первого успешного запуска эту функцию и вызов ниже удалить.
-    localStorage.removeItem("finance_transactions");
-    localStorage.removeItem("finance_accounts");
   }
 
   function openModal(mode) {
@@ -140,8 +124,26 @@ const transactionsListEl = document.getElementById("transactionsList");
       .replaceAll("'", "&#039;");
   }
 
+  function getAccountBalance(accountName) {
+    let balance = 0;
+
+    state.transactions.forEach((transaction) => {
+      if (transaction.account !== accountName) return;
+
+      if (transaction.type === "income") {
+        balance += transaction.amount;
+      } else if (transaction.type === "expense") {
+        balance -= transaction.amount;
+      }
+    });
+
+    return balance;
+  }
+
   function calculateBalance() {
-    return state.accounts.reduce((sum, account) => sum + account.balance, 0);
+    return state.accounts.reduce((sum, account) => {
+      return sum + getAccountBalance(account.name);
+    }, 0);
   }
 
   function calculateMonthlyStats() {
@@ -208,9 +210,10 @@ const transactionsListEl = document.getElementById("transactionsList");
     accountsListEl.innerHTML = "";
 
     state.accounts.forEach((account) => {
+      const currentBalance = getAccountBalance(account.name);
+
       const card = document.createElement("div");
-      card.className = "list-card list-card--clickable";
-      card.dataset.accountId = account.id;
+      card.className = "list-card";
 
       card.innerHTML = `
         <div class="list-icon" style="background:${account.color};">${account.icon}</div>
@@ -223,28 +226,11 @@ const transactionsListEl = document.getElementById("transactionsList");
         </div>
 
         <div class="list-right">
-          <p class="list-value">${formatMoney(account.balance)}</p>
+          <p class="list-value">${formatMoney(currentBalance)}</p>
         </div>
 
         <div class="list-arrow">›</div>
       `;
-
-      card.addEventListener("click", () => {
-        const nextValue = prompt(`Введите сумму для счёта "${account.name}"`, account.balance);
-
-        if (nextValue === null) return;
-
-        const numericValue = Number(String(nextValue).replace(/\s/g, "").replace(",", "."));
-
-        if (Number.isNaN(numericValue) || numericValue < 0) {
-          alert("Введи корректную сумму");
-          return;
-        }
-
-        account.balance = numericValue;
-        saveToStorage();
-        renderAll();
-      });
 
       accountsListEl.appendChild(card);
     });
@@ -349,40 +335,29 @@ const transactionsListEl = document.getElementById("transactionsList");
   }
 
   function renderTransactions() {
-  if (!transactionsListEl) return;
+    if (!transactionsListEl) return;
 
-  transactionsListEl.innerHTML = "";
+    transactionsListEl.innerHTML = "";
 
-  if (state.transactions.length === 0) {
-    const empty = document.createElement("div");
-    empty.className = "list-card";
-    empty.innerHTML = `
-      <div class="list-body">
-        <h3 class="list-title">Операций пока нет</h3>
-        <p class="list-subtitle">Добавь первую операцию через кнопки сверху</p>
-      </div>
-    `;
-    transactionsListEl.appendChild(empty);
-    return;
-  }
-
-  state.transactions
-    .slice()
-    .reverse()
-    .forEach((transaction) => {
-      transactionsListEl.appendChild(createTransactionCard(transaction));
-    });
-}
-
-  function applyTransactionToAccount(transaction) {
-    const account = state.accounts.find((item) => item.name === transaction.account);
-    if (!account) return;
-
-    if (transaction.type === "income") {
-      account.balance += transaction.amount;
-    } else if (transaction.type === "expense") {
-      account.balance -= transaction.amount;
+    if (state.transactions.length === 0) {
+      const empty = document.createElement("div");
+      empty.className = "list-card";
+      empty.innerHTML = `
+        <div class="list-body">
+          <h3 class="list-title">Операций пока нет</h3>
+          <p class="list-subtitle">Добавь первую операцию через кнопки сверху</p>
+        </div>
+      `;
+      transactionsListEl.appendChild(empty);
+      return;
     }
+
+    state.transactions
+      .slice()
+      .reverse()
+      .forEach((transaction) => {
+        transactionsListEl.appendChild(createTransactionCard(transaction));
+      });
   }
 
   function saveTransaction() {
@@ -425,7 +400,6 @@ const transactionsListEl = document.getElementById("transactionsList");
     };
 
     state.transactions.push(transaction);
-    applyTransactionToAccount(transaction);
 
     saveToStorage();
     renderAll();
