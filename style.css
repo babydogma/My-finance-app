@@ -1,0 +1,643 @@
+/* =========================================================
+   FINANCE APP — TG WALLET STYLE
+   ========================================================= */
+
+/* =========================================================
+   1. TOKENS
+   ========================================================= */
+
+:root {
+  --bg: #111216;
+  --surface: #23242b;
+  --surface-2: #2a2b33;
+  --surface-3: rgba(42, 43, 51, 0.78);
+
+  --text: #ffffff;
+  --text-muted: #a8a9b3;
+  --text-soft: #7f818c;
+
+  --accent: #4f8cff;
+  --accent-soft: rgba(79, 140, 255, 0.14);
+
+  --green: #35d07f;
+  --red: #ff6a5f;
+
+  --border: rgba(255, 255, 255, 0.05);
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.28);
+
+  --radius-card: 28px;
+  --radius-btn: 26px;
+  --radius-pill: 999px;
+
+  --space-xs: 6px;
+  --space-sm: 10px;
+  --space-md: 16px;
+  --space-lg: 22px;
+  --space-xl: 30px;
+}
+
+/* =========================================================
+   2. RESET
+   ========================================================= */
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  font-size: 16px;
+}
+
+body {
+  margin: 0;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+/* =========================================================
+   3. LAYOUT
+   ========================================================= */
+
+.app {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 18px 16px 130px;
+}
+
+.section {
+  margin-top: 26px;
+}
+
+.section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.section-title {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.section-note {
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* =========================================================
+   4. HEADER
+   ========================================================= */
+
+.header {
+  display: grid;
+  grid-template-columns: 52px 1fr 52px;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 34px;
+}
+
+.header-avatar,
+.header-icon-btn {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.header-avatar {
+  background: linear-gradient(180deg, #ffc86a 0%, #f0a84d 100%);
+  color: #fff;
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.header-icon-btn {
+  background: var(--surface);
+  color: #fff;
+}
+
+.header-center {
+  display: flex;
+  justify-content: center;
+}
+
+.header-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface);
+  border-radius: var(--radius-pill);
+  padding: 8px;
+}
+
+.header-switch__item {
+  min-width: 120px;
+  height: 48px;
+  border: none;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.header-switch__item.is-active {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+/* =========================================================
+   5. BALANCE
+   ========================================================= */
+
+.balance {
+  text-align: center;
+  margin-top: 8px;
+}
+
+.balance-label {
+  margin: 0 0 12px;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.balance-amount {
+  margin: 0;
+  font-size: clamp(58px, 12vw, 88px);
+  line-height: 0.95;
+  font-weight: 900;
+  letter-spacing: -0.06em;
+}
+
+.balance-meta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+}
+
+.balance-profit {
+  color: var(--green);
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.balance-loss {
+  padding: 8px 14px;
+  background: rgba(123, 37, 31, 0.45);
+  color: #ff6e62;
+  border-radius: var(--radius-pill);
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.balance-period {
+  color: var(--text-muted);
+  font-size: 18px;
+  font-weight: 700;
+}
+
+/* =========================================================
+   6. ACTIONS
+   ========================================================= */
+
+.actions {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-top: 34px;
+}
+
+.action-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  min-height: 132px;
+  padding: 18px 10px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+
+.action-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+}
+
+.action-label {
+  color: var(--accent);
+  font-size: 17px;
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+
+/* =========================================================
+   7. LIST CARDS
+   ========================================================= */
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.list-card {
+  background: linear-gradient(180deg, #292a31 0%, #23242b 100%);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: 18px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: var(--shadow);
+}
+
+.list-card--clickable {
+  cursor: pointer;
+}
+
+.list-icon {
+  flex: 0 0 60px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: #3b3d46;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+}
+
+.list-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.list-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.list-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 850;
+  letter-spacing: -0.025em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.list-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 10px;
+  border-radius: 12px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.list-subtitle {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 16px;
+  font-weight: 650;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.list-right {
+  flex: 0 0 auto;
+  text-align: right;
+  margin-left: auto;
+}
+
+.list-value {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 850;
+  letter-spacing: -0.03em;
+}
+
+.list-value--green {
+  color: var(--green);
+}
+
+.list-value--red {
+  color: var(--red);
+}
+
+.list-caption {
+  margin-top: 4px;
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.list-arrow {
+  margin-left: 12px;
+  color: var(--text-soft);
+  font-size: 34px;
+  line-height: 1;
+}
+
+/* =========================================================
+   8. MINI SUMMARY
+   ========================================================= */
+
+.summary {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+
+.summary-card {
+  background: linear-gradient(180deg, #292a31 0%, #23242b 100%);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: 18px;
+  box-shadow: var(--shadow);
+}
+
+.summary-label {
+  margin: 0 0 8px;
+  color: var(--text-muted);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.summary-value {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 850;
+  letter-spacing: -0.04em;
+}
+
+/* =========================================================
+   9. BOTTOM NAV
+   ========================================================= */
+
+.bottom-nav-wrap {
+  position: fixed;
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+  width: min(448px, calc(100% - 16px));
+  z-index: 50;
+}
+
+.bottom-nav {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+  padding: 10px;
+  border-radius: 32px;
+  background: rgba(39, 40, 49, 0.72);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.34);
+}
+
+.nav-item {
+  min-height: 88px;
+  border: none;
+  background: transparent;
+  border-radius: 26px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: #f2f2f4;
+}
+
+.nav-item.is-active {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.nav-icon {
+  font-size: 32px;
+  line-height: 1;
+}
+
+.nav-item.is-active .nav-icon,
+.nav-item.is-active .nav-label {
+  color: var(--accent);
+}
+
+.nav-label {
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+/* =========================================================
+   10. MODAL
+   ========================================================= */
+
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 10, 12, 0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 12px;
+  z-index: 100;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal-sheet {
+  width: min(480px, 100%);
+  background: #1b1c22;
+  border-radius: 28px 28px 20px 20px;
+  padding: 18px 16px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.4);
+}
+
+.modal-handle {
+  width: 44px;
+  height: 5px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.15);
+  margin: 0 auto 16px;
+}
+
+.modal-title {
+  margin: 0 0 16px;
+  text-align: center;
+  font-size: 22px;
+  font-weight: 850;
+  letter-spacing: -0.03em;
+}
+
+.field {
+  margin-bottom: 12px;
+}
+
+.input,
+.select {
+  width: 100%;
+  height: 56px;
+  border: none;
+  outline: none;
+  border-radius: 18px;
+  background: #2a2b33;
+  color: #fff;
+  padding: 0 16px;
+  font-size: 17px;
+}
+
+.input::placeholder {
+  color: #90929d;
+}
+
+.modal-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.btn {
+  height: 56px;
+  border: none;
+  border-radius: 18px;
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.btn-secondary {
+  background: #2a2b33;
+  color: #fff;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* =========================================================
+   11. RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 420px) {
+  .app {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .header {
+    grid-template-columns: 46px 1fr 46px;
+    gap: 10px;
+  }
+
+  .header-avatar,
+  .header-icon-btn {
+    width: 46px;
+    height: 46px;
+  }
+
+  .header-switch__item {
+    min-width: 96px;
+    height: 42px;
+    font-size: 16px;
+  }
+
+  .actions {
+    gap: 10px;
+  }
+
+  .action-card {
+    min-height: 118px;
+    padding: 14px 8px;
+  }
+
+  .action-label {
+    font-size: 15px;
+  }
+
+  .list-card {
+    padding: 16px;
+    gap: 14px;
+  }
+
+  .list-icon {
+    width: 54px;
+    height: 54px;
+    flex-basis: 54px;
+    font-size: 26px;
+  }
+
+  .list-title {
+    font-size: 18px;
+  }
+
+  .list-subtitle {
+    font-size: 15px;
+  }
+
+  .list-value {
+    font-size: 20px;
+  }
+
+  .bottom-nav {
+    padding: 8px;
+  }
+
+  .nav-item {
+    min-height: 78px;
+  }
+
+  .nav-icon {
+    font-size: 28px;
+  }
+}
