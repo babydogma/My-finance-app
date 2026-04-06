@@ -133,11 +133,17 @@
 
         <div class="history-filters">
           <div class="history-filter-group">
-            <button class="history-filter-btn is-active" type="button" data-period="today">Сегодня</button>
-            <button class="history-filter-btn" type="button" data-period="7">7 дней</button>
-            <button class="history-filter-btn" type="button" data-period="30">30 дней</button>
-            <button class="history-filter-btn" type="button" data-period="all">Всё</button>
-          </div>
+  <button class="history-filter-btn is-active" type="button" data-period="today">Сегодня</button>
+  <button class="history-filter-btn" type="button" data-period="7">7 дней</button>
+  <button class="history-filter-btn" type="button" data-period="30">30 дней</button>
+  <button class="history-filter-btn" type="button" data-period="customMonth" id="historyCustomMonthBtn">Период</button>
+  <button class="history-filter-btn" type="button" data-period="all">Всё</button>
+</div>
+
+<div class="history-filter-group">
+  <input class="input hidden" type="month" id="historyMonthInput" />
+  <div class="section-note hidden" id="historySelectedPeriodLabel"></div>
+</div>
 
           <div class="history-filter-group">
             <button class="history-filter-btn is-active" type="button" data-type="all">Все</button>
