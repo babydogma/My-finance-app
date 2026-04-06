@@ -4,14 +4,21 @@ document.addEventListener("DOMContentLoaded", () => {
   const openIncomeModalBtn = document.getElementById("openIncomeModal");
   const openTransferModalBtn = document.getElementById("openTransferModal");
   const closeModalBtn = document.getElementById("closeModalBtn");
+  const saveBtn = document.getElementById("saveTransactionBtn");
 
   const modalTitle = modal?.querySelector(".modal-title");
-  const saveBtn = modal?.querySelector(".btn-primary");
 
-  const amountInput = modal?.querySelector('input[type="number"]');
-  const categorySelect = modal?.querySelectorAll(".select")[0];
-  const accountSelect = modal?.querySelectorAll(".select")[1];
-  const commentInput = modal?.querySelector('input[type="text"]');
+  const amountInput = document.getElementById("amountInput");
+  const categorySelect = document.getElementById("categorySelect");
+  const accountSelect = document.getElementById("accountSelect");
+  const fromAccountSelect = document.getElementById("fromAccountSelect");
+  const toAccountSelect = document.getElementById("toAccountSelect");
+  const commentInput = document.getElementById("commentInput");
+
+  const categoryField = document.getElementById("categoryField");
+  const accountField = document.getElementById("accountField");
+  const fromAccountField = document.getElementById("fromAccountField");
+  const toAccountField = document.getElementById("toAccountField");
 
   const balanceEl = document.querySelector(".balance-amount");
   const accountsTotalEl = document.getElementById("accountsTotal");
@@ -53,6 +60,7 @@ document.addEventListener("DOMContentLoaded", () => {
     "Развлечения": { icon: "🎮", color: "#a56bff", subtitle: "Игры и подписки" },
     "Зарплата": { icon: "💰", color: "#35d07f", subtitle: "Доход" },
     "Перекус": { icon: "☕", color: "#ff8a65", subtitle: "Быстрые траты" },
+    "Перевод": { icon: "↗", color: "#4f8cff", subtitle: "Между счетами" },
   };
 
   const state = {
@@ -66,7 +74,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function loadFromStorage() {
     const transactionsData = localStorage.getItem("finance_transactions");
-
     if (transactionsData) {
       state.transactions = JSON.parse(transactionsData);
     }
@@ -78,12 +85,45 @@ document.addEventListener("DOMContentLoaded", () => {
     if (mode === "expense") {
       modalTitle.textContent = "Добавить расход";
       saveBtn.textContent = "Сохранить расход";
+
+      categoryField.classList.remove("hidden");
+      accountField.classList.remove("hidden");
+      fromAccountField.classList.add("hidden");
+      toAccountField.classList.add("hidden");
+
+      if (categorySelect) {
+        categorySelect.innerHTML = `
+          <option>Выбери категорию</option>
+          <option>Еда</option>
+          <option>Транспорт</option>
+          <option>Развлечения</option>
+          <option>Перекус</option>
+        `;
+      }
     } else if (mode === "income") {
       modalTitle.textContent = "Добавить доход";
       saveBtn.textContent = "Сохранить доход";
+
+      categoryField.classList.remove("hidden");
+      accountField.classList.remove("hidden");
+      fromAccountField.classList.add("hidden");
+      toAccountField.classList.add("hidden");
+
+      if (categorySelect) {
+        categorySelect.innerHTML = `
+          <option>Выбери категорию</option>
+          <option>Зарплата</option>
+          <option>Доход</option>
+        `;
+      }
     } else if (mode === "transfer") {
       modalTitle.textContent = "Сделать перевод";
       saveBtn.textContent = "Сохранить перевод";
+
+      categoryField.classList.add("hidden");
+      accountField.classList.add("hidden");
+      fromAccountField.classList.remove("hidden");
+      toAccountField.classList.remove("hidden");
     }
 
     resetForm();
@@ -97,10 +137,13 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function resetForm() {
-    if (amountInput) amountInput.value = "";
+    amountInput.value = "";
+    commentInput.value = "";
+
     if (categorySelect) categorySelect.selectedIndex = 0;
     if (accountSelect) accountSelect.selectedIndex = 0;
-    if (commentInput) commentInput.value = "";
+    if (fromAccountSelect) fromAccountSelect.selectedIndex = 0;
+    if (toAccountSelect) toAccountSelect.selectedIndex = 0;
   }
 
   function getCurrentTime() {
@@ -128,6 +171,16 @@ document.addEventListener("DOMContentLoaded", () => {
     let balance = 0;
 
     state.transactions.forEach((transaction) => {
+      if (transaction.type === "transfer") {
+        if (transaction.fromAccount === accountName) {
+          balance -= transaction.amount;
+        }
+        if (transaction.toAccount === accountName) {
+          balance += transaction.amount;
+        }
+        return;
+      }
+
       if (transaction.account !== accountName) return;
 
       if (transaction.type === "income") {
@@ -182,31 +235,18 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function renderBalance() {
-    if (!balanceEl) return;
-
     const balance = calculateBalance();
     balanceEl.textContent = formatMoney(balance);
-
-    if (accountsTotalEl) {
-      accountsTotalEl.textContent = `Всего: ${formatMoney(balance)}`;
-    }
+    accountsTotalEl.textContent = `Всего: ${formatMoney(balance)}`;
   }
 
   function renderMonthlyStats() {
     const { income, expense } = calculateMonthlyStats();
-
-    if (monthlyIncomeValueEl) {
-      monthlyIncomeValueEl.textContent = formatMoney(income);
-    }
-
-    if (monthlyExpenseValueEl) {
-      monthlyExpenseValueEl.textContent = formatMoney(expense);
-    }
+    monthlyIncomeValueEl.textContent = formatMoney(income);
+    monthlyExpenseValueEl.textContent = formatMoney(expense);
   }
 
   function renderAccounts() {
-    if (!accountsListEl) return;
-
     accountsListEl.innerHTML = "";
 
     state.accounts.forEach((account) => {
@@ -217,19 +257,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
       card.innerHTML = `
         <div class="list-icon" style="background:${account.color};">${account.icon}</div>
-
         <div class="list-body">
           <div class="list-title-row">
             <h3 class="list-title">${escapeHtml(account.name)}</h3>
           </div>
           <p class="list-subtitle">${escapeHtml(account.subtitle)}</p>
         </div>
-
         <div class="list-right">
           <p class="list-value">${formatMoney(currentBalance)}</p>
         </div>
-
-        <div class="list-arrow">›</div>
       `;
 
       accountsListEl.appendChild(card);
@@ -242,14 +278,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     card.innerHTML = `
       <div class="list-icon" style="background:${category.color};">${category.icon}</div>
-
       <div class="list-body">
         <div class="list-title-row">
           <h3 class="list-title">${escapeHtml(category.name)}</h3>
         </div>
         <p class="list-subtitle">${escapeHtml(category.subtitle)}</p>
       </div>
-
       <div class="list-right">
         <p class="list-value">${formatMoney(category.amount)}</p>
       </div>
@@ -259,8 +293,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function renderCategories() {
-    if (!categoriesListEl) return;
-
     categoriesListEl.innerHTML = "";
 
     const categories = calculateCategories();
@@ -285,7 +317,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function createTransactionCard(transaction) {
     const card = document.createElement("div");
-    card.className = "list-card";
+    card.className = "list-card list-card--clickable";
 
     const iconBg =
       transaction.type === "income"
@@ -301,42 +333,53 @@ document.addEventListener("DOMContentLoaded", () => {
         ? "↗"
         : "🛒";
 
-    const signedAmount =
-      transaction.type === "income"
-        ? `+${formatMoney(transaction.amount)}`
-        : transaction.type === "transfer"
-        ? `${formatMoney(transaction.amount)}`
-        : `−${formatMoney(transaction.amount)}`;
+    let subtitle = "";
+    let signedAmount = "";
+    let valueClass = "list-value";
 
-    const valueClass =
-      transaction.type === "income"
-        ? "list-value list-value--green"
-        : transaction.type === "expense"
-        ? "list-value list-value--red"
-        : "list-value";
+    if (transaction.type === "transfer") {
+      subtitle = `${escapeHtml(transaction.fromAccount)} → ${escapeHtml(transaction.toAccount)}`;
+      signedAmount = formatMoney(transaction.amount);
+    } else {
+      subtitle = `${escapeHtml(transaction.category)} • ${escapeHtml(transaction.account)}`;
+      signedAmount =
+        transaction.type === "income"
+          ? `+${formatMoney(transaction.amount)}`
+          : `−${formatMoney(transaction.amount)}`;
+
+      valueClass =
+        transaction.type === "income"
+          ? "list-value list-value--green"
+          : "list-value list-value--red";
+    }
 
     card.innerHTML = `
       <div class="list-icon" style="background:${iconBg};">${icon}</div>
-
       <div class="list-body">
         <div class="list-title-row">
           <h3 class="list-title">${escapeHtml(transaction.title)}</h3>
         </div>
-        <p class="list-subtitle">${escapeHtml(transaction.category)} • ${escapeHtml(transaction.account)}</p>
+        <p class="list-subtitle">${subtitle}</p>
       </div>
-
       <div class="list-right">
         <p class="${valueClass}">${signedAmount}</p>
         <div class="list-caption">${transaction.time}</div>
       </div>
     `;
 
+    card.addEventListener("click", () => {
+      const ok = confirm(`Удалить операцию "${transaction.title}"?`);
+      if (!ok) return;
+
+      state.transactions = state.transactions.filter((item) => item.id !== transaction.id);
+      saveToStorage();
+      renderAll();
+    });
+
     return card;
   }
 
   function renderTransactions() {
-    if (!transactionsListEl) return;
-
     transactionsListEl.innerHTML = "";
 
     if (state.transactions.length === 0) {
@@ -362,14 +405,52 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function saveTransaction() {
     const amount = Number(amountInput.value.trim());
-    const category = categorySelect.value;
-    const account = accountSelect.value;
     const comment = commentInput.value.trim();
 
     if (!amount || amount <= 0) {
       alert("Введи сумму");
       return;
     }
+
+    if (currentMode === "transfer") {
+      const fromAccount = fromAccountSelect.value;
+      const toAccount = toAccountSelect.value;
+
+      if (fromAccount === "С какого счёта") {
+        alert("Выбери счёт списания");
+        return;
+      }
+
+      if (toAccount === "На какой счёт") {
+        alert("Выбери счёт зачисления");
+        return;
+      }
+
+      if (fromAccount === toAccount) {
+        alert("Счета должны быть разными");
+        return;
+      }
+
+      const transaction = {
+        id: crypto.randomUUID(),
+        type: "transfer",
+        title: comment || "Перевод",
+        category: "Перевод",
+        fromAccount,
+        toAccount,
+        amount,
+        time: getCurrentTime(),
+      };
+
+      state.transactions.push(transaction);
+      saveToStorage();
+      renderAll();
+      closeModal();
+      return;
+    }
+
+    const category = categorySelect.value;
+    const account = accountSelect.value;
 
     if (category === "Выбери категорию") {
       alert("Выбери категорию");
@@ -383,11 +464,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const title =
       comment ||
-      (currentMode === "income"
-        ? "Новый доход"
-        : currentMode === "transfer"
-        ? "Перевод"
-        : "Новая трата");
+      (currentMode === "income" ? "Новый доход" : "Новая трата");
 
     const transaction = {
       id: crypto.randomUUID(),
@@ -400,7 +477,6 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     state.transactions.push(transaction);
-
     saveToStorage();
     renderAll();
     closeModal();
