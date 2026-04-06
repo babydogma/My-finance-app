@@ -1,4 +1,4 @@
-е<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
@@ -96,7 +96,7 @@
       <section class="section">
         <div class="section-head">
           <h2 class="section-title">Последние операции</h2>
-          <div class="section-note">Сегодня</div>
+          <div class="section-note">5 последних</div>
         </div>
 
         <div class="list" id="transactionsList"></div>
@@ -138,27 +138,58 @@
       </section>
     </div>
 
+    <!-- HISTORY VIEW -->
+    <div id="historyView" class="hidden">
+      <section class="section section--manager-top">
+        <div class="section-head">
+          <h2 class="section-title">История</h2>
+          <div class="section-note" id="historyCountLabel">0 операций</div>
+        </div>
+
+        <div class="history-filters">
+          <div class="history-filter-group">
+            <button class="history-filter-btn is-active" type="button" data-period="today">Сегодня</button>
+            <button class="history-filter-btn" type="button" data-period="7">7 дней</button>
+            <button class="history-filter-btn" type="button" data-period="30">30 дней</button>
+            <button class="history-filter-btn" type="button" data-period="month">Месяц</button>
+            <button class="history-filter-btn" type="button" data-period="all">Всё</button>
+          </div>
+
+          <div class="history-filter-group">
+            <button class="history-filter-btn is-active" type="button" data-type="all">Все</button>
+            <button class="history-filter-btn" type="button" data-type="income">Доходы</button>
+            <button class="history-filter-btn" type="button" data-type="expense">Расходы</button>
+            <button class="history-filter-btn" type="button" data-type="transfer">Переводы</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="list" id="historyTransactionsList"></div>
+      </section>
+    </div>
+
   </main>
 
   <!-- BOTTOM NAV -->
   <div class="bottom-nav-wrap">
     <nav class="bottom-nav">
-      <button class="nav-item is-active" type="button">
+      <button class="nav-item is-active" type="button" id="navWalletBtn">
         <div class="nav-icon">👛</div>
         <div class="nav-label">Кошелёк</div>
       </button>
 
-      <button class="nav-item" type="button">
+      <button class="nav-item" type="button" id="navAnalyticsBtn">
         <div class="nav-icon">📈</div>
         <div class="nav-label">Аналитика</div>
       </button>
 
-      <button class="nav-item" type="button">
+      <button class="nav-item" type="button" id="navBudgetBtn">
         <div class="nav-icon">%</div>
         <div class="nav-label">Бюджет</div>
       </button>
 
-      <button class="nav-item" type="button">
+      <button class="nav-item" type="button" id="navHistoryBtn">
         <div class="nav-icon">🕘</div>
         <div class="nav-label">История</div>
       </button>
@@ -221,7 +252,7 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase.js"></script>
-<script src="script.js"></script>
+  <script src="supabase.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
