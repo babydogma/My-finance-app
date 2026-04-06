@@ -761,3 +761,16 @@ select {
 .hidden {
   display: none !important;
 }
+
+.hidden {
+  display: none !important;
+}
+
+.modal-actions--triple {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+.btn-danger {
+  background: rgba(255, 106, 95, 0.18);
+  color: #ff6a5f;
+}
