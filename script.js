@@ -34,9 +34,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   const addCategoryBtn = document.getElementById("addCategoryBtn");
 
   const historyTransactionsList = document.getElementById("historyTransactionsList");
-  const historyCountLabel = document.getElementById("historyCountLabel");
-  const historyPeriodButtons = document.querySelectorAll("[data-period]");
-  const historyTypeButtons = document.querySelectorAll("[data-type]");
+const historyCountLabel = document.getElementById("historyCountLabel");
+const historyPeriodButtons = document.querySelectorAll("[data-period]");
+const historyTypeButtons = document.querySelectorAll("[data-type]");
+const historyMonthInput = document.getElementById("historyMonthInput");
+const historySelectedPeriodLabel = document.getElementById("historySelectedPeriodLabel");
+const historyCustomMonthBtn = document.getElementById("historyCustomMonthBtn");
 
   const analyticsPeriodButtons = document.querySelectorAll("[data-analytics-period]");
   const analyticsIncomeValue = document.getElementById("analyticsIncomeValue");
@@ -83,8 +86,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   let currentView = "wallet";
 
   let historyFilterPeriod = "today";
-  let historyFilterType = "all";
-  let analyticsFilterPeriod = "7";
+let historyFilterType = "all";
+let historySelectedMonth = "";
+let analyticsFilterPeriod = "7";
 
   let activeBudgetCategoryId = null;
 
@@ -414,6 +418,32 @@ commentInput.value = transaction.title === "Перевод" ? "" : transaction.t
   function formatMoney(value) {
     return `${new Intl.NumberFormat("ru-RU").format(Number(value) || 0)} ₽`;
   }
+  
+  function getMonthRange(monthValue) {
+  if (!monthValue) return null;
+
+  const [year, month] = monthValue.split("-").map(Number);
+  if (!year || !month) return null;
+
+  const start = new Date(year, month - 1, 1).getTime();
+  const end = new Date(year, month, 1).getTime();
+
+  return { start, end };
+}
+
+function formatMonthLabel(monthValue) {
+  if (!monthValue) return "";
+
+  const [year, month] = monthValue.split("-").map(Number);
+  if (!year || !month) return "";
+
+  const date = new Date(year, month - 1, 1);
+
+  return date.toLocaleDateString("ru-RU", {
+    month: "long",
+    year: "numeric",
+  });
+}
 
   function escapeHtml(str) {
     return String(str)
@@ -602,8 +632,8 @@ commentInput.value = transaction.title === "Перевод" ? "" : transaction.t
     }
 
     const now = new Date();
-    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+const customMonthRange = getMonthRange(historySelectedMonth);
 
     filtered = filtered.filter((transaction) => {
       const transactionTime = transaction.created_at
@@ -611,13 +641,16 @@ commentInput.value = transaction.title === "Перевод" ? "" : transaction.t
         : 0;
 
       if (historyFilterPeriod === "all") return true;
-      if (historyFilterPeriod === "today") return transactionTime >= startOfToday;
-      if (historyFilterPeriod === "7") return transactionTime >= Date.now() - 7 * 24 * 60 * 60 * 1000;
-      if (historyFilterPeriod === "30") return transactionTime >= Date.now() - 30 * 24 * 60 * 60 * 1000;
-      if (historyFilterPeriod === "month") return transactionTime >= startOfMonth;
+if (historyFilterPeriod === "today") return transactionTime >= startOfToday;
+if (historyFilterPeriod === "7") return transactionTime >= Date.now() - 7 * 24 * 60 * 60 * 1000;
+if (historyFilterPeriod === "30") return transactionTime >= Date.now() - 30 * 24 * 60 * 60 * 1000;
 
-      return true;
-    });
+if (historyFilterPeriod === "customMonth") {
+  if (!customMonthRange) return true;
+  return transactionTime >= customMonthRange.start && transactionTime < customMonthRange.end;
+}
+
+return true;
 
     return filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
   }
@@ -1071,13 +1104,18 @@ commentInput.value = transaction.title === "Перевод" ? "" : transaction.t
 
     historyCountLabel.textContent = `${filteredTransactions.length} операций`;
 
-    historyPeriodButtons.forEach((btn) => {
-      btn.classList.toggle("is-active", btn.dataset.period === historyFilterPeriod);
-    });
+    if (historyMonthInput) {
+  historyMonthInput.classList.toggle("hidden", historyFilterPeriod !== "customMonth");
+}
 
-    historyTypeButtons.forEach((btn) => {
-      btn.classList.toggle("is-active", btn.dataset.type === historyFilterType);
-    });
+if (historySelectedPeriodLabel) {
+  const hasCustomMonth = historyFilterPeriod === "customMonth" && historySelectedMonth;
+
+  historySelectedPeriodLabel.classList.toggle("hidden", !hasCustomMonth);
+  historySelectedPeriodLabel.textContent = hasCustomMonth
+    ? formatMonthLabel(historySelectedMonth)
+    : "";
+}
 
     if (filteredTransactions.length === 0) {
       const empty = document.createElement("div");
@@ -1566,11 +1604,35 @@ const existingCreatedAt = `${selectedDate}T${preservedTime}`;
   navBudgetBtn?.addEventListener("click", showBudgetView);
 
   historyPeriodButtons.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      historyFilterPeriod = btn.dataset.period;
-      renderHistory();
-    });
+  btn.addEventListener("click", () => {
+    historyFilterPeriod = btn.dataset.period;
+
+    if (historyFilterPeriod === "customMonth") {
+      if (!historySelectedMonth) {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, "0");
+        historySelectedMonth = `${year}-${month}`;
+      }
+
+      if (historyMonthInput) {
+        historyMonthInput.value = historySelectedMonth;
+        historyMonthInput.classList.remove("hidden");
+        historyMonthInput.showPicker?.();
+      }
+    }
+
+    renderHistory();
   });
+});
+
+historyMonthInput?.addEventListener("change", () => {
+  if (!historyMonthInput.value) return;
+
+  historySelectedMonth = historyMonthInput.value;
+  historyFilterPeriod = "customMonth";
+  renderHistory();
+});
 
   historyTypeButtons.forEach((btn) => {
     btn.addEventListener("click", () => {
