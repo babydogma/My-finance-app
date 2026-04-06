@@ -11,93 +11,132 @@
   <main class="app">
 
     <!-- HEADER -->
-<header class="header header--simple">
-  <div class="header-center header-center--single">
-    <div class="header-switch">
-      <button class="header-switch__item is-active" type="button" id="period7Btn">7 дней</button>
-      <button class="header-switch__item" type="button" id="period30Btn">30 дней</button>
+    <header class="header header--simple">
+      <div class="header-center header-center--single">
+        <div class="header-switch">
+          <button class="header-switch__item is-active" type="button" id="period7Btn">7 дней</button>
+          <button class="header-switch__item" type="button" id="period30Btn">30 дней</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- MAIN VIEW -->
+    <div id="mainView">
+
+      <!-- BALANCE -->
+      <section class="balance">
+        <p class="balance-label">Баланс</p>
+        <h1 class="balance-amount">0 ₽</h1>
+
+        <div class="balance-meta balance-meta--single">
+          <div class="balance-result" id="balanceResultValue">0 ₽</div>
+          <div class="balance-period-toggle" id="balancePeriodLabel">за 7 дней</div>
+        </div>
+      </section>
+
+      <!-- ACTIONS -->
+      <section class="actions">
+        <button class="action-card" type="button" id="openExpenseModal">
+          <div class="action-icon">−</div>
+          <div class="action-label">Расход</div>
+        </button>
+
+        <button class="action-card" type="button" id="openIncomeModal">
+          <div class="action-icon">+</div>
+          <div class="action-label">Доход</div>
+        </button>
+
+        <button class="action-card" type="button" id="openTransferModal">
+          <div class="action-icon">↗</div>
+          <div class="action-label">Перевод</div>
+        </button>
+
+        <button class="action-card" type="button" id="openCategoriesManagerBtn">
+          <div class="action-icon">⇄</div>
+          <div class="action-label">Категории</div>
+        </button>
+      </section>
+
+      <!-- QUICK SUMMARY -->
+      <section class="section">
+        <div class="summary">
+          <div class="summary-card">
+            <p class="summary-label">Расходы за месяц</p>
+            <p class="summary-value" id="monthlyExpenseValue">0 ₽</p>
+          </div>
+
+          <div class="summary-card">
+            <p class="summary-label">Доходы за месяц</p>
+            <p class="summary-value" id="monthlyIncomeValue">0 ₽</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ACCOUNTS -->
+      <section class="section">
+        <div class="section-head">
+          <h2 class="section-title">Счета</h2>
+          <div class="section-note" id="accountsTotal">Всего: 0 ₽</div>
+        </div>
+
+        <div class="list" id="accountsList"></div>
+      </section>
+
+      <!-- CATEGORIES -->
+      <section class="section">
+        <div class="section-head">
+          <h2 class="section-title">Категории</h2>
+          <div class="section-note">Этот месяц</div>
+        </div>
+
+        <div class="list" id="categoriesList"></div>
+      </section>
+
+      <!-- TRANSACTIONS -->
+      <section class="section">
+        <div class="section-head">
+          <h2 class="section-title">Последние операции</h2>
+          <div class="section-note">Сегодня</div>
+        </div>
+
+        <div class="list" id="transactionsList"></div>
+      </section>
+
     </div>
-  </div>
-</header>
 
-<!-- BALANCE -->
-<section class="balance">
-  <p class="balance-label">Баланс</p>
-  <h1 class="balance-amount">0 ₽</h1>
+    <!-- CATEGORIES MANAGER VIEW -->
+    <div id="categoriesManagerView" class="hidden">
+      <section class="section section--manager-top">
+        <div class="section-head">
+          <button class="manager-back-btn" type="button" id="closeCategoriesManagerBtn">← Назад</button>
+          <h2 class="section-title">Категории расходов</h2>
+          <div class="section-note">Управление</div>
+        </div>
 
-  <div class="balance-meta balance-meta--single">
-    <div class="balance-result" id="balanceResultValue">0 ₽</div>
-    <div class="balance-period-toggle" id="balancePeriodLabel">за 7 дней</div>
-  </div>
-</section>
+        <div class="manager-card">
+          <div class="field">
+            <input class="input" id="newCategoryNameInput" type="text" placeholder="Название категории" />
+          </div>
 
-    <!-- ACTIONS -->
-    <section class="actions">
-      <button class="action-card" type="button" id="openExpenseModal">
-        <div class="action-icon">−</div>
-        <div class="action-label">Расход</div>
-      </button>
+          <div class="field">
+            <input class="input" id="newCategoryIconInput" type="text" placeholder="Эмодзи, например 🍔" maxlength="4" />
+          </div>
 
-      <button class="action-card" type="button" id="openIncomeModal">
-        <div class="action-icon">+</div>
-        <div class="action-label">Доход</div>
-      </button>
+          <button class="btn btn-primary manager-add-btn" type="button" id="addCategoryBtn">
+            Добавить категорию
+          </button>
+        </div>
+      </section>
 
-      <button class="action-card" type="button" id="openTransferModal">
-        <div class="action-icon">↗</div>
-        <div class="action-label">Перевод</div>
-      </button>
+      <section class="section">
+        <div class="section-head">
+          <h2 class="section-title">Список категорий</h2>
+          <div class="section-note">Можно менять</div>
+        </div>
 
-      <button class="action-card" type="button">
-        <div class="action-icon">⇄</div>
-        <div class="action-label">Категории</div>
-      </button>
-    </section>
-
-    <!-- QUICK SUMMARY -->
-    <section class="section">
-  <div class="summary">
-    <div class="summary-card">
-      <p class="summary-label">Расходы за месяц</p>
-      <p class="summary-value" id="monthlyExpenseValue">0 ₽</p>
+        <div class="list" id="categoriesManagerList"></div>
+      </section>
     </div>
-
-    <div class="summary-card">
-      <p class="summary-label">Доходы за месяц</p>
-      <p class="summary-value" id="monthlyIncomeValue">0 ₽</p>
-    </div>
-  </div>
-</section>
-
-    <!-- ACCOUNTS -->
-<section class="section">
-  <div class="section-head">
-    <h2 class="section-title">Счета</h2>
-    <div class="section-note" id="accountsTotal">Всего: 0 ₽</div>
-  </div>
-
-  <div class="list" id="accountsList"></div>
-</section>
-
-<!-- CATEGORIES -->
-<section class="section">
-  <div class="section-head">
-    <h2 class="section-title">Категории</h2>
-    <div class="section-note">Этот месяц</div>
-  </div>
-
-  <div class="list" id="categoriesList"></div>
-</section>
-
-<!-- TRANSACTIONS -->
-<section class="section">
-  <div class="section-head">
-    <h2 class="section-title">Последние операции</h2>
-    <div class="section-note">Сегодня</div>
-  </div>
-
-  <div class="list" id="transactionsList"></div>
-</section>
 
   </main>
 
@@ -127,64 +166,59 @@
   </div>
 
   <!-- MODAL -->
-<div class="modal hidden" id="transactionModal">
-  <div class="modal-sheet">
-    <div class="modal-handle"></div>
-    <h3 class="modal-title">Добавить операцию</h3>
+  <div class="modal hidden" id="transactionModal">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <h3 class="modal-title">Добавить операцию</h3>
 
-    <div class="field">
-      <input class="input" id="amountInput" type="number" placeholder="Сумма" />
-    </div>
+      <div class="field">
+        <input class="input" id="amountInput" type="number" placeholder="Сумма" />
+      </div>
 
-    <div class="field" id="categoryField">
-      <select class="select" id="categorySelect">
-        <option>Выбери категорию</option>
-        <option>Еда</option>
-        <option>Транспорт</option>
-        <option>Развлечения</option>
-        <option>Зарплата</option>
-        <option>Перекус</option>
-      </select>
-    </div>
+      <div class="field" id="categoryField">
+        <select class="select" id="categorySelect">
+          <option>Выбери категорию</option>
+        </select>
+      </div>
 
-    <div class="field" id="accountField">
-      <select class="select" id="accountSelect">
-        <option>Выбери счёт</option>
-        <option>Яндекс Банк</option>
-        <option>Наличные</option>
-        <option>Сейф</option>
-      </select>
-    </div>
+      <div class="field" id="accountField">
+        <select class="select" id="accountSelect">
+          <option>Выбери счёт</option>
+          <option>Яндекс Банк</option>
+          <option>Наличные</option>
+          <option>Сейф</option>
+        </select>
+      </div>
 
-    <div class="field hidden" id="fromAccountField">
-      <select class="select" id="fromAccountSelect">
-        <option>С какого счёта</option>
-        <option>Яндекс Банк</option>
-        <option>Наличные</option>
-        <option>Сейф</option>
-      </select>
-    </div>
+      <div class="field hidden" id="fromAccountField">
+        <select class="select" id="fromAccountSelect">
+          <option>С какого счёта</option>
+          <option>Яндекс Банк</option>
+          <option>Наличные</option>
+          <option>Сейф</option>
+        </select>
+      </div>
 
-    <div class="field hidden" id="toAccountField">
-      <select class="select" id="toAccountSelect">
-        <option>На какой счёт</option>
-        <option>Яндекс Банк</option>
-        <option>Наличные</option>
-        <option>Сейф</option>
-      </select>
-    </div>
+      <div class="field hidden" id="toAccountField">
+        <select class="select" id="toAccountSelect">
+          <option>На какой счёт</option>
+          <option>Яндекс Банк</option>
+          <option>Наличные</option>
+          <option>Сейф</option>
+        </select>
+      </div>
 
-    <div class="field">
-      <input class="input" id="commentInput" type="text" placeholder="Комментарий" />
-    </div>
+      <div class="field">
+        <input class="input" id="commentInput" type="text" placeholder="Комментарий" />
+      </div>
 
-    <div class="modal-actions modal-actions--triple">
-      <button class="btn btn-danger hidden" type="button" id="deleteTransactionBtn">Удалить</button>
-      <button class="btn btn-secondary" type="button" id="closeModalBtn">Отмена</button>
-      <button class="btn btn-primary" type="button" id="saveTransactionBtn">Сохранить</button>
+      <div class="modal-actions modal-actions--triple">
+        <button class="btn btn-danger hidden" type="button" id="deleteTransactionBtn">Удалить</button>
+        <button class="btn btn-secondary" type="button" id="closeModalBtn">Отмена</button>
+        <button class="btn btn-primary" type="button" id="saveTransactionBtn">Сохранить</button>
+      </div>
     </div>
   </div>
-</div>
 
   <script src="script.js"></script>
 </body>
