@@ -907,3 +907,60 @@ select {
 .list-icon--neutral {
   background: rgba(90, 93, 106, 0.42) !important;
 }
+
+/* =========================================================
+   HISTORY VIEW
+   ========================================================= */
+
+.history-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.history-filter-group {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  scrollbar-width: none;
+}
+
+.history-filter-group::-webkit-scrollbar {
+  display: none;
+}
+
+.history-filter-btn {
+  flex: 0 0 auto;
+  height: 38px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.history-filter-btn.is-active {
+  background: rgba(255, 255, 255, 0.14);
+  color: var(--text);
+}
+
+#historyView {
+  padding-bottom: 8px;
+}
+
+/* =========================================================
+   BOTTOM NAV ACTIVE STATES FOR VIEWS
+   ========================================================= */
+
+.nav-item.is-active {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.nav-item.is-active .nav-icon,
+.nav-item.is-active .nav-label {
+  color: var(--accent);
+}
