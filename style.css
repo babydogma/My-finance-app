@@ -318,28 +318,24 @@ button {
    7. LIST CARDS
    ========================================================= */
 
-/* =========================================================
-   7. LIST CARDS
-   ========================================================= */
-
 .list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .list-card {
-  min-height: 96px;
-  padding: 14px 18px;
-  border-radius: 28px;
-  gap: 14px;
+  min-height: 74px;
+  padding: 10px 14px;
+  border-radius: 24px;
+  gap: 12px;
   display: flex;
   align-items: center;
-  background: linear-gradient(180deg, rgba(43, 45, 53, 0.96) 0%, rgba(35, 37, 45, 0.98) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.045);
+  background: linear-gradient(180deg, rgba(42, 44, 52, 0.96) 0%, rgba(35, 37, 45, 0.98) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.04);
   box-shadow:
-    0 10px 26px rgba(0, 0, 0, 0.18),
-    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+    0 6px 18px rgba(0, 0, 0, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.025);
   position: relative;
   overflow: hidden;
 }
@@ -349,19 +345,19 @@ button {
 }
 
 .list-card--clickable:active {
-  transform: scale(0.995);
+  transform: scale(0.996);
 }
 
 .list-icon {
-  width: 56px;
-  height: 56px;
-  flex: 0 0 56px;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
   border-radius: 50%;
-  background: rgba(90, 93, 106, 0.30);
+  background: rgba(90, 93, 106, 0.28);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 26px;
+  font-size: 20px;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
@@ -374,15 +370,15 @@ button {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 3px;
+  margin-bottom: 2px;
 }
 
 .list-title {
   margin: 0;
-  font-size: 17px;
-  font-weight: 820;
+  font-size: 14px;
+  font-weight: 780;
   line-height: 1.05;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.03em;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -392,22 +388,22 @@ button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 5px 10px;
-  border-radius: 12px;
+  padding: 4px 9px;
+  border-radius: 11px;
   background: var(--accent-soft);
   color: var(--accent);
-  font-size: 12px;
-  font-weight: 800;
+  font-size: 11px;
+  font-weight: 780;
   line-height: 1;
   border: 1px solid rgba(92, 142, 255, 0.14);
 }
 
 .list-subtitle {
   margin: 0;
-  color: rgba(255, 255, 255, 0.56);
-  font-size: 12px;
+  color: rgba(255, 255, 255, 0.50);
+  font-size: 11px;
   font-weight: 560;
-  line-height: 1.15;
+  line-height: 1.1;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -417,39 +413,39 @@ button {
   flex: 0 0 auto;
   text-align: right;
   margin-left: auto;
-  padding-left: 12px;
+  padding-left: 10px;
 }
 
 .list-value {
   margin: 0;
-  font-size: 17px;
-  font-weight: 790;
+  font-size: 14px;
+  font-weight: 760;
   line-height: 1;
-  letter-spacing: -0.045em;
+  letter-spacing: -0.03em;
 }
 
 .list-value--green {
   color: var(--green);
-  text-shadow: 0 0 18px rgba(74, 216, 140, 0.08);
+  text-shadow: 0 0 12px rgba(74, 216, 140, 0.06);
 }
 
 .list-value--red {
   color: var(--red);
-  text-shadow: 0 0 18px rgba(255, 114, 104, 0.08);
+  text-shadow: 0 0 12px rgba(255, 114, 104, 0.06);
 }
 
 .list-caption {
-  margin-top: 4px;
-  color: rgba(255, 255, 255, 0.50);
-  font-size: 11px;
+  margin-top: 3px;
+  color: rgba(255, 255, 255, 0.46);
+  font-size: 10.5px;
   font-weight: 600;
   line-height: 1;
 }
 
 .list-arrow {
-  margin-left: 8px;
-  color: rgba(255, 255, 255, 0.28);
-  font-size: 26px;
+  margin-left: 6px;
+  color: rgba(255, 255, 255, 0.24);
+  font-size: 22px;
   line-height: 1;
 }
 
@@ -1035,30 +1031,30 @@ button {
     padding: 8px 6px;
   }
 
-    .list-card {
-    min-height: 92px;
-    padding: 13px 16px;
-    gap: 12px;
-    border-radius: 26px;
+      .list-card {
+    min-height: 70px;
+    padding: 9px 12px;
+    gap: 10px;
+    border-radius: 22px;
   }
 
   .list-icon {
-    width: 52px;
-    height: 52px;
-    flex-basis: 52px;
-    font-size: 24px;
+    width: 40px;
+    height: 40px;
+    flex-basis: 40px;
+    font-size: 18px;
   }
 
   .list-title {
-    font-size: 16px;
+    font-size: 13.5px;
   }
 
   .list-subtitle {
-    font-size: 11.5px;
+    font-size: 10.5px;
   }
 
   .list-value {
-    font-size: 16px;
+    font-size: 13.5px;
   }
   
   .summary {
@@ -1284,62 +1280,5 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     height: 32px;
     padding: 0 12px;
     font-size: 12px;
-  }
-}
-
-/* =========================================================
-   ACCOUNTS — TG WALLET FEEL
-   ========================================================= */
-
-#accountsList .list-card {
-  min-height: 104px;
-  padding: 16px 20px;
-  border-radius: 30px;
-}
-
-#accountsList .list-icon {
-  width: 58px;
-  height: 58px;
-  flex-basis: 58px;
-  font-size: 27px;
-}
-
-#accountsList .list-title {
-  font-size: 18px;
-  font-weight: 820;
-}
-
-#accountsList .list-subtitle {
-  font-size: 12px;
-  font-weight: 560;
-  color: rgba(255, 255, 255, 0.52);
-}
-
-#accountsList .list-value {
-  font-size: 18px;
-  font-weight: 790;
-  letter-spacing: -0.045em;
-}
-
-@media (max-width: 420px) {
-  #accountsList .list-card {
-    min-height: 98px;
-    padding: 14px 17px;
-    border-radius: 28px;
-  }
-
-  #accountsList .list-icon {
-    width: 54px;
-    height: 54px;
-    flex-basis: 54px;
-    font-size: 25px;
-  }
-
-  #accountsList .list-title {
-    font-size: 17px;
-  }
-
-  #accountsList .list-value {
-    font-size: 17px;
   }
 }
