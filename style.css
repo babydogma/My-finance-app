@@ -689,3 +689,185 @@ select {
     grid-template-columns: 1fr;
   }
 }
+
+/* =========================================================
+   VISUAL POLISH — COMPACT TG WALLET FEEL
+   ========================================================= */
+
+.app {
+  padding-top: 14px;
+  padding-bottom: 118px;
+}
+
+.section {
+  margin-top: 20px;
+}
+
+.section-head {
+  margin-bottom: 10px;
+}
+
+.section-title {
+  font-size: 14px;
+  font-weight: 780;
+}
+
+.section-note {
+  font-size: 12px;
+}
+
+.balance {
+  margin-top: 2px;
+}
+
+.balance-label {
+  margin-bottom: 8px;
+  font-size: 15px;
+}
+
+.balance-amount {
+  font-size: clamp(40px, 8vw, 58px);
+  letter-spacing: -0.05em;
+}
+
+.balance-meta--single {
+  margin-top: 10px;
+  gap: 8px;
+}
+
+.balance-result {
+  font-size: 15px;
+}
+
+.balance-period-toggle {
+  padding: 7px 12px;
+  font-size: 13px;
+}
+
+.actions {
+  margin-top: 18px;
+  gap: 8px;
+}
+
+.action-card {
+  min-height: 84px;
+  padding: 10px 6px;
+  border-radius: 20px;
+  gap: 10px;
+}
+
+.action-icon {
+  width: 34px;
+  height: 34px;
+  font-size: 17px;
+}
+
+.action-label {
+  font-size: 13px;
+}
+
+.summary {
+  gap: 10px;
+}
+
+.summary-card {
+  padding: 14px;
+  border-radius: 20px;
+  min-height: 112px;
+}
+
+.summary-label {
+  font-size: 13px;
+  margin-bottom: 10px;
+}
+
+.summary-value {
+  font-size: 18px;
+  line-height: 1.1;
+}
+
+.list {
+  gap: 10px;
+}
+
+.list-card {
+  padding: 12px;
+  border-radius: 20px;
+  gap: 10px;
+}
+
+.list-icon {
+  width: 44px;
+  height: 44px;
+  flex-basis: 44px;
+  font-size: 20px;
+}
+
+.list-title {
+  font-size: 15px;
+  font-weight: 820;
+}
+
+.list-subtitle {
+  font-size: 12px;
+}
+
+.list-value {
+  font-size: 15px;
+}
+
+.list-caption {
+  font-size: 12px;
+}
+
+.list-arrow {
+  font-size: 20px;
+  margin-left: 8px;
+}
+
+.manager-card {
+  padding: 12px;
+  border-radius: 20px;
+}
+
+.manager-back-btn {
+  padding: 8px 12px;
+  font-size: 13px;
+}
+
+.input,
+.select {
+  height: 52px;
+  border-radius: 16px;
+  font-size: 16px;
+}
+
+.btn {
+  height: 52px;
+  border-radius: 16px;
+  font-size: 16px;
+}
+
+.bottom-nav-wrap {
+  bottom: 12px;
+  width: min(440px, calc(100% - 14px));
+}
+
+.bottom-nav {
+  padding: 8px;
+  border-radius: 28px;
+}
+
+.nav-item {
+  min-height: 66px;
+  border-radius: 22px;
+  gap: 6px;
+}
+
+.nav-icon {
+  font-size: 22px;
+}
+
+.nav-label {
+  font-size: 11px;
+}
