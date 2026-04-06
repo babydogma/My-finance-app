@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Finance App</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="avatar">Н</div>
+    <div class="title">Финансы</div>
+  </header>
+
+  <!-- BALANCE -->
+  <section class="balance">
+    <div class="balance__label">Баланс</div>
+    <div class="balance__amount">78 450 ₽</div>
+    <div class="balance__sub">
+      +2 300 ₽ за месяц
+    </div>
+  </section>
+
+  <!-- ACTION BUTTONS -->
+  <section class="actions">
+    <button class="action-btn" id="addExpense">- Расход</button>
+    <button class="action-btn" id="addIncome">+ Доход</button>
+    <button class="action-btn" id="transfer">↔ Перевод</button>
+  </section>
+
+  <!-- ACCOUNTS -->
+  <section class="block">
+    <div class="block__title">Счета</div>
+
+    <div class="card">
+      <div class="card__left">💳 Яндекс</div>
+      <div class="card__right">25 000 ₽</div>
+    </div>
+
+    <div class="card">
+      <div class="card__left">💵 Наличные</div>
+      <div class="card__right">5 000 ₽</div>
+    </div>
+
+    <div class="card">
+      <div class="card__left">🏦 Сейф</div>
+      <div class="card__right">11 500 ₽</div>
+    </div>
+  </section>
+
+  <!-- CATEGORIES -->
+  <section class="block">
+    <div class="block__title">Категории</div>
+
+    <div class="card">
+      <div class="card__left">🍔 Еда</div>
+      <div class="card__right">8 200 ₽</div>
+    </div>
+
+    <div class="card">
+      <div class="card__left">🚕 Транспорт</div>
+      <div class="card__right">2 100 ₽</div>
+    </div>
+
+    <div class="card">
+      <div class="card__left">🎮 Развлечения</div>
+      <div class="card__right">3 000 ₽</div>
+    </div>
+  </section>
+
+  <!-- TRANSACTIONS -->
+  <section class="block">
+    <div class="block__title">Операции</div>
+
+    <div class="card">
+      <div class="card__left">🍔 Мак</div>
+      <div class="card__right expense">-450 ₽</div>
+    </div>
+
+    <div class="card">
+      <div class="card__left">☕ Кофе</div>
+      <div class="card__right expense">-120 ₽</div>
+    </div>
+
+    <div class="card">
+      <div class="card__left">💰 Зарплата</div>
+      <div class="card__right income">+80 000 ₽</div>
+    </div>
+  </section>
+
+  <!-- MODAL -->
+  <div class="modal hidden" id="modal">
+    <div class="modal__content">
+
+      <div class="modal__title">Добавить операцию</div>
+
+      <input type="number" placeholder="Сумма" class="input">
+      <input type="text" placeholder="Категория" class="input">
+      <input type="text" placeholder="Комментарий" class="input">
+
+      <button class="submit-btn">Сохранить</button>
+
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
