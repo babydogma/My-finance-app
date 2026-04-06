@@ -1035,8 +1035,12 @@ button {
   }
 
   .modal-actions--triple {
-    grid-template-columns: 1fr;
-  }
+  grid-template-columns: 1fr 1fr;
+}
+
+.modal-actions--triple .btn-danger {
+  grid-column: 1 / -1;
+}
 
   .analytics-donut {
     width: 156px;
