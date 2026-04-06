@@ -11,38 +11,25 @@
   <main class="app">
 
     <!-- HEADER -->
-    <header class="header">
-      <div class="header-avatar">Н</div>
+<header class="header header--simple">
+  <div class="header-center header-center--single">
+    <div class="header-switch">
+      <button class="header-switch__item is-active" type="button" id="period7Btn">7 дней</button>
+      <button class="header-switch__item" type="button" id="period30Btn">30 дней</button>
+    </div>
+  </div>
+</header>
 
-      <div class="header-center">
-        <div class="header-switch">
-          <button class="header-switch__item is-active" type="button">Финансы</button>
-          <button class="header-switch__item" type="button">Бюджет</button>
-        </div>
-      </div>
+<!-- BALANCE -->
+<section class="balance">
+  <p class="balance-label">Баланс</p>
+  <h1 class="balance-amount">0 ₽</h1>
 
-      <button class="header-icon-btn" type="button" aria-label="Сканировать">
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path d="M8 4H6a2 2 0 0 0-2 2v2" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
-          <path d="M16 4h2a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
-          <path d="M8 20H6a2 2 0 0 1-2-2v-2" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
-          <path d="M16 20h2a2 2 0 0 0 2-2v-2" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
-          <path d="M8 12h8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
-        </svg>
-      </button>
-    </header>
-
-    <!-- BALANCE -->
-    <section class="balance">
-      <p class="balance-label">Баланс</p>
-      <h1 class="balance-amount">78 450 ₽</h1>
-
-      <div class="balance-meta">
-        <div class="balance-profit">+2 300 ₽</div>
-        <div class="balance-loss">↓ 12,4%</div>
-        <div class="balance-period">за месяц</div>
-      </div>
-    </section>
+  <div class="balance-meta balance-meta--single">
+    <div class="balance-result" id="balanceResultValue">0 ₽</div>
+    <div class="balance-period-toggle" id="balancePeriodLabel">за 7 дней</div>
+  </div>
+</section>
 
     <!-- ACTIONS -->
     <section class="actions">
