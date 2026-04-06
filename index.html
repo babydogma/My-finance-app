@@ -129,136 +129,38 @@
 
     <!-- QUICK SUMMARY -->
     <section class="section">
-      <div class="summary">
-        <div class="summary-card">
-          <p class="summary-label">Расходы за месяц</p>
-          <p class="summary-value">31 250 ₽</p>
-        </div>
+  <div class="summary">
+    <div class="summary-card">
+      <p class="summary-label">Расходы за месяц</p>
+      <p class="summary-value" id="monthlyExpenseValue">0 ₽</p>
+    </div>
 
-        <div class="summary-card">
-          <p class="summary-label">Доходы за месяц</p>
-          <p class="summary-value">80 000 ₽</p>
-        </div>
-      </div>
-    </section>
+    <div class="summary-card">
+      <p class="summary-label">Доходы за месяц</p>
+      <p class="summary-value" id="monthlyIncomeValue">0 ₽</p>
+    </div>
+  </div>
+</section>
 
     <!-- CATEGORIES -->
     <section class="section">
-      <div class="section-head">
-        <h2 class="section-title">Категории</h2>
-        <div class="section-note">Этот месяц</div>
-      </div>
+  <div class="section-head">
+    <h2 class="section-title">Категории</h2>
+    <div class="section-note">Этот месяц</div>
+  </div>
 
-      <div class="list">
-
-        <div class="list-card">
-          <div class="list-icon" style="background:#35d07f;">🍔</div>
-
-          <div class="list-body">
-            <div class="list-title-row">
-              <h3 class="list-title">Еда</h3>
-            </div>
-            <p class="list-subtitle">Продукты и кафе</p>
-          </div>
-
-          <div class="list-right">
-            <p class="list-value">8 200 ₽</p>
-          </div>
-        </div>
-
-        <div class="list-card">
-          <div class="list-icon" style="background:#4f8cff;">🚇</div>
-
-          <div class="list-body">
-            <div class="list-title-row">
-              <h3 class="list-title">Транспорт</h3>
-            </div>
-            <p class="list-subtitle">Метро и поездки</p>
-          </div>
-
-          <div class="list-right">
-            <p class="list-value">2 100 ₽</p>
-          </div>
-        </div>
-
-        <div class="list-card">
-          <div class="list-icon" style="background:#a56bff;">🎮</div>
-
-          <div class="list-body">
-            <div class="list-title-row">
-              <h3 class="list-title">Развлечения</h3>
-              <span class="list-badge">новое</span>
-            </div>
-            <p class="list-subtitle">Игры и подписки</p>
-          </div>
-
-          <div class="list-right">
-            <p class="list-value">3 000 ₽</p>
-          </div>
-        </div>
-
-      </div>
-    </section>
+  <div class="list" id="categoriesList"></div>
+</section>
 
     <!-- TRANSACTIONS -->
     <section class="section">
-      <div class="section-head">
-        <h2 class="section-title">Последние операции</h2>
-        <div class="section-note">Сегодня</div>
-      </div>
+  <div class="section-head">
+    <h2 class="section-title">Счета</h2>
+    <div class="section-note" id="accountsTotal">Всего: 0 ₽</div>
+  </div>
 
-      <div class="list">
-
-        <div class="list-card">
-          <div class="list-icon" style="background:#35d07f;">🍔</div>
-
-          <div class="list-body">
-            <div class="list-title-row">
-              <h3 class="list-title">Вкусно и точка</h3>
-            </div>
-            <p class="list-subtitle">Еда • Яндекс Банк</p>
-          </div>
-
-          <div class="list-right">
-            <p class="list-value list-value--red">−450 ₽</p>
-            <div class="list-caption">14:32</div>
-          </div>
-        </div>
-
-        <div class="list-card">
-          <div class="list-icon" style="background:#4f8cff;">☕</div>
-
-          <div class="list-body">
-            <div class="list-title-row">
-              <h3 class="list-title">Кофе</h3>
-            </div>
-            <p class="list-subtitle">Перекус • Наличные</p>
-          </div>
-
-          <div class="list-right">
-            <p class="list-value list-value--red">−120 ₽</p>
-            <div class="list-caption">11:08</div>
-          </div>
-        </div>
-
-        <div class="list-card">
-          <div class="list-icon" style="background:#35d07f;">💰</div>
-
-          <div class="list-body">
-            <div class="list-title-row">
-              <h3 class="list-title">Зарплата</h3>
-            </div>
-            <p class="list-subtitle">Доход • Яндекс Банк</p>
-          </div>
-
-          <div class="list-right">
-            <p class="list-value list-value--green">+80 000 ₽</p>
-            <div class="list-caption">09:00</div>
-          </div>
-        </div>
-
-      </div>
-    </section>
+  <div class="list" id="accountsList"></div>
+</section>
 
   </main>
 
