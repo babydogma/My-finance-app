@@ -52,6 +52,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const modalTitle = modal?.querySelector(".modal-title");
 
   const amountInput = document.getElementById("amountInput");
+  const dateInput = document.getElementById("dateInput");
   const categorySelect = document.getElementById("categorySelect");
   const accountSelect = document.getElementById("accountSelect");
   const fromAccountSelect = document.getElementById("fromAccountSelect");
@@ -315,8 +316,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       fillExpenseCategorySelect(transaction.category_id || UNCATEGORIZED_ID);
 
       amountInput.value = transaction.amount;
-      accountSelect.value = transaction.account;
-      commentInput.value = transaction.title === "Новая трата" ? "" : transaction.title;
+dateInput.value = transaction.created_at
+  ? new Date(transaction.created_at).toISOString().slice(0, 10)
+  : getTodayDateValue();
+accountSelect.value = transaction.account;
+commentInput.value = transaction.title === "Новая трата" ? "" : transaction.title;
     } else if (transaction.type === "income") {
       modalTitle.textContent = "Редактировать доход";
       saveBtn.textContent = "Сохранить";
@@ -327,8 +331,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       toAccountField.classList.add("hidden");
 
       amountInput.value = transaction.amount;
-      accountSelect.value = transaction.account;
-      commentInput.value = transaction.title === "Новый доход" ? "" : transaction.title;
+dateInput.value = transaction.created_at
+  ? new Date(transaction.created_at).toISOString().slice(0, 10)
+  : getTodayDateValue();
+accountSelect.value = transaction.account;
+commentInput.value = transaction.title === "Новый доход" ? "" : transaction.title;
     } else if (transaction.type === "transfer") {
       modalTitle.textContent = "Редактировать перевод";
       saveBtn.textContent = "Сохранить";
@@ -339,9 +346,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       toAccountField.classList.remove("hidden");
 
       amountInput.value = transaction.amount;
-      fromAccountSelect.value = transaction.from_account;
-      toAccountSelect.value = transaction.to_account;
-      commentInput.value = transaction.title === "Перевод" ? "" : transaction.title;
+dateInput.value = transaction.created_at
+  ? new Date(transaction.created_at).toISOString().slice(0, 10)
+  : getTodayDateValue();
+fromAccountSelect.value = transaction.from_account;
+toAccountSelect.value = transaction.to_account;
+commentInput.value = transaction.title === "Перевод" ? "" : transaction.title;
     }
 
     modal.classList.remove("hidden");
@@ -355,13 +365,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function resetForm() {
-    amountInput.value = "";
-    commentInput.value = "";
-    categorySelect.innerHTML = `<option value="">Выбери категорию</option>`;
-    accountSelect.selectedIndex = 0;
-    fromAccountSelect.selectedIndex = 0;
-    toAccountSelect.selectedIndex = 0;
-  }
+  amountInput.value = "";
+  dateInput.value = getTodayDateValue();
+  commentInput.value = "";
+  categorySelect.innerHTML = `<option value="">Выбери категорию</option>`;
+  accountSelect.selectedIndex = 0;
+  fromAccountSelect.selectedIndex = 0;
+  toAccountSelect.selectedIndex = 0;
+}
 
   function getCurrentTime() {
     const now = new Date();
@@ -370,6 +381,14 @@ document.addEventListener("DOMContentLoaded", async () => {
       minute: "2-digit",
     });
   }
+  
+  function getTodayDateValue() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
 
   function formatMoney(value) {
     return `${new Intl.NumberFormat("ru-RU").format(Number(value) || 0)} ₽`;
@@ -1113,9 +1132,16 @@ document.addEventListener("DOMContentLoaded", async () => {
       return null;
     }
 
-    const existingCreatedAt = editingTransactionId
-      ? state.transactions.find((item) => item.id === editingTransactionId)?.created_at || new Date().toISOString()
-      : new Date().toISOString();
+    const selectedDate = dateInput.value || getTodayDateValue();
+const existingTimePart = editingTransactionId
+  ? state.transactions.find((item) => item.id === editingTransactionId)?.created_at
+  : null;
+
+const preservedTime = existingTimePart
+  ? new Date(existingTimePart).toTimeString().slice(0, 8)
+  : new Date().toTimeString().slice(0, 8);
+
+const existingCreatedAt = `${selectedDate}T${preservedTime}`;
 
     if (currentMode === "transfer") {
       const fromAccount = fromAccountSelect.value;
