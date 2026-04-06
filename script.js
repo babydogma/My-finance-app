@@ -468,7 +468,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  resetAllDataOnce(); // УДАЛИ после первого успешного запуска
   loadFromStorage();
   renderAll();
 });
