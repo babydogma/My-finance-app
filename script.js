@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
   const modal = document.getElementById("transactionModal");
   const openExpenseModalBtn = document.getElementById("openExpenseModal");
   const openIncomeModalBtn = document.getElementById("openIncomeModal");
@@ -51,61 +51,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const UNCATEGORIZED_ID = "uncategorized";
 
-  const defaultAccounts = [
-    {
-      id: "yandex",
-      name: "Яндекс Банк",
-      subtitle: "Основной счёт",
-      icon: "💳",
-      color: "#35d07f",
-    },
-    {
-      id: "cash",
-      name: "Наличные",
-      subtitle: "Кошелёк",
-      icon: "💵",
-      color: "#4f8cff",
-    },
-    {
-      id: "safe",
-      name: "Сейф",
-      subtitle: "Отложенные деньги",
-      icon: "🏦",
-      color: "#e0b13f",
-    },
-  ];
-
-  const defaultCategories = [
-    { id: UNCATEGORIZED_ID, name: "Без категории", icon: "📦", locked: true },
-    { id: "food", name: "Еда", icon: "🍔", locked: false },
-    { id: "transport", name: "Транспорт", icon: "🚇", locked: false },
-    { id: "fun", name: "Развлечения", icon: "🎮", locked: false },
-    { id: "snack", name: "Перекус", icon: "☕", locked: false },
-  ];
-
   const state = {
     transactions: [],
-    accounts: [...defaultAccounts],
-    categories: [...defaultCategories],
+    accounts: [],
+    categories: [],
   };
-
-  function saveToStorage() {
-    localStorage.setItem("finance_transactions", JSON.stringify(state.transactions));
-    localStorage.setItem("finance_categories", JSON.stringify(state.categories));
-  }
-
-  function loadFromStorage() {
-    const transactionsData = localStorage.getItem("finance_transactions");
-    const categoriesData = localStorage.getItem("finance_categories");
-
-    if (transactionsData) {
-      state.transactions = JSON.parse(transactionsData);
-    }
-
-    if (categoriesData) {
-      state.categories = JSON.parse(categoriesData);
-    }
-  }
 
   function getCategoryById(categoryId) {
     return state.categories.find((item) => item.id === categoryId);
@@ -130,6 +80,7 @@ document.addEventListener("DOMContentLoaded", () => {
         name: "Без категории",
         icon: "📦",
         locked: true,
+        sort_order: 1,
       });
     }
   }
@@ -208,7 +159,7 @@ document.addEventListener("DOMContentLoaded", () => {
       fromAccountField.classList.add("hidden");
       toAccountField.classList.add("hidden");
 
-      fillExpenseCategorySelect(transaction.categoryId || UNCATEGORIZED_ID);
+      fillExpenseCategorySelect(transaction.category_id || UNCATEGORIZED_ID);
 
       amountInput.value = transaction.amount;
       accountSelect.value = transaction.account;
@@ -235,8 +186,8 @@ document.addEventListener("DOMContentLoaded", () => {
       toAccountField.classList.remove("hidden");
 
       amountInput.value = transaction.amount;
-      fromAccountSelect.value = transaction.fromAccount;
-      toAccountSelect.value = transaction.toAccount;
+      fromAccountSelect.value = transaction.from_account;
+      toAccountSelect.value = transaction.to_account;
       commentInput.value = transaction.title === "Перевод" ? "" : transaction.title;
     }
 
@@ -278,7 +229,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function formatMoney(value) {
-    return `${new Intl.NumberFormat("ru-RU").format(value)} ₽`;
+    return `${new Intl.NumberFormat("ru-RU").format(Number(value) || 0)} ₽`;
   }
 
   function escapeHtml(str) {
@@ -308,16 +259,18 @@ document.addEventListener("DOMContentLoaded", () => {
     let balance = 0;
 
     state.transactions.forEach((transaction) => {
+      const amount = Number(transaction.amount) || 0;
+
       if (transaction.type === "transfer") {
-        if (transaction.fromAccount === accountName) balance -= transaction.amount;
-        if (transaction.toAccount === accountName) balance += transaction.amount;
+        if (transaction.from_account === accountName) balance -= amount;
+        if (transaction.to_account === accountName) balance += amount;
         return;
       }
 
       if (transaction.account !== accountName) return;
 
-      if (transaction.type === "income") balance += transaction.amount;
-      if (transaction.type === "expense") balance -= transaction.amount;
+      if (transaction.type === "income") balance += amount;
+      if (transaction.type === "expense") balance -= amount;
     });
 
     return balance;
@@ -332,8 +285,9 @@ document.addEventListener("DOMContentLoaded", () => {
     let expense = 0;
 
     state.transactions.forEach((transaction) => {
-      if (transaction.type === "income") income += transaction.amount;
-      if (transaction.type === "expense") expense += transaction.amount;
+      const amount = Number(transaction.amount) || 0;
+      if (transaction.type === "income") income += amount;
+      if (transaction.type === "expense") expense += amount;
     });
 
     return { income, expense };
@@ -344,8 +298,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const rangeStart = now - days * 24 * 60 * 60 * 1000;
 
     return state.transactions.filter((transaction) => {
-      if (!transaction.createdAt) return false;
-      const transactionTime = new Date(transaction.createdAt).getTime();
+      if (!transaction.created_at) return false;
+      const transactionTime = new Date(transaction.created_at).getTime();
       return transactionTime >= rangeStart;
     });
   }
@@ -357,8 +311,9 @@ document.addEventListener("DOMContentLoaded", () => {
     let expense = 0;
 
     periodTransactions.forEach((transaction) => {
-      if (transaction.type === "income") income += transaction.amount;
-      if (transaction.type === "expense") expense += transaction.amount;
+      const amount = Number(transaction.amount) || 0;
+      if (transaction.type === "income") income += amount;
+      if (transaction.type === "expense") expense += amount;
     });
 
     return income - expense;
@@ -370,9 +325,10 @@ document.addEventListener("DOMContentLoaded", () => {
     state.transactions.forEach((transaction) => {
       if (transaction.type !== "expense") return;
 
-      const categoryId = transaction.categoryId || UNCATEGORIZED_ID;
+      const categoryId = transaction.category_id || UNCATEGORIZED_ID;
+      const amount = Number(transaction.amount) || 0;
       const current = map.get(categoryId) || 0;
-      map.set(categoryId, current + transaction.amount);
+      map.set(categoryId, current + amount);
     });
 
     return [...map.entries()]
@@ -556,7 +512,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const editBtn = card.querySelector("[data-edit-id]");
       const deleteBtn = card.querySelector("[data-delete-id]");
 
-      editBtn?.addEventListener("click", () => {
+      editBtn?.addEventListener("click", async () => {
         const nextName = prompt("Новое название категории", category.name);
         if (nextName === null) return;
 
@@ -571,33 +527,54 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const cleanedIcon = nextIcon.trim() || "📦";
 
-        category.name = cleanedName;
-        category.icon = cleanedIcon;
+        const { error } = await supabaseClient
+          .from("categories")
+          .update({
+            name: cleanedName,
+            icon: cleanedIcon,
+          })
+          .eq("id", category.id);
 
-        saveToStorage();
+        if (error) {
+          alert("Ошибка обновления категории");
+          console.error(error);
+          return;
+        }
+
+        await loadDataFromSupabase();
         renderAll();
       });
 
-      deleteBtn?.addEventListener("click", () => {
+      deleteBtn?.addEventListener("click", async () => {
         if (category.locked) return;
 
         const ok = confirm(`Удалить категорию "${category.name}"? Все старые расходы перейдут в "Без категории".`);
         if (!ok) return;
 
-        state.transactions = state.transactions.map((transaction) => {
-          if (transaction.type === "expense" && transaction.categoryId === category.id) {
-            return {
-              ...transaction,
-              categoryId: UNCATEGORIZED_ID,
-            };
-          }
+        const { error: txError } = await supabaseClient
+          .from("transactions")
+          .update({ category_id: UNCATEGORIZED_ID })
+          .eq("type", "expense")
+          .eq("category_id", category.id);
 
-          return transaction;
-        });
+        if (txError) {
+          alert("Ошибка переноса старых расходов");
+          console.error(txError);
+          return;
+        }
 
-        state.categories = state.categories.filter((item) => item.id !== category.id);
+        const { error: deleteError } = await supabaseClient
+          .from("categories")
+          .delete()
+          .eq("id", category.id);
 
-        saveToStorage();
+        if (deleteError) {
+          alert("Ошибка удаления категории");
+          console.error(deleteError);
+          return;
+        }
+
+        await loadDataFromSupabase();
         renderAll();
       });
 
@@ -614,10 +591,10 @@ document.addEventListener("DOMContentLoaded", () => {
         ? "💰"
         : transaction.type === "transfer"
         ? "↗"
-        : getCategoryIcon(transaction.categoryId || UNCATEGORIZED_ID);
+        : getCategoryIcon(transaction.category_id || UNCATEGORIZED_ID);
 
     const toneKey =
-      transaction.type === "expense" ? (transaction.categoryId || UNCATEGORIZED_ID) : "";
+      transaction.type === "expense" ? (transaction.category_id || UNCATEGORIZED_ID) : "";
 
     const iconToneClass = getIconToneClass(transaction.type, toneKey);
 
@@ -626,14 +603,14 @@ document.addEventListener("DOMContentLoaded", () => {
     let valueClass = "list-value";
 
     if (transaction.type === "transfer") {
-      subtitle = `${escapeHtml(transaction.fromAccount)} → ${escapeHtml(transaction.toAccount)}`;
+      subtitle = `${escapeHtml(transaction.from_account)} → ${escapeHtml(transaction.to_account)}`;
       signedAmount = formatMoney(transaction.amount);
     } else if (transaction.type === "income") {
       subtitle = `${escapeHtml(transaction.account)} • доход`;
       signedAmount = `+${formatMoney(transaction.amount)}`;
       valueClass = "list-value list-value--green";
     } else {
-      subtitle = `${escapeHtml(getCategoryName(transaction.categoryId || UNCATEGORIZED_ID))} • ${escapeHtml(transaction.account)}`;
+      subtitle = `${escapeHtml(getCategoryName(transaction.category_id || UNCATEGORIZED_ID))} • ${escapeHtml(transaction.account)}`;
       signedAmount = `−${formatMoney(transaction.amount)}`;
       valueClass = "list-value list-value--red";
     }
@@ -648,7 +625,7 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>
       <div class="list-right">
         <p class="${valueClass}">${signedAmount}</p>
-        <div class="list-caption">${transaction.time}</div>
+        <div class="list-caption">${transaction.time_label || ""}</div>
       </div>
     `;
 
@@ -674,7 +651,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     state.transactions
       .slice()
-      .reverse()
+      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
       .forEach((transaction) => {
         transactionsListEl.appendChild(createTransactionCard(transaction));
       });
@@ -688,6 +665,10 @@ document.addEventListener("DOMContentLoaded", () => {
       alert("Введи сумму");
       return null;
     }
+
+    const existingCreatedAt = editingTransactionId
+      ? state.transactions.find((item) => item.id === editingTransactionId)?.created_at || new Date().toISOString()
+      : new Date().toISOString();
 
     if (currentMode === "transfer") {
       const fromAccount = fromAccountSelect.value;
@@ -712,14 +693,13 @@ document.addEventListener("DOMContentLoaded", () => {
         id: editingTransactionId || crypto.randomUUID(),
         type: "transfer",
         title: comment || "Перевод",
-        category: "Перевод",
-        fromAccount,
-        toAccount,
+        account: null,
+        category_id: null,
+        from_account: fromAccount,
+        to_account: toAccount,
         amount,
-        time: getCurrentTime(),
-        createdAt: editingTransactionId
-          ? state.transactions.find((item) => item.id === editingTransactionId)?.createdAt || new Date().toISOString()
-          : new Date().toISOString(),
+        time_label: getCurrentTime(),
+        created_at: existingCreatedAt,
       };
     }
 
@@ -736,11 +716,12 @@ document.addEventListener("DOMContentLoaded", () => {
         type: "income",
         title: comment || "Новый доход",
         account,
+        category_id: null,
+        from_account: null,
+        to_account: null,
         amount,
-        time: getCurrentTime(),
-        createdAt: editingTransactionId
-          ? state.transactions.find((item) => item.id === editingTransactionId)?.createdAt || new Date().toISOString()
-          : new Date().toISOString(),
+        time_label: getCurrentTime(),
+        created_at: existingCreatedAt,
       };
     }
 
@@ -755,49 +736,71 @@ document.addEventListener("DOMContentLoaded", () => {
       id: editingTransactionId || crypto.randomUUID(),
       type: "expense",
       title: comment || "Новая трата",
-      categoryId,
       account,
+      category_id: categoryId,
+      from_account: null,
+      to_account: null,
       amount,
-      time: getCurrentTime(),
-      createdAt: editingTransactionId
-        ? state.transactions.find((item) => item.id === editingTransactionId)?.createdAt || new Date().toISOString()
-        : new Date().toISOString(),
+      time_label: getCurrentTime(),
+      created_at: existingCreatedAt,
     };
   }
 
-  function saveTransaction() {
+  async function saveTransaction() {
     const transaction = buildTransactionFromForm();
     if (!transaction) return;
 
     if (editingTransactionId) {
-      state.transactions = state.transactions.map((item) =>
-        item.id === editingTransactionId ? transaction : item
-      );
+      const { error } = await supabaseClient
+        .from("transactions")
+        .update(transaction)
+        .eq("id", editingTransactionId);
+
+      if (error) {
+        alert("Ошибка обновления операции");
+        console.error(error);
+        return;
+      }
     } else {
-      state.transactions.push(transaction);
+      const { error } = await supabaseClient
+        .from("transactions")
+        .insert(transaction);
+
+      if (error) {
+        alert("Ошибка сохранения операции");
+        console.error(error);
+        return;
+      }
     }
 
-    saveToStorage();
+    await loadDataFromSupabase();
     renderAll();
     closeModal();
   }
 
-  function deleteTransaction() {
+  async function deleteTransaction() {
     if (!editingTransactionId) return;
 
     const ok = confirm("Удалить эту операцию?");
     if (!ok) return;
 
-    state.transactions = state.transactions.filter(
-      (item) => item.id !== editingTransactionId
-    );
+    const { error } = await supabaseClient
+      .from("transactions")
+      .delete()
+      .eq("id", editingTransactionId);
 
-    saveToStorage();
+    if (error) {
+      alert("Ошибка удаления операции");
+      console.error(error);
+      return;
+    }
+
+    await loadDataFromSupabase();
     renderAll();
     closeModal();
   }
 
-  function addCategory() {
+  async function addCategory() {
     const name = newCategoryNameInput.value.trim();
     const icon = newCategoryIconInput.value.trim() || "📦";
 
@@ -806,18 +809,62 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    state.categories.push({
+    const newCategory = {
       id: crypto.randomUUID(),
       name,
       icon,
       locked: false,
-    });
+      sort_order: state.categories.length + 1,
+    };
+
+    const { error } = await supabaseClient
+      .from("categories")
+      .insert(newCategory);
+
+    if (error) {
+      alert("Ошибка добавления категории");
+      console.error(error);
+      return;
+    }
 
     newCategoryNameInput.value = "";
     newCategoryIconInput.value = "";
 
-    saveToStorage();
+    await loadDataFromSupabase();
     renderAll();
+  }
+
+  async function loadDataFromSupabase() {
+    const [{ data: accounts, error: accountsError }, { data: categories, error: categoriesError }, { data: transactions, error: transactionsError }] =
+      await Promise.all([
+        supabaseClient.from("accounts").select("*").order("sort_order", { ascending: true }),
+        supabaseClient.from("categories").select("*").order("sort_order", { ascending: true }),
+        supabaseClient.from("transactions").select("*").order("created_at", { ascending: false }),
+      ]);
+
+    if (accountsError) {
+      console.error(accountsError);
+      alert("Ошибка загрузки счетов из Supabase");
+      return;
+    }
+
+    if (categoriesError) {
+      console.error(categoriesError);
+      alert("Ошибка загрузки категорий из Supabase");
+      return;
+    }
+
+    if (transactionsError) {
+      console.error(transactionsError);
+      alert("Ошибка загрузки операций из Supabase");
+      return;
+    }
+
+    state.accounts = accounts || [];
+    state.categories = categories || [];
+    state.transactions = transactions || [];
+
+    ensureUncategorizedCategory();
   }
 
   function renderAll() {
@@ -863,7 +910,6 @@ document.addEventListener("DOMContentLoaded", () => {
     renderBalanceResult();
   });
 
-  loadFromStorage();
-  ensureUncategorizedCategory();
+  await loadDataFromSupabase();
   renderAll();
 });
