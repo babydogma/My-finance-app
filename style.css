@@ -398,7 +398,7 @@ select {
 .summary {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 14px;
+  gap: 8px;
 }
 
 .summary-card {
@@ -771,20 +771,22 @@ select {
   gap: 10px;
 }
 
+
 .summary-card {
-  padding: 14px;
+  padding: 12px 14px;
   border-radius: 20px;
-  min-height: 126px;
+  min-height: 92px;
 }
 
 .summary-label {
-  font-size: 13px;
-  margin-bottom: 10px;
+  font-size: 12px;
+  margin-bottom: 8px;
+  line-height: 1.15;
 }
 
 .summary-value {
-  font-size: 18px;
-  line-height: 1.1;
+  font-size: 17px;
+  line-height: 1;
 }
 
 .list {
