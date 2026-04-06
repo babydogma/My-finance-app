@@ -46,6 +46,17 @@ document.addEventListener("DOMContentLoaded", () => {
       },
     ],
   };
+  
+  function saveToStorage() {
+  localStorage.setItem("finance_transactions", JSON.stringify(state.transactions));
+}
+
+function loadFromStorage() {
+  const data = localStorage.getItem("finance_transactions");
+  if (data) {
+    state.transactions = JSON.parse(data);
+  }
+}
 
   function openModal(mode) {
     currentMode = mode;
@@ -212,6 +223,7 @@ document.addEventListener("DOMContentLoaded", () => {
       amount,
       time: getCurrentTime(),
     });
+    saveToStorage();
 
     renderTransactions();
     closeModal();
@@ -235,5 +247,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  renderTransactions();
+  loadFromStorage();
+renderTransactions();
 });
