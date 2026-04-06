@@ -5,6 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const openTransferModalBtn = document.getElementById("openTransferModal");
   const closeModalBtn = document.getElementById("closeModalBtn");
   const saveBtn = document.getElementById("saveTransactionBtn");
+  const deleteTransactionBtn = document.getElementById("deleteTransactionBtn");
 
   const modalTitle = modal?.querySelector(".modal-title");
 
@@ -29,6 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const transactionsListEl = document.getElementById("transactionsList");
 
   let currentMode = "expense";
+  let editingTransactionId = null;
 
   const defaultAccounts = [
     {
@@ -59,9 +61,13 @@ document.addEventListener("DOMContentLoaded", () => {
     "Транспорт": { icon: "🚇", color: "#4f8cff", subtitle: "Метро и поездки" },
     "Развлечения": { icon: "🎮", color: "#a56bff", subtitle: "Игры и подписки" },
     "Зарплата": { icon: "💰", color: "#35d07f", subtitle: "Доход" },
+    "Доход": { icon: "💰", color: "#35d07f", subtitle: "Поступления" },
     "Перекус": { icon: "☕", color: "#ff8a65", subtitle: "Быстрые траты" },
     "Перевод": { icon: "↗", color: "#4f8cff", subtitle: "Между счетами" },
   };
+
+  const expenseCategories = ["Еда", "Транспорт", "Развлечения", "Перекус"];
+  const incomeCategories = ["Зарплата", "Доход"];
 
   const state = {
     transactions: [],
@@ -79,8 +85,19 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  function setCategoryOptions(items) {
+    categorySelect.innerHTML = `<option>Выбери категорию</option>`;
+    items.forEach((item) => {
+      const option = document.createElement("option");
+      option.textContent = item;
+      categorySelect.appendChild(option);
+    });
+  }
+
   function openModal(mode) {
     currentMode = mode;
+    editingTransactionId = null;
+    deleteTransactionBtn.classList.add("hidden");
 
     if (mode === "expense") {
       modalTitle.textContent = "Добавить расход";
@@ -91,15 +108,7 @@ document.addEventListener("DOMContentLoaded", () => {
       fromAccountField.classList.add("hidden");
       toAccountField.classList.add("hidden");
 
-      if (categorySelect) {
-        categorySelect.innerHTML = `
-          <option>Выбери категорию</option>
-          <option>Еда</option>
-          <option>Транспорт</option>
-          <option>Развлечения</option>
-          <option>Перекус</option>
-        `;
-      }
+      setCategoryOptions(expenseCategories);
     } else if (mode === "income") {
       modalTitle.textContent = "Добавить доход";
       saveBtn.textContent = "Сохранить доход";
@@ -109,13 +118,7 @@ document.addEventListener("DOMContentLoaded", () => {
       fromAccountField.classList.add("hidden");
       toAccountField.classList.add("hidden");
 
-      if (categorySelect) {
-        categorySelect.innerHTML = `
-          <option>Выбери категорию</option>
-          <option>Зарплата</option>
-          <option>Доход</option>
-        `;
-      }
+      setCategoryOptions(incomeCategories);
     } else if (mode === "transfer") {
       modalTitle.textContent = "Сделать перевод";
       saveBtn.textContent = "Сохранить перевод";
@@ -131,19 +134,73 @@ document.addEventListener("DOMContentLoaded", () => {
     document.body.style.overflow = "hidden";
   }
 
+  function openEditModal(transactionId) {
+    const transaction = state.transactions.find((item) => item.id === transactionId);
+    if (!transaction) return;
+
+    editingTransactionId = transaction.id;
+    currentMode = transaction.type;
+
+    deleteTransactionBtn.classList.remove("hidden");
+
+    if (transaction.type === "expense") {
+      modalTitle.textContent = "Редактировать расход";
+      saveBtn.textContent = "Сохранить";
+      categoryField.classList.remove("hidden");
+      accountField.classList.remove("hidden");
+      fromAccountField.classList.add("hidden");
+      toAccountField.classList.add("hidden");
+      setCategoryOptions(expenseCategories);
+
+      amountInput.value = transaction.amount;
+      categorySelect.value = transaction.category;
+      accountSelect.value = transaction.account;
+      commentInput.value = transaction.title === "Новая трата" ? "" : transaction.title;
+    } else if (transaction.type === "income") {
+      modalTitle.textContent = "Редактировать доход";
+      saveBtn.textContent = "Сохранить";
+      categoryField.classList.remove("hidden");
+      accountField.classList.remove("hidden");
+      fromAccountField.classList.add("hidden");
+      toAccountField.classList.add("hidden");
+      setCategoryOptions(incomeCategories);
+
+      amountInput.value = transaction.amount;
+      categorySelect.value = transaction.category;
+      accountSelect.value = transaction.account;
+      commentInput.value =
+        transaction.title === "Новый доход" ? "" : transaction.title;
+    } else if (transaction.type === "transfer") {
+      modalTitle.textContent = "Редактировать перевод";
+      saveBtn.textContent = "Сохранить";
+      categoryField.classList.add("hidden");
+      accountField.classList.add("hidden");
+      fromAccountField.classList.remove("hidden");
+      toAccountField.classList.remove("hidden");
+
+      amountInput.value = transaction.amount;
+      fromAccountSelect.value = transaction.fromAccount;
+      toAccountSelect.value = transaction.toAccount;
+      commentInput.value = transaction.title === "Перевод" ? "" : transaction.title;
+    }
+
+    modal.classList.remove("hidden");
+    document.body.style.overflow = "hidden";
+  }
+
   function closeModal() {
     modal.classList.add("hidden");
     document.body.style.overflow = "";
+    editingTransactionId = null;
   }
 
   function resetForm() {
     amountInput.value = "";
     commentInput.value = "";
-
-    if (categorySelect) categorySelect.selectedIndex = 0;
-    if (accountSelect) accountSelect.selectedIndex = 0;
-    if (fromAccountSelect) fromAccountSelect.selectedIndex = 0;
-    if (toAccountSelect) toAccountSelect.selectedIndex = 0;
+    categorySelect.selectedIndex = 0;
+    accountSelect.selectedIndex = 0;
+    fromAccountSelect.selectedIndex = 0;
+    toAccountSelect.selectedIndex = 0;
   }
 
   function getCurrentTime() {
@@ -172,31 +229,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
     state.transactions.forEach((transaction) => {
       if (transaction.type === "transfer") {
-        if (transaction.fromAccount === accountName) {
-          balance -= transaction.amount;
-        }
-        if (transaction.toAccount === accountName) {
-          balance += transaction.amount;
-        }
+        if (transaction.fromAccount === accountName) balance -= transaction.amount;
+        if (transaction.toAccount === accountName) balance += transaction.amount;
         return;
       }
 
       if (transaction.account !== accountName) return;
 
-      if (transaction.type === "income") {
-        balance += transaction.amount;
-      } else if (transaction.type === "expense") {
-        balance -= transaction.amount;
-      }
+      if (transaction.type === "income") balance += transaction.amount;
+      if (transaction.type === "expense") balance -= transaction.amount;
     });
 
     return balance;
   }
 
   function calculateBalance() {
-    return state.accounts.reduce((sum, account) => {
-      return sum + getAccountBalance(account.name);
-    }, 0);
+    return state.accounts.reduce((sum, account) => sum + getAccountBalance(account.name), 0);
   }
 
   function calculateMonthlyStats() {
@@ -216,7 +264,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     state.transactions.forEach((transaction) => {
       if (transaction.type !== "expense") return;
-
       const current = map.get(transaction.category) || 0;
       map.set(transaction.category, current + transaction.amount);
     });
@@ -242,8 +289,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function renderMonthlyStats() {
     const { income, expense } = calculateMonthlyStats();
-    monthlyIncomeValueEl.textContent = formatMoney(income);
-    monthlyExpenseValueEl.textContent = formatMoney(expense);
+    monthlyIncomeValueEl.textContent = formatMoney(expense);
+    monthlyExpenseValueEl.textContent = formatMoney(income);
   }
 
   function renderAccounts() {
@@ -294,7 +341,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function renderCategories() {
     categoriesListEl.innerHTML = "";
-
     const categories = calculateCategories();
 
     if (categories.length === 0) {
@@ -367,15 +413,7 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>
     `;
 
-    card.addEventListener("click", () => {
-      const ok = confirm(`Удалить операцию "${transaction.title}"?`);
-      if (!ok) return;
-
-      state.transactions = state.transactions.filter((item) => item.id !== transaction.id);
-      saveToStorage();
-      renderAll();
-    });
-
+    card.addEventListener("click", () => openEditModal(transaction.id));
     return card;
   }
 
@@ -403,13 +441,13 @@ document.addEventListener("DOMContentLoaded", () => {
       });
   }
 
-  function saveTransaction() {
+  function buildTransactionFromForm() {
     const amount = Number(amountInput.value.trim());
     const comment = commentInput.value.trim();
 
     if (!amount || amount <= 0) {
       alert("Введи сумму");
-      return;
+      return null;
     }
 
     if (currentMode === "transfer") {
@@ -418,21 +456,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
       if (fromAccount === "С какого счёта") {
         alert("Выбери счёт списания");
-        return;
+        return null;
       }
 
       if (toAccount === "На какой счёт") {
         alert("Выбери счёт зачисления");
-        return;
+        return null;
       }
 
       if (fromAccount === toAccount) {
         alert("Счета должны быть разными");
-        return;
+        return null;
       }
 
-      const transaction = {
-        id: crypto.randomUUID(),
+      return {
+        id: editingTransactionId || crypto.randomUUID(),
         type: "transfer",
         title: comment || "Перевод",
         category: "Перевод",
@@ -441,12 +479,6 @@ document.addEventListener("DOMContentLoaded", () => {
         amount,
         time: getCurrentTime(),
       };
-
-      state.transactions.push(transaction);
-      saveToStorage();
-      renderAll();
-      closeModal();
-      return;
     }
 
     const category = categorySelect.value;
@@ -454,29 +486,52 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (category === "Выбери категорию") {
       alert("Выбери категорию");
-      return;
+      return null;
     }
 
     if (account === "Выбери счёт") {
       alert("Выбери счёт");
-      return;
+      return null;
     }
 
-    const title =
-      comment ||
-      (currentMode === "income" ? "Новый доход" : "Новая трата");
-
-    const transaction = {
-      id: crypto.randomUUID(),
+    return {
+      id: editingTransactionId || crypto.randomUUID(),
       type: currentMode,
-      title,
+      title: comment || (currentMode === "income" ? "Новый доход" : "Новая трата"),
       category,
       account,
       amount,
       time: getCurrentTime(),
     };
+  }
 
-    state.transactions.push(transaction);
+  function saveTransaction() {
+    const transaction = buildTransactionFromForm();
+    if (!transaction) return;
+
+    if (editingTransactionId) {
+      state.transactions = state.transactions.map((item) =>
+        item.id === editingTransactionId ? transaction : item
+      );
+    } else {
+      state.transactions.push(transaction);
+    }
+
+    saveToStorage();
+    renderAll();
+    closeModal();
+  }
+
+  function deleteTransaction() {
+    if (!editingTransactionId) return;
+
+    const ok = confirm("Удалить эту операцию?");
+    if (!ok) return;
+
+    state.transactions = state.transactions.filter(
+      (item) => item.id !== editingTransactionId
+    );
+
     saveToStorage();
     renderAll();
     closeModal();
@@ -495,11 +550,10 @@ document.addEventListener("DOMContentLoaded", () => {
   openTransferModalBtn?.addEventListener("click", () => openModal("transfer"));
   closeModalBtn?.addEventListener("click", closeModal);
   saveBtn?.addEventListener("click", saveTransaction);
+  deleteTransactionBtn?.addEventListener("click", deleteTransaction);
 
   modal?.addEventListener("click", (event) => {
-    if (event.target === modal) {
-      closeModal();
-    }
+    if (event.target === modal) closeModal();
   });
 
   document.addEventListener("keydown", (event) => {
