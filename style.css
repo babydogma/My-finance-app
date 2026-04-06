@@ -964,3 +964,133 @@ select {
 .nav-item.is-active .nav-label {
   color: var(--accent);
 }
+
+/* =========================================================
+   ANALYTICS VIEW
+   ========================================================= */
+
+.analytics-total-card {
+  padding: 14px;
+  border-radius: 20px;
+}
+
+.analytics-chart-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 14px;
+  border-radius: 20px;
+}
+
+.analytics-donut-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-top: 4px;
+}
+
+.analytics-donut {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background: conic-gradient(
+    rgba(90, 93, 106, 0.42) 0deg 360deg
+  );
+  position: relative;
+  flex: 0 0 180px;
+}
+
+.analytics-donut::after {
+  content: "";
+  position: absolute;
+  inset: 24px;
+  border-radius: 50%;
+  background: var(--bg);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+}
+
+.analytics-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.analytics-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.analytics-legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex: 0 0 12px;
+}
+
+.analytics-legend-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.analytics-legend-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 780;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.analytics-legend-subtitle {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.analytics-legend-value {
+  margin-left: auto;
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.analytics-empty {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 700;
+  padding: 16px 0 4px;
+}
+
+#analyticsView {
+  padding-bottom: 8px;
+}
+
+@media (max-width: 420px) {
+  .analytics-donut {
+    width: 156px;
+    height: 156px;
+    flex-basis: 156px;
+  }
+
+  .analytics-donut::after {
+    inset: 21px;
+  }
+
+  .analytics-chart-card {
+    gap: 12px;
+    padding: 12px;
+  }
+
+  .analytics-legend-title {
+    font-size: 13px;
+  }
+
+  .analytics-legend-value {
+    font-size: 13px;
+  }
+}
