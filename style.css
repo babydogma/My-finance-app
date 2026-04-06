@@ -1163,3 +1163,21 @@ button {
 #budgetView .section {
   margin-top: 18px;
 }
+
+/* Date input polish */
+input[type="date"] {
+  appearance: none;
+  -webkit-appearance: none;
+  color: var(--text);
+}
+
+input[type="date"]::-webkit-date-and-time-value {
+  text-align: left;
+  color: var(--text);
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: 0.9;
+  cursor: pointer;
+  filter: invert(1) brightness(0.9);
+}
