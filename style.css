@@ -774,3 +774,57 @@ select {
   background: rgba(255, 106, 95, 0.18);
   color: #ff6a5f;
 }
+
+/* =========================================================
+   TOP BLOCK CLEANUP
+   ========================================================= */
+
+.header--simple {
+  grid-template-columns: 1fr;
+  gap: 0;
+  margin-bottom: 18px;
+}
+
+.header-center--single {
+  justify-content: center;
+}
+
+.header--simple .header-switch {
+  padding: 6px;
+}
+
+.header--simple .header-switch__item {
+  min-width: 108px;
+  height: 40px;
+  font-size: 15px;
+}
+
+.balance-meta--single {
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.balance-result {
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text-muted);
+}
+
+.balance-result.is-positive {
+  color: var(--green);
+}
+
+.balance-result.is-negative {
+  color: var(--red);
+}
+
+.balance-period-toggle {
+  padding: 8px 14px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-muted);
+  border-radius: var(--radius-pill);
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1;
+}
