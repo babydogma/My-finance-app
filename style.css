@@ -1160,3 +1160,7 @@ select {
   font-weight: 700;
   padding: 18px 6px;
 }
+
+.app--budget .header {
+  display: none;
+}
