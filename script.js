@@ -318,10 +318,10 @@ function calculatePeriodResult(days) {
   }
 
   function renderMonthlyStats() {
-    const { income, expense } = calculateMonthlyStats();
-    monthlyIncomeValueEl.textContent = formatMoney(expense);
-    monthlyExpenseValueEl.textContent = formatMoney(income);
-  }
+  const { income, expense } = calculateMonthlyStats();
+  monthlyExpenseValueEl.textContent = formatMoney(expense);
+  monthlyIncomeValueEl.textContent = formatMoney(income);
+}
   
   function renderBalanceResult() {
   if (!balanceResultValueEl || !balancePeriodLabelEl) return;
