@@ -18,7 +18,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const monthlyExpenseValueEl = document.getElementById("monthlyExpenseValue");
   const monthlyIncomeValueEl = document.getElementById("monthlyIncomeValue");
   const accountsListEl = document.getElementById("accountsList");
-  const categoriesListEl = document.getElementById("categoriesList");
+const categoriesListEl = document.getElementById("categoriesList");
+const transactionsListEl = document.getElementById("transactionsList");
 
   let currentMode = "expense";
 
@@ -348,41 +349,30 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function renderTransactions() {
-    const sectionTitles = [...document.querySelectorAll(".section-title")];
-    const transactionsTitle = sectionTitles.find(
-      (el) => el.textContent.trim() === "Последние операции"
-    );
+  if (!transactionsListEl) return;
 
-    if (!transactionsTitle) return;
+  transactionsListEl.innerHTML = "";
 
-    const transactionsSection = transactionsTitle.closest(".section");
-    if (!transactionsSection) return;
-
-    const list = transactionsSection.querySelector(".list");
-    if (!list) return;
-
-    list.innerHTML = "";
-
-    if (state.transactions.length === 0) {
-      const empty = document.createElement("div");
-      empty.className = "list-card";
-      empty.innerHTML = `
-        <div class="list-body">
-          <h3 class="list-title">Операций пока нет</h3>
-          <p class="list-subtitle">Добавь первую операцию через кнопки сверху</p>
-        </div>
-      `;
-      list.appendChild(empty);
-      return;
-    }
-
-    state.transactions
-      .slice()
-      .reverse()
-      .forEach((transaction) => {
-        list.appendChild(createTransactionCard(transaction));
-      });
+  if (state.transactions.length === 0) {
+    const empty = document.createElement("div");
+    empty.className = "list-card";
+    empty.innerHTML = `
+      <div class="list-body">
+        <h3 class="list-title">Операций пока нет</h3>
+        <p class="list-subtitle">Добавь первую операцию через кнопки сверху</p>
+      </div>
+    `;
+    transactionsListEl.appendChild(empty);
+    return;
   }
+
+  state.transactions
+    .slice()
+    .reverse()
+    .forEach((transaction) => {
+      transactionsListEl.appendChild(createTransactionCard(transaction));
+    });
+}
 
   function applyTransactionToAccount(transaction) {
     const account = state.accounts.find((item) => item.name === transaction.account);
