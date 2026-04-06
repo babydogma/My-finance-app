@@ -1,108 +1,329 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Finance App</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
 </head>
-
 <body>
 
-  <!-- HEADER -->
-  <header class="header">
-    <div class="avatar">Н</div>
-    <div class="title">Финансы</div>
-  </header>
+  <main class="app">
 
-  <!-- BALANCE -->
-  <section class="balance">
-    <div class="balance__label">Баланс</div>
-    <div class="balance__amount">78 450 ₽</div>
-    <div class="balance__sub">
-      +2 300 ₽ за месяц
-    </div>
-  </section>
+    <!-- HEADER -->
+    <header class="header">
+      <div class="header-avatar">Н</div>
 
-  <!-- ACTION BUTTONS -->
-  <section class="actions">
-    <button class="action-btn" id="addExpense">- Расход</button>
-    <button class="action-btn" id="addIncome">+ Доход</button>
-    <button class="action-btn" id="transfer">↔ Перевод</button>
-  </section>
+      <div class="header-center">
+        <div class="header-switch">
+          <button class="header-switch__item is-active" type="button">Финансы</button>
+          <button class="header-switch__item" type="button">Бюджет</button>
+        </div>
+      </div>
 
-  <!-- ACCOUNTS -->
-  <section class="block">
-    <div class="block__title">Счета</div>
+      <button class="header-icon-btn" type="button" aria-label="Сканировать">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M8 4H6a2 2 0 0 0-2 2v2" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+          <path d="M16 4h2a2 2 0 0 1 2 2v2" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+          <path d="M8 20H6a2 2 0 0 1-2-2v-2" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+          <path d="M16 20h2a2 2 0 0 0 2-2v-2" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+          <path d="M8 12h8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </header>
 
-    <div class="card">
-      <div class="card__left">💳 Яндекс</div>
-      <div class="card__right">25 000 ₽</div>
-    </div>
+    <!-- BALANCE -->
+    <section class="balance">
+      <p class="balance-label">Баланс</p>
+      <h1 class="balance-amount">78 450 ₽</h1>
 
-    <div class="card">
-      <div class="card__left">💵 Наличные</div>
-      <div class="card__right">5 000 ₽</div>
-    </div>
+      <div class="balance-meta">
+        <div class="balance-profit">+2 300 ₽</div>
+        <div class="balance-loss">↓ 12,4%</div>
+        <div class="balance-period">за месяц</div>
+      </div>
+    </section>
 
-    <div class="card">
-      <div class="card__left">🏦 Сейф</div>
-      <div class="card__right">11 500 ₽</div>
-    </div>
-  </section>
+    <!-- ACTIONS -->
+    <section class="actions">
+      <button class="action-card" type="button" id="openExpenseModal">
+        <div class="action-icon">−</div>
+        <div class="action-label">Расход</div>
+      </button>
 
-  <!-- CATEGORIES -->
-  <section class="block">
-    <div class="block__title">Категории</div>
+      <button class="action-card" type="button" id="openIncomeModal">
+        <div class="action-icon">+</div>
+        <div class="action-label">Доход</div>
+      </button>
 
-    <div class="card">
-      <div class="card__left">🍔 Еда</div>
-      <div class="card__right">8 200 ₽</div>
-    </div>
+      <button class="action-card" type="button" id="openTransferModal">
+        <div class="action-icon">↗</div>
+        <div class="action-label">Перевод</div>
+      </button>
 
-    <div class="card">
-      <div class="card__left">🚕 Транспорт</div>
-      <div class="card__right">2 100 ₽</div>
-    </div>
+      <button class="action-card" type="button">
+        <div class="action-icon">⇄</div>
+        <div class="action-label">Категории</div>
+      </button>
+    </section>
 
-    <div class="card">
-      <div class="card__left">🎮 Развлечения</div>
-      <div class="card__right">3 000 ₽</div>
-    </div>
-  </section>
+    <!-- ACCOUNTS -->
+    <section class="section">
+      <div class="section-head">
+        <h2 class="section-title">Счета</h2>
+        <div class="section-note">Всего: 78 450 ₽</div>
+      </div>
 
-  <!-- TRANSACTIONS -->
-  <section class="block">
-    <div class="block__title">Операции</div>
+      <div class="list">
 
-    <div class="card">
-      <div class="card__left">🍔 Мак</div>
-      <div class="card__right expense">-450 ₽</div>
-    </div>
+        <div class="list-card">
+          <div class="list-icon" style="background:#35d07f;">💳</div>
 
-    <div class="card">
-      <div class="card__left">☕ Кофе</div>
-      <div class="card__right expense">-120 ₽</div>
-    </div>
+          <div class="list-body">
+            <div class="list-title-row">
+              <h3 class="list-title">Яндекс Банк</h3>
+            </div>
+            <p class="list-subtitle">Основной счёт</p>
+          </div>
 
-    <div class="card">
-      <div class="card__left">💰 Зарплата</div>
-      <div class="card__right income">+80 000 ₽</div>
-    </div>
-  </section>
+          <div class="list-right">
+            <p class="list-value">25 000 ₽</p>
+          </div>
+        </div>
+
+        <div class="list-card">
+          <div class="list-icon" style="background:#4f8cff;">💵</div>
+
+          <div class="list-body">
+            <div class="list-title-row">
+              <h3 class="list-title">Наличные</h3>
+            </div>
+            <p class="list-subtitle">Кошелёк</p>
+          </div>
+
+          <div class="list-right">
+            <p class="list-value">5 000 ₽</p>
+          </div>
+        </div>
+
+        <div class="list-card list-card--clickable">
+          <div class="list-icon" style="background:#e0b13f;">🏦</div>
+
+          <div class="list-body">
+            <div class="list-title-row">
+              <h3 class="list-title">Сейф</h3>
+            </div>
+            <p class="list-subtitle">Отложенные деньги</p>
+          </div>
+
+          <div class="list-right">
+            <p class="list-value">11 500 ₽</p>
+            <div class="list-caption">накопления</div>
+          </div>
+
+          <div class="list-arrow">›</div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- QUICK SUMMARY -->
+    <section class="section">
+      <div class="summary">
+        <div class="summary-card">
+          <p class="summary-label">Расходы за месяц</p>
+          <p class="summary-value">31 250 ₽</p>
+        </div>
+
+        <div class="summary-card">
+          <p class="summary-label">Доходы за месяц</p>
+          <p class="summary-value">80 000 ₽</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- CATEGORIES -->
+    <section class="section">
+      <div class="section-head">
+        <h2 class="section-title">Категории</h2>
+        <div class="section-note">Этот месяц</div>
+      </div>
+
+      <div class="list">
+
+        <div class="list-card">
+          <div class="list-icon" style="background:#35d07f;">🍔</div>
+
+          <div class="list-body">
+            <div class="list-title-row">
+              <h3 class="list-title">Еда</h3>
+            </div>
+            <p class="list-subtitle">Продукты и кафе</p>
+          </div>
+
+          <div class="list-right">
+            <p class="list-value">8 200 ₽</p>
+          </div>
+        </div>
+
+        <div class="list-card">
+          <div class="list-icon" style="background:#4f8cff;">🚇</div>
+
+          <div class="list-body">
+            <div class="list-title-row">
+              <h3 class="list-title">Транспорт</h3>
+            </div>
+            <p class="list-subtitle">Метро и поездки</p>
+          </div>
+
+          <div class="list-right">
+            <p class="list-value">2 100 ₽</p>
+          </div>
+        </div>
+
+        <div class="list-card">
+          <div class="list-icon" style="background:#a56bff;">🎮</div>
+
+          <div class="list-body">
+            <div class="list-title-row">
+              <h3 class="list-title">Развлечения</h3>
+              <span class="list-badge">новое</span>
+            </div>
+            <p class="list-subtitle">Игры и подписки</p>
+          </div>
+
+          <div class="list-right">
+            <p class="list-value">3 000 ₽</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- TRANSACTIONS -->
+    <section class="section">
+      <div class="section-head">
+        <h2 class="section-title">Последние операции</h2>
+        <div class="section-note">Сегодня</div>
+      </div>
+
+      <div class="list">
+
+        <div class="list-card">
+          <div class="list-icon" style="background:#35d07f;">🍔</div>
+
+          <div class="list-body">
+            <div class="list-title-row">
+              <h3 class="list-title">Вкусно и точка</h3>
+            </div>
+            <p class="list-subtitle">Еда • Яндекс Банк</p>
+          </div>
+
+          <div class="list-right">
+            <p class="list-value list-value--red">−450 ₽</p>
+            <div class="list-caption">14:32</div>
+          </div>
+        </div>
+
+        <div class="list-card">
+          <div class="list-icon" style="background:#4f8cff;">☕</div>
+
+          <div class="list-body">
+            <div class="list-title-row">
+              <h3 class="list-title">Кофе</h3>
+            </div>
+            <p class="list-subtitle">Перекус • Наличные</p>
+          </div>
+
+          <div class="list-right">
+            <p class="list-value list-value--red">−120 ₽</p>
+            <div class="list-caption">11:08</div>
+          </div>
+        </div>
+
+        <div class="list-card">
+          <div class="list-icon" style="background:#35d07f;">💰</div>
+
+          <div class="list-body">
+            <div class="list-title-row">
+              <h3 class="list-title">Зарплата</h3>
+            </div>
+            <p class="list-subtitle">Доход • Яндекс Банк</p>
+          </div>
+
+          <div class="list-right">
+            <p class="list-value list-value--green">+80 000 ₽</p>
+            <div class="list-caption">09:00</div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- BOTTOM NAV -->
+  <div class="bottom-nav-wrap">
+    <nav class="bottom-nav">
+      <button class="nav-item is-active" type="button">
+        <div class="nav-icon">👛</div>
+        <div class="nav-label">Кошелёк</div>
+      </button>
+
+      <button class="nav-item" type="button">
+        <div class="nav-icon">📈</div>
+        <div class="nav-label">Аналитика</div>
+      </button>
+
+      <button class="nav-item" type="button">
+        <div class="nav-icon">%</div>
+        <div class="nav-label">Бюджет</div>
+      </button>
+
+      <button class="nav-item" type="button">
+        <div class="nav-icon">🕘</div>
+        <div class="nav-label">История</div>
+      </button>
+    </nav>
+  </div>
 
   <!-- MODAL -->
-  <div class="modal hidden" id="modal">
-    <div class="modal__content">
+  <div class="modal hidden" id="transactionModal">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <h3 class="modal-title">Добавить операцию</h3>
 
-      <div class="modal__title">Добавить операцию</div>
+      <div class="field">
+        <input class="input" type="number" placeholder="Сумма" />
+      </div>
 
-      <input type="number" placeholder="Сумма" class="input">
-      <input type="text" placeholder="Категория" class="input">
-      <input type="text" placeholder="Комментарий" class="input">
+      <div class="field">
+        <select class="select">
+          <option>Выбери категорию</option>
+          <option>Еда</option>
+          <option>Транспорт</option>
+          <option>Развлечения</option>
+          <option>Зарплата</option>
+        </select>
+      </div>
 
-      <button class="submit-btn">Сохранить</button>
+      <div class="field">
+        <select class="select">
+          <option>Выбери счёт</option>
+          <option>Яндекс Банк</option>
+          <option>Наличные</option>
+          <option>Сейф</option>
+        </select>
+      </div>
 
+      <div class="field">
+        <input class="input" type="text" placeholder="Комментарий" />
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn btn-secondary" type="button" id="closeModalBtn">Отмена</button>
+        <button class="btn btn-primary" type="button">Сохранить</button>
+      </div>
     </div>
   </div>
 
