@@ -273,14 +273,14 @@ button {
   border-radius: 18px;
   border: 1px solid var(--border);
   background:
-    linear-gradient(180deg, rgba(39, 42, 52, 0.94) 0%, rgba(31, 34, 43, 0.94) 100%);
+    linear-gradient(180deg, rgba(39, 42, 52, 0.9) 0%, rgba(31, 34, 43, 0.94) 100%);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 8px;
   text-align: center;
-  box-shadow: var(--shadow-soft), var(--glow-soft);
+  box-shadow: var(--shadow-soft);
   transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
 }
 
@@ -346,7 +346,7 @@ button {
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.015), transparent 32%);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.008), transparent 24%);
   pointer-events: none;
 }
 
@@ -576,11 +576,11 @@ button {
   padding: 8px;
   border-radius: 28px;
   background:
-    linear-gradient(180deg, rgba(43, 46, 57, 0.74) 0%, rgba(31, 34, 43, 0.74) 100%);
+    linear-gradient(180deg, rgba(43, 46, 57, 0.66) 0%, rgba(31, 34, 43, 0.72) 100%);
   backdrop-filter: blur(22px);
   -webkit-backdrop-filter: blur(22px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: var(--shadow-nav), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: var(--shadow-nav);
 }
 
 .nav-item {
