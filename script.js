@@ -265,6 +265,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       toAccountField.classList.add("hidden");
 
       fillExpenseCategorySelect();
+      accountSelect.value = "Яндекс Банк";
     } else if (mode === "income") {
       modalTitle.textContent = "Добавить доход";
       saveBtn.textContent = "Сохранить доход";
@@ -273,6 +274,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       accountField.classList.remove("hidden");
       fromAccountField.classList.add("hidden");
       toAccountField.classList.add("hidden");
+      
+      accountSelect.value = "Яндекс Банк";
     } else if (mode === "transfer") {
       modalTitle.textContent = "Сделать перевод";
       saveBtn.textContent = "Сохранить перевод";
@@ -281,6 +284,9 @@ document.addEventListener("DOMContentLoaded", async () => {
       accountField.classList.add("hidden");
       fromAccountField.classList.remove("hidden");
       toAccountField.classList.remove("hidden");
+      
+      fromAccountSelect.value = "Яндекс Банк";
+      toAccountSelect.value = "Наличные";
     }
 
     modal.classList.remove("hidden");
@@ -645,12 +651,14 @@ document.addEventListener("DOMContentLoaded", async () => {
       card.className = "list-card";
 
       const accountTone =
-        account.id === "yandex"
-          ? "list-icon--green"
-          : account.id === "cash"
-          ? "list-icon--blue"
-          : "list-icon--amber";
-
+  account.id === "yandex"
+    ? "list-icon--green"
+    : account.id === "cash"
+    ? "list-icon--blue"
+    : account.id === "cash_reserve"
+    ? "list-icon--neutral"
+    : "list-icon--amber";
+    
       card.innerHTML = `
         <div class="list-icon ${accountTone}">${account.icon}</div>
         <div class="list-body">
