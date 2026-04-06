@@ -1061,3 +1061,101 @@ button {
     font-size: 13px;
   }
 }
+
+/* =========================================================
+   FINAL POLISH PATCH
+   ========================================================= */
+
+/* 1. Hide top header outside wallet */
+.app--history .header,
+.app--analytics .header,
+.app--budget .header {
+  display: none;
+}
+
+/* 2. Slightly tighter bottom nav */
+.bottom-nav {
+  padding: 7px;
+  border-radius: 26px;
+}
+
+.nav-item {
+  min-height: 62px;
+  border-radius: 20px;
+  gap: 5px;
+}
+
+.nav-icon {
+  font-size: 21px;
+}
+
+.nav-label {
+  font-size: 10.5px;
+}
+
+/* 3. Analytics tighter */
+.analytics-chart-card {
+  gap: 12px;
+  padding: 12px;
+}
+
+.analytics-donut {
+  width: 156px;
+  height: 156px;
+  flex-basis: 156px;
+}
+
+.analytics-donut::after {
+  inset: 21px;
+}
+
+.analytics-legend {
+  gap: 8px;
+}
+
+.analytics-legend-title {
+  font-size: 13px;
+}
+
+.analytics-legend-subtitle,
+.analytics-legend-value {
+  font-size: 12px;
+}
+
+/* 4. Budget more compact */
+.budget-meta {
+  gap: 2px;
+  margin-top: 0;
+}
+
+.budget-line {
+  font-size: 11.5px;
+  line-height: 1.2;
+}
+
+.budget-progress {
+  margin-top: 8px;
+  height: 7px;
+}
+
+/* 5. History filters tighter */
+.history-filters {
+  gap: 8px;
+}
+
+.history-filter-group {
+  gap: 7px;
+}
+
+.history-filter-btn {
+  height: 34px;
+  padding: 0 12px;
+  font-size: 12.5px;
+}
+
+/* 6. Slightly tighter section rhythm for secondary views */
+#historyView .section,
+#analyticsView .section,
+#budgetView .section {
+  margin-top: 18px;
+}
