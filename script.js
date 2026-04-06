@@ -13,46 +13,79 @@ document.addEventListener("DOMContentLoaded", () => {
   const accountSelect = modal?.querySelectorAll(".select")[1];
   const commentInput = modal?.querySelector('input[type="text"]');
 
+  const balanceEl = document.querySelector(".balance-amount");
+  const accountsTotalEl = document.getElementById("accountsTotal");
+  const monthlyExpenseValueEl = document.getElementById("monthlyExpenseValue");
+  const monthlyIncomeValueEl = document.getElementById("monthlyIncomeValue");
+  const accountsListEl = document.getElementById("accountsList");
+  const categoriesListEl = document.getElementById("categoriesList");
+
   let currentMode = "expense";
 
+  const defaultAccounts = [
+    {
+      id: "yandex",
+      name: "Яндекс Банк",
+      subtitle: "Основной счёт",
+      balance: 0,
+      icon: "💳",
+      color: "#35d07f",
+    },
+    {
+      id: "cash",
+      name: "Наличные",
+      subtitle: "Кошелёк",
+      balance: 0,
+      icon: "💵",
+      color: "#4f8cff",
+    },
+    {
+      id: "safe",
+      name: "Сейф",
+      subtitle: "Отложенные деньги",
+      balance: 0,
+      icon: "🏦",
+      color: "#e0b13f",
+    },
+  ];
+
+  const defaultCategoryMeta = {
+    "Еда": { icon: "🍔", color: "#35d07f", subtitle: "Продукты и кафе" },
+    "Транспорт": { icon: "🚇", color: "#4f8cff", subtitle: "Метро и поездки" },
+    "Развлечения": { icon: "🎮", color: "#a56bff", subtitle: "Игры и подписки" },
+    "Зарплата": { icon: "💰", color: "#35d07f", subtitle: "Доход" },
+    "Перекус": { icon: "☕", color: "#ff8a65", subtitle: "Быстрые траты" },
+  };
+
   const state = {
-  transactions: [],
-};
-  
+    transactions: [],
+    accounts: [...defaultAccounts],
+  };
+
   function saveToStorage() {
-  localStorage.setItem("finance_transactions", JSON.stringify(state.transactions));
-}
-
-function loadFromStorage() {
-  const data = localStorage.getItem("finance_transactions");
-  if (data) {
-    state.transactions = JSON.parse(data);
+    localStorage.setItem("finance_transactions", JSON.stringify(state.transactions));
+    localStorage.setItem("finance_accounts", JSON.stringify(state.accounts));
   }
-}
 
-function calculateBalance() {
-  return state.transactions.reduce((sum, transaction) => {
-    if (transaction.type === "income") return sum + transaction.amount;
-    if (transaction.type === "expense") return sum - transaction.amount;
-    return sum;
-  }, 0);
-}
+  function loadFromStorage() {
+    const transactionsData = localStorage.getItem("finance_transactions");
+    const accountsData = localStorage.getItem("finance_accounts");
 
-function renderBalance() {
-  const balanceEl = document.querySelector(".balance-amount");
-  const totalEl = document.querySelector(".section-note");
+    if (transactionsData) {
+      state.transactions = JSON.parse(transactionsData);
+    }
 
-  if (!balanceEl) return;
-
-  const balance = calculateBalance();
-  const formatted = formatMoney(balance);
-
-  balanceEl.textContent = formatted;
-
-  if (totalEl && totalEl.textContent.includes("Всего:")) {
-    totalEl.textContent = `Всего: ${formatted}`;
+    if (accountsData) {
+      state.accounts = JSON.parse(accountsData);
+    }
   }
-}
+
+  function resetAllDataOnce() {
+    // ВРЕМЕННО: один раз сотрёт старые сохранения.
+    // После первого успешного запуска эту функцию и вызов ниже удалить.
+    localStorage.removeItem("finance_transactions");
+    localStorage.removeItem("finance_accounts");
+  }
 
   function openModal(mode) {
     currentMode = mode;
@@ -95,6 +128,172 @@ function renderBalance() {
 
   function formatMoney(value) {
     return `${new Intl.NumberFormat("ru-RU").format(value)} ₽`;
+  }
+
+  function escapeHtml(str) {
+    return String(str)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  function calculateBalance() {
+    return state.accounts.reduce((sum, account) => sum + account.balance, 0);
+  }
+
+  function calculateMonthlyStats() {
+    let income = 0;
+    let expense = 0;
+
+    state.transactions.forEach((transaction) => {
+      if (transaction.type === "income") income += transaction.amount;
+      if (transaction.type === "expense") expense += transaction.amount;
+    });
+
+    return { income, expense };
+  }
+
+  function calculateCategories() {
+    const map = new Map();
+
+    state.transactions.forEach((transaction) => {
+      if (transaction.type !== "expense") return;
+
+      const current = map.get(transaction.category) || 0;
+      map.set(transaction.category, current + transaction.amount);
+    });
+
+    return [...map.entries()]
+      .map(([name, amount]) => ({
+        name,
+        amount,
+        ...(defaultCategoryMeta[name] || {
+          icon: "📦",
+          color: "#4f8cff",
+          subtitle: "Без описания",
+        }),
+      }))
+      .sort((a, b) => b.amount - a.amount);
+  }
+
+  function renderBalance() {
+    if (!balanceEl) return;
+
+    const balance = calculateBalance();
+    balanceEl.textContent = formatMoney(balance);
+
+    if (accountsTotalEl) {
+      accountsTotalEl.textContent = `Всего: ${formatMoney(balance)}`;
+    }
+  }
+
+  function renderMonthlyStats() {
+    const { income, expense } = calculateMonthlyStats();
+
+    if (monthlyIncomeValueEl) {
+      monthlyIncomeValueEl.textContent = formatMoney(income);
+    }
+
+    if (monthlyExpenseValueEl) {
+      monthlyExpenseValueEl.textContent = formatMoney(expense);
+    }
+  }
+
+  function renderAccounts() {
+    if (!accountsListEl) return;
+
+    accountsListEl.innerHTML = "";
+
+    state.accounts.forEach((account) => {
+      const card = document.createElement("div");
+      card.className = "list-card list-card--clickable";
+      card.dataset.accountId = account.id;
+
+      card.innerHTML = `
+        <div class="list-icon" style="background:${account.color};">${account.icon}</div>
+
+        <div class="list-body">
+          <div class="list-title-row">
+            <h3 class="list-title">${escapeHtml(account.name)}</h3>
+          </div>
+          <p class="list-subtitle">${escapeHtml(account.subtitle)}</p>
+        </div>
+
+        <div class="list-right">
+          <p class="list-value">${formatMoney(account.balance)}</p>
+        </div>
+
+        <div class="list-arrow">›</div>
+      `;
+
+      card.addEventListener("click", () => {
+        const nextValue = prompt(`Введите сумму для счёта "${account.name}"`, account.balance);
+
+        if (nextValue === null) return;
+
+        const numericValue = Number(String(nextValue).replace(/\s/g, "").replace(",", "."));
+
+        if (Number.isNaN(numericValue) || numericValue < 0) {
+          alert("Введи корректную сумму");
+          return;
+        }
+
+        account.balance = numericValue;
+        saveToStorage();
+        renderAll();
+      });
+
+      accountsListEl.appendChild(card);
+    });
+  }
+
+  function createCategoryCard(category) {
+    const card = document.createElement("div");
+    card.className = "list-card";
+
+    card.innerHTML = `
+      <div class="list-icon" style="background:${category.color};">${category.icon}</div>
+
+      <div class="list-body">
+        <div class="list-title-row">
+          <h3 class="list-title">${escapeHtml(category.name)}</h3>
+        </div>
+        <p class="list-subtitle">${escapeHtml(category.subtitle)}</p>
+      </div>
+
+      <div class="list-right">
+        <p class="list-value">${formatMoney(category.amount)}</p>
+      </div>
+    `;
+
+    return card;
+  }
+
+  function renderCategories() {
+    if (!categoriesListEl) return;
+
+    categoriesListEl.innerHTML = "";
+
+    const categories = calculateCategories();
+
+    if (categories.length === 0) {
+      const empty = document.createElement("div");
+      empty.className = "list-card";
+      empty.innerHTML = `
+        <div class="list-body">
+          <h3 class="list-title">Категорий пока нет</h3>
+          <p class="list-subtitle">Добавь первую расходную операцию</p>
+        </div>
+      `;
+      categoriesListEl.appendChild(empty);
+      return;
+    }
+
+    categories.forEach((category) => {
+      categoriesListEl.appendChild(createCategoryCard(category));
+    });
   }
 
   function createTransactionCard(transaction) {
@@ -164,6 +363,19 @@ function renderBalance() {
 
     list.innerHTML = "";
 
+    if (state.transactions.length === 0) {
+      const empty = document.createElement("div");
+      empty.className = "list-card";
+      empty.innerHTML = `
+        <div class="list-body">
+          <h3 class="list-title">Операций пока нет</h3>
+          <p class="list-subtitle">Добавь первую операцию через кнопки сверху</p>
+        </div>
+      `;
+      list.appendChild(empty);
+      return;
+    }
+
     state.transactions
       .slice()
       .reverse()
@@ -172,13 +384,15 @@ function renderBalance() {
       });
   }
 
-  function escapeHtml(str) {
-    return String(str)
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;")
-      .replaceAll("'", "&#039;");
+  function applyTransactionToAccount(transaction) {
+    const account = state.accounts.find((item) => item.name === transaction.account);
+    if (!account) return;
+
+    if (transaction.type === "income") {
+      account.balance += transaction.amount;
+    } else if (transaction.type === "expense") {
+      account.balance -= transaction.amount;
+    }
   }
 
   function saveTransaction() {
@@ -210,7 +424,7 @@ function renderBalance() {
         ? "Перевод"
         : "Новая трата");
 
-    state.transactions.push({
+    const transaction = {
       id: crypto.randomUUID(),
       type: currentMode,
       title,
@@ -218,12 +432,22 @@ function renderBalance() {
       account,
       amount,
       time: getCurrentTime(),
-    });
-    saveToStorage();
+    };
 
-    renderTransactions();
-    renderBalance();
+    state.transactions.push(transaction);
+    applyTransactionToAccount(transaction);
+
+    saveToStorage();
+    renderAll();
     closeModal();
+  }
+
+  function renderAll() {
+    renderBalance();
+    renderMonthlyStats();
+    renderAccounts();
+    renderCategories();
+    renderTransactions();
   }
 
   openExpenseModalBtn?.addEventListener("click", () => openModal("expense"));
@@ -244,8 +468,7 @@ function renderBalance() {
     }
   });
 
-  
-loadFromStorage();
-renderTransactions();
-renderBalance();
+  resetAllDataOnce(); // УДАЛИ после первого успешного запуска
+  loadFromStorage();
+  renderAll();
 });
