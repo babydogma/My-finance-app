@@ -10,13 +10,24 @@ document.addEventListener("DOMContentLoaded", async () => {
   const openCategoriesManagerBtn = document.getElementById("openCategoriesManagerBtn");
   const closeCategoriesManagerBtn = document.getElementById("closeCategoriesManagerBtn");
 
+  const navWalletBtn = document.getElementById("navWalletBtn");
+  const navAnalyticsBtn = document.getElementById("navAnalyticsBtn");
+  const navBudgetBtn = document.getElementById("navBudgetBtn");
+  const navHistoryBtn = document.getElementById("navHistoryBtn");
+
   const mainView = document.getElementById("mainView");
   const categoriesManagerView = document.getElementById("categoriesManagerView");
+  const historyView = document.getElementById("historyView");
 
   const categoriesManagerList = document.getElementById("categoriesManagerList");
   const newCategoryNameInput = document.getElementById("newCategoryNameInput");
   const newCategoryIconInput = document.getElementById("newCategoryIconInput");
   const addCategoryBtn = document.getElementById("addCategoryBtn");
+
+  const historyTransactionsList = document.getElementById("historyTransactionsList");
+  const historyCountLabel = document.getElementById("historyCountLabel");
+  const historyPeriodButtons = document.querySelectorAll("[data-period]");
+  const historyTypeButtons = document.querySelectorAll("[data-type]");
 
   const modalTitle = modal?.querySelector(".modal-title");
 
@@ -48,6 +59,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   let currentMode = "expense";
   let editingTransactionId = null;
   let currentPeriodDays = 7;
+  let currentView = "wallet";
+
+  let historyFilterPeriod = "today";
+  let historyFilterType = "all";
 
   const UNCATEGORIZED_ID = "uncategorized";
 
@@ -99,6 +114,42 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       categorySelect.appendChild(option);
     });
+  }
+
+  function setActiveNav(viewName) {
+    navWalletBtn?.classList.toggle("is-active", viewName === "wallet");
+    navAnalyticsBtn?.classList.toggle("is-active", viewName === "analytics");
+    navBudgetBtn?.classList.toggle("is-active", viewName === "budget");
+    navHistoryBtn?.classList.toggle("is-active", viewName === "history");
+  }
+
+  function showWalletView() {
+    currentView = "wallet";
+    mainView.classList.remove("hidden");
+    categoriesManagerView.classList.add("hidden");
+    historyView.classList.add("hidden");
+    setActiveNav("wallet");
+  }
+
+  function openCategoriesManager() {
+    currentView = "categories";
+    mainView.classList.add("hidden");
+    categoriesManagerView.classList.remove("hidden");
+    historyView.classList.add("hidden");
+    setActiveNav("wallet");
+  }
+
+  function closeCategoriesManager() {
+    showWalletView();
+  }
+
+  function showHistoryView() {
+    currentView = "history";
+    mainView.classList.add("hidden");
+    categoriesManagerView.classList.add("hidden");
+    historyView.classList.remove("hidden");
+    setActiveNav("history");
+    renderHistory();
   }
 
   function openModal(mode) {
@@ -208,16 +259,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     accountSelect.selectedIndex = 0;
     fromAccountSelect.selectedIndex = 0;
     toAccountSelect.selectedIndex = 0;
-  }
-
-  function openCategoriesManager() {
-    mainView.classList.add("hidden");
-    categoriesManagerView.classList.remove("hidden");
-  }
-
-  function closeCategoriesManager() {
-    categoriesManagerView.classList.add("hidden");
-    mainView.classList.remove("hidden");
   }
 
   function getCurrentTime() {
@@ -344,6 +385,34 @@ document.addEventListener("DOMContentLoaded", async () => {
         };
       })
       .sort((a, b) => b.amount - a.amount);
+  }
+
+  function getHistoryFilteredTransactions() {
+    let filtered = [...state.transactions];
+
+    if (historyFilterType !== "all") {
+      filtered = filtered.filter((item) => item.type === historyFilterType);
+    }
+
+    const now = new Date();
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+
+    filtered = filtered.filter((transaction) => {
+      const transactionTime = transaction.created_at
+        ? new Date(transaction.created_at).getTime()
+        : 0;
+
+      if (historyFilterPeriod === "all") return true;
+      if (historyFilterPeriod === "today") return transactionTime >= startOfToday;
+      if (historyFilterPeriod === "7") return transactionTime >= Date.now() - 7 * 24 * 60 * 60 * 1000;
+      if (historyFilterPeriod === "30") return transactionTime >= Date.now() - 30 * 24 * 60 * 60 * 1000;
+      if (historyFilterPeriod === "month") return transactionTime >= startOfMonth;
+
+      return true;
+    });
+
+    return filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
   }
 
   function renderBalance() {
@@ -636,7 +705,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   function renderTransactions() {
     transactionsListEl.innerHTML = "";
 
-    if (state.transactions.length === 0) {
+    const latestTransactions = [...state.transactions]
+      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+      .slice(0, 5);
+
+    if (latestTransactions.length === 0) {
       const empty = document.createElement("div");
       empty.className = "list-card";
       empty.innerHTML = `
@@ -649,12 +722,44 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
-    state.transactions
-      .slice()
-      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-      .forEach((transaction) => {
-        transactionsListEl.appendChild(createTransactionCard(transaction));
-      });
+    latestTransactions.forEach((transaction) => {
+      transactionsListEl.appendChild(createTransactionCard(transaction));
+    });
+  }
+
+  function renderHistory() {
+    if (!historyTransactionsList) return;
+
+    historyTransactionsList.innerHTML = "";
+
+    const filteredTransactions = getHistoryFilteredTransactions();
+
+    historyCountLabel.textContent = `${filteredTransactions.length} операций`;
+
+    historyPeriodButtons.forEach((btn) => {
+      btn.classList.toggle("is-active", btn.dataset.period === historyFilterPeriod);
+    });
+
+    historyTypeButtons.forEach((btn) => {
+      btn.classList.toggle("is-active", btn.dataset.type === historyFilterType);
+    });
+
+    if (filteredTransactions.length === 0) {
+      const empty = document.createElement("div");
+      empty.className = "list-card";
+      empty.innerHTML = `
+        <div class="list-body">
+          <h3 class="list-title">Ничего не найдено</h3>
+          <p class="list-subtitle">Попробуй другой период или тип операций</p>
+        </div>
+      `;
+      historyTransactionsList.appendChild(empty);
+      return;
+    }
+
+    filteredTransactions.forEach((transaction) => {
+      historyTransactionsList.appendChild(createTransactionCard(transaction));
+    });
   }
 
   function buildTransactionFromForm() {
@@ -835,12 +940,15 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   async function loadDataFromSupabase() {
-    const [{ data: accounts, error: accountsError }, { data: categories, error: categoriesError }, { data: transactions, error: transactionsError }] =
-      await Promise.all([
-        supabaseClient.from("accounts").select("*").order("sort_order", { ascending: true }),
-        supabaseClient.from("categories").select("*").order("sort_order", { ascending: true }),
-        supabaseClient.from("transactions").select("*").order("created_at", { ascending: false }),
-      ]);
+    const [
+      { data: accounts, error: accountsError },
+      { data: categories, error: categoriesError },
+      { data: transactions, error: transactionsError }
+    ] = await Promise.all([
+      supabaseClient.from("accounts").select("*").order("sort_order", { ascending: true }),
+      supabaseClient.from("categories").select("*").order("sort_order", { ascending: true }),
+      supabaseClient.from("transactions").select("*").order("created_at", { ascending: false }),
+    ]);
 
     if (accountsError) {
       console.error(accountsError);
@@ -876,6 +984,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     renderCategories();
     renderCategoriesManager();
     renderTransactions();
+    renderHistory();
   }
 
   openExpenseModalBtn?.addEventListener("click", () => openModal("expense"));
@@ -884,6 +993,31 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   openCategoriesManagerBtn?.addEventListener("click", openCategoriesManager);
   closeCategoriesManagerBtn?.addEventListener("click", closeCategoriesManager);
+
+  navWalletBtn?.addEventListener("click", showWalletView);
+  navHistoryBtn?.addEventListener("click", showHistoryView);
+
+  navAnalyticsBtn?.addEventListener("click", () => {
+    alert("Аналитика будет следующим этапом");
+  });
+
+  navBudgetBtn?.addEventListener("click", () => {
+    alert("Бюджет будет следующим этапом");
+  });
+
+  historyPeriodButtons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      historyFilterPeriod = btn.dataset.period;
+      renderHistory();
+    });
+  });
+
+  historyTypeButtons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      historyFilterType = btn.dataset.type;
+      renderHistory();
+    });
+  });
 
   closeModalBtn?.addEventListener("click", closeModal);
   saveBtn?.addEventListener("click", saveTransaction);
@@ -912,4 +1046,5 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   await loadDataFromSupabase();
   renderAll();
+  showWalletView();
 });
