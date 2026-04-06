@@ -641,3 +641,119 @@ select {
     font-size: 28px;
   }
 }
+
+/* =========================================================
+   COMPACT MODE (TG WALLET LIKE)
+   ========================================================= */
+
+/* Баланс меньше */
+.balance-amount {
+  font-size: clamp(44px, 9vw, 64px);
+}
+
+.balance-label {
+  font-size: 16px;
+}
+
+.balance-meta {
+  margin-top: 10px;
+}
+
+.balance-profit,
+.balance-loss,
+.balance-period {
+  font-size: 14px;
+}
+
+/* Actions компактнее */
+.actions {
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.action-card {
+  min-height: 90px;
+  padding: 12px 8px;
+  border-radius: 22px;
+}
+
+.action-icon {
+  width: 36px;
+  height: 36px;
+  font-size: 18px;
+}
+
+.action-label {
+  font-size: 14px;
+}
+
+/* Карточки плотнее */
+.list-card {
+  padding: 14px;
+  border-radius: 22px;
+  gap: 12px;
+}
+
+.list-icon {
+  width: 48px;
+  height: 48px;
+  flex-basis: 48px;
+  font-size: 22px;
+}
+
+.list-title {
+  font-size: 16px;
+}
+
+.list-subtitle {
+  font-size: 13px;
+}
+
+.list-value {
+  font-size: 16px;
+}
+
+/* Заголовки секций */
+.section-title {
+  font-size: 15px;
+}
+
+.section-note {
+  font-size: 13px;
+}
+
+/* Header компактнее */
+.header {
+  grid-template-columns: 44px 1fr 44px;
+  margin-bottom: 20px;
+}
+
+.header-avatar,
+.header-icon-btn {
+  width: 44px;
+  height: 44px;
+}
+
+.header-switch__item {
+  min-width: 90px;
+  height: 40px;
+  font-size: 15px;
+}
+
+/* Summary меньше */
+.summary-value {
+  font-size: 20px;
+}
+
+/* Bottom nav компактнее */
+.nav-item {
+  min-height: 70px;
+}
+
+.nav-icon {
+  font-size: 24px;
+}
+
+.nav-label {
+  font-size: 12px;
+}
