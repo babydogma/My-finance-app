@@ -7,6 +7,13 @@ document.addEventListener("DOMContentLoaded", async () => {
   const saveBtn = document.getElementById("saveTransactionBtn");
   const deleteTransactionBtn = document.getElementById("deleteTransactionBtn");
 
+  const budgetModal = document.getElementById("budgetModal");
+  const budgetModalTitle = document.getElementById("budgetModalTitle");
+  const budgetAmountInput = document.getElementById("budgetAmountInput");
+  const closeBudgetModalBtn = document.getElementById("closeBudgetModalBtn");
+  const saveBudgetBtn = document.getElementById("saveBudgetBtn");
+  const deleteBudgetBtn = document.getElementById("deleteBudgetBtn");
+
   const openCategoriesManagerBtn = document.getElementById("openCategoriesManagerBtn");
   const closeCategoriesManagerBtn = document.getElementById("closeCategoriesManagerBtn");
 
@@ -19,6 +26,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const categoriesManagerView = document.getElementById("categoriesManagerView");
   const historyView = document.getElementById("historyView");
   const analyticsView = document.getElementById("analyticsView");
+  const budgetView = document.getElementById("budgetView");
 
   const categoriesManagerList = document.getElementById("categoriesManagerList");
   const newCategoryNameInput = document.getElementById("newCategoryNameInput");
@@ -37,6 +45,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   const analyticsDonut = document.getElementById("analyticsDonut");
   const analyticsLegend = document.getElementById("analyticsLegend");
   const analyticsCategoriesCount = document.getElementById("analyticsCategoriesCount");
+
+  const budgetList = document.getElementById("budgetList");
+  const budgetCountLabel = document.getElementById("budgetCountLabel");
 
   const modalTitle = modal?.querySelector(".modal-title");
 
@@ -74,6 +85,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   let historyFilterType = "all";
   let analyticsFilterPeriod = "7";
 
+  let activeBudgetCategoryId = null;
+
   const UNCATEGORIZED_ID = "uncategorized";
 
   const ANALYTICS_COLORS = [
@@ -89,6 +102,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     transactions: [],
     accounts: [],
     categories: [],
+    budgetLimits: [],
   };
 
   function getCategoryById(categoryId) {
@@ -103,6 +117,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   function getCategoryIcon(categoryId) {
     const category = getCategoryById(categoryId);
     return category ? category.icon : "📦";
+  }
+
+  function getBudgetLimitByCategoryId(categoryId) {
+    return state.budgetLimits.find((item) => item.category_id === categoryId);
   }
 
   function ensureUncategorizedCategory() {
@@ -148,6 +166,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     categoriesManagerView.classList.add("hidden");
     historyView.classList.add("hidden");
     analyticsView.classList.add("hidden");
+    budgetView.classList.add("hidden");
     setActiveNav("wallet");
   }
 
@@ -157,6 +176,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     categoriesManagerView.classList.remove("hidden");
     historyView.classList.add("hidden");
     analyticsView.classList.add("hidden");
+    budgetView.classList.add("hidden");
     setActiveNav("wallet");
   }
 
@@ -170,6 +190,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     categoriesManagerView.classList.add("hidden");
     historyView.classList.remove("hidden");
     analyticsView.classList.add("hidden");
+    budgetView.classList.add("hidden");
     setActiveNav("history");
     renderHistory();
   }
@@ -180,8 +201,43 @@ document.addEventListener("DOMContentLoaded", async () => {
     categoriesManagerView.classList.add("hidden");
     historyView.classList.add("hidden");
     analyticsView.classList.remove("hidden");
+    budgetView.classList.add("hidden");
     setActiveNav("analytics");
     renderAnalytics();
+  }
+
+  function showBudgetView() {
+    currentView = "budget";
+    mainView.classList.add("hidden");
+    categoriesManagerView.classList.add("hidden");
+    historyView.classList.add("hidden");
+    analyticsView.classList.add("hidden");
+    budgetView.classList.remove("hidden");
+    setActiveNav("budget");
+    renderBudget();
+  }
+
+  function openBudgetModal(categoryId) {
+    const category = getCategoryById(categoryId);
+    if (!category) return;
+
+    activeBudgetCategoryId = categoryId;
+
+    const existing = getBudgetLimitByCategoryId(categoryId);
+
+    budgetModalTitle.textContent = `${category.icon} ${category.name}`;
+    budgetAmountInput.value = existing ? Number(existing.monthly_limit) : "";
+    deleteBudgetBtn.classList.toggle("hidden", !existing);
+
+    budgetModal.classList.remove("hidden");
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeBudgetModal() {
+    budgetModal.classList.add("hidden");
+    document.body.style.overflow = "";
+    activeBudgetCategoryId = null;
+    budgetAmountInput.value = "";
   }
 
   function openModal(mode) {
@@ -484,6 +540,51 @@ document.addEventListener("DOMContentLoaded", async () => {
       .sort((a, b) => b.amount - a.amount);
   }
 
+  function getHistoryFilteredTransactions() {
+    let filtered = [...state.transactions];
+
+    if (historyFilterType !== "all") {
+      filtered = filtered.filter((item) => item.type === historyFilterType);
+    }
+
+    const now = new Date();
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+
+    filtered = filtered.filter((transaction) => {
+      const transactionTime = transaction.created_at
+        ? new Date(transaction.created_at).getTime()
+        : 0;
+
+      if (historyFilterPeriod === "all") return true;
+      if (historyFilterPeriod === "today") return transactionTime >= startOfToday;
+      if (historyFilterPeriod === "7") return transactionTime >= Date.now() - 7 * 24 * 60 * 60 * 1000;
+      if (historyFilterPeriod === "30") return transactionTime >= Date.now() - 30 * 24 * 60 * 60 * 1000;
+      if (historyFilterPeriod === "month") return transactionTime >= startOfMonth;
+
+      return true;
+    });
+
+    return filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+  }
+
+  function getCurrentMonthExpenseByCategory(categoryId) {
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+
+    return state.transactions.reduce((sum, transaction) => {
+      if (transaction.type !== "expense") return sum;
+      if ((transaction.category_id || UNCATEGORIZED_ID) !== categoryId) return sum;
+      const time = transaction.created_at ? new Date(transaction.created_at).getTime() : 0;
+      if (time < startOfMonth) return sum;
+      return sum + (Number(transaction.amount) || 0);
+    }, 0);
+  }
+
+  function getBudgetCategories() {
+    return state.categories.filter((category) => category.id !== UNCATEGORIZED_ID);
+  }
+
   function renderBalance() {
     const balance = calculateBalance();
     balanceEl.textContent = formatMoney(balance);
@@ -491,16 +592,16 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function renderMonthlyStats() {
-  const { income, expense } = calculateMonthlyStats();
+    const { income, expense } = calculateMonthlyStats();
 
-  if (monthlyExpenseValueEl) {
-    monthlyExpenseValueEl.textContent = formatMoney(expense);
-  }
+    if (monthlyExpenseValueEl) {
+      monthlyExpenseValueEl.textContent = formatMoney(expense);
+    }
 
-  if (monthlyIncomeValueEl) {
-    monthlyIncomeValueEl.textContent = formatMoney(income);
+    if (monthlyIncomeValueEl) {
+      monthlyIncomeValueEl.textContent = formatMoney(income);
+    }
   }
-}
 
   function renderBalanceResult() {
     if (!balanceResultValueEl || !balancePeriodLabelEl) return;
@@ -692,7 +793,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       deleteBtn?.addEventListener("click", async () => {
         if (category.locked) return;
 
-        const ok = confirm(`Удалить категорию "${category.name}"? Все старые расходы перейдут в "Без категории".`);
+        const ok = confirm(`Удалить категорию "${category.name}"? Все старые расходы перейдут в "Без категории". Лимит бюджета тоже удалится.`);
         if (!ok) return;
 
         const { error: txError } = await supabaseClient
@@ -704,6 +805,17 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (txError) {
           alert("Ошибка переноса старых расходов");
           console.error(txError);
+          return;
+        }
+
+        const { error: budgetDeleteError } = await supabaseClient
+          .from("budget_limits")
+          .delete()
+          .eq("category_id", category.id);
+
+        if (budgetDeleteError) {
+          alert("Ошибка удаления лимита бюджета");
+          console.error(budgetDeleteError);
           return;
         }
 
@@ -802,34 +914,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
-  function getHistoryFilteredTransactions() {
-    let filtered = [...state.transactions];
-
-    if (historyFilterType !== "all") {
-      filtered = filtered.filter((item) => item.type === historyFilterType);
-    }
-
-    const now = new Date();
-    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
-
-    filtered = filtered.filter((transaction) => {
-      const transactionTime = transaction.created_at
-        ? new Date(transaction.created_at).getTime()
-        : 0;
-
-      if (historyFilterPeriod === "all") return true;
-      if (historyFilterPeriod === "today") return transactionTime >= startOfToday;
-      if (historyFilterPeriod === "7") return transactionTime >= Date.now() - 7 * 24 * 60 * 60 * 1000;
-      if (historyFilterPeriod === "30") return transactionTime >= Date.now() - 30 * 24 * 60 * 60 * 1000;
-      if (historyFilterPeriod === "month") return transactionTime >= startOfMonth;
-
-      return true;
-    });
-
-    return filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-  }
-
   function renderHistory() {
     if (!historyTransactionsList) return;
 
@@ -926,6 +1010,81 @@ document.addEventListener("DOMContentLoaded", async () => {
         <div class="analytics-legend-value">${formatMoney(item.amount)}</div>
       `;
       analyticsLegend.appendChild(row);
+    });
+  }
+
+  function renderBudget() {
+    if (!budgetList) return;
+
+    budgetList.innerHTML = "";
+
+    const categories = getBudgetCategories();
+    budgetCountLabel.textContent = `${categories.length} категорий`;
+
+    if (!categories.length) {
+      budgetList.innerHTML = `<div class="manager-card"><div class="budget-empty">Категорий пока нет</div></div>`;
+      return;
+    }
+
+    categories.forEach((category) => {
+      const spent = getCurrentMonthExpenseByCategory(category.id);
+      const limitRecord = getBudgetLimitByCategoryId(category.id);
+      const limit = limitRecord ? Number(limitRecord.monthly_limit) || 0 : 0;
+      const remains = Math.max(limit - spent, 0);
+      const progressPercent = limit > 0 ? Math.min((spent / limit) * 100, 100) : 0;
+
+      const toneClass =
+        category.id === "food"
+          ? "list-icon--green"
+          : category.id === "transport"
+          ? "list-icon--blue"
+          : category.id === "fun"
+          ? "list-icon--purple"
+          : category.id === "snack"
+          ? "list-icon--amber"
+          : "list-icon--neutral";
+
+      let fillClass = "budget-progress__fill";
+      if (limit > 0 && progressPercent >= 100) {
+        fillClass += " is-danger";
+      } else if (limit > 0 && progressPercent >= 75) {
+        fillClass += " is-warning";
+      }
+
+      const card = document.createElement("div");
+      card.className = "list-card budget-card";
+      card.innerHTML = `
+        <div class="list-icon ${toneClass}">${category.icon}</div>
+        <div class="list-body">
+          <div class="list-title-row">
+            <h3 class="list-title">${escapeHtml(category.name)}</h3>
+          </div>
+
+          <div class="budget-meta">
+            <div class="budget-line">
+              <span>Можно потратить</span>
+              <strong>${limit > 0 ? formatMoney(limit) : "Не задано"}</strong>
+            </div>
+
+            <div class="budget-line">
+              <span>Уже потрачено</span>
+              <strong>${formatMoney(spent)}</strong>
+            </div>
+
+            <div class="budget-line">
+              <span>Осталось</span>
+              <strong>${limit > 0 ? formatMoney(remains) : "—"}</strong>
+            </div>
+          </div>
+
+          <div class="budget-progress">
+            <div class="${fillClass}" style="width:${progressPercent}%;"></div>
+          </div>
+        </div>
+      `;
+
+      card.addEventListener("click", () => openBudgetModal(category.id));
+      budgetList.appendChild(card);
     });
   }
 
@@ -1106,15 +1265,82 @@ document.addEventListener("DOMContentLoaded", async () => {
     renderAll();
   }
 
+  async function saveBudgetLimit() {
+    if (!activeBudgetCategoryId) return;
+
+    const amount = Number(budgetAmountInput.value.trim());
+
+    if (Number.isNaN(amount) || amount < 0) {
+      alert("Введи корректный лимит");
+      return;
+    }
+
+    const existing = getBudgetLimitByCategoryId(activeBudgetCategoryId);
+
+    if (existing) {
+      const { error } = await supabaseClient
+        .from("budget_limits")
+        .update({ monthly_limit: amount })
+        .eq("category_id", activeBudgetCategoryId);
+
+      if (error) {
+        alert("Ошибка обновления лимита");
+        console.error(error);
+        return;
+      }
+    } else {
+      const { error } = await supabaseClient
+        .from("budget_limits")
+        .insert({
+          category_id: activeBudgetCategoryId,
+          monthly_limit: amount,
+        });
+
+      if (error) {
+        alert("Ошибка сохранения лимита");
+        console.error(error);
+        return;
+      }
+    }
+
+    await loadDataFromSupabase();
+    renderAll();
+    closeBudgetModal();
+  }
+
+  async function deleteBudgetLimit() {
+    if (!activeBudgetCategoryId) return;
+
+    const ok = confirm("Удалить лимит для этой категории?");
+    if (!ok) return;
+
+    const { error } = await supabaseClient
+      .from("budget_limits")
+      .delete()
+      .eq("category_id", activeBudgetCategoryId);
+
+    if (error) {
+      alert("Ошибка удаления лимита");
+      console.error(error);
+      return;
+    }
+
+    await loadDataFromSupabase();
+    renderAll();
+    closeBudgetModal();
+  }
+
   async function loadDataFromSupabase() {
     const [
       { data: accounts, error: accountsError },
       { data: categories, error: categoriesError },
-      { data: transactions, error: transactionsError }
+      { data: transactions, error: transactionsError },
+      { data: budgetLimits, error: budgetLimitsError }
     ] = await Promise.all([
       supabaseClient.from("accounts").select("*").order("sort_order", { ascending: true }),
       supabaseClient.from("categories").select("*").order("sort_order", { ascending: true }),
       supabaseClient.from("transactions").select("*").order("created_at", { ascending: false }),
+      supabaseClient.from("budget_limits").select("*"),
     ]);
 
     if (accountsError) {
@@ -1135,9 +1361,16 @@ document.addEventListener("DOMContentLoaded", async () => {
       return;
     }
 
+    if (budgetLimitsError) {
+      console.error(budgetLimitsError);
+      alert("Ошибка загрузки лимитов бюджета из Supabase");
+      return;
+    }
+
     state.accounts = accounts || [];
     state.categories = categories || [];
     state.transactions = transactions || [];
+    state.budgetLimits = budgetLimits || [];
 
     ensureUncategorizedCategory();
   }
@@ -1153,6 +1386,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     renderTransactions();
     renderHistory();
     renderAnalytics();
+    renderBudget();
   }
 
   openExpenseModalBtn?.addEventListener("click", () => openModal("expense"));
@@ -1165,10 +1399,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   navWalletBtn?.addEventListener("click", showWalletView);
   navHistoryBtn?.addEventListener("click", showHistoryView);
   navAnalyticsBtn?.addEventListener("click", showAnalyticsView);
-
-  navBudgetBtn?.addEventListener("click", () => {
-    alert("Бюджет будет следующим этапом");
-  });
+  navBudgetBtn?.addEventListener("click", showBudgetView);
 
   historyPeriodButtons.forEach((btn) => {
     btn.addEventListener("click", () => {
@@ -1196,13 +1427,24 @@ document.addEventListener("DOMContentLoaded", async () => {
   deleteTransactionBtn?.addEventListener("click", deleteTransaction);
   addCategoryBtn?.addEventListener("click", addCategory);
 
+  closeBudgetModalBtn?.addEventListener("click", closeBudgetModal);
+  saveBudgetBtn?.addEventListener("click", saveBudgetLimit);
+  deleteBudgetBtn?.addEventListener("click", deleteBudgetLimit);
+
   modal?.addEventListener("click", (event) => {
     if (event.target === modal) closeModal();
+  });
+
+  budgetModal?.addEventListener("click", (event) => {
+    if (event.target === budgetModal) closeBudgetModal();
   });
 
   document.addEventListener("keydown", (event) => {
     if (event.key === "Escape" && !modal.classList.contains("hidden")) {
       closeModal();
+    }
+    if (event.key === "Escape" && !budgetModal.classList.contains("hidden")) {
+      closeBudgetModal();
     }
   });
 
