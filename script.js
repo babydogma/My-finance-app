@@ -161,7 +161,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function showWalletView() {
-    document.querySelector(".app")?.classList.remove("app--budget");
+    document.querySelector(".app")?.classList.remove("app--budget", "app--history", "app--analytics");
     currentView = "wallet";
     mainView.classList.remove("hidden");
     categoriesManagerView.classList.add("hidden");
@@ -172,7 +172,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function openCategoriesManager() {
-    document.querySelector(".app")?.classList.remove("app--budget");
+    document.querySelector(".app")?.classList.remove("app--budget", "app--history", "app--analytics");
     currentView = "categories";
     mainView.classList.add("hidden");
     categoriesManagerView.classList.remove("hidden");
@@ -187,7 +187,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function showHistoryView() {
-    document.querySelector(".app")?.classList.remove("app--budget");
+    document.querySelector(".app")?.classList.remove("app--budget", "app--analytics");
+    document.querySelector(".app")?.classList.add("app--history");
     currentView = "history";
     mainView.classList.add("hidden");
     categoriesManagerView.classList.add("hidden");
@@ -199,7 +200,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function showAnalyticsView() {
-    document.querySelector(".app")?.classList.remove("app--budget");
+    document.querySelector(".app")?.classList.remove("app--budget", "app--history");
+    document.querySelector(".app")?.classList.add("app--analytics");
     currentView = "analytics";
     mainView.classList.add("hidden");
     categoriesManagerView.classList.add("hidden");
@@ -212,6 +214,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   function showBudgetView() {
   currentView = "budget";
+  document.querySelector(".app")?.classList.remove("app--history", "app--analytics");
   document.querySelector(".app")?.classList.add("app--budget");
   mainView.classList.add("hidden");
   categoriesManagerView.classList.add("hidden");
