@@ -161,6 +161,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function showWalletView() {
+    document.querySelector(".app")?.classList.remove("app--budget");
     currentView = "wallet";
     mainView.classList.remove("hidden");
     categoriesManagerView.classList.add("hidden");
@@ -171,6 +172,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function openCategoriesManager() {
+    document.querySelector(".app")?.classList.remove("app--budget");
     currentView = "categories";
     mainView.classList.add("hidden");
     categoriesManagerView.classList.remove("hidden");
@@ -185,6 +187,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function showHistoryView() {
+    document.querySelector(".app")?.classList.remove("app--budget");
     currentView = "history";
     mainView.classList.add("hidden");
     categoriesManagerView.classList.add("hidden");
@@ -196,6 +199,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function showAnalyticsView() {
+    document.querySelector(".app")?.classList.remove("app--budget");
     currentView = "analytics";
     mainView.classList.add("hidden");
     categoriesManagerView.classList.add("hidden");
@@ -207,15 +211,16 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function showBudgetView() {
-    currentView = "budget";
-    mainView.classList.add("hidden");
-    categoriesManagerView.classList.add("hidden");
-    historyView.classList.add("hidden");
-    analyticsView.classList.add("hidden");
-    budgetView.classList.remove("hidden");
-    setActiveNav("budget");
-    renderBudget();
-  }
+  currentView = "budget";
+  document.querySelector(".app")?.classList.add("app--budget");
+  mainView.classList.add("hidden");
+  categoriesManagerView.classList.add("hidden");
+  historyView.classList.add("hidden");
+  analyticsView.classList.add("hidden");
+  budgetView.classList.remove("hidden");
+  setActiveNav("budget");
+  renderBudget();
+}
 
   function openBudgetModal(categoryId) {
     const category = getCategoryById(categoryId);
