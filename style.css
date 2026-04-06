@@ -69,9 +69,7 @@ body {
   font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   color: var(--text);
   min-height: 100vh;
-  background:
-    radial-gradient(circle at top center, rgba(25, 36, 72, 0.08), transparent 28%),
-    linear-gradient(180deg, #0d0f15 0%, #0b0d13 100%);
+  background: #0b0d13;
 }
 
 button,
@@ -272,15 +270,14 @@ button {
   padding: 8px 6px;
   border-radius: 18px;
   border: 1px solid var(--border);
-  background:
-    linear-gradient(180deg, rgba(39, 42, 52, 0.9) 0%, rgba(31, 34, 43, 0.94) 100%);
+  background: linear-gradient(180deg, rgba(39, 42, 52, 0.9) 0%, rgba(31, 34, 43, 0.94) 100%);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 8px;
   text-align: center;
-  box-shadow: var(--shadow-soft);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.2);
   transition: transform 0.16s ease, box-shadow 0.16s ease, border-color 0.16s ease;
 }
 
@@ -338,16 +335,7 @@ button {
   border: 1px solid var(--border);
   box-shadow: var(--shadow-card), var(--glow-soft);
   position: relative;
-  overflow: hidden;
-}
-
-.list-card::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.008), transparent 24%);
-  pointer-events: none;
+  overflow: visible;
 }
 
 .list-card--clickable {
@@ -575,12 +563,11 @@ button {
   gap: 4px;
   padding: 8px;
   border-radius: 28px;
-  background:
-    linear-gradient(180deg, rgba(43, 46, 57, 0.66) 0%, rgba(31, 34, 43, 0.72) 100%);
-  backdrop-filter: blur(22px);
-  -webkit-backdrop-filter: blur(22px);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  box-shadow: var(--shadow-nav);
+  background: rgba(31, 34, 43, 0.78);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.34);
 }
 
 .nav-item {
@@ -602,10 +589,8 @@ button {
 }
 
 .nav-item.is-active {
-  background:
-    radial-gradient(circle at top center, rgba(255, 255, 255, 0.06), transparent 60%),
-    rgba(255, 255, 255, 0.08);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: none;
 }
 
 .nav-icon {
