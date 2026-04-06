@@ -625,35 +625,49 @@ function formatMonthLabel(monthValue) {
   }
 
   function getHistoryFilteredTransactions() {
-    let filtered = [...state.transactions];
+  let filtered = [...state.transactions];
 
-    if (historyFilterType !== "all") {
-      filtered = filtered.filter((item) => item.type === historyFilterType);
+  if (historyFilterType !== "all") {
+    filtered = filtered.filter((item) => item.type === historyFilterType);
+  }
+
+  const now = new Date();
+  const startOfToday = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate()
+  ).getTime();
+
+  const customMonthRange = getMonthRange(historySelectedMonth);
+
+  filtered = filtered.filter((transaction) => {
+    const transactionTime = transaction.created_at
+      ? new Date(transaction.created_at).getTime()
+      : 0;
+
+    if (historyFilterPeriod === "all") return true;
+    if (historyFilterPeriod === "today") return transactionTime >= startOfToday;
+    if (historyFilterPeriod === "7") {
+      return transactionTime >= Date.now() - 7 * 24 * 60 * 60 * 1000;
+    }
+    if (historyFilterPeriod === "30") {
+      return transactionTime >= Date.now() - 30 * 24 * 60 * 60 * 1000;
     }
 
-    const now = new Date();
-const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-const customMonthRange = getMonthRange(historySelectedMonth);
+    if (historyFilterPeriod === "customMonth") {
+      if (!customMonthRange) return true;
 
-    filtered = filtered.filter((transaction) => {
-      const transactionTime = transaction.created_at
-        ? new Date(transaction.created_at).getTime()
-        : 0;
+      return (
+        transactionTime >= customMonthRange.start &&
+        transactionTime < customMonthRange.end
+      );
+    }
 
-      if (historyFilterPeriod === "all") return true;
-if (historyFilterPeriod === "today") return transactionTime >= startOfToday;
-if (historyFilterPeriod === "7") return transactionTime >= Date.now() - 7 * 24 * 60 * 60 * 1000;
-if (historyFilterPeriod === "30") return transactionTime >= Date.now() - 30 * 24 * 60 * 60 * 1000;
+    return true;
+  });
 
-if (historyFilterPeriod === "customMonth") {
-  if (!customMonthRange) return true;
-  return transactionTime >= customMonthRange.start && transactionTime < customMonthRange.end;
+  return filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 }
-
-return true;
-
-    return filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-  }
 
   function getCurrentMonthExpenseByCategory(categoryId) {
     const now = new Date();
@@ -1103,6 +1117,13 @@ return true;
     const filteredTransactions = getHistoryFilteredTransactions();
 
     historyCountLabel.textContent = `${filteredTransactions.length} операций`;
+    historyPeriodButtons.forEach((btn) => {
+  btn.classList.toggle("is-active", btn.dataset.period === historyFilterPeriod);
+});
+
+historyTypeButtons.forEach((btn) => {
+  btn.classList.toggle("is-active", btn.dataset.type === historyFilterType);
+});
 
     if (historyMonthInput) {
   historyMonthInput.classList.toggle("hidden", historyFilterPeriod !== "customMonth");
