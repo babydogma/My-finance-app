@@ -289,20 +289,20 @@ document.addEventListener("DOMContentLoaded", () => {
       .replaceAll('"', "&quot;")
       .replaceAll("'", "&#039;");
   }
-  
+
   function getIconToneClass(type, extra = "") {
-  if (type === "income") return "list-icon--green";
-  if (type === "transfer") return "list-icon--blue";
-  if (type === "expense") {
-    if (extra === "transport") return "list-icon--blue";
-    if (extra === "fun") return "list-icon--purple";
-    if (extra === "snack") return "list-icon--amber";
-    if (extra === "food") return "list-icon--green";
-    if (extra === "uncategorized") return "list-icon--neutral";
-    return "list-icon--red";
+    if (type === "income") return "list-icon--green";
+    if (type === "transfer") return "list-icon--blue";
+    if (type === "expense") {
+      if (extra === "transport") return "list-icon--blue";
+      if (extra === "fun") return "list-icon--purple";
+      if (extra === "snack") return "list-icon--amber";
+      if (extra === "food") return "list-icon--green";
+      if (extra === "uncategorized") return "list-icon--neutral";
+      return "list-icon--red";
+    }
+    return "list-icon--neutral";
   }
-  return "list-icon--neutral";
-}
 
   function getAccountBalance(accountName) {
     let balance = 0;
@@ -436,14 +436,14 @@ document.addEventListener("DOMContentLoaded", () => {
       card.className = "list-card";
 
       const accountTone =
-  account.id === "yandex"
-    ? "list-icon--green"
-    : account.id === "cash"
-    ? "list-icon--blue"
-    : "list-icon--amber";
+        account.id === "yandex"
+          ? "list-icon--green"
+          : account.id === "cash"
+          ? "list-icon--blue"
+          : "list-icon--amber";
 
-card.innerHTML = `
-  <div class="list-icon ${accountTone}">${account.icon}</div>
+      card.innerHTML = `
+        <div class="list-icon ${accountTone}">${account.icon}</div>
         <div class="list-body">
           <div class="list-title-row">
             <h3 class="list-title">${escapeHtml(account.name)}</h3>
@@ -464,18 +464,18 @@ card.innerHTML = `
     card.className = "list-card";
 
     const categoryTone =
-  category.id === "food"
-    ? "list-icon--green"
-    : category.id === "transport"
-    ? "list-icon--blue"
-    : category.id === "fun"
-    ? "list-icon--purple"
-    : category.id === "snack"
-    ? "list-icon--amber"
-    : "list-icon--neutral";
+      category.id === "food"
+        ? "list-icon--green"
+        : category.id === "transport"
+        ? "list-icon--blue"
+        : category.id === "fun"
+        ? "list-icon--purple"
+        : category.id === "snack"
+        ? "list-icon--amber"
+        : "list-icon--neutral";
 
-card.innerHTML = `
-  <div class="list-icon ${categoryTone}">${category.icon}</div>
+    card.innerHTML = `
+      <div class="list-icon ${categoryTone}">${category.icon}</div>
       <div class="list-body">
         <div class="list-title-row">
           <h3 class="list-title">${escapeHtml(category.name)}</h3>
@@ -522,18 +522,19 @@ card.innerHTML = `
       const lockedAttr = category.locked ? "disabled" : "";
       const lockedSubtitle = category.locked ? "Системная категория" : "Можно редактировать";
 
+      const managerTone =
+        category.id === "food"
+          ? "list-icon--green"
+          : category.id === "transport"
+          ? "list-icon--blue"
+          : category.id === "fun"
+          ? "list-icon--purple"
+          : category.id === "snack"
+          ? "list-icon--amber"
+          : "list-icon--neutral";
+
       card.innerHTML = `
-        const managerTone =
-  category.id === "food"
-    ? "list-icon--green"
-    : category.id === "transport"
-    ? "list-icon--blue"
-    : category.id === "fun"
-    ? "list-icon--purple"
-    : category.id === "snack"
-    ? "list-icon--amber"
-    : "list-icon--neutral";
-    <div class="list-icon ${managerTone}">${category.icon}</div>
+        <div class="list-icon ${managerTone}">${category.icon}</div>
 
         <div class="list-body">
           <div class="list-title-row">
@@ -609,16 +610,16 @@ card.innerHTML = `
     card.className = "list-card list-card--clickable";
 
     const icon =
-  transaction.type === "income"
-    ? "💰"
-    : transaction.type === "transfer"
-    ? "↗"
-    : getCategoryIcon(transaction.categoryId || UNCATEGORIZED_ID);
+      transaction.type === "income"
+        ? "💰"
+        : transaction.type === "transfer"
+        ? "↗"
+        : getCategoryIcon(transaction.categoryId || UNCATEGORIZED_ID);
 
-const toneKey =
-  transaction.type === "expense" ? (transaction.categoryId || UNCATEGORIZED_ID) : "";
+    const toneKey =
+      transaction.type === "expense" ? (transaction.categoryId || UNCATEGORIZED_ID) : "";
 
-const iconToneClass = getIconToneClass(transaction.type, toneKey);
+    const iconToneClass = getIconToneClass(transaction.type, toneKey);
 
     let subtitle = "";
     let signedAmount = "";
@@ -638,7 +639,6 @@ const iconToneClass = getIconToneClass(transaction.type, toneKey);
     }
 
     card.innerHTML = `
-      <
       <div class="list-icon ${iconToneClass}">${icon}</div>
       <div class="list-body">
         <div class="list-title-row">
