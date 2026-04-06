@@ -16,36 +16,8 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentMode = "expense";
 
   const state = {
-    transactions: [
-      {
-        id: crypto.randomUUID(),
-        type: "expense",
-        title: "Вкусно и точка",
-        category: "Еда",
-        account: "Яндекс Банк",
-        amount: 450,
-        time: "14:32",
-      },
-      {
-        id: crypto.randomUUID(),
-        type: "expense",
-        title: "Кофе",
-        category: "Перекус",
-        account: "Наличные",
-        amount: 120,
-        time: "11:08",
-      },
-      {
-        id: crypto.randomUUID(),
-        type: "income",
-        title: "Зарплата",
-        category: "Доход",
-        account: "Яндекс Банк",
-        amount: 80000,
-        time: "09:00",
-      },
-    ],
-  };
+  transactions: [],
+};
   
   function saveToStorage() {
   localStorage.setItem("finance_transactions", JSON.stringify(state.transactions));
@@ -55,6 +27,36 @@ function loadFromStorage() {
   const data = localStorage.getItem("finance_transactions");
   if (data) {
     state.transactions = JSON.parse(data);
+  }
+}
+
+function clearStorageIfNeeded() {
+  // ВРЕМЕННО: один раз очистит старые данные.
+  // После первого обновления страницы эту функцию и вызов можно удалить.
+  localStorage.removeItem("finance_transactions");
+}
+
+function calculateBalance() {
+  return state.transactions.reduce((sum, transaction) => {
+    if (transaction.type === "income") return sum + transaction.amount;
+    if (transaction.type === "expense") return sum - transaction.amount;
+    return sum;
+  }, 0);
+}
+
+function renderBalance() {
+  const balanceEl = document.querySelector(".balance-amount");
+  const totalEl = document.querySelector(".section-note");
+
+  if (!balanceEl) return;
+
+  const balance = calculateBalance();
+  const formatted = formatMoney(balance);
+
+  balanceEl.textContent = formatted;
+
+  if (totalEl && totalEl.textContent.includes("Всего:")) {
+    totalEl.textContent = `Всего: ${formatted}`;
   }
 }
 
@@ -226,6 +228,7 @@ function loadFromStorage() {
     saveToStorage();
 
     renderTransactions();
+    renderBalance();
     closeModal();
   }
 
@@ -247,6 +250,8 @@ function loadFromStorage() {
     }
   });
 
-  loadFromStorage();
+  clearStorageIfNeeded(); // ВРЕМЕННО. После первого обновления удалить.
+loadFromStorage();
 renderTransactions();
+renderBalance();
 });
