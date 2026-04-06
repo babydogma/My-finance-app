@@ -18,6 +18,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const mainView = document.getElementById("mainView");
   const categoriesManagerView = document.getElementById("categoriesManagerView");
   const historyView = document.getElementById("historyView");
+  const analyticsView = document.getElementById("analyticsView");
 
   const categoriesManagerList = document.getElementById("categoriesManagerList");
   const newCategoryNameInput = document.getElementById("newCategoryNameInput");
@@ -28,6 +29,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   const historyCountLabel = document.getElementById("historyCountLabel");
   const historyPeriodButtons = document.querySelectorAll("[data-period]");
   const historyTypeButtons = document.querySelectorAll("[data-type]");
+
+  const analyticsPeriodButtons = document.querySelectorAll("[data-analytics-period]");
+  const analyticsIncomeValue = document.getElementById("analyticsIncomeValue");
+  const analyticsExpenseValue = document.getElementById("analyticsExpenseValue");
+  const analyticsNetValue = document.getElementById("analyticsNetValue");
+  const analyticsDonut = document.getElementById("analyticsDonut");
+  const analyticsLegend = document.getElementById("analyticsLegend");
+  const analyticsCategoriesCount = document.getElementById("analyticsCategoriesCount");
 
   const modalTitle = modal?.querySelector(".modal-title");
 
@@ -63,8 +72,18 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   let historyFilterPeriod = "today";
   let historyFilterType = "all";
+  let analyticsFilterPeriod = "7";
 
   const UNCATEGORIZED_ID = "uncategorized";
+
+  const ANALYTICS_COLORS = [
+    "#5a7a6c",
+    "#586b94",
+    "#8c703a",
+    "#6b5a8f",
+    "#8a5a55",
+    "#5a5d6a",
+  ];
 
   const state = {
     transactions: [],
@@ -128,6 +147,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     mainView.classList.remove("hidden");
     categoriesManagerView.classList.add("hidden");
     historyView.classList.add("hidden");
+    analyticsView.classList.add("hidden");
     setActiveNav("wallet");
   }
 
@@ -136,6 +156,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     mainView.classList.add("hidden");
     categoriesManagerView.classList.remove("hidden");
     historyView.classList.add("hidden");
+    analyticsView.classList.add("hidden");
     setActiveNav("wallet");
   }
 
@@ -148,8 +169,19 @@ document.addEventListener("DOMContentLoaded", async () => {
     mainView.classList.add("hidden");
     categoriesManagerView.classList.add("hidden");
     historyView.classList.remove("hidden");
+    analyticsView.classList.add("hidden");
     setActiveNav("history");
     renderHistory();
+  }
+
+  function showAnalyticsView() {
+    currentView = "analytics";
+    mainView.classList.add("hidden");
+    categoriesManagerView.classList.add("hidden");
+    historyView.classList.add("hidden");
+    analyticsView.classList.remove("hidden");
+    setActiveNav("analytics");
+    renderAnalytics();
   }
 
   function openModal(mode) {
@@ -387,32 +419,69 @@ document.addEventListener("DOMContentLoaded", async () => {
       .sort((a, b) => b.amount - a.amount);
   }
 
-  function getHistoryFilteredTransactions() {
+  function getAnalyticsFilteredTransactions() {
     let filtered = [...state.transactions];
 
-    if (historyFilterType !== "all") {
-      filtered = filtered.filter((item) => item.type === historyFilterType);
+    if (analyticsFilterPeriod === "7") {
+      filtered = filtered.filter((item) => {
+        if (!item.created_at) return false;
+        return new Date(item.created_at).getTime() >= Date.now() - 7 * 24 * 60 * 60 * 1000;
+      });
+    } else if (analyticsFilterPeriod === "30") {
+      filtered = filtered.filter((item) => {
+        if (!item.created_at) return false;
+        return new Date(item.created_at).getTime() >= Date.now() - 30 * 24 * 60 * 60 * 1000;
+      });
     }
 
-    const now = new Date();
-    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+    return filtered;
+  }
 
-    filtered = filtered.filter((transaction) => {
-      const transactionTime = transaction.created_at
-        ? new Date(transaction.created_at).getTime()
-        : 0;
+  function getAnalyticsSummary() {
+    const items = getAnalyticsFilteredTransactions();
 
-      if (historyFilterPeriod === "all") return true;
-      if (historyFilterPeriod === "today") return transactionTime >= startOfToday;
-      if (historyFilterPeriod === "7") return transactionTime >= Date.now() - 7 * 24 * 60 * 60 * 1000;
-      if (historyFilterPeriod === "30") return transactionTime >= Date.now() - 30 * 24 * 60 * 60 * 1000;
-      if (historyFilterPeriod === "month") return transactionTime >= startOfMonth;
+    let income = 0;
+    let expense = 0;
 
-      return true;
+    items.forEach((transaction) => {
+      const amount = Number(transaction.amount) || 0;
+      if (transaction.type === "income") income += amount;
+      if (transaction.type === "expense") expense += amount;
     });
 
-    return filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    return {
+      income,
+      expense,
+      net: income - expense,
+    };
+  }
+
+  function getAnalyticsCategoryBreakdown() {
+    const items = getAnalyticsFilteredTransactions();
+    const map = new Map();
+
+    items.forEach((transaction) => {
+      if (transaction.type !== "expense") return;
+
+      const categoryId = transaction.category_id || UNCATEGORIZED_ID;
+      const amount = Number(transaction.amount) || 0;
+      const current = map.get(categoryId) || 0;
+      map.set(categoryId, current + amount);
+    });
+
+    return [...map.entries()]
+      .map(([categoryId, amount], index) => {
+        const category = getCategoryById(categoryId) || getCategoryById(UNCATEGORIZED_ID);
+
+        return {
+          id: category.id,
+          name: category.name,
+          icon: category.icon,
+          amount,
+          color: ANALYTICS_COLORS[index % ANALYTICS_COLORS.length],
+        };
+      })
+      .sort((a, b) => b.amount - a.amount);
   }
 
   function renderBalance() {
@@ -727,6 +796,34 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
   }
 
+  function getHistoryFilteredTransactions() {
+    let filtered = [...state.transactions];
+
+    if (historyFilterType !== "all") {
+      filtered = filtered.filter((item) => item.type === historyFilterType);
+    }
+
+    const now = new Date();
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+
+    filtered = filtered.filter((transaction) => {
+      const transactionTime = transaction.created_at
+        ? new Date(transaction.created_at).getTime()
+        : 0;
+
+      if (historyFilterPeriod === "all") return true;
+      if (historyFilterPeriod === "today") return transactionTime >= startOfToday;
+      if (historyFilterPeriod === "7") return transactionTime >= Date.now() - 7 * 24 * 60 * 60 * 1000;
+      if (historyFilterPeriod === "30") return transactionTime >= Date.now() - 30 * 24 * 60 * 60 * 1000;
+      if (historyFilterPeriod === "month") return transactionTime >= startOfMonth;
+
+      return true;
+    });
+
+    return filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+  }
+
   function renderHistory() {
     if (!historyTransactionsList) return;
 
@@ -759,6 +856,70 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     filteredTransactions.forEach((transaction) => {
       historyTransactionsList.appendChild(createTransactionCard(transaction));
+    });
+  }
+
+  function renderAnalytics() {
+    if (!analyticsView) return;
+
+    const summary = getAnalyticsSummary();
+    const breakdown = getAnalyticsCategoryBreakdown();
+
+    analyticsIncomeValue.textContent = formatMoney(summary.income);
+    analyticsExpenseValue.textContent = formatMoney(summary.expense);
+
+    analyticsNetValue.classList.remove("is-positive", "is-negative");
+    if (summary.net > 0) {
+      analyticsNetValue.textContent = `+${formatMoney(summary.net)}`;
+      analyticsNetValue.classList.add("is-positive");
+    } else if (summary.net < 0) {
+      analyticsNetValue.textContent = `−${formatMoney(Math.abs(summary.net))}`;
+      analyticsNetValue.classList.add("is-negative");
+    } else {
+      analyticsNetValue.textContent = formatMoney(0);
+    }
+
+    analyticsPeriodButtons.forEach((btn) => {
+      btn.classList.toggle("is-active", btn.dataset.analyticsPeriod === analyticsFilterPeriod);
+    });
+
+    analyticsCategoriesCount.textContent = `${breakdown.length} категорий`;
+
+    if (!breakdown.length) {
+      analyticsDonut.style.background = "conic-gradient(rgba(90, 93, 106, 0.42) 0deg 360deg)";
+      analyticsLegend.innerHTML = `<div class="analytics-empty">Нет данных по расходам за выбранный период</div>`;
+      return;
+    }
+
+    const totalExpense = breakdown.reduce((sum, item) => sum + item.amount, 0);
+
+    let currentAngle = 0;
+    const gradientParts = breakdown.map((item) => {
+      const part = totalExpense > 0 ? (item.amount / totalExpense) * 360 : 0;
+      const start = currentAngle;
+      const end = currentAngle + part;
+      currentAngle = end;
+      return `${item.color} ${start}deg ${end}deg`;
+    });
+
+    analyticsDonut.style.background = `conic-gradient(${gradientParts.join(", ")})`;
+
+    analyticsLegend.innerHTML = "";
+
+    breakdown.forEach((item) => {
+      const percent = totalExpense > 0 ? Math.round((item.amount / totalExpense) * 100) : 0;
+
+      const row = document.createElement("div");
+      row.className = "analytics-legend-item";
+      row.innerHTML = `
+        <div class="analytics-legend-dot" style="background:${item.color};"></div>
+        <div class="analytics-legend-body">
+          <p class="analytics-legend-title">${escapeHtml(item.icon)} ${escapeHtml(item.name)}</p>
+          <p class="analytics-legend-subtitle">${percent}% от расходов</p>
+        </div>
+        <div class="analytics-legend-value">${formatMoney(item.amount)}</div>
+      `;
+      analyticsLegend.appendChild(row);
     });
   }
 
@@ -985,6 +1146,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     renderCategoriesManager();
     renderTransactions();
     renderHistory();
+    renderAnalytics();
   }
 
   openExpenseModalBtn?.addEventListener("click", () => openModal("expense"));
@@ -996,10 +1158,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   navWalletBtn?.addEventListener("click", showWalletView);
   navHistoryBtn?.addEventListener("click", showHistoryView);
-
-  navAnalyticsBtn?.addEventListener("click", () => {
-    alert("Аналитика будет следующим этапом");
-  });
+  navAnalyticsBtn?.addEventListener("click", showAnalyticsView);
 
   navBudgetBtn?.addEventListener("click", () => {
     alert("Бюджет будет следующим этапом");
@@ -1016,6 +1175,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     btn.addEventListener("click", () => {
       historyFilterType = btn.dataset.type;
       renderHistory();
+    });
+  });
+
+  analyticsPeriodButtons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      analyticsFilterPeriod = btn.dataset.analyticsPeriod;
+      renderAnalytics();
     });
   });
 
