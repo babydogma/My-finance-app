@@ -432,6 +432,25 @@ function getLocalDateKey(dateValue) {
   function formatDateShort(dateValue) {
   if (!dateValue) return "";
 
+  const rawDate = String(dateValue).slice(0, 10);
+  const [year, month, day] = rawDate.split("-");
+
+  if (!year || !month || !day) return "";
+
+  return `${day}.${month}.${year.slice(-2)}`;
+}
+
+function sortTransactionsByLatest(items) {
+  return [...items].sort((a, b) => {
+    const timeA = a.created_at ? new Date(a.created_at).getTime() : 0;
+    const timeB = b.created_at ? new Date(b.created_at).getTime() : 0;
+    return timeB - timeA;
+  });
+}
+  
+  function formatDateShort(dateValue) {
+  if (!dateValue) return "";
+
   const date = new Date(dateValue);
 
   const day = String(date.getDate()).padStart(2, "0");
@@ -1068,81 +1087,82 @@ filtered = filtered.filter((transaction) => {
   }
 
   function createTransactionCard(transaction) {
-    const card = document.createElement("div");
-    card.className = "list-card list-card--clickable";
+  const card = document.createElement("div");
+  card.className = "list-card list-card--clickable";
 
-    const icon =
-      transaction.type === "income"
-        ? "💰"
-        : transaction.type === "transfer"
-        ? "↗"
-        : getCategoryIcon(transaction.category_id || UNCATEGORIZED_ID);
+  const icon =
+    transaction.type === "income"
+      ? "💰"
+      : transaction.type === "transfer"
+      ? "↗"
+      : getCategoryIcon(transaction.category_id || UNCATEGORIZED_ID);
 
-    const toneKey =
-      transaction.type === "expense" ? (transaction.category_id || UNCATEGORIZED_ID) : "";
+  const toneKey =
+    transaction.type === "expense" ? (transaction.category_id || UNCATEGORIZED_ID) : "";
 
-    const iconToneClass = getIconToneClass(transaction.type, toneKey);
+  const iconToneClass = getIconToneClass(transaction.type, toneKey);
 
-    let subtitle = "";
-    let signedAmount = "";
-    let valueClass = "list-value";
+  let subtitle = "";
+  let signedAmount = "";
+  let valueClass = "list-value";
 
-    if (transaction.type === "transfer") {
-      subtitle = `${escapeHtml(transaction.from_account)} → ${escapeHtml(transaction.to_account)}`;
-      signedAmount = formatMoney(transaction.amount);
-    } else if (transaction.type === "income") {
-      subtitle = `${escapeHtml(transaction.account)} • доход`;
-      signedAmount = `+${formatMoney(transaction.amount)}`;
-      valueClass = "list-value list-value--green";
-    } else {
-      subtitle = `${escapeHtml(getCategoryName(transaction.category_id || UNCATEGORIZED_ID))} • ${escapeHtml(transaction.account)}`;
-      signedAmount = `−${formatMoney(transaction.amount)}`;
-      valueClass = "list-value list-value--red";
-    }
-
-    const shortDate = formatDateShort(transaction.created_at);
-const timeLabel = transaction.time_label || "";
-
-card.innerHTML = `
-  <div class="list-icon ${iconToneClass}">${icon}</div>
-  <div class="list-body">
-    <div class="list-title-row">
-      <h3 class="list-title">${escapeHtml(transaction.title)}</h3>
-    </div>
-    <p class="list-subtitle">${subtitle}</p>
-  </div>
-  <div class="list-right">
-    <p class="${valueClass}">${signedAmount}</p>
-    <div class="list-caption">${shortDate}${shortDate && timeLabel ? " • " : ""}${timeLabel}</div>
-  </div>
-`;
-
-    card.addEventListener("click", () => openEditModal(transaction.id));
-    return card;
+  if (transaction.type === "transfer") {
+    subtitle = `${escapeHtml(transaction.from_account)} → ${escapeHtml(transaction.to_account)}`;
+    signedAmount = formatMoney(transaction.amount);
+  } else if (transaction.type === "income") {
+    subtitle = `${escapeHtml(transaction.account)} • доход`;
+    signedAmount = `+${formatMoney(transaction.amount)}`;
+    valueClass = "list-value list-value--green";
+  } else {
+    subtitle = `${escapeHtml(getCategoryName(transaction.category_id || UNCATEGORIZED_ID))} • ${escapeHtml(transaction.account)}`;
+    signedAmount = `−${formatMoney(transaction.amount)}`;
+    valueClass = "list-value list-value--red";
   }
+
+  const shortDate = formatDateShort(transaction.created_at);
+  const timeLabel = transaction.time_label || "";
+  const caption = `${shortDate}${shortDate && timeLabel ? " • " : ""}${timeLabel}`;
+
+  card.innerHTML = `
+    <div class="list-icon ${iconToneClass}">${icon}</div>
+    <div class="list-body">
+      <div class="list-title-row">
+        <h3 class="list-title">${escapeHtml(transaction.title)}</h3>
+      </div>
+      <p class="list-subtitle">${subtitle}</p>
+    </div>
+    <div class="list-right">
+      <p class="${valueClass}">${signedAmount}</p>
+      <div class="list-caption">${caption}</div>
+    </div>
+  `;
+
+  card.addEventListener("click", () => openEditModal(transaction.id));
+  return card;
+}
 
   function renderTransactions() {
-    transactionsListEl.innerHTML = "";
+  transactionsListEl.innerHTML = "";
 
-    const latestTransactions = sortTransactionsByLatest(state.transactions).slice(0, 5);
+  const latestTransactions = sortTransactionsByLatest(state.transactions).slice(0, 5);
 
-    if (latestTransactions.length === 0) {
-      const empty = document.createElement("div");
-      empty.className = "list-card";
-      empty.innerHTML = `
-        <div class="list-body">
-          <h3 class="list-title">Операций пока нет</h3>
-          <p class="list-subtitle">Добавь первую операцию через кнопки сверху</p>
-        </div>
-      `;
-      transactionsListEl.appendChild(empty);
-      return;
-    }
-
-    latestTransactions.forEach((transaction) => {
-      transactionsListEl.appendChild(createTransactionCard(transaction));
-    });
+  if (latestTransactions.length === 0) {
+    const empty = document.createElement("div");
+    empty.className = "list-card";
+    empty.innerHTML = `
+      <div class="list-body">
+        <h3 class="list-title">Операций пока нет</h3>
+        <p class="list-subtitle">Добавь первую операцию через кнопки сверху</p>
+      </div>
+    `;
+    transactionsListEl.appendChild(empty);
+    return;
   }
+
+  latestTransactions.forEach((transaction) => {
+    transactionsListEl.appendChild(createTransactionCard(transaction));
+  });
+}
 
   function renderHistory() {
     if (!historyTransactionsList) return;
