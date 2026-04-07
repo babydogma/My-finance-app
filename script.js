@@ -642,40 +642,43 @@ function formatMonthLabel(monthValue) {
   }
 
   const now = new Date();
-const todayKey = getLocalDateKey(now);
+const todayKey = getTodayDateValue();
 const customMonthRange = getMonthRange(historySelectedMonth);
 
-  filtered = filtered.filter((transaction) => {
-    const transactionTime = transaction.created_at
-  ? new Date(transaction.created_at).getTime()
-  : 0;
+filtered = filtered.filter((transaction) => {
+  const transactionTime = transaction.created_at
+    ? new Date(transaction.created_at).getTime()
+    : 0;
 
-const transactionDateKey = transaction.created_at
-  ? getLocalDateKey(transaction.created_at)
-  : "";
+  const transactionDateKey = transaction.created_at
+    ? String(transaction.created_at).slice(0, 10)
+    : "";
 
-    if (historyFilterPeriod === "all") return true;
-    if (historyFilterPeriod === "today") {
-  return transactionDateKey === todayKey;
-}
-    if (historyFilterPeriod === "7") {
-      return transactionTime >= Date.now() - 7 * 24 * 60 * 60 * 1000;
-    }
-    if (historyFilterPeriod === "30") {
-      return transactionTime >= Date.now() - 30 * 24 * 60 * 60 * 1000;
-    }
+  if (historyFilterPeriod === "all") return true;
 
-    if (historyFilterPeriod === "customMonth") {
-      if (!customMonthRange) return true;
+  if (historyFilterPeriod === "today") {
+    return transactionDateKey === todayKey;
+  }
 
-      return (
-        transactionTime >= customMonthRange.start &&
-        transactionTime < customMonthRange.end
-      );
-    }
+  if (historyFilterPeriod === "7") {
+    return transactionTime >= Date.now() - 7 * 24 * 60 * 60 * 1000;
+  }
 
-    return true;
-  });
+  if (historyFilterPeriod === "30") {
+    return transactionTime >= Date.now() - 30 * 24 * 60 * 60 * 1000;
+  }
+
+  if (historyFilterPeriod === "customMonth") {
+    if (!customMonthRange) return true;
+
+    return (
+      transactionTime >= customMonthRange.start &&
+      transactionTime < customMonthRange.end
+    );
+  }
+
+  return true;
+});
 
   return filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 }
