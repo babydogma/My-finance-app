@@ -34,12 +34,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   const addCategoryBtn = document.getElementById("addCategoryBtn");
 
   const historyTransactionsList = document.getElementById("historyTransactionsList");
-const historyCountLabel = document.getElementById("historyCountLabel");
-const historyPeriodButtons = document.querySelectorAll("[data-period]");
-const historyTypeButtons = document.querySelectorAll("[data-type]");
-const historyMonthInput = document.getElementById("historyMonthInput");
-const historySelectedPeriodLabel = document.getElementById("historySelectedPeriodLabel");
-const historyCustomMonthBtn = document.getElementById("historyCustomMonthBtn");
+  const historyCountLabel = document.getElementById("historyCountLabel");
+  const historyPeriodButtons = document.querySelectorAll("[data-period]");
+  const historyTypeButtons = document.querySelectorAll("[data-type]");
+  const historyMonthInput = document.getElementById("historyMonthInput");
+  const historySelectedPeriodLabel = document.getElementById("historySelectedPeriodLabel");
+  const historyCustomMonthBtn = document.getElementById("historyCustomMonthBtn");
 
   const analyticsPeriodButtons = document.querySelectorAll("[data-analytics-period]");
   const analyticsIncomeValue = document.getElementById("analyticsIncomeValue");
@@ -47,7 +47,6 @@ const historyCustomMonthBtn = document.getElementById("historyCustomMonthBtn");
   const analyticsNetValue = document.getElementById("analyticsNetValue");
   const analyticsDonut = document.getElementById("analyticsDonut");
   const analyticsLegend = document.getElementById("analyticsLegend");
-  const analyticsCategoriesCount = document.getElementById("analyticsCategoriesCount");
 
   const budgetList = document.getElementById("budgetList");
   const budgetCountLabel = document.getElementById("budgetCountLabel");
@@ -86,9 +85,9 @@ const historyCustomMonthBtn = document.getElementById("historyCustomMonthBtn");
   let currentView = "wallet";
 
   let historyFilterPeriod = "today";
-let historyFilterType = "all";
-let historySelectedMonth = "";
-let analyticsFilterPeriod = "7";
+  let historyFilterType = "all";
+  let historySelectedMonth = "";
+  let analyticsFilterPeriod = "7";
 
   let activeBudgetCategoryId = null;
 
@@ -104,12 +103,12 @@ let analyticsFilterPeriod = "7";
   ];
 
   const state = {
-  transactions: [],
-  accounts: [],
-  categories: [],
-  budgetLimits: [],
-  appMeta: [],
-};
+    transactions: [],
+    accounts: [],
+    categories: [],
+    budgetLimits: [],
+    appMeta: [],
+  };
 
   function getCategoryById(categoryId) {
     return state.categories.find((item) => item.id === categoryId);
@@ -128,26 +127,122 @@ let analyticsFilterPeriod = "7";
   function getBudgetLimitByCategoryId(categoryId) {
     return state.budgetLimits.find((item) => item.category_id === categoryId);
   }
-  
+
   function getAppMetaValue(key) {
-  const item = state.appMeta.find((entry) => entry.key === key);
-  return item ? item.value : "";
-}
+    const item = state.appMeta.find((entry) => entry.key === key);
+    return item ? item.value : "";
+  }
 
-function getDateOnlyString(date) {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-}
+  function getDateOnlyString(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  }
 
-function getSafeBalance() {
-  return getAccountBalance("Сейфы Яндекса");
-}
+  function getSafeBalance() {
+    return getAccountBalance("Сейфы Яндекса");
+  }
 
-function roundToTwo(num) {
-  return Math.round((num + Number.EPSILON) * 100) / 100;
-}
+  function roundToTwo(num) {
+    return Math.round((num + Number.EPSILON) * 100) / 100;
+  }
+
+  function getTodayDateValue() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const day = String(now.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  }
+
+  function getCurrentTime() {
+    const now = new Date();
+    return now.toLocaleTimeString("ru-RU", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  }
+
+  function formatMoney(value) {
+    return `${new Intl.NumberFormat("ru-RU").format(Number(value) || 0)} ₽`;
+  }
+
+  function formatDateShort(dateValue) {
+    if (!dateValue) return "";
+
+    const rawDate = String(dateValue).slice(0, 10);
+    const [year, month, day] = rawDate.split("-");
+
+    if (!year || !month || !day) return "";
+
+    return `${day}.${month}.${year.slice(-2)}`;
+  }
+
+  function sortTransactionsByLatest(items) {
+    return [...items].sort((a, b) => {
+      const timeA = a.created_at ? new Date(a.created_at).getTime() : 0;
+      const timeB = b.created_at ? new Date(b.created_at).getTime() : 0;
+      return timeB - timeA;
+    });
+  }
+
+  function getMonthRange(monthValue) {
+    if (!monthValue) return null;
+
+    const [year, month] = monthValue.split("-").map(Number);
+    if (!year || !month) return null;
+
+    const start = new Date(year, month - 1, 1).getTime();
+    const end = new Date(year, month, 1).getTime();
+
+    return { start, end };
+  }
+
+  function formatMonthLabel(monthValue) {
+    if (!monthValue) return "";
+
+    const [year, month] = monthValue.split("-").map(Number);
+    if (!year || !month) return "";
+
+    const date = new Date(year, month - 1, 1);
+
+    return date.toLocaleDateString("ru-RU", {
+      month: "long",
+      year: "numeric",
+    });
+  }
+
+  function getAnalyticsPeriodLabel() {
+    if (analyticsFilterPeriod === "7") return "за 7 дней";
+    if (analyticsFilterPeriod === "30") return "за 30 дней";
+    return "за всё время";
+  }
+
+  function escapeHtml(str) {
+    return String(str)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  function getIconToneClass(type, extra = "") {
+    if (type === "income") return "list-icon--green";
+    if (type === "transfer") return "list-icon--blue";
+
+    if (type === "expense") {
+      if (extra === "transport") return "list-icon--blue";
+      if (extra === "fun") return "list-icon--purple";
+      if (extra === "snack") return "list-icon--amber";
+      if (extra === "food") return "list-icon--green";
+      if (extra === "uncategorized") return "list-icon--neutral";
+      return "list-icon--red";
+    }
+
+    return "list-icon--neutral";
+  }
 
   function ensureUncategorizedCategory() {
     const exists = state.categories.some((item) => item.id === UNCATEGORIZED_ID);
@@ -239,17 +334,17 @@ function roundToTwo(num) {
   }
 
   function showBudgetView() {
-  currentView = "budget";
-  document.querySelector(".app")?.classList.remove("app--history", "app--analytics");
-  document.querySelector(".app")?.classList.add("app--budget");
-  mainView.classList.add("hidden");
-  categoriesManagerView.classList.add("hidden");
-  historyView.classList.add("hidden");
-  analyticsView.classList.add("hidden");
-  budgetView.classList.remove("hidden");
-  setActiveNav("budget");
-  renderBudget();
-}
+    currentView = "budget";
+    document.querySelector(".app")?.classList.remove("app--history", "app--analytics");
+    document.querySelector(".app")?.classList.add("app--budget");
+    mainView.classList.add("hidden");
+    categoriesManagerView.classList.add("hidden");
+    historyView.classList.add("hidden");
+    analyticsView.classList.add("hidden");
+    budgetView.classList.remove("hidden");
+    setActiveNav("budget");
+    renderBudget();
+  }
 
   function openBudgetModal(categoryId) {
     const category = getCategoryById(categoryId);
@@ -272,6 +367,16 @@ function roundToTwo(num) {
     document.body.style.overflow = "";
     activeBudgetCategoryId = null;
     budgetAmountInput.value = "";
+  }
+
+  function resetForm() {
+    amountInput.value = "";
+    dateInput.value = getTodayDateValue();
+    commentInput.value = "";
+    categorySelect.innerHTML = `<option value="">Выбери категорию</option>`;
+    accountSelect.selectedIndex = 0;
+    fromAccountSelect.selectedIndex = 0;
+    toAccountSelect.selectedIndex = 0;
   }
 
   function openModal(mode) {
@@ -300,7 +405,7 @@ function roundToTwo(num) {
       accountField.classList.remove("hidden");
       fromAccountField.classList.add("hidden");
       toAccountField.classList.add("hidden");
-      
+
       accountSelect.value = "Яндекс Банк";
     } else if (mode === "transfer") {
       modalTitle.textContent = "Сделать перевод";
@@ -310,7 +415,7 @@ function roundToTwo(num) {
       accountField.classList.add("hidden");
       fromAccountField.classList.remove("hidden");
       toAccountField.classList.remove("hidden");
-      
+
       fromAccountSelect.value = "Яндекс Банк";
       toAccountSelect.value = "Наличные";
     }
@@ -341,11 +446,9 @@ function roundToTwo(num) {
       fillExpenseCategorySelect(transaction.category_id || UNCATEGORIZED_ID);
 
       amountInput.value = transaction.amount;
-dateInput.value = transaction.created_at
-  ? new Date(transaction.created_at).toISOString().slice(0, 10)
-  : getTodayDateValue();
-accountSelect.value = transaction.account;
-commentInput.value = transaction.title === "Новая трата" ? "" : transaction.title;
+      dateInput.value = transaction.created_at ? String(transaction.created_at).slice(0, 10) : getTodayDateValue();
+      accountSelect.value = transaction.account;
+      commentInput.value = transaction.title === "Новая трата" ? "" : transaction.title;
     } else if (transaction.type === "income") {
       modalTitle.textContent = "Редактировать доход";
       saveBtn.textContent = "Сохранить";
@@ -356,11 +459,9 @@ commentInput.value = transaction.title === "Новая трата" ? "" : transa
       toAccountField.classList.add("hidden");
 
       amountInput.value = transaction.amount;
-dateInput.value = transaction.created_at
-  ? new Date(transaction.created_at).toISOString().slice(0, 10)
-  : getTodayDateValue();
-accountSelect.value = transaction.account;
-commentInput.value = transaction.title === "Новый доход" ? "" : transaction.title;
+      dateInput.value = transaction.created_at ? String(transaction.created_at).slice(0, 10) : getTodayDateValue();
+      accountSelect.value = transaction.account;
+      commentInput.value = transaction.title === "Новый доход" ? "" : transaction.title;
     } else if (transaction.type === "transfer") {
       modalTitle.textContent = "Редактировать перевод";
       saveBtn.textContent = "Сохранить";
@@ -371,12 +472,10 @@ commentInput.value = transaction.title === "Новый доход" ? "" : transa
       toAccountField.classList.remove("hidden");
 
       amountInput.value = transaction.amount;
-dateInput.value = transaction.created_at
-  ? new Date(transaction.created_at).toISOString().slice(0, 10)
-  : getTodayDateValue();
-fromAccountSelect.value = transaction.from_account;
-toAccountSelect.value = transaction.to_account;
-commentInput.value = transaction.title === "Перевод" ? "" : transaction.title;
+      dateInput.value = transaction.created_at ? String(transaction.created_at).slice(0, 10) : getTodayDateValue();
+      fromAccountSelect.value = transaction.from_account;
+      toAccountSelect.value = transaction.to_account;
+      commentInput.value = transaction.title === "Перевод" ? "" : transaction.title;
     }
 
     modal.classList.remove("hidden");
@@ -387,132 +486,6 @@ commentInput.value = transaction.title === "Перевод" ? "" : transaction.t
     modal.classList.add("hidden");
     document.body.style.overflow = "";
     editingTransactionId = null;
-  }
-
-  function resetForm() {
-  amountInput.value = "";
-  dateInput.value = getTodayDateValue();
-  commentInput.value = "";
-  categorySelect.innerHTML = `<option value="">Выбери категорию</option>`;
-  accountSelect.selectedIndex = 0;
-  fromAccountSelect.selectedIndex = 0;
-  toAccountSelect.selectedIndex = 0;
-}
-
-  function getCurrentTime() {
-    const now = new Date();
-    return now.toLocaleTimeString("ru-RU", {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  }
-  
-  function getTodayDateValue() {
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, "0");
-  const day = String(now.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-}
-
-function getLocalDateKey(dateValue) {
-  const date = new Date(dateValue);
-
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-
-  return `${year}-${month}-${day}`;
-}
-
-  function formatMoney(value) {
-    return `${new Intl.NumberFormat("ru-RU").format(Number(value) || 0)} ₽`;
-  }
-  
-  function formatDateShort(dateValue) {
-  if (!dateValue) return "";
-
-  const rawDate = String(dateValue).slice(0, 10);
-  const [year, month, day] = rawDate.split("-");
-
-  if (!year || !month || !day) return "";
-
-  return `${day}.${month}.${year.slice(-2)}`;
-}
-
-function sortTransactionsByLatest(items) {
-  return [...items].sort((a, b) => {
-    const timeA = a.created_at ? new Date(a.created_at).getTime() : 0;
-    const timeB = b.created_at ? new Date(b.created_at).getTime() : 0;
-    return timeB - timeA;
-  });
-}
-  
-  function formatDateShort(dateValue) {
-  if (!dateValue) return "";
-
-  const date = new Date(dateValue);
-
-  const day = String(date.getDate()).padStart(2, "0");
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const year = String(date.getFullYear()).slice(-2);
-
-  return `${day}.${month}.${year}`;
-}
-  
-  function getMonthRange(monthValue) {
-  if (!monthValue) return null;
-
-  const [year, month] = monthValue.split("-").map(Number);
-  if (!year || !month) return null;
-
-  const start = new Date(year, month - 1, 1).getTime();
-  const end = new Date(year, month, 1).getTime();
-
-  return { start, end };
-}
-
-function formatMonthLabel(monthValue) {
-  if (!monthValue) return "";
-
-  const [year, month] = monthValue.split("-").map(Number);
-  if (!year || !month) return "";
-
-  const date = new Date(year, month - 1, 1);
-
-  return date.toLocaleDateString("ru-RU", {
-    month: "long",
-    year: "numeric",
-  });
-}
-
-function getAnalyticsPeriodLabel() {
-  if (analyticsFilterPeriod === "7") return "за 7 дней";
-  if (analyticsFilterPeriod === "30") return "за 30 дней";
-  return "за всё время";
-}
-
-  function escapeHtml(str) {
-    return String(str)
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;")
-      .replaceAll("'", "&#039;");
-  }
-
-  function getIconToneClass(type, extra = "") {
-    if (type === "income") return "list-icon--green";
-    if (type === "transfer") return "list-icon--blue";
-    if (type === "expense") {
-      if (extra === "transport") return "list-icon--blue";
-      if (extra === "fun") return "list-icon--purple";
-      if (extra === "snack") return "list-icon--amber";
-      if (extra === "food") return "list-icon--green";
-      if (extra === "uncategorized") return "list-icon--neutral";
-      return "list-icon--red";
-    }
-    return "list-icon--neutral";
   }
 
   function getAccountBalance(accountName) {
@@ -647,7 +620,7 @@ function getAnalyticsPeriodLabel() {
     const items = getAnalyticsFilteredTransactions();
     const map = new Map();
 
-    items.forEach((transaction) => {
+    items.forEach((transaction, index) => {
       if (transaction.type !== "expense") return;
 
       const categoryId = transaction.category_id || UNCATEGORIZED_ID;
@@ -672,53 +645,52 @@ function getAnalyticsPeriodLabel() {
   }
 
   function getHistoryFilteredTransactions() {
-  let filtered = [...state.transactions];
+    let filtered = [...state.transactions];
 
-  if (historyFilterType !== "all") {
-    filtered = filtered.filter((item) => item.type === historyFilterType);
+    if (historyFilterType !== "all") {
+      filtered = filtered.filter((item) => item.type === historyFilterType);
+    }
+
+    const todayKey = getTodayDateValue();
+    const customMonthRange = getMonthRange(historySelectedMonth);
+
+    filtered = filtered.filter((transaction) => {
+      const transactionTime = transaction.created_at
+        ? new Date(transaction.created_at).getTime()
+        : 0;
+
+      const transactionDateKey = transaction.created_at
+        ? String(transaction.created_at).slice(0, 10)
+        : "";
+
+      if (historyFilterPeriod === "all") return true;
+
+      if (historyFilterPeriod === "today") {
+        return transactionDateKey === todayKey;
+      }
+
+      if (historyFilterPeriod === "7") {
+        return transactionTime >= Date.now() - 7 * 24 * 60 * 60 * 1000;
+      }
+
+      if (historyFilterPeriod === "30") {
+        return transactionTime >= Date.now() - 30 * 24 * 60 * 60 * 1000;
+      }
+
+      if (historyFilterPeriod === "customMonth") {
+        if (!customMonthRange) return true;
+
+        return (
+          transactionTime >= customMonthRange.start &&
+          transactionTime < customMonthRange.end
+        );
+      }
+
+      return true;
+    });
+
+    return sortTransactionsByLatest(filtered);
   }
-
-  const now = new Date();
-const todayKey = getTodayDateValue();
-const customMonthRange = getMonthRange(historySelectedMonth);
-
-filtered = filtered.filter((transaction) => {
-  const transactionTime = transaction.created_at
-    ? new Date(transaction.created_at).getTime()
-    : 0;
-
-  const transactionDateKey = transaction.created_at
-    ? String(transaction.created_at).slice(0, 10)
-    : "";
-
-  if (historyFilterPeriod === "all") return true;
-
-  if (historyFilterPeriod === "today") {
-    return transactionDateKey === todayKey;
-  }
-
-  if (historyFilterPeriod === "7") {
-    return transactionTime >= Date.now() - 7 * 24 * 60 * 60 * 1000;
-  }
-
-  if (historyFilterPeriod === "30") {
-    return transactionTime >= Date.now() - 30 * 24 * 60 * 60 * 1000;
-  }
-
-  if (historyFilterPeriod === "customMonth") {
-    if (!customMonthRange) return true;
-
-    return (
-      transactionTime >= customMonthRange.start &&
-      transactionTime < customMonthRange.end
-    );
-  }
-
-  return true;
-});
-
-  return sortTransactionsByLatest(filtered);
-}
 
   function getCurrentMonthExpenseByCategory(categoryId) {
     const now = new Date();
@@ -727,8 +699,10 @@ filtered = filtered.filter((transaction) => {
     return state.transactions.reduce((sum, transaction) => {
       if (transaction.type !== "expense") return sum;
       if ((transaction.category_id || UNCATEGORIZED_ID) !== categoryId) return sum;
+
       const time = transaction.created_at ? new Date(transaction.created_at).getTime() : 0;
       if (time < startOfMonth) return sum;
+
       return sum + (Number(transaction.amount) || 0);
     }, 0);
   }
@@ -736,112 +710,99 @@ filtered = filtered.filter((transaction) => {
   function getBudgetCategories() {
     return state.categories.filter((category) => category.id !== UNCATEGORIZED_ID);
   }
-  
+
   async function applySafeInterestIfNeeded() {
-  const annualRate = 0.12;
-  const dailyRate = annualRate / 365;
+    const annualRate = 0.12;
+    const dailyRate = annualRate / 365;
 
-  const today = new Date();
-  const todayString = getDateOnlyString(today);
+    const today = new Date();
+    const todayString = getDateOnlyString(today);
 
-  const lastAppliedDate = getAppMetaValue("safe_interest_last_applied_date");
+    const lastAppliedDate = getAppMetaValue("safe_interest_last_applied_date");
 
-  if (lastAppliedDate === todayString) {
-    return;
-  }
-
-  let startDate;
-
-  if (!lastAppliedDate) {
-    startDate = new Date(today);
-    startDate.setDate(startDate.getDate() - 1);
-  } else {
-    startDate = new Date(`${lastAppliedDate}T00:00:00`);
-  }
-
-  const daysToApply = [];
-  const cursor = new Date(startDate);
-
-  while (true) {
-    cursor.setDate(cursor.getDate() + 1);
-    const cursorString = getDateOnlyString(cursor);
-
-    if (cursorString > todayString) break;
-    daysToApply.push(new Date(cursor));
-  }
-
-  if (!daysToApply.length) {
-    return;
-  }
-
-  for (const day of daysToApply) {
-    const safeBalance = getSafeBalance();
-
-    if (safeBalance <= 0) {
-      continue;
-    }
-
-    const interestAmount = roundToTwo(safeBalance * dailyRate);
-
-    if (interestAmount <= 0) {
-      continue;
-    }
-
-    const dayString = getDateOnlyString(day);
-
-    const interestTransaction = {
-      id: crypto.randomUUID(),
-      type: "income",
-      title: "Проценты по сейфу",
-      account: "Сейфы Яндекса",
-      category_id: null,
-      from_account: null,
-      to_account: null,
-      amount: interestAmount,
-      time_label: "00:01",
-      created_at: `${dayString}T00:01:00`,
-    };
-
-    const { error: insertError } = await supabaseClient
-      .from("transactions")
-      .insert(interestTransaction);
-
-    if (insertError) {
-      console.error(insertError);
-      alert("Ошибка начисления процентов по сейфу");
+    if (lastAppliedDate === todayString) {
       return;
     }
 
-    state.transactions.push(interestTransaction);
-  }
+    let startDate;
 
-  const { error: metaError } = await supabaseClient
-    .from("app_meta")
-    .upsert({
-      key: "safe_interest_last_applied_date",
-      value: todayString,
-    });
+    if (!lastAppliedDate) {
+      startDate = new Date(today);
+      startDate.setDate(startDate.getDate() - 1);
+    } else {
+      startDate = new Date(`${lastAppliedDate}T00:00:00`);
+    }
 
-  if (metaError) {
-    console.error(metaError);
-    alert("Ошибка сохранения даты начисления процентов");
-    return;
+    const daysToApply = [];
+    const cursor = new Date(startDate);
+
+    while (true) {
+      cursor.setDate(cursor.getDate() + 1);
+      const cursorString = getDateOnlyString(cursor);
+
+      if (cursorString > todayString) break;
+      daysToApply.push(new Date(cursor));
+    }
+
+    if (!daysToApply.length) {
+      return;
+    }
+
+    for (const day of daysToApply) {
+      const safeBalance = getSafeBalance();
+
+      if (safeBalance <= 0) continue;
+
+      const interestAmount = roundToTwo(safeBalance * dailyRate);
+
+      if (interestAmount <= 0) continue;
+
+      const dayString = getDateOnlyString(day);
+
+      const interestTransaction = {
+        id: crypto.randomUUID(),
+        type: "income",
+        title: "Проценты по сейфу",
+        account: "Сейфы Яндекса",
+        category_id: null,
+        from_account: null,
+        to_account: null,
+        amount: interestAmount,
+        time_label: "00:01",
+        created_at: `${dayString}T00:01:00`,
+      };
+
+      const { error: insertError } = await supabaseClient
+        .from("transactions")
+        .insert(interestTransaction);
+
+      if (insertError) {
+        console.error(insertError);
+        alert("Ошибка начисления процентов по сейфу");
+        return;
+      }
+
+      state.transactions.push(interestTransaction);
+    }
+
+    const { error: metaError } = await supabaseClient
+      .from("app_meta")
+      .upsert({
+        key: "safe_interest_last_applied_date",
+        value: todayString,
+      });
+
+    if (metaError) {
+      console.error(metaError);
+      alert("Ошибка сохранения даты начисления процентов");
+    }
   }
-}
 
   function renderBalance() {
     const balance = calculateBalance();
     balanceEl.textContent = formatMoney(balance);
     accountsTotalEl.textContent = `Всего: ${formatMoney(balance)}`;
   }
-  
-  function sortTransactionsByLatest(items) {
-  return [...items].sort((a, b) => {
-    const timeA = a.created_at ? new Date(a.created_at).getTime() : 0;
-    const timeB = b.created_at ? new Date(b.created_at).getTime() : 0;
-    return timeB - timeA;
-  });
-}
 
   function renderMonthlyStats() {
     const { income, expense } = calculateMonthlyStats();
@@ -889,14 +850,14 @@ filtered = filtered.filter((transaction) => {
       card.className = "list-card";
 
       const accountTone =
-  account.id === "yandex"
-    ? "list-icon--green"
-    : account.id === "cash"
-    ? "list-icon--blue"
-    : account.id === "cash_reserve"
-    ? "list-icon--neutral"
-    : "list-icon--amber";
-    
+        account.id === "yandex"
+          ? "list-icon--green"
+          : account.id === "cash"
+          ? "list-icon--blue"
+          : account.id === "cash_reserve"
+          ? "list-icon--neutral"
+          : "list-icon--amber";
+
       card.innerHTML = `
         <div class="list-icon ${accountTone}">${account.icon}</div>
         <div class="list-body">
@@ -1093,82 +1054,82 @@ filtered = filtered.filter((transaction) => {
   }
 
   function createTransactionCard(transaction) {
-  const card = document.createElement("div");
-  card.className = "list-card list-card--clickable";
+    const card = document.createElement("div");
+    card.className = "list-card list-card--clickable";
 
-  const icon =
-    transaction.type === "income"
-      ? "💰"
-      : transaction.type === "transfer"
-      ? "↗"
-      : getCategoryIcon(transaction.category_id || UNCATEGORIZED_ID);
+    const icon =
+      transaction.type === "income"
+        ? "💰"
+        : transaction.type === "transfer"
+        ? "↗"
+        : getCategoryIcon(transaction.category_id || UNCATEGORIZED_ID);
 
-  const toneKey =
-    transaction.type === "expense" ? (transaction.category_id || UNCATEGORIZED_ID) : "";
+    const toneKey =
+      transaction.type === "expense" ? (transaction.category_id || UNCATEGORIZED_ID) : "";
 
-  const iconToneClass = getIconToneClass(transaction.type, toneKey);
+    const iconToneClass = getIconToneClass(transaction.type, toneKey);
 
-  let subtitle = "";
-  let signedAmount = "";
-  let valueClass = "list-value";
+    let subtitle = "";
+    let signedAmount = "";
+    let valueClass = "list-value";
 
-  if (transaction.type === "transfer") {
-    subtitle = `${escapeHtml(transaction.from_account)} → ${escapeHtml(transaction.to_account)}`;
-    signedAmount = formatMoney(transaction.amount);
-  } else if (transaction.type === "income") {
-    subtitle = `${escapeHtml(transaction.account)} • доход`;
-    signedAmount = `+${formatMoney(transaction.amount)}`;
-    valueClass = "list-value list-value--green";
-  } else {
-    subtitle = `${escapeHtml(getCategoryName(transaction.category_id || UNCATEGORIZED_ID))} • ${escapeHtml(transaction.account)}`;
-    signedAmount = `−${formatMoney(transaction.amount)}`;
-    valueClass = "list-value list-value--red";
-  }
+    if (transaction.type === "transfer") {
+      subtitle = `${escapeHtml(transaction.from_account)} → ${escapeHtml(transaction.to_account)}`;
+      signedAmount = formatMoney(transaction.amount);
+    } else if (transaction.type === "income") {
+      subtitle = `${escapeHtml(transaction.account)} • доход`;
+      signedAmount = `+${formatMoney(transaction.amount)}`;
+      valueClass = "list-value list-value--green";
+    } else {
+      subtitle = `${escapeHtml(getCategoryName(transaction.category_id || UNCATEGORIZED_ID))} • ${escapeHtml(transaction.account)}`;
+      signedAmount = `−${formatMoney(transaction.amount)}`;
+      valueClass = "list-value list-value--red";
+    }
 
-  const shortDate = formatDateShort(transaction.created_at);
-  const timeLabel = transaction.time_label || "";
-  const caption = `${shortDate}${shortDate && timeLabel ? " • " : ""}${timeLabel}`;
+    const shortDate = formatDateShort(transaction.created_at);
+    const timeLabel = transaction.time_label || "";
+    const caption = `${shortDate}${shortDate && timeLabel ? " • " : ""}${timeLabel}`;
 
-  card.innerHTML = `
-    <div class="list-icon ${iconToneClass}">${icon}</div>
-    <div class="list-body">
-      <div class="list-title-row">
-        <h3 class="list-title">${escapeHtml(transaction.title)}</h3>
-      </div>
-      <p class="list-subtitle">${subtitle}</p>
-    </div>
-    <div class="list-right">
-      <p class="${valueClass}">${signedAmount}</p>
-      <div class="list-caption">${caption}</div>
-    </div>
-  `;
-
-  card.addEventListener("click", () => openEditModal(transaction.id));
-  return card;
-}
-
-  function renderTransactions() {
-  transactionsListEl.innerHTML = "";
-
-  const latestTransactions = sortTransactionsByLatest(state.transactions).slice(0, 5);
-
-  if (latestTransactions.length === 0) {
-    const empty = document.createElement("div");
-    empty.className = "list-card";
-    empty.innerHTML = `
+    card.innerHTML = `
+      <div class="list-icon ${iconToneClass}">${icon}</div>
       <div class="list-body">
-        <h3 class="list-title">Операций пока нет</h3>
-        <p class="list-subtitle">Добавь первую операцию через кнопки сверху</p>
+        <div class="list-title-row">
+          <h3 class="list-title">${escapeHtml(transaction.title)}</h3>
+        </div>
+        <p class="list-subtitle">${subtitle}</p>
+      </div>
+      <div class="list-right">
+        <p class="${valueClass}">${signedAmount}</p>
+        <div class="list-caption">${caption}</div>
       </div>
     `;
-    transactionsListEl.appendChild(empty);
-    return;
+
+    card.addEventListener("click", () => openEditModal(transaction.id));
+    return card;
   }
 
-  latestTransactions.forEach((transaction) => {
-    transactionsListEl.appendChild(createTransactionCard(transaction));
-  });
-}
+  function renderTransactions() {
+    transactionsListEl.innerHTML = "";
+
+    const latestTransactions = sortTransactionsByLatest(state.transactions).slice(0, 5);
+
+    if (latestTransactions.length === 0) {
+      const empty = document.createElement("div");
+      empty.className = "list-card";
+      empty.innerHTML = `
+        <div class="list-body">
+          <h3 class="list-title">Операций пока нет</h3>
+          <p class="list-subtitle">Добавь первую операцию через кнопки сверху</p>
+        </div>
+      `;
+      transactionsListEl.appendChild(empty);
+      return;
+    }
+
+    latestTransactions.forEach((transaction) => {
+      transactionsListEl.appendChild(createTransactionCard(transaction));
+    });
+  }
 
   function renderHistory() {
     if (!historyTransactionsList) return;
@@ -1178,26 +1139,27 @@ filtered = filtered.filter((transaction) => {
     const filteredTransactions = getHistoryFilteredTransactions();
 
     historyCountLabel.textContent = `${filteredTransactions.length} операций`;
-    historyPeriodButtons.forEach((btn) => {
-  btn.classList.toggle("is-active", btn.dataset.period === historyFilterPeriod);
-});
 
-historyTypeButtons.forEach((btn) => {
-  btn.classList.toggle("is-active", btn.dataset.type === historyFilterType);
-});
+    historyPeriodButtons.forEach((btn) => {
+      btn.classList.toggle("is-active", btn.dataset.period === historyFilterPeriod);
+    });
+
+    historyTypeButtons.forEach((btn) => {
+      btn.classList.toggle("is-active", btn.dataset.type === historyFilterType);
+    });
 
     if (historyMonthInput) {
-  historyMonthInput.classList.toggle("hidden", historyFilterPeriod !== "customMonth");
-}
+      historyMonthInput.classList.toggle("hidden", historyFilterPeriod !== "customMonth");
+    }
 
-if (historySelectedPeriodLabel) {
-  const hasCustomMonth = historyFilterPeriod === "customMonth" && historySelectedMonth;
+    if (historySelectedPeriodLabel) {
+      const hasCustomMonth = historyFilterPeriod === "customMonth" && historySelectedMonth;
 
-  historySelectedPeriodLabel.classList.toggle("hidden", !hasCustomMonth);
-  historySelectedPeriodLabel.textContent = hasCustomMonth
-    ? formatMonthLabel(historySelectedMonth)
-    : "";
-}
+      historySelectedPeriodLabel.classList.toggle("hidden", !hasCustomMonth);
+      historySelectedPeriodLabel.textContent = hasCustomMonth
+        ? formatMonthLabel(historySelectedMonth)
+        : "";
+    }
 
     if (filteredTransactions.length === 0) {
       const empty = document.createElement("div");
@@ -1218,160 +1180,168 @@ if (historySelectedPeriodLabel) {
   }
 
   function renderAnalytics() {
-  if (!analyticsView) return;
+    if (!analyticsView) return;
 
-  const summary = getAnalyticsSummary();
-  const breakdown = getAnalyticsCategoryBreakdown();
+    const summary = getAnalyticsSummary();
+    const breakdown = getAnalyticsCategoryBreakdown();
 
-  analyticsIncomeValue.textContent = formatMoney(summary.income);
-  analyticsExpenseValue.textContent = formatMoney(summary.expense);
+    analyticsIncomeValue.textContent = formatMoney(summary.income);
+    analyticsExpenseValue.textContent = formatMoney(summary.expense);
 
-  analyticsNetValue.classList.remove("is-positive", "is-negative");
+    analyticsNetValue.classList.remove("is-positive", "is-negative");
 
-  if (summary.net > 0) {
-    analyticsNetValue.textContent = `+${formatMoney(summary.net)}`;
-    analyticsNetValue.classList.add("is-positive");
-  } else if (summary.net < 0) {
-    analyticsNetValue.textContent = `−${formatMoney(Math.abs(summary.net))}`;
-    analyticsNetValue.classList.add("is-negative");
-  } else {
-    analyticsNetValue.textContent = formatMoney(0);
-  }
-
-  analyticsPeriodButtons.forEach((btn) => {
-    btn.classList.toggle("is-active", btn.dataset.analyticsPeriod === analyticsFilterPeriod);
-  });
-
-  if (!breakdown.length) {
-    analyticsDonut.innerHTML = `
-      <div class="analytics-overview-card analytics-overview-card--empty">
-        <div class="analytics-overview-card__total">${formatMoney(0)}</div>
-        <div class="analytics-overview-card__period">${getAnalyticsPeriodLabel()}</div>
-      </div>
-    `;
-
-    analyticsLegend.innerHTML = `
-      <div class="analytics-empty analytics-empty--clean">
-        Нет данных по расходам за выбранный период
-      </div>
-    `;
-    return;
-  }
-
-  const totalExpense = breakdown.reduce((sum, item) => sum + item.amount, 0);
-  const topItem = breakdown[0];
-  const topPercent = totalExpense > 0 ? Math.round((topItem.amount / totalExpense) * 100) : 0;
-
-  analyticsDonut.innerHTML = `
-    <div class="analytics-overview-card">
-      <div class="analytics-overview-card__label">Расходы по категориям</div>
-      <div class="analytics-overview-card__total">${formatMoney(totalExpense)}</div>
-      <div class="analytics-overview-card__period">${getAnalyticsPeriodLabel()}</div>
-
-      <div class="analytics-overview-card__leader">
-        <div class="analytics-overview-card__leader-label">Главная категория</div>
-        <div class="analytics-overview-card__leader-title">${escapeHtml(topItem.icon)} ${escapeHtml(topItem.name)}</div>
-        <div class="analytics-overview-card__leader-meta">${topPercent}% • ${formatMoney(topItem.amount)}</div>
-      </div>
-    </div>
-  `;
-
-  const listMarkup = breakdown
-    .map((item, index) => {
-      const percent = totalExpense > 0 ? Math.round((item.amount / totalExpense) * 100) : 0;
-
-      return `
-        <div class="analytics-breakdown-row">
-          <div class="analytics-breakdown-row__left">
-            <div class="analytics-breakdown-row__rank">#${index + 1}</div>
-            <span class="analytics-breakdown-row__dot" style="background:${item.color};"></span>
-            <div class="analytics-breakdown-row__body">
-              <div class="analytics-breakdown-row__title">${escapeHtml(item.icon)} ${escapeHtml(item.name)}</div>
-              <div class="analytics-breakdown-row__subtitle">${percent}% от расходов</div>
-            </div>
-          </div>
-          <div class="analytics-breakdown-row__value">${formatMoney(item.amount)}</div>
-        </div>
-      `;
-    })
-    .join("");
-
-  analyticsLegend.innerHTML = `
-    <div class="analytics-breakdown-list">
-      ${listMarkup}
-    </div>
-  `;
-}
-
-  function renderBudget() {
-  if (!budgetList) return;
-
-  budgetList.innerHTML = "";
-
-  const categories = getBudgetCategories();
-  budgetCountLabel.textContent = `${categories.length} категорий`;
-
-  if (!categories.length) {
-    budgetList.innerHTML = `<div class="manager-card"><div class="budget-empty">Категорий пока нет</div></div>`;
-    return;
-  }
-
-  categories.forEach((category) => {
-    const spent = getCurrentMonthExpenseByCategory(category.id);
-    const limitRecord = getBudgetLimitByCategoryId(category.id);
-    const limit = limitRecord ? Number(limitRecord.monthly_limit) || 0 : 0;
-    const remains = Math.max(limit - spent, 0);
-    const progressPercent = limit > 0 ? Math.min((spent / limit) * 100, 100) : 0;
-
-    const toneClass =
-      category.id === "food"
-        ? "list-icon--green"
-        : category.id === "transport"
-        ? "list-icon--blue"
-        : category.id === "fun"
-        ? "list-icon--purple"
-        : category.id === "snack"
-        ? "list-icon--amber"
-        : "list-icon--neutral";
-
-    let fillClass = "budget-progress__fill";
-    if (limit > 0 && progressPercent >= 100) {
-      fillClass += " is-danger";
-    } else if (limit > 0 && progressPercent >= 75) {
-      fillClass += " is-warning";
+    if (summary.net > 0) {
+      analyticsNetValue.textContent = `+${formatMoney(summary.net)}`;
+      analyticsNetValue.classList.add("is-positive");
+    } else if (summary.net < 0) {
+      analyticsNetValue.textContent = `−${formatMoney(Math.abs(summary.net))}`;
+      analyticsNetValue.classList.add("is-negative");
+    } else {
+      analyticsNetValue.textContent = formatMoney(0);
     }
 
-    const spentText = formatMoney(spent);
-    const limitText = limit > 0 ? formatMoney(limit) : "Без лимита";
-    const remainsText = limit > 0 ? formatMoney(remains) : "—";
+    analyticsPeriodButtons.forEach((btn) => {
+      btn.classList.toggle("is-active", btn.dataset.analyticsPeriod === analyticsFilterPeriod);
+    });
 
-    const card = document.createElement("div");
-    card.className = "list-card budget-card";
-    card.innerHTML = `
-      <div class="list-icon ${toneClass}">${category.icon}</div>
-
-      <div class="list-body">
-        <div class="budget-top">
-          <div class="budget-top__left">
-            <h3 class="list-title">${escapeHtml(category.name)}</h3>
-            <p class="budget-remains">Осталось ${remainsText}</p>
-          </div>
-
-          <div class="budget-top__right">
-            <p class="budget-ratio">${spentText} <span>из ${limitText}</span></p>
-          </div>
+    if (!breakdown.length) {
+      analyticsDonut.innerHTML = `
+        <div class="analytics-overview-card analytics-overview-card--empty">
+          <div class="analytics-overview-card__total">${formatMoney(0)}</div>
+          <div class="analytics-overview-card__period">${getAnalyticsPeriodLabel()}</div>
         </div>
+      `;
 
-        <div class="budget-progress">
-          <div class="${fillClass}" style="width:${progressPercent}%;"></div>
+      analyticsLegend.innerHTML = `
+        <div class="analytics-empty analytics-empty--clean">
+          Нет данных по расходам за выбранный период
+        </div>
+      `;
+      return;
+    }
+
+    const totalExpense = breakdown.reduce((sum, item) => sum + item.amount, 0);
+    const topItem = breakdown[0];
+    const topPercent = totalExpense > 0 ? Math.round((topItem.amount / totalExpense) * 100) : 0;
+
+    analyticsDonut.innerHTML = `
+      <div class="analytics-overview-card">
+        <div class="analytics-overview-card__label">Расходы по категориям</div>
+        <div class="analytics-overview-card__total">${formatMoney(totalExpense)}</div>
+        <div class="analytics-overview-card__period">${getAnalyticsPeriodLabel()}</div>
+
+        <div class="analytics-overview-card__leader">
+          <div class="analytics-overview-card__leader-label">Главная категория</div>
+          <div class="analytics-overview-card__leader-title">${escapeHtml(topItem.icon)} ${escapeHtml(topItem.name)}</div>
+          <div class="analytics-overview-card__leader-meta">${topPercent}% • ${formatMoney(topItem.amount)}</div>
         </div>
       </div>
     `;
 
-    card.addEventListener("click", () => openBudgetModal(category.id));
-    budgetList.appendChild(card);
-  });
-}
+    const listMarkup = breakdown
+      .map((item, index) => {
+        const percent = totalExpense > 0 ? Math.round((item.amount / totalExpense) * 100) : 0;
+
+        return `
+          <div class="analytics-breakdown-row">
+            <div class="analytics-breakdown-row__left">
+              <div class="analytics-breakdown-row__rank">#${index + 1}</div>
+              <span class="analytics-breakdown-row__dot" style="background:${item.color};"></span>
+              <div class="analytics-breakdown-row__body">
+                <div class="analytics-breakdown-row__title">${escapeHtml(item.icon)} ${escapeHtml(item.name)}</div>
+                <div class="analytics-breakdown-row__subtitle">${percent}% от расходов</div>
+              </div>
+            </div>
+            <div class="analytics-breakdown-row__value">${formatMoney(item.amount)}</div>
+          </div>
+        `;
+      })
+      .join("");
+
+    analyticsLegend.innerHTML = `
+      <div class="analytics-breakdown-list">
+        ${listMarkup}
+      </div>
+    `;
+  }
+
+  function renderBudget() {
+    if (!budgetList) return;
+
+    budgetList.innerHTML = "";
+
+    const categories = getBudgetCategories();
+
+    if (budgetCountLabel) {
+      budgetCountLabel.textContent = `${categories.length} категорий`;
+    }
+
+    if (!categories.length) {
+      budgetList.innerHTML = `
+        <div class="manager-card">
+          <div class="budget-empty">Категорий пока нет</div>
+        </div>
+      `;
+      return;
+    }
+
+    categories.forEach((category) => {
+      const spent = Number(getCurrentMonthExpenseByCategory(category.id)) || 0;
+      const limitRecord = getBudgetLimitByCategoryId(category.id);
+      const limit = limitRecord ? Number(limitRecord.monthly_limit) || 0 : 0;
+      const remains = Math.max(limit - spent, 0);
+      const progressPercent = limit > 0 ? Math.min((spent / limit) * 100, 100) : 0;
+
+      const toneClass =
+        category.id === "food"
+          ? "list-icon--green"
+          : category.id === "transport"
+          ? "list-icon--blue"
+          : category.id === "fun"
+          ? "list-icon--purple"
+          : category.id === "snack"
+          ? "list-icon--amber"
+          : "list-icon--neutral";
+
+      let fillClass = "budget-progress__fill";
+      if (limit > 0 && progressPercent >= 100) {
+        fillClass += " is-danger";
+      } else if (limit > 0 && progressPercent >= 75) {
+        fillClass += " is-warning";
+      }
+
+      const spentText = formatMoney(spent);
+      const limitText = limit > 0 ? formatMoney(limit) : "Без лимита";
+      const remainsText = limit > 0 ? formatMoney(remains) : "—";
+
+      const card = document.createElement("div");
+      card.className = "list-card budget-card";
+
+      card.innerHTML = `
+        <div class="list-icon ${toneClass}">${escapeHtml(category.icon || "📦")}</div>
+
+        <div class="list-body">
+          <div class="budget-top">
+            <div class="budget-top__left">
+              <h3 class="list-title">${escapeHtml(category.name || "Без названия")}</h3>
+              <p class="budget-remains">Осталось ${remainsText}</p>
+            </div>
+
+            <div class="budget-top__right">
+              <p class="budget-ratio">${spentText} <span>из ${limitText}</span></p>
+            </div>
+          </div>
+
+          <div class="budget-progress">
+            <div class="${fillClass}" style="width:${progressPercent}%;"></div>
+          </div>
+        </div>
+      `;
+
+      card.addEventListener("click", () => openBudgetModal(category.id));
+      budgetList.appendChild(card);
+    });
+  }
 
   function buildTransactionFromForm() {
     const amount = Number(amountInput.value.trim());
@@ -1383,15 +1353,15 @@ if (historySelectedPeriodLabel) {
     }
 
     const selectedDate = dateInput.value || getTodayDateValue();
-const existingTimePart = editingTransactionId
-  ? state.transactions.find((item) => item.id === editingTransactionId)?.created_at
-  : null;
+    const existingTimePart = editingTransactionId
+      ? state.transactions.find((item) => item.id === editingTransactionId)?.created_at
+      : null;
 
-const preservedTime = existingTimePart
-  ? new Date(existingTimePart).toTimeString().slice(0, 8)
-  : new Date().toTimeString().slice(0, 8);
+    const preservedTime = existingTimePart
+      ? String(existingTimePart).slice(11, 19) || new Date().toTimeString().slice(0, 8)
+      : new Date().toTimeString().slice(0, 8);
 
-const existingCreatedAt = `${selectedDate}T${preservedTime}`;
+    const createdAt = `${selectedDate}T${preservedTime}`;
 
     if (currentMode === "transfer") {
       const fromAccount = fromAccountSelect.value;
@@ -1422,7 +1392,7 @@ const existingCreatedAt = `${selectedDate}T${preservedTime}`;
         to_account: toAccount,
         amount,
         time_label: getCurrentTime(),
-        created_at: existingCreatedAt,
+        created_at: createdAt,
       };
     }
 
@@ -1444,7 +1414,7 @@ const existingCreatedAt = `${selectedDate}T${preservedTime}`;
         to_account: null,
         amount,
         time_label: getCurrentTime(),
-        created_at: existingCreatedAt,
+        created_at: createdAt,
       };
     }
 
@@ -1465,7 +1435,7 @@ const existingCreatedAt = `${selectedDate}T${preservedTime}`;
       to_account: null,
       amount,
       time_label: getCurrentTime(),
-      created_at: existingCreatedAt,
+      created_at: createdAt,
     };
   }
 
@@ -1623,58 +1593,58 @@ const existingCreatedAt = `${selectedDate}T${preservedTime}`;
   }
 
   async function loadDataFromSupabase() {
-  const [
-    { data: accounts, error: accountsError },
-    { data: categories, error: categoriesError },
-    { data: transactions, error: transactionsError },
-    { data: budgetLimits, error: budgetLimitsError },
-    { data: appMeta, error: appMetaError }
-  ] = await Promise.all([
-    supabaseClient.from("accounts").select("*").order("sort_order", { ascending: true }),
-    supabaseClient.from("categories").select("*").order("sort_order", { ascending: true }),
-    supabaseClient.from("transactions").select("*").order("created_at", { ascending: false }),
-    supabaseClient.from("budget_limits").select("*"),
-    supabaseClient.from("app_meta").select("*"),
-  ]);
+    const [
+      { data: accounts, error: accountsError },
+      { data: categories, error: categoriesError },
+      { data: transactions, error: transactionsError },
+      { data: budgetLimits, error: budgetLimitsError },
+      { data: appMeta, error: appMetaError },
+    ] = await Promise.all([
+      supabaseClient.from("accounts").select("*").order("sort_order", { ascending: true }),
+      supabaseClient.from("categories").select("*").order("sort_order", { ascending: true }),
+      supabaseClient.from("transactions").select("*").order("created_at", { ascending: false }),
+      supabaseClient.from("budget_limits").select("*"),
+      supabaseClient.from("app_meta").select("*"),
+    ]);
 
-  if (accountsError) {
-    console.error(accountsError);
-    alert("Ошибка загрузки счетов из Supabase");
-    return;
+    if (accountsError) {
+      console.error(accountsError);
+      alert("Ошибка загрузки счетов из Supabase");
+      return;
+    }
+
+    if (categoriesError) {
+      console.error(categoriesError);
+      alert("Ошибка загрузки категорий из Supabase");
+      return;
+    }
+
+    if (transactionsError) {
+      console.error(transactionsError);
+      alert("Ошибка загрузки операций из Supabase");
+      return;
+    }
+
+    if (budgetLimitsError) {
+      console.error(budgetLimitsError);
+      alert("Ошибка загрузки лимитов бюджета из Supabase");
+      return;
+    }
+
+    if (appMetaError) {
+      console.error(appMetaError);
+      alert("Ошибка загрузки служебных данных приложения");
+      return;
+    }
+
+    state.accounts = accounts || [];
+    state.categories = categories || [];
+    state.transactions = transactions || [];
+    state.budgetLimits = budgetLimits || [];
+    state.appMeta = appMeta || [];
+
+    ensureUncategorizedCategory();
   }
-
-  if (categoriesError) {
-    console.error(categoriesError);
-    alert("Ошибка загрузки категорий из Supabase");
-    return;
-  }
-
-  if (transactionsError) {
-    console.error(transactionsError);
-    alert("Ошибка загрузки операций из Supabase");
-    return;
-  }
-
-  if (budgetLimitsError) {
-    console.error(budgetLimitsError);
-    alert("Ошибка загрузки лимитов бюджета из Supabase");
-    return;
-  }
-
-  if (appMetaError) {
-    console.error(appMetaError);
-    alert("Ошибка загрузки служебных данных приложения");
-    return;
-  }
-
-  state.accounts = accounts || [];
-  state.categories = categories || [];
-  state.transactions = transactions || [];
-  state.budgetLimits = budgetLimits || [];
-  state.appMeta = appMeta || [];
-
-  ensureUncategorizedCategory();
-}
 
   function renderAll() {
     ensureUncategorizedCategory();
@@ -1703,35 +1673,35 @@ const existingCreatedAt = `${selectedDate}T${preservedTime}`;
   navBudgetBtn?.addEventListener("click", showBudgetView);
 
   historyPeriodButtons.forEach((btn) => {
-  btn.addEventListener("click", () => {
-    historyFilterPeriod = btn.dataset.period;
+    btn.addEventListener("click", () => {
+      historyFilterPeriod = btn.dataset.period;
 
-    if (historyFilterPeriod === "customMonth") {
-      if (!historySelectedMonth) {
-        const now = new Date();
-        const year = now.getFullYear();
-        const month = String(now.getMonth() + 1).padStart(2, "0");
-        historySelectedMonth = `${year}-${month}`;
+      if (historyFilterPeriod === "customMonth") {
+        if (!historySelectedMonth) {
+          const now = new Date();
+          const year = now.getFullYear();
+          const month = String(now.getMonth() + 1).padStart(2, "0");
+          historySelectedMonth = `${year}-${month}`;
+        }
+
+        if (historyMonthInput) {
+          historyMonthInput.value = historySelectedMonth;
+          historyMonthInput.classList.remove("hidden");
+          historyMonthInput.showPicker?.();
+        }
       }
 
-      if (historyMonthInput) {
-        historyMonthInput.value = historySelectedMonth;
-        historyMonthInput.classList.remove("hidden");
-        historyMonthInput.showPicker?.();
-      }
-    }
+      renderHistory();
+    });
+  });
 
+  historyMonthInput?.addEventListener("change", () => {
+    if (!historyMonthInput.value) return;
+
+    historySelectedMonth = historyMonthInput.value;
+    historyFilterPeriod = "customMonth";
     renderHistory();
   });
-});
-
-historyMonthInput?.addEventListener("change", () => {
-  if (!historyMonthInput.value) return;
-
-  historySelectedMonth = historyMonthInput.value;
-  historyFilterPeriod = "customMonth";
-  renderHistory();
-});
 
   historyTypeButtons.forEach((btn) => {
     btn.addEventListener("click", () => {
@@ -1768,6 +1738,7 @@ historyMonthInput?.addEventListener("change", () => {
     if (event.key === "Escape" && !modal.classList.contains("hidden")) {
       closeModal();
     }
+
     if (event.key === "Escape" && !budgetModal.classList.contains("hidden")) {
       closeBudgetModal();
     }
@@ -1784,8 +1755,8 @@ historyMonthInput?.addEventListener("change", () => {
   });
 
   await loadDataFromSupabase();
-await applySafeInterestIfNeeded();
-await loadDataFromSupabase();
-renderAll();
-showWalletView();
+  await applySafeInterestIfNeeded();
+  await loadDataFromSupabase();
+  renderAll();
+  showWalletView();
 });
