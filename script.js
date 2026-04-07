@@ -486,6 +486,12 @@ function formatMonthLabel(monthValue) {
   });
 }
 
+function getAnalyticsPeriodLabel() {
+  if (analyticsFilterPeriod === "7") return "за 7 дней";
+  if (analyticsFilterPeriod === "30") return "за 30 дней";
+  return "за всё время";
+}
+
   function escapeHtml(str) {
     return String(str)
       .replaceAll("&", "&amp;")
@@ -1212,68 +1218,153 @@ if (historySelectedPeriodLabel) {
   }
 
   function renderAnalytics() {
-    if (!analyticsView) return;
+  if (!analyticsView) return;
 
-    const summary = getAnalyticsSummary();
-    const breakdown = getAnalyticsCategoryBreakdown();
+  const summary = getAnalyticsSummary();
+  const breakdown = getAnalyticsCategoryBreakdown();
 
-    analyticsIncomeValue.textContent = formatMoney(summary.income);
-    analyticsExpenseValue.textContent = formatMoney(summary.expense);
+  analyticsIncomeValue.textContent = formatMoney(summary.income);
+  analyticsExpenseValue.textContent = formatMoney(summary.expense);
 
-    analyticsNetValue.classList.remove("is-positive", "is-negative");
-    if (summary.net > 0) {
-      analyticsNetValue.textContent = `+${formatMoney(summary.net)}`;
-      analyticsNetValue.classList.add("is-positive");
-    } else if (summary.net < 0) {
-      analyticsNetValue.textContent = `−${formatMoney(Math.abs(summary.net))}`;
-      analyticsNetValue.classList.add("is-negative");
-    } else {
-      analyticsNetValue.textContent = formatMoney(0);
-    }
+  analyticsNetValue.classList.remove("is-positive", "is-negative");
 
-    analyticsPeriodButtons.forEach((btn) => {
-      btn.classList.toggle("is-active", btn.dataset.analyticsPeriod === analyticsFilterPeriod);
-    });
+  if (summary.net > 0) {
+    analyticsNetValue.textContent = `+${formatMoney(summary.net)}`;
+    analyticsNetValue.classList.add("is-positive");
+  } else if (summary.net < 0) {
+    analyticsNetValue.textContent = `−${formatMoney(Math.abs(summary.net))}`;
+    analyticsNetValue.classList.add("is-negative");
+  } else {
+    analyticsNetValue.textContent = formatMoney(0);
+  }
 
-    analyticsCategoriesCount.textContent = `${breakdown.length} категорий`;
+  analyticsPeriodButtons.forEach((btn) => {
+    btn.classList.toggle("is-active", btn.dataset.analyticsPeriod === analyticsFilterPeriod);
+  });
 
-    if (!breakdown.length) {
-      analyticsDonut.style.background = "conic-gradient(rgba(90, 93, 106, 0.42) 0deg 360deg)";
-      analyticsLegend.innerHTML = `<div class="analytics-empty">Нет данных по расходам за выбранный период</div>`;
-      return;
-    }
-
-    const totalExpense = breakdown.reduce((sum, item) => sum + item.amount, 0);
-
-    let currentAngle = 0;
-    const gradientParts = breakdown.map((item) => {
-      const part = totalExpense > 0 ? (item.amount / totalExpense) * 360 : 0;
-      const start = currentAngle;
-      const end = currentAngle + part;
-      currentAngle = end;
-      return `${item.color} ${start}deg ${end}deg`;
-    });
-
-    analyticsDonut.style.background = `conic-gradient(${gradientParts.join(", ")})`;
-
-    analyticsLegend.innerHTML = "";
-
-    breakdown.forEach((item) => {
-      const percent = totalExpense > 0 ? Math.round((item.amount / totalExpense) * 100) : 0;
-
-      const row = document.createElement("div");
-      row.className = "analytics-legend-item";
-      row.innerHTML = `
-        <div class="analytics-legend-dot" style="background:${item.color};"></div>
-        <div class="analytics-legend-body">
-          <p class="analytics-legend-title">${escapeHtml(item.icon)} ${escapeHtml(item.name)}</p>
-          <p class="analytics-legend-subtitle">${percent}% от расходов</p>
+  if (!breakdown.length) {
+    analyticsDonut.className = "analytics-donut analytics-donut--radial";
+    analyticsDonut.innerHTML = `
+      <div class="analytics-radial analytics-radial--empty">
+        <div class="analytics-radial__center">
+          <div class="analytics-radial__total">${formatMoney(0)}</div>
+          <div class="analytics-radial__period">${getAnalyticsPeriodLabel()}</div>
         </div>
-        <div class="analytics-legend-value">${formatMoney(item.amount)}</div>
-      `;
-      analyticsLegend.appendChild(row);
+      </div>
+    `;
+
+    analyticsLegend.innerHTML = `
+      <div class="analytics-empty analytics-empty--radial">
+        Нет данных по расходам за выбранный период
+      </div>
+    `;
+    return;
+  }
+
+  const totalExpense = breakdown.reduce((sum, item) => sum + item.amount, 0);
+
+  const radialItems = breakdown.slice(0, 5).map((item, index) => {
+    const percent = totalExpense > 0 ? Math.round((item.amount / totalExpense) * 100) : 0;
+    return { ...item, percent, index };
+  });
+
+  const otherItems = breakdown.slice(5);
+  const otherAmount = otherItems.reduce((sum, item) => sum + item.amount, 0);
+
+  if (otherAmount > 0) {
+    const otherPercent = totalExpense > 0 ? Math.round((otherAmount / totalExpense) * 100) : 0;
+    radialItems.push({
+      id: "analytics-other",
+      name: "Остальные",
+      icon: "⋯",
+      amount: otherAmount,
+      color: "rgba(255,255,255,0.22)",
+      percent: otherPercent,
+      index: radialItems.length,
     });
   }
+
+  const ringMarkup = radialItems
+    .map((item, index) => {
+      const size = 236 - index * 26;
+      const thickness = 14;
+      const angle = Math.max((item.percent / 100) * 360, item.percent > 0 ? 8 : 0);
+
+      return `
+        <div
+          class="analytics-radial__ring"
+          style="
+            --ring-size:${size}px;
+            --ring-thickness:${thickness}px;
+            --ring-angle:${angle}deg;
+            --ring-color:${item.color};
+          "
+          title="${escapeHtml(item.name)} — ${item.percent}%"
+        ></div>
+      `;
+    })
+    .join("");
+
+  analyticsDonut.className = "analytics-donut analytics-donut--radial";
+  analyticsDonut.innerHTML = `
+    <div class="analytics-radial">
+      ${ringMarkup}
+      <div class="analytics-radial__center">
+        <div class="analytics-radial__total">${formatMoney(totalExpense)}</div>
+        <div class="analytics-radial__period">${getAnalyticsPeriodLabel()}</div>
+      </div>
+    </div>
+  `;
+
+  const top1 = breakdown[0];
+  const top2 = breakdown[1];
+  const minItem = breakdown[breakdown.length - 1];
+
+  const insightCard = (label, item) => {
+    if (!item) return "";
+
+    const percent = totalExpense > 0 ? Math.round((item.amount / totalExpense) * 100) : 0;
+
+    return `
+      <div class="analytics-insight-card">
+        <div class="analytics-insight-card__label">${label}</div>
+        <div class="analytics-insight-card__title">${escapeHtml(item.icon)} ${escapeHtml(item.name)}</div>
+        <div class="analytics-insight-card__meta">${percent}% • ${formatMoney(item.amount)}</div>
+      </div>
+    `;
+  };
+
+  const listMarkup = breakdown
+    .map((item) => {
+      const percent = totalExpense > 0 ? Math.round((item.amount / totalExpense) * 100) : 0;
+
+      return `
+        <div class="analytics-category-row">
+          <div class="analytics-category-row__left">
+            <span class="analytics-category-row__dot" style="background:${item.color};"></span>
+            <div class="analytics-category-row__body">
+              <div class="analytics-category-row__title">${escapeHtml(item.icon)} ${escapeHtml(item.name)}</div>
+              <div class="analytics-category-row__subtitle">${percent}% от расходов</div>
+            </div>
+          </div>
+          <div class="analytics-category-row__value">${formatMoney(item.amount)}</div>
+        </div>
+      `;
+    })
+    .join("");
+
+  analyticsLegend.innerHTML = `
+    <div class="analytics-insights">
+      ${insightCard("Главная категория", top1)}
+      ${insightCard("Вторая по весу", top2)}
+      ${insightCard("Минимальная доля", minItem)}
+    </div>
+
+    <div class="analytics-category-list">
+      ${listMarkup}
+    </div>
+  `;
+}
 
   function renderBudget() {
   if (!budgetList) return;
