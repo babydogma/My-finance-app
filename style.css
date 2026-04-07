@@ -1740,8 +1740,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .analytics-overview-card {
-  padding: 14px;
-  border-radius: 22px;
+  padding: 12px 14px;
+  border-radius: 20px;
   background:
     radial-gradient(circle at top, rgba(255, 255, 255, 0.025), transparent 48%),
     linear-gradient(180deg, rgba(22, 26, 37, 0.98) 0%, rgba(14, 18, 28, 1) 100%);
@@ -1763,8 +1763,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .analytics-overview-card__total {
-  margin-top: 8px;
-  font-size: 28px;
+  margin-top: 6px;
+  font-size: 24px;
   font-weight: 880;
   line-height: 0.95;
   letter-spacing: -0.05em;
@@ -1780,8 +1780,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .analytics-overview-card__leader {
-  margin-top: 14px;
-  padding-top: 12px;
+  margin-top: 10px;
+  padding-top: 10px;
   border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
@@ -1837,8 +1837,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 .analytics-breakdown-row__rank {
   flex: 0 0 auto;
-  min-width: 28px;
-  height: 22px;
+  min-width: 24px;
+  height: 20px;
   padding: 0 8px;
   border-radius: 999px;
   background: rgba(111, 156, 255, 0.12);
