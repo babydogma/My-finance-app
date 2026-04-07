@@ -1724,3 +1724,214 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     font-size: 13.5px;
   }
 }
+
+/* =========================================================
+   ANALYTICS — CLEAN REBUILD
+   ========================================================= */
+
+.analytics-chart-card--clean {
+  padding: 14px;
+  border-radius: 28px;
+  gap: 14px;
+}
+
+.analytics-overview {
+  width: 100%;
+}
+
+.analytics-overview-card {
+  padding: 14px;
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at top, rgba(255, 255, 255, 0.025), transparent 48%),
+    linear-gradient(180deg, rgba(22, 26, 37, 0.98) 0%, rgba(14, 18, 28, 1) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.03),
+    0 10px 26px rgba(0, 0, 0, 0.24);
+}
+
+.analytics-overview-card--empty {
+  text-align: center;
+}
+
+.analytics-overview-card__label {
+  font-size: 12px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.48);
+  line-height: 1.1;
+}
+
+.analytics-overview-card__total {
+  margin-top: 8px;
+  font-size: 28px;
+  font-weight: 880;
+  line-height: 0.95;
+  letter-spacing: -0.05em;
+  color: var(--text);
+}
+
+.analytics-overview-card__period {
+  margin-top: 6px;
+  font-size: 12px;
+  font-weight: 680;
+  color: rgba(255, 255, 255, 0.5);
+  line-height: 1.1;
+}
+
+.analytics-overview-card__leader {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.analytics-overview-card__leader-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.44);
+  line-height: 1.1;
+}
+
+.analytics-overview-card__leader-title {
+  margin-top: 6px;
+  font-size: 16px;
+  font-weight: 820;
+  line-height: 1.1;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+
+.analytics-overview-card__leader-meta {
+  margin-top: 4px;
+  font-size: 13px;
+  font-weight: 680;
+  color: rgba(255, 255, 255, 0.58);
+  line-height: 1.1;
+}
+
+.analytics-breakdown {
+  width: 100%;
+}
+
+.analytics-breakdown-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.analytics-breakdown-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 4px 0;
+}
+
+.analytics-breakdown-row__left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  flex: 1;
+}
+
+.analytics-breakdown-row__rank {
+  flex: 0 0 auto;
+  min-width: 28px;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: rgba(111, 156, 255, 0.12);
+  color: var(--accent);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.analytics-breakdown-row__dot {
+  width: 10px;
+  height: 10px;
+  flex: 0 0 10px;
+  border-radius: 50%;
+  box-shadow:
+    0 0 12px rgba(255, 255, 255, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+}
+
+.analytics-breakdown-row__body {
+  min-width: 0;
+  flex: 1;
+}
+
+.analytics-breakdown-row__title {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.analytics-breakdown-row__subtitle {
+  margin-top: 3px;
+  font-size: 12px;
+  font-weight: 650;
+  color: rgba(255, 255, 255, 0.5);
+  line-height: 1.1;
+}
+
+.analytics-breakdown-row__value {
+  flex: 0 0 auto;
+  font-size: 15px;
+  font-weight: 820;
+  color: var(--text);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+.analytics-empty--clean {
+  padding: 10px 0 2px;
+}
+
+@media (max-width: 420px) {
+  .analytics-chart-card--clean {
+    padding: 12px;
+    border-radius: 24px;
+    gap: 12px;
+  }
+
+  .analytics-overview-card {
+    padding: 13px;
+    border-radius: 20px;
+  }
+
+  .analytics-overview-card__total {
+    font-size: 25px;
+  }
+
+  .analytics-overview-card__leader-title {
+    font-size: 15px;
+  }
+
+  .analytics-overview-card__leader-meta {
+    font-size: 12px;
+  }
+
+  .analytics-breakdown-row__title {
+    font-size: 14px;
+  }
+
+  .analytics-breakdown-row__subtitle {
+    font-size: 11.5px;
+  }
+
+  .analytics-breakdown-row__value {
+    font-size: 14px;
+  }
+}
