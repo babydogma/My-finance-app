@@ -415,6 +415,16 @@ commentInput.value = transaction.title === "Перевод" ? "" : transaction.t
   return `${year}-${month}-${day}`;
 }
 
+function getLocalDateKey(dateValue) {
+  const date = new Date(dateValue);
+
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
+
   function formatMoney(value) {
     return `${new Intl.NumberFormat("ru-RU").format(Number(value) || 0)} ₽`;
   }
@@ -632,21 +642,22 @@ function formatMonthLabel(monthValue) {
   }
 
   const now = new Date();
-  const startOfToday = new Date(
-    now.getFullYear(),
-    now.getMonth(),
-    now.getDate()
-  ).getTime();
-
-  const customMonthRange = getMonthRange(historySelectedMonth);
+const todayKey = getLocalDateKey(now);
+const customMonthRange = getMonthRange(historySelectedMonth);
 
   filtered = filtered.filter((transaction) => {
     const transactionTime = transaction.created_at
-      ? new Date(transaction.created_at).getTime()
-      : 0;
+  ? new Date(transaction.created_at).getTime()
+  : 0;
+
+const transactionDateKey = transaction.created_at
+  ? getLocalDateKey(transaction.created_at)
+  : "";
 
     if (historyFilterPeriod === "all") return true;
-    if (historyFilterPeriod === "today") return transactionTime >= startOfToday;
+    if (historyFilterPeriod === "today") {
+  return transactionDateKey === todayKey;
+}
     if (historyFilterPeriod === "7") {
       return transactionTime >= Date.now() - 7 * 24 * 60 * 60 * 1000;
     }
