@@ -1256,79 +1256,74 @@ if (historySelectedPeriodLabel) {
   }
 
   function renderBudget() {
-    if (!budgetList) return;
+  if (!budgetList) return;
 
-    budgetList.innerHTML = "";
+  budgetList.innerHTML = "";
 
-    const categories = getBudgetCategories();
-    budgetCountLabel.textContent = `${categories.length} категорий`;
+  const categories = getBudgetCategories();
+  budgetCountLabel.textContent = `${categories.length} категорий`;
 
-    if (!categories.length) {
-      budgetList.innerHTML = `<div class="manager-card"><div class="budget-empty">Категорий пока нет</div></div>`;
-      return;
+  if (!categories.length) {
+    budgetList.innerHTML = `<div class="manager-card"><div class="budget-empty">Категорий пока нет</div></div>`;
+    return;
+  }
+
+  categories.forEach((category) => {
+    const spent = getCurrentMonthExpenseByCategory(category.id);
+    const limitRecord = getBudgetLimitByCategoryId(category.id);
+    const limit = limitRecord ? Number(limitRecord.monthly_limit) || 0 : 0;
+    const remains = Math.max(limit - spent, 0);
+    const progressPercent = limit > 0 ? Math.min((spent / limit) * 100, 100) : 0;
+
+    const toneClass =
+      category.id === "food"
+        ? "list-icon--green"
+        : category.id === "transport"
+        ? "list-icon--blue"
+        : category.id === "fun"
+        ? "list-icon--purple"
+        : category.id === "snack"
+        ? "list-icon--amber"
+        : "list-icon--neutral";
+
+    let fillClass = "budget-progress__fill";
+    if (limit > 0 && progressPercent >= 100) {
+      fillClass += " is-danger";
+    } else if (limit > 0 && progressPercent >= 75) {
+      fillClass += " is-warning";
     }
 
-    categories.forEach((category) => {
-      const spent = getCurrentMonthExpenseByCategory(category.id);
-      const limitRecord = getBudgetLimitByCategoryId(category.id);
-      const limit = limitRecord ? Number(limitRecord.monthly_limit) || 0 : 0;
-      const remains = Math.max(limit - spent, 0);
-      const progressPercent = limit > 0 ? Math.min((spent / limit) * 100, 100) : 0;
+    const spentText = formatMoney(spent);
+    const limitText = limit > 0 ? formatMoney(limit) : "Без лимита";
+    const remainsText = limit > 0 ? formatMoney(remains) : "—";
 
-      const toneClass =
-        category.id === "food"
-          ? "list-icon--green"
-          : category.id === "transport"
-          ? "list-icon--blue"
-          : category.id === "fun"
-          ? "list-icon--purple"
-          : category.id === "snack"
-          ? "list-icon--amber"
-          : "list-icon--neutral";
+    const card = document.createElement("div");
+    card.className = "list-card budget-card";
+    card.innerHTML = `
+      <div class="list-icon ${toneClass}">${category.icon}</div>
 
-      let fillClass = "budget-progress__fill";
-      if (limit > 0 && progressPercent >= 100) {
-        fillClass += " is-danger";
-      } else if (limit > 0 && progressPercent >= 75) {
-        fillClass += " is-warning";
-      }
-
-      const card = document.createElement("div");
-      card.className = "list-card budget-card";
-      card.innerHTML = `
-        <div class="list-icon ${toneClass}">${category.icon}</div>
-        <div class="list-body">
-          <div class="list-title-row">
+      <div class="list-body">
+        <div class="budget-top">
+          <div class="budget-top__left">
             <h3 class="list-title">${escapeHtml(category.name)}</h3>
+            <p class="budget-remains">Осталось ${remainsText}</p>
           </div>
 
-          <div class="budget-meta">
-            <div class="budget-line">
-              <span>Можно потратить</span>
-              <strong>${limit > 0 ? formatMoney(limit) : "Не задано"}</strong>
-            </div>
-
-            <div class="budget-line">
-              <span>Уже потрачено</span>
-              <strong>${formatMoney(spent)}</strong>
-            </div>
-
-            <div class="budget-line">
-              <span>Осталось</span>
-              <strong>${limit > 0 ? formatMoney(remains) : "—"}</strong>
-            </div>
-          </div>
-
-          <div class="budget-progress">
-            <div class="${fillClass}" style="width:${progressPercent}%;"></div>
+          <div class="budget-top__right">
+            <p class="budget-ratio">${spentText} <span>из ${limitText}</span></p>
           </div>
         </div>
-      `;
 
-      card.addEventListener("click", () => openBudgetModal(category.id));
-      budgetList.appendChild(card);
-    });
-  }
+        <div class="budget-progress">
+          <div class="${fillClass}" style="width:${progressPercent}%;"></div>
+        </div>
+      </div>
+    `;
+
+    card.addEventListener("click", () => openBudgetModal(category.id));
+    budgetList.appendChild(card);
+  });
+}
 
   function buildTransactionFromForm() {
     const amount = Number(amountInput.value.trim());
