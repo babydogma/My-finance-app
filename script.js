@@ -429,6 +429,18 @@ function getLocalDateKey(dateValue) {
     return `${new Intl.NumberFormat("ru-RU").format(Number(value) || 0)} ₽`;
   }
   
+  function formatDateShort(dateValue) {
+  if (!dateValue) return "";
+
+  const date = new Date(dateValue);
+
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = String(date.getFullYear()).slice(-2);
+
+  return `${day}.${month}.${year}`;
+}
+  
   function getMonthRange(monthValue) {
   if (!monthValue) return null;
 
@@ -680,7 +692,7 @@ filtered = filtered.filter((transaction) => {
   return true;
 });
 
-  return filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+  return sortTransactionsByLatest(filtered);
 }
 
   function getCurrentMonthExpenseByCategory(categoryId) {
@@ -797,6 +809,14 @@ filtered = filtered.filter((transaction) => {
     balanceEl.textContent = formatMoney(balance);
     accountsTotalEl.textContent = `Всего: ${formatMoney(balance)}`;
   }
+  
+  function sortTransactionsByLatest(items) {
+  return [...items].sort((a, b) => {
+    const timeA = a.created_at ? new Date(a.created_at).getTime() : 0;
+    const timeB = b.created_at ? new Date(b.created_at).getTime() : 0;
+    return timeB - timeA;
+  });
+}
 
   function renderMonthlyStats() {
     const { income, expense } = calculateMonthlyStats();
@@ -1080,19 +1100,22 @@ filtered = filtered.filter((transaction) => {
       valueClass = "list-value list-value--red";
     }
 
-    card.innerHTML = `
-      <div class="list-icon ${iconToneClass}">${icon}</div>
-      <div class="list-body">
-        <div class="list-title-row">
-          <h3 class="list-title">${escapeHtml(transaction.title)}</h3>
-        </div>
-        <p class="list-subtitle">${subtitle}</p>
-      </div>
-      <div class="list-right">
-        <p class="${valueClass}">${signedAmount}</p>
-        <div class="list-caption">${transaction.time_label || ""}</div>
-      </div>
-    `;
+    const shortDate = formatDateShort(transaction.created_at);
+const timeLabel = transaction.time_label || "";
+
+card.innerHTML = `
+  <div class="list-icon ${iconToneClass}">${icon}</div>
+  <div class="list-body">
+    <div class="list-title-row">
+      <h3 class="list-title">${escapeHtml(transaction.title)}</h3>
+    </div>
+    <p class="list-subtitle">${subtitle}</p>
+  </div>
+  <div class="list-right">
+    <p class="${valueClass}">${signedAmount}</p>
+    <div class="list-caption">${shortDate}${shortDate && timeLabel ? " • " : ""}${timeLabel}</div>
+  </div>
+`;
 
     card.addEventListener("click", () => openEditModal(transaction.id));
     return card;
@@ -1101,9 +1124,7 @@ filtered = filtered.filter((transaction) => {
   function renderTransactions() {
     transactionsListEl.innerHTML = "";
 
-    const latestTransactions = [...state.transactions]
-      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-      .slice(0, 5);
+    const latestTransactions = sortTransactionsByLatest(state.transactions).slice(0, 5);
 
     if (latestTransactions.length === 0) {
       const empty = document.createElement("div");
