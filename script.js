@@ -1243,18 +1243,15 @@ if (historySelectedPeriodLabel) {
   });
 
   if (!breakdown.length) {
-    analyticsDonut.className = "analytics-donut analytics-donut--radial";
     analyticsDonut.innerHTML = `
-      <div class="analytics-radial analytics-radial--empty">
-        <div class="analytics-radial__center">
-          <div class="analytics-radial__total">${formatMoney(0)}</div>
-          <div class="analytics-radial__period">${getAnalyticsPeriodLabel()}</div>
-        </div>
+      <div class="analytics-overview-card analytics-overview-card--empty">
+        <div class="analytics-overview-card__total">${formatMoney(0)}</div>
+        <div class="analytics-overview-card__period">${getAnalyticsPeriodLabel()}</div>
       </div>
     `;
 
     analyticsLegend.innerHTML = `
-      <div class="analytics-empty analytics-empty--radial">
+      <div class="analytics-empty analytics-empty--clean">
         Нет данных по расходам за выбранный период
       </div>
     `;
@@ -1262,105 +1259,45 @@ if (historySelectedPeriodLabel) {
   }
 
   const totalExpense = breakdown.reduce((sum, item) => sum + item.amount, 0);
+  const topItem = breakdown[0];
+  const topPercent = totalExpense > 0 ? Math.round((topItem.amount / totalExpense) * 100) : 0;
 
-  const radialItems = breakdown.slice(0, 5).map((item, index) => {
-    const percent = totalExpense > 0 ? Math.round((item.amount / totalExpense) * 100) : 0;
-    return { ...item, percent, index };
-  });
-
-  const otherItems = breakdown.slice(5);
-  const otherAmount = otherItems.reduce((sum, item) => sum + item.amount, 0);
-
-  if (otherAmount > 0) {
-    const otherPercent = totalExpense > 0 ? Math.round((otherAmount / totalExpense) * 100) : 0;
-    radialItems.push({
-      id: "analytics-other",
-      name: "Остальные",
-      icon: "⋯",
-      amount: otherAmount,
-      color: "rgba(255,255,255,0.22)",
-      percent: otherPercent,
-      index: radialItems.length,
-    });
-  }
-
-  const ringMarkup = radialItems
-    .map((item, index) => {
-      const size = 236 - index * 26;
-      const thickness = 14;
-      const angle = Math.max((item.percent / 100) * 360, item.percent > 0 ? 8 : 0);
-
-      return `
-        <div
-          class="analytics-radial__ring"
-          style="
-            --ring-size:${size}px;
-            --ring-thickness:${thickness}px;
-            --ring-angle:${angle}deg;
-            --ring-color:${item.color};
-          "
-          title="${escapeHtml(item.name)} — ${item.percent}%"
-        ></div>
-      `;
-    })
-    .join("");
-
-  analyticsDonut.className = "analytics-donut analytics-donut--radial";
   analyticsDonut.innerHTML = `
-    <div class="analytics-radial">
-      ${ringMarkup}
-      <div class="analytics-radial__center">
-        <div class="analytics-radial__total">${formatMoney(totalExpense)}</div>
-        <div class="analytics-radial__period">${getAnalyticsPeriodLabel()}</div>
+    <div class="analytics-overview-card">
+      <div class="analytics-overview-card__label">Расходы по категориям</div>
+      <div class="analytics-overview-card__total">${formatMoney(totalExpense)}</div>
+      <div class="analytics-overview-card__period">${getAnalyticsPeriodLabel()}</div>
+
+      <div class="analytics-overview-card__leader">
+        <div class="analytics-overview-card__leader-label">Главная категория</div>
+        <div class="analytics-overview-card__leader-title">${escapeHtml(topItem.icon)} ${escapeHtml(topItem.name)}</div>
+        <div class="analytics-overview-card__leader-meta">${topPercent}% • ${formatMoney(topItem.amount)}</div>
       </div>
     </div>
   `;
 
-  const top1 = breakdown[0];
-  const top2 = breakdown[1];
-  const minItem = breakdown[breakdown.length - 1];
-
-  const insightCard = (label, item) => {
-    if (!item) return "";
-
-    const percent = totalExpense > 0 ? Math.round((item.amount / totalExpense) * 100) : 0;
-
-    return `
-      <div class="analytics-insight-card">
-        <div class="analytics-insight-card__label">${label}</div>
-        <div class="analytics-insight-card__title">${escapeHtml(item.icon)} ${escapeHtml(item.name)}</div>
-        <div class="analytics-insight-card__meta">${percent}% • ${formatMoney(item.amount)}</div>
-      </div>
-    `;
-  };
-
   const listMarkup = breakdown
-    .map((item) => {
+    .map((item, index) => {
       const percent = totalExpense > 0 ? Math.round((item.amount / totalExpense) * 100) : 0;
 
       return `
-        <div class="analytics-category-row">
-          <div class="analytics-category-row__left">
-            <span class="analytics-category-row__dot" style="background:${item.color};"></span>
-            <div class="analytics-category-row__body">
-              <div class="analytics-category-row__title">${escapeHtml(item.icon)} ${escapeHtml(item.name)}</div>
-              <div class="analytics-category-row__subtitle">${percent}% от расходов</div>
+        <div class="analytics-breakdown-row">
+          <div class="analytics-breakdown-row__left">
+            <div class="analytics-breakdown-row__rank">#${index + 1}</div>
+            <span class="analytics-breakdown-row__dot" style="background:${item.color};"></span>
+            <div class="analytics-breakdown-row__body">
+              <div class="analytics-breakdown-row__title">${escapeHtml(item.icon)} ${escapeHtml(item.name)}</div>
+              <div class="analytics-breakdown-row__subtitle">${percent}% от расходов</div>
             </div>
           </div>
-          <div class="analytics-category-row__value">${formatMoney(item.amount)}</div>
+          <div class="analytics-breakdown-row__value">${formatMoney(item.amount)}</div>
         </div>
       `;
     })
     .join("");
 
   analyticsLegend.innerHTML = `
-    <div class="analytics-insights">
-      ${insightCard("Главная категория", top1)}
-      ${insightCard("Вторая по весу", top2)}
-      ${insightCard("Минимальная доля", minItem)}
-    </div>
-
-    <div class="analytics-category-list">
+    <div class="analytics-breakdown-list">
       ${listMarkup}
     </div>
   `;
