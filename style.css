@@ -1308,3 +1308,110 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     font-size: 10px;
   }
 }
+
+/* =========================================================
+   BUDGET — VARIANT A
+   ========================================================= */
+
+.section-head--budget {
+  margin-bottom: 2px;
+}
+
+#budgetList {
+  gap: 12px;
+}
+
+.budget-card {
+  align-items: stretch;
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+.budget-card .list-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+}
+
+.budget-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.budget-top__left {
+  min-width: 0;
+  flex: 1;
+}
+
+.budget-top__right {
+  flex: 0 0 auto;
+  text-align: right;
+  padding-left: 10px;
+}
+
+.budget-card .list-title {
+  font-size: 14px;
+  font-weight: 790;
+  margin: 0;
+}
+
+.budget-remains {
+  margin: 4px 0 0;
+  color: rgba(255, 255, 255, 0.44);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.15;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.budget-ratio {
+  margin: 0;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 780;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+.budget-ratio span {
+  color: rgba(255, 255, 255, 0.52);
+  font-weight: 650;
+}
+
+.budget-progress {
+  margin-top: 0;
+  height: 8px;
+}
+
+@media (max-width: 420px) {
+  .budget-card {
+    padding-top: 11px;
+    padding-bottom: 11px;
+  }
+
+  .budget-top {
+    gap: 10px;
+  }
+
+  .budget-card .list-title {
+    font-size: 13.5px;
+  }
+
+  .budget-remains {
+    font-size: 10.5px;
+  }
+
+  .budget-ratio {
+    font-size: 12.5px;
+  }
+
+  .budget-progress {
+    height: 7px;
+  }
+}
