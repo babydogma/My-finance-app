@@ -848,7 +848,14 @@ button {
   flex-direction: column;
   gap: 14px;
   padding: 14px;
-  border-radius: 20px;
+  border-radius: 24px;
+  background:
+    linear-gradient(180deg, rgba(49, 53, 68, 0.98) 0%, rgba(39, 43, 57, 0.99) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow:
+    0 10px 28px rgba(0, 0, 0, 0.22),
+    0 0 22px rgba(111, 156, 255, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
 }
 
 .analytics-donut-wrap {
@@ -866,9 +873,9 @@ button {
   position: relative;
   background: conic-gradient(rgba(90, 93, 106, 0.42) 0deg 360deg);
   box-shadow:
-    0 14px 34px rgba(0, 0, 0, 0.22),
-    0 0 24px rgba(111, 156, 255, 0.05),
-    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    0 16px 38px rgba(0, 0, 0, 0.24),
+    0 0 26px rgba(111, 156, 255, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 .analytics-donut::after {
@@ -877,30 +884,35 @@ button {
   inset: 24px;
   border-radius: 50%;
   background:
-    radial-gradient(circle at top, rgba(255, 255, 255, 0.02), transparent 55%),
-    var(--bg);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+    radial-gradient(circle at top, rgba(255, 255, 255, 0.025), transparent 55%),
+    #0c1018;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.035),
+    0 0 16px rgba(0, 0, 0, 0.18);
 }
 
 .analytics-legend {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
 .analytics-legend-item {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   min-width: 0;
+  padding: 2px 0;
 }
 
 .analytics-legend-dot {
-  width: 12px;
-  height: 12px;
-  flex: 0 0 12px;
+  width: 13px;
+  height: 13px;
+  flex: 0 0 13px;
   border-radius: 50%;
-  box-shadow: 0 0 10px rgba(255,255,255,0.02);
+  box-shadow:
+    0 0 14px rgba(255,255,255,0.06),
+    inset 0 1px 0 rgba(255,255,255,0.12);
 }
 
 .analytics-legend-body {
@@ -910,26 +922,29 @@ button {
 
 .analytics-legend-title {
   margin: 0;
-  font-size: 14px;
-  font-weight: 790;
+  font-size: 15px;
+  font-weight: 800;
   color: var(--text);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  letter-spacing: -0.02em;
 }
 
 .analytics-legend-subtitle {
-  margin: 2px 0 0;
-  font-size: 12px;
-  color: var(--text-muted);
+  margin: 3px 0 0;
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, 0.56);
+  font-weight: 620;
 }
 
 .analytics-legend-value {
   margin-left: auto;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 820;
   color: var(--text);
   white-space: nowrap;
+  letter-spacing: -0.02em;
 }
 
 .analytics-empty {
@@ -1088,27 +1103,32 @@ button {
   }
 
   .analytics-donut {
-    width: 156px;
-    height: 156px;
-    flex-basis: 156px;
-  }
+  width: 164px;
+  height: 164px;
+  flex-basis: 164px;
+}
 
-  .analytics-donut::after {
-    inset: 21px;
-  }
+.analytics-donut::after {
+  inset: 22px;
+}
 
-  .analytics-chart-card {
-    gap: 12px;
-    padding: 12px;
-  }
+.analytics-chart-card {
+  gap: 12px;
+  padding: 13px;
+  border-radius: 22px;
+}
 
-  .analytics-legend-title {
-    font-size: 13px;
-  }
+.analytics-legend-title {
+  font-size: 14px;
+}
 
-  .analytics-legend-value {
-    font-size: 13px;
-  }
+.analytics-legend-subtitle {
+  font-size: 12px;
+}
+
+.analytics-legend-value {
+  font-size: 14px;
+}
 }
 
 /* =========================================================
@@ -1144,31 +1164,34 @@ button {
 
 /* 3. Analytics tighter */
 .analytics-chart-card {
-  gap: 12px;
-  padding: 12px;
+  gap: 14px;
+  padding: 14px;
 }
 
 .analytics-donut {
-  width: 156px;
-  height: 156px;
-  flex-basis: 156px;
+  width: 180px;
+  height: 180px;
+  flex-basis: 180px;
 }
 
 .analytics-donut::after {
-  inset: 21px;
+  inset: 24px;
 }
 
 .analytics-legend {
-  gap: 8px;
+  gap: 12px;
 }
 
 .analytics-legend-title {
-  font-size: 13px;
+  font-size: 15px;
 }
 
-.analytics-legend-subtitle,
+.analytics-legend-subtitle {
+  font-size: 12.5px;
+}
+
 .analytics-legend-value {
-  font-size: 12px;
+  font-size: 15px;
 }
 
 /* 4. Budget more compact */
