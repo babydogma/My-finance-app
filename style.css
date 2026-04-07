@@ -375,7 +375,7 @@ button {
 
 .list-title {
   margin: 0;
-  font-size: 14.5px;
+  font-size: 15.5px;
   font-weight: 790;
   line-height: 1.05;
   letter-spacing: -0.03em;
@@ -401,7 +401,7 @@ button {
 .list-subtitle {
   margin: 0;
   color: rgba(255, 255, 255, 0.46);
-  font-size: 10.5px;
+  font-size: 11.5px;
   font-weight: 560;
   line-height: 1.1;
   white-space: nowrap;
@@ -418,7 +418,7 @@ button {
 
 .list-value {
   margin: 0;
-  font-size: 14.5px;
+  font-size: 15.5px;
   font-weight: 770;
   line-height: 1;
   letter-spacing: -0.03em;
@@ -1048,15 +1048,15 @@ button {
   }
 
     .list-title {
-    font-size: 14px;
+    font-size: 15px;
   }
 
   .list-subtitle {
-    font-size: 10px;
+    font-size: 11px;
   }
 
   .list-value {
-    font-size: 14px;
+    font-size: 15px;
   }
   
   .summary {
