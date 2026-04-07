@@ -160,58 +160,46 @@
     </div>
 
     <!-- ANALYTICS VIEW -->
-    <div id="analyticsView" class="hidden">
-      <section class="section section--manager-top">
-        <div class="section-head">
-          <h2 class="section-title">Аналитика</h2>
-          <div class="section-note">Расходы и итоги</div>
-        </div>
-
-        <div class="history-filters">
-          <div class="history-filter-group">
-            <button class="history-filter-btn is-active" type="button" data-analytics-period="7">7 дней</button>
-            <button class="history-filter-btn" type="button" data-analytics-period="30">30 дней</button>
-            <button class="history-filter-btn" type="button" data-analytics-period="all">Всё</button>
-          </div>
-        </div>
-      </section>
-
-      <section class="section">
-        <div class="summary">
-          <div class="summary-card">
-            <p class="summary-label">Доходы за период</p>
-            <p class="summary-value" id="analyticsIncomeValue">0 ₽</p>
-          </div>
-
-          <div class="summary-card">
-            <p class="summary-label">Расходы за период</p>
-            <p class="summary-value" id="analyticsExpenseValue">0 ₽</p>
-          </div>
-        </div>
-      </section>
-
-      <section class="section">
-        <div class="manager-card analytics-total-card">
-          <p class="summary-label">Итог за период</p>
-          <p class="summary-value" id="analyticsNetValue">0 ₽</p>
-        </div>
-      </section>
-
-      <section class="section">
-        <div class="section-head">
-          <h2 class="section-title">Расходы по категориям</h2>
-          <div class="section-note" id="analyticsCategoriesCount">0 категорий</div>
-        </div>
-
-        <div class="manager-card analytics-chart-card">
-          <div class="analytics-donut-wrap">
-            <div class="analytics-donut" id="analyticsDonut"></div>
-          </div>
-
-          <div class="analytics-legend" id="analyticsLegend"></div>
-        </div>
-      </section>
+    <!-- ANALYTICS VIEW -->
+<div id="analyticsView" class="hidden">
+  <section class="section section--manager-top">
+    <div class="history-filters">
+      <div class="history-filter-group">
+        <button class="history-filter-btn is-active" type="button" data-analytics-period="7">7 дней</button>
+        <button class="history-filter-btn" type="button" data-analytics-period="30">30 дней</button>
+        <button class="history-filter-btn" type="button" data-analytics-period="all">Всё</button>
+      </div>
     </div>
+  </section>
+
+  <section class="section">
+    <div class="summary">
+      <div class="summary-card">
+        <p class="summary-label">Доходы за период</p>
+        <p class="summary-value" id="analyticsIncomeValue">0 ₽</p>
+      </div>
+
+      <div class="summary-card">
+        <p class="summary-label">Расходы за период</p>
+        <p class="summary-value" id="analyticsExpenseValue">0 ₽</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="manager-card analytics-total-card">
+      <p class="summary-label">Итог за период</p>
+      <p class="summary-value" id="analyticsNetValue">0 ₽</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="manager-card analytics-chart-card analytics-chart-card--radial">
+      <div class="analytics-donut analytics-donut--radial" id="analyticsDonut"></div>
+      <div class="analytics-legend analytics-legend--radial" id="analyticsLegend"></div>
+    </div>
+  </section>
+</div>
 
     <!-- BUDGET VIEW -->
     <div id="budgetView" class="hidden">
