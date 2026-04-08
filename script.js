@@ -41,7 +41,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const historyRangeFromInput = document.getElementById("historyRangeFromInput");
   const historyRangeToInput = document.getElementById("historyRangeToInput");
   const historySelectedPeriodLabel = document.getElementById("historySelectedPeriodLabel");
-
+  
   const analyticsPeriodButtons = document.querySelectorAll("[data-analytics-period]");
   const analyticsIncomeValue = document.getElementById("analyticsIncomeValue");
   const analyticsExpenseValue = document.getElementById("analyticsExpenseValue");
