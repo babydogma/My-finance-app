@@ -1433,30 +1433,30 @@ if (historyMonthBtn) {
   const totalExpense = breakdown.reduce((sum, item) => sum + item.amount, 0);
 
   if (!breakdown.length) {
-  analyticsDonut.innerHTML = `
-  <div class="analytics-panel">
-    <div class="analytics-panel__eyebrow">Расходы по категориям</div>
+    analyticsDonut.innerHTML = `
+      <div class="analytics-panel">
+        <div class="analytics-panel__eyebrow">Расходы по категориям</div>
 
-    <div class="analytics-panel__headline">
-      <div class="analytics-panel__total">${formatMoney(0)}</div>
-      <div class="analytics-panel__period">${escapeHtml(periodLabel)}</div>
-    </div>
+        <div class="analytics-panel__headline">
+          <div class="analytics-panel__total">${formatMoney(0)}</div>
+          <div class="analytics-panel__period">${escapeHtml(periodLabel)}</div>
+        </div>
 
-    <div class="analytics-leader analytics-leader--empty">
-      <div class="analytics-leader__left">
-        <div class="analytics-breakdown-row__rank analytics-breakdown-row__rank--leader">#1</div>
+        <div class="analytics-leader analytics-leader--empty">
+          <div class="analytics-leader__left">
+            <div class="analytics-breakdown-row__rank analytics-breakdown-row__rank--leader">#1</div>
 
-        <div class="analytics-leader__content">
-          <div class="analytics-leader__label">Лидер</div>
-          <div class="analytics-leader__title">Нет данных</div>
-          <div class="analytics-leader__meta">За выбранный период нет расходов</div>
+            <div class="analytics-leader__content">
+              <div class="analytics-leader__label">Лидер</div>
+              <div class="analytics-leader__title">Нет данных</div>
+              <div class="analytics-leader__meta">За выбранный период нет расходов</div>
+            </div>
+          </div>
+
+          <div class="analytics-leader__value">—</div>
         </div>
       </div>
-
-      <div class="analytics-leader__value">—</div>
-    </div>
-  </div>
-`;
+    `;
 
     analyticsLegend.innerHTML = `
       <div class="analytics-breakdown-list analytics-breakdown-list--empty">
@@ -1470,74 +1470,81 @@ if (historyMonthBtn) {
   const topPercent = totalExpense > 0 ? Math.round((topItem.amount / totalExpense) * 100) : 0;
 
   analyticsDonut.innerHTML = `
-  <div class="analytics-panel">
-    <div class="analytics-panel__eyebrow">Расходы по категориям</div>
+    <div class="analytics-panel">
+      <div class="analytics-panel__eyebrow">Расходы по категориям</div>
 
-    <div class="analytics-panel__headline">
-      <div class="analytics-panel__total">${formatMoney(totalExpense)}</div>
-      <div class="analytics-panel__period">${escapeHtml(periodLabel)}</div>
-    </div>
-
-    <button class="analytics-leader analytics-leader--button" type="button" data-analytics-category-id="${escapeHtml(topItem.id)}">
-      <div class="analytics-leader__left">
-        <div class="analytics-breakdown-row__rank analytics-breakdown-row__rank--leader">#1</div>
-
-        <div class="analytics-leader__content">
-          <div class="analytics-leader__label">Лидер</div>
-          <div class="analytics-leader__title">${escapeHtml(topItem.icon)} ${escapeHtml(topItem.name)}</div>
-          <div class="analytics-leader__meta">${topPercent}% от расходов</div>
-        </div>
+      <div class="analytics-panel__headline">
+        <div class="analytics-panel__total">${formatMoney(totalExpense)}</div>
+        <div class="analytics-panel__period">${escapeHtml(periodLabel)}</div>
       </div>
 
-      <div class="analytics-leader__value">${formatMoney(topItem.amount)}</div>
+      <button
+        class="analytics-leader analytics-leader--button"
+        type="button"
+        data-analytics-category-id="${escapeHtml(topItem.id)}"
+      >
+        <div class="analytics-leader__left">
+          <div class="analytics-breakdown-row__rank analytics-breakdown-row__rank--leader">#1</div>
+
+          <div class="analytics-leader__content">
+            <div class="analytics-leader__label">Лидер</div>
+            <div class="analytics-leader__title">${escapeHtml(topItem.icon)} ${escapeHtml(topItem.name)}</div>
+            <div class="analytics-leader__meta">${topPercent}% от расходов</div>
+          </div>
+        </div>
+
+        <div class="analytics-leader__value">${formatMoney(topItem.amount)}</div>
+      </button>
     </div>
-  </button>
-`;
+  `;
 
   const restItems = breakdown.slice(1);
 
-const listMarkup = restItems
-  .map((item, index) => {
-    const percent = totalExpense > 0 ? Math.round((item.amount / totalExpense) * 100) : 0;
+  const listMarkup = restItems
+    .map((item, index) => {
+      const percent = totalExpense > 0 ? Math.round((item.amount / totalExpense) * 100) : 0;
 
-    return `
       return `
-  <button class="analytics-breakdown-row analytics-breakdown-row--button" type="button" data-analytics-category-id="${escapeHtml(item.id)}">
-        <div class="analytics-breakdown-row__left">
-          <div class="analytics-breakdown-row__rank">#${index + 2}</div>
-          <div class="analytics-breakdown-row__body">
-            <div class="analytics-breakdown-row__title">${escapeHtml(item.icon)} ${escapeHtml(item.name)}</div>
-            <div class="analytics-breakdown-row__subtitle">${percent}% от расходов</div>
+        <button
+          class="analytics-breakdown-row analytics-breakdown-row--button"
+          type="button"
+          data-analytics-category-id="${escapeHtml(item.id)}"
+        >
+          <div class="analytics-breakdown-row__left">
+            <div class="analytics-breakdown-row__rank">#${index + 2}</div>
+            <div class="analytics-breakdown-row__body">
+              <div class="analytics-breakdown-row__title">${escapeHtml(item.icon)} ${escapeHtml(item.name)}</div>
+              <div class="analytics-breakdown-row__subtitle">${percent}% от расходов</div>
+            </div>
           </div>
-        </div>
-        <div class="analytics-breakdown-row__value">${formatMoney(item.amount)}</div>
-      </button>
-`;
-  })
-  .join("");
+          <div class="analytics-breakdown-row__value">${formatMoney(item.amount)}</div>
+        </button>
+      `;
+    })
+    .join("");
 
   analyticsLegend.innerHTML = `
     <div class="analytics-breakdown-list">
       ${listMarkup}
     </div>
   `;
+
+  analyticsDonut
+    .querySelectorAll("[data-analytics-category-id]")
+    .forEach((el) => {
+      el.addEventListener("click", () => {
+        openAnalyticsCategoryModal(el.dataset.analyticsCategoryId);
+      });
+    });
+
+  analyticsLegend
+    .querySelectorAll("[data-analytics-category-id]")
+    .forEach((el) => {
+      el.addEventListener("click", () => {
+        openAnalyticsCategoryModal(el.dataset.analyticsCategoryId);
+      });
+    });
 }
-
-analyticsDonut
-  .querySelectorAll("[data-analytics-category-id]")
-  .forEach((el) => {
-    el.addEventListener("click", () => {
-      openAnalyticsCategoryModal(el.dataset.analyticsCategoryId);
-    });
-  });
-
-analyticsLegend
-  .querySelectorAll("[data-analytics-category-id]")
-  .forEach((el) => {
-    el.addEventListener("click", () => {
-      openAnalyticsCategoryModal(el.dataset.analyticsCategoryId);
-    });
-  });
 
   function renderBudget() {
     if (!budgetList) return;
@@ -2089,17 +2096,22 @@ analyticsLegend
   });
 
   document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" && !modal.classList.contains("hidden")) {
-      closeModal();
-    }
+  if (event.key !== "Escape") return;
 
-    if (event.key === "Escape" && !budgetModal.classList.contains("hidden")) {
-      closeBudgetModal();
-    if (event.key === "Escape" && !analyticsCategoryModal.classList.contains("hidden")) {
-  closeAnalyticsCategoryModal();
-    }
+  if (modal && !modal.classList.contains("hidden")) {
+    closeModal();
+    return;
   }
-  });
+
+  if (budgetModal && !budgetModal.classList.contains("hidden")) {
+    closeBudgetModal();
+    return;
+  }
+
+  if (analyticsCategoryModal && !analyticsCategoryModal.classList.contains("hidden")) {
+    closeAnalyticsCategoryModal();
+  }
+});
 
   period7Btn?.addEventListener("click", () => {
     currentPeriodDays = 7;
