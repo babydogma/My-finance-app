@@ -1220,55 +1220,56 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function renderHistory() {
-    if (!historyTransactionsList) return;
+  if (!historyTransactionsList) return;
 
-    historyTransactionsList.innerHTML = "";
+  historyTransactionsList.innerHTML = "";
 
-    const filteredTransactions = getHistoryFilteredTransactions();
+  const filteredTransactions = getHistoryFilteredTransactions();
 
-    historyCountLabel.textContent = `${filteredTransactions.length} операций`;
+  historyCountLabel.textContent = `${filteredTransactions.length} операций`;
 
-    historyPeriodButtons.forEach((btn) => {
-      btn.classList.toggle("is-active", btn.dataset.period === historyFilterPeriod);
-    });
+  historyPeriodButtons.forEach((btn) => {
+    btn.classList.toggle("is-active", btn.dataset.period === historyFilterPeriod);
+  });
 
-    historyTypeButtons.forEach((btn) => {
-      btn.classList.toggle("is-active", btn.dataset.type === historyFilterType);
-    });
+  historyTypeButtons.forEach((btn) => {
+    btn.classList.toggle("is-active", btn.dataset.type === historyFilterType);
+  });
 
-    const isMonth = historyFilterPeriod === "month";
-    const isRange = historyFilterPeriod === "range";
+  const isMonth = historyFilterPeriod === "month";
+  const isRange = historyFilterPeriod === "range";
 
-    setNativePickerVisibility(historyMonthInput, isMonth);
-    setNativePickerVisibility(historyRangeFromInput, isRange);
-    setNativePickerVisibility(historyRangeToInput, isRange);
+  setNativePickerVisibility(historyMonthInput, isMonth);
+  setNativePickerVisibility(historyRangeFromInput, isRange);
+  setNativePickerVisibility(historyRangeToInput, isRange);
 
-    if (historyMonthBtn) {
-      historyMonthBtn.textContent = formatMonthButtonLabel(historySelectedMonth);
-    }
-
-    if (historySelectedPeriodLabel) {
-      historySelectedPeriodLabel.classList.add("hidden");
-      historySelectedPeriodLabel.textContent = "";
-    }
-
-    if (filteredTransactions.length === 0) {
-      const empty = document.createElement("div");
-      empty.className = "list-card";
-      empty.innerHTML = `
-        <div class="list-body">
-          <h3 class="list-title">Ничего не найдено</h3>
-          <p class="list-subtitle">Попробуй другой период или тип операций</p>
-        </div>
-      `;
-      historyTransactionsList.appendChild(empty);
-      return;
-    }
-
-    filteredTransactions.forEach((transaction) => {
-      historyTransactionsList.appendChild(createTransactionCard(transaction));
-    });
+  if (historyMonthBtn) {
+    historyMonthBtn.textContent = formatMonthButtonLabel(historySelectedMonth);
   }
+
+  if (historySelectedPeriodLabel) {
+    historySelectedPeriodLabel.classList.add("hidden");
+    historySelectedPeriodLabel.textContent = "";
+    historySelectedPeriodLabel.style.display = "none";
+  }
+
+  if (filteredTransactions.length === 0) {
+    const empty = document.createElement("div");
+    empty.className = "list-card";
+    empty.innerHTML = `
+      <div class="list-body">
+        <h3 class="list-title">Ничего не найдено</h3>
+        <p class="list-subtitle">Попробуй другой период или тип операций</p>
+      </div>
+    `;
+    historyTransactionsList.appendChild(empty);
+    return;
+  }
+
+  filteredTransactions.forEach((transaction) => {
+    historyTransactionsList.appendChild(createTransactionCard(transaction));
+  });
+}
 
   function renderAnalytics() {
     if (!analyticsView) return;
@@ -1292,24 +1293,25 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     analyticsPeriodButtons.forEach((btn) => {
-      btn.classList.toggle("is-active", btn.dataset.analyticsPeriod === analyticsFilterPeriod);
-    });
+  btn.classList.toggle("is-active", btn.dataset.analyticsPeriod === analyticsFilterPeriod);
+});
 
-    const isAnalyticsMonth = analyticsFilterPeriod === "month";
-    const isAnalyticsRange = analyticsFilterPeriod === "range";
+const isAnalyticsMonth = analyticsFilterPeriod === "month";
+const isAnalyticsRange = analyticsFilterPeriod === "range";
 
-    setNativePickerVisibility(analyticsMonthInput, isAnalyticsMonth);
-    setNativePickerVisibility(analyticsRangeFromInput, isAnalyticsRange);
-    setNativePickerVisibility(analyticsRangeToInput, isAnalyticsRange);
+setNativePickerVisibility(analyticsMonthInput, isAnalyticsMonth);
+setNativePickerVisibility(analyticsRangeFromInput, isAnalyticsRange);
+setNativePickerVisibility(analyticsRangeToInput, isAnalyticsRange);
 
-    if (analyticsMonthBtn) {
-      analyticsMonthBtn.textContent = formatMonthButtonLabel(analyticsSelectedMonth);
-    }
+if (analyticsMonthBtn) {
+  analyticsMonthBtn.textContent = formatMonthButtonLabel(analyticsSelectedMonth);
+}
 
-    if (analyticsSelectedPeriodLabel) {
-      analyticsSelectedPeriodLabel.classList.add("hidden");
-      analyticsSelectedPeriodLabel.textContent = "";
-    }
+if (analyticsSelectedPeriodLabel) {
+  analyticsSelectedPeriodLabel.classList.add("hidden");
+  analyticsSelectedPeriodLabel.textContent = "";
+  analyticsSelectedPeriodLabel.style.display = "none";
+}
 
     if (!breakdown.length) {
       analyticsDonut.innerHTML = `
