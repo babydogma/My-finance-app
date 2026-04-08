@@ -1369,22 +1369,27 @@ if (historyMonthBtn) {
 
   if (!breakdown.length) {
     analyticsDonut.innerHTML = `
-      <div class="analytics-panel">
-        <div class="analytics-panel__top">
-          <div>
-            <div class="analytics-panel__eyebrow">Расходы по категориям</div>
-            <div class="analytics-panel__total">${formatMoney(0)}</div>
-          </div>
-          <div class="analytics-panel__period">${escapeHtml(periodLabel)}</div>
-        </div>
+  <div class="analytics-panel">
+    <div class="analytics-panel__top">
+      <div>
+        <div class="analytics-panel__eyebrow">Расходы по категориям</div>
+        <div class="analytics-panel__total">${formatMoney(totalExpense)}</div>
+      </div>
+      <div class="analytics-panel__period">${escapeHtml(periodLabel)}</div>
+    </div>
 
-        <div class="analytics-leader analytics-leader--empty">
+    <div class="analytics-leader">
+      <div class="analytics-leader__left">
+        <div class="analytics-breakdown-row__rank">#1</div>
+        <div class="analytics-leader__content">
           <div class="analytics-leader__label">Лидер</div>
-          <div class="analytics-leader__title">Нет данных</div>
-          <div class="analytics-leader__meta">За выбранный период нет расходов</div>
+          <div class="analytics-leader__title">${escapeHtml(topItem.icon)} ${escapeHtml(topItem.name)}</div>
+          <div class="analytics-leader__meta">${topPercent}% • ${formatMoney(topItem.amount)}</div>
         </div>
       </div>
-    `;
+    </div>
+  </div>
+`;
 
     analyticsLegend.innerHTML = `
       <div class="analytics-breakdown-list analytics-breakdown-list--empty">
@@ -1415,24 +1420,26 @@ if (historyMonthBtn) {
     </div>
   `;
 
-  const listMarkup = breakdown
-    .map((item, index) => {
-      const percent = totalExpense > 0 ? Math.round((item.amount / totalExpense) * 100) : 0;
+  const restItems = breakdown.slice(1);
 
-      return `
-        <div class="analytics-breakdown-row">
-          <div class="analytics-breakdown-row__left">
-            <div class="analytics-breakdown-row__rank">#${index + 1}</div>
-            <div class="analytics-breakdown-row__body">
-              <div class="analytics-breakdown-row__title">${escapeHtml(item.icon)} ${escapeHtml(item.name)}</div>
-              <div class="analytics-breakdown-row__subtitle">${percent}% от расходов</div>
-            </div>
+const listMarkup = restItems
+  .map((item, index) => {
+    const percent = totalExpense > 0 ? Math.round((item.amount / totalExpense) * 100) : 0;
+
+    return `
+      <div class="analytics-breakdown-row">
+        <div class="analytics-breakdown-row__left">
+          <div class="analytics-breakdown-row__rank">#${index + 2}</div>
+          <div class="analytics-breakdown-row__body">
+            <div class="analytics-breakdown-row__title">${escapeHtml(item.icon)} ${escapeHtml(item.name)}</div>
+            <div class="analytics-breakdown-row__subtitle">${percent}% от расходов</div>
           </div>
-          <div class="analytics-breakdown-row__value">${formatMoney(item.amount)}</div>
         </div>
-      `;
-    })
-    .join("");
+        <div class="analytics-breakdown-row__value">${formatMoney(item.amount)}</div>
+      </div>
+    `;
+  })
+  .join("");
 
   analyticsLegend.innerHTML = `
     <div class="analytics-breakdown-list">
