@@ -1031,6 +1031,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   min-width: 34px;
   height: 24px;
   font-size: 11px;
+  background: rgba(224, 178, 72, 0.16);
+  color: #f4e1a1;
 }
 
 .analytics-breakdown-list {
