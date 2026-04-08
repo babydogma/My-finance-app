@@ -974,6 +974,17 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     0 8px 22px rgba(0, 0, 0, 0.18);
 }
 
+.analytics-leader--button {
+  width: 100%;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+.analytics-leader--button:active {
+  transform: scale(0.995);
+}
+
 .analytics-leader--empty {
   opacity: 0.88;
 }
@@ -1055,6 +1066,20 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   gap: 14px;
   min-height: 56px;
   padding: 6px 0;
+}
+
+.analytics-breakdown-row--button {
+  width: 100%;
+  border: none;
+  background: transparent;
+  padding-left: 0;
+  padding-right: 0;
+  text-align: left;
+  cursor: pointer;
+}
+
+.analytics-breakdown-row--button:active {
+  transform: scale(0.995);
 }
 
 .analytics-breakdown-row__left {
