@@ -26,11 +26,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   const navWalletBtn = document.getElementById("navWalletBtn");
   const navAnalyticsBtn = document.getElementById("navAnalyticsBtn");
   const navBudgetBtn = document.getElementById("navBudgetBtn");
-  const navHistoryBtn = document.getElementById("navHistoryBtn");
 
   const mainView = document.getElementById("mainView");
   const categoriesManagerView = document.getElementById("categoriesManagerView");
-  const historyView = document.getElementById("historyView");
   const analyticsView = document.getElementById("analyticsView");
   const budgetView = document.getElementById("budgetView");
 
@@ -38,16 +36,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   const newCategoryNameInput = document.getElementById("newCategoryNameInput");
   const newCategoryIconInput = document.getElementById("newCategoryIconInput");
   const addCategoryBtn = document.getElementById("addCategoryBtn");
-
-  const historyTransactionsList = document.getElementById("historyTransactionsList");
-  const historyCountLabel = document.getElementById("historyCountLabel");
-  const historyPeriodButtons = document.querySelectorAll("[data-period]");
-  const historyTypeButtons = document.querySelectorAll("[data-type]");
-  const historyMonthBtn = document.getElementById("historyMonthBtn");
-  const historyMonthInput = document.getElementById("historyMonthInput");
-  const historyRangeFromInput = document.getElementById("historyRangeFromInput");
-  const historyRangeToInput = document.getElementById("historyRangeToInput");
-  const historySelectedPeriodLabel = document.getElementById("historySelectedPeriodLabel");
 
   const analyticsPeriodButtons = document.querySelectorAll("[data-analytics-period]");
   const analyticsIncomeValue = document.getElementById("analyticsIncomeValue");
@@ -106,12 +94,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   let editingTransactionId = null;
   let currentPeriodDays = 7;
   let currentView = "wallet";
-
-  let historyFilterPeriod = "month";
-  let historyFilterType = "all";
-  let historySelectedMonth = getCurrentMonthValue();
-  let historyRangeStart = "";
-  let historyRangeEnd = "";
 
   let analyticsFilterPeriod = "month";
   let analyticsSelectedMonth = getCurrentMonthValue();
@@ -209,8 +191,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   function setNativePickerVisibility(input, visible) {
   if (!input) return;
 
-  const isMonthInput =
-    input.id === "historyMonthInput" || input.id === "analyticsMonthInput";
+  const isMonthInput = input.id === "analyticsMonthInput";
 
   if (isMonthInput) {
     input.classList.add("hidden");
@@ -471,76 +452,59 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function setActiveNav(viewName) {
-    navWalletBtn?.classList.toggle("is-active", viewName === "wallet");
-    navAnalyticsBtn?.classList.toggle("is-active", viewName === "analytics");
-    navBudgetBtn?.classList.toggle("is-active", viewName === "budget");
-    navHistoryBtn?.classList.toggle("is-active", viewName === "history");
-  }
+  navWalletBtn?.classList.toggle("is-active", viewName === "wallet");
+  navAnalyticsBtn?.classList.toggle("is-active", viewName === "analytics");
+  navBudgetBtn?.classList.toggle("is-active", viewName === "budget");
+}
 
   function showWalletView() {
-    document.querySelector(".app")?.classList.remove("app--budget", "app--history", "app--analytics");
-    currentView = "wallet";
-    mainView.classList.remove("hidden");
-    categoriesManagerView.classList.add("hidden");
-    historyView.classList.add("hidden");
-    analyticsView.classList.add("hidden");
-    budgetView.classList.add("hidden");
-    setActiveNav("wallet");
-  }
+  document.querySelector(".app")?.classList.remove("app--budget", "app--history", "app--analytics");
+  currentView = "wallet";
+  mainView.classList.remove("hidden");
+  categoriesManagerView.classList.add("hidden");
+  analyticsView.classList.add("hidden");
+  budgetView.classList.add("hidden");
+  setActiveNav("wallet");
+}
 
   function openCategoriesManager() {
-    document.querySelector(".app")?.classList.remove("app--budget", "app--history", "app--analytics");
-    currentView = "categories";
-    mainView.classList.add("hidden");
-    categoriesManagerView.classList.remove("hidden");
-    historyView.classList.add("hidden");
-    analyticsView.classList.add("hidden");
-    budgetView.classList.add("hidden");
-    setActiveNav("wallet");
-  }
+  document.querySelector(".app")?.classList.remove("app--budget", "app--history", "app--analytics");
+  currentView = "categories";
+  mainView.classList.add("hidden");
+  categoriesManagerView.classList.remove("hidden");
+  analyticsView.classList.add("hidden");
+  budgetView.classList.add("hidden");
+  setActiveNav("wallet");
+}
 
   function closeCategoriesManager() {
     showWalletView();
   }
 
-  function showHistoryView() {
-    document.querySelector(".app")?.classList.remove("app--budget", "app--analytics");
-    document.querySelector(".app")?.classList.add("app--history");
-    currentView = "history";
-    mainView.classList.add("hidden");
-    categoriesManagerView.classList.add("hidden");
-    historyView.classList.remove("hidden");
-    analyticsView.classList.add("hidden");
-    budgetView.classList.add("hidden");
-    setActiveNav("history");
-    renderHistory();
-  }
 
   function showAnalyticsView() {
-    document.querySelector(".app")?.classList.remove("app--budget", "app--history");
-    document.querySelector(".app")?.classList.add("app--analytics");
-    currentView = "analytics";
-    mainView.classList.add("hidden");
-    categoriesManagerView.classList.add("hidden");
-    historyView.classList.add("hidden");
-    analyticsView.classList.remove("hidden");
-    budgetView.classList.add("hidden");
-    setActiveNav("analytics");
-    renderAnalytics();
-  }
+  document.querySelector(".app")?.classList.remove("app--budget", "app--history");
+  document.querySelector(".app")?.classList.add("app--analytics");
+  currentView = "analytics";
+  mainView.classList.add("hidden");
+  categoriesManagerView.classList.add("hidden");
+  analyticsView.classList.remove("hidden");
+  budgetView.classList.add("hidden");
+  setActiveNav("analytics");
+  renderAnalytics();
+}
 
   function showBudgetView() {
-    currentView = "budget";
-    document.querySelector(".app")?.classList.remove("app--history", "app--analytics");
-    document.querySelector(".app")?.classList.add("app--budget");
-    mainView.classList.add("hidden");
-    categoriesManagerView.classList.add("hidden");
-    historyView.classList.add("hidden");
-    analyticsView.classList.add("hidden");
-    budgetView.classList.remove("hidden");
-    setActiveNav("budget");
-    renderBudget();
-  }
+  currentView = "budget";
+  document.querySelector(".app")?.classList.remove("app--history", "app--analytics");
+  document.querySelector(".app")?.classList.add("app--budget");
+  mainView.classList.add("hidden");
+  categoriesManagerView.classList.add("hidden");
+  analyticsView.classList.add("hidden");
+  budgetView.classList.remove("hidden");
+  setActiveNav("budget");
+  renderBudget();
+}
 
   function openBudgetModal(categoryId) {
     const category = getCategoryById(categoryId);
@@ -899,24 +863,6 @@ function getAnalyticsOperationsFilteredTransactions() {
 
   return sortTransactionsByLatest(items);
 }
-
-  function getHistoryFilteredTransactions() {
-    let filtered = [...state.transactions];
-
-    if (historyFilterType !== "all") {
-      filtered = filtered.filter((item) => item.type === historyFilterType);
-    }
-
-    filtered = filterTransactionsByPeriod(
-      filtered,
-      historyFilterPeriod,
-      historySelectedMonth,
-      historyRangeStart,
-      historyRangeEnd
-    );
-
-    return sortTransactionsByLatest(filtered);
-  }
 
   function getCurrentMonthExpenseByCategory(categoryId) {
     const now = new Date();
@@ -1358,58 +1304,6 @@ function getAnalyticsOperationsFilteredTransactions() {
       transactionsListEl.appendChild(createTransactionCard(transaction));
     });
   }
-
-  function renderHistory() {
-  if (!historyTransactionsList) return;
-
-  historyTransactionsList.innerHTML = "";
-
-  const filteredTransactions = getHistoryFilteredTransactions();
-
-  historyCountLabel.textContent = `${filteredTransactions.length} операций`;
-
-  historyPeriodButtons.forEach((btn) => {
-    btn.classList.toggle("is-active", btn.dataset.period === historyFilterPeriod);
-  });
-
-  historyTypeButtons.forEach((btn) => {
-    btn.classList.toggle("is-active", btn.dataset.type === historyFilterType);
-  });
-
-  const isMonth = historyFilterPeriod === "month";
-  const isRange = historyFilterPeriod === "range";
-
-  populateMonthSelect(historyMonthInput, historySelectedMonth);
-setNativePickerVisibility(historyRangeFromInput, isRange);
-setNativePickerVisibility(historyRangeToInput, isRange);
-
-if (historyMonthBtn) {
-  historyMonthBtn.textContent = formatMonthButtonLabel(historySelectedMonth);
-}
-
-  if (historySelectedPeriodLabel) {
-    historySelectedPeriodLabel.classList.add("hidden");
-    historySelectedPeriodLabel.textContent = "";
-    historySelectedPeriodLabel.style.display = "none";
-  }
-
-  if (filteredTransactions.length === 0) {
-    const empty = document.createElement("div");
-    empty.className = "list-card";
-    empty.innerHTML = `
-      <div class="list-body">
-        <h3 class="list-title">Ничего не найдено</h3>
-        <p class="list-subtitle">Попробуй другой период или тип операций</p>
-      </div>
-    `;
-    historyTransactionsList.appendChild(empty);
-    return;
-  }
-
-  filteredTransactions.forEach((transaction) => {
-    historyTransactionsList.appendChild(createTransactionCard(transaction));
-  });
-}
 
 function renderAnalyticsOperations() {
   if (!analyticsTransactionsList) return;
@@ -1992,18 +1886,17 @@ function renderAnalyticsOperations() {
   }
 
   function renderAll() {
-    ensureUncategorizedCategory();
-    renderBalance();
-    renderBalanceResult();
-    renderMonthlyStats();
-    renderAccounts();
-    renderCategories();
-    renderCategoriesManager();
-    renderTransactions();
-    renderHistory();
-    renderAnalytics();
-    renderBudget();
-  }
+  ensureUncategorizedCategory();
+  renderBalance();
+  renderBalanceResult();
+  renderMonthlyStats();
+  renderAccounts();
+  renderCategories();
+  renderCategoriesManager();
+  renderTransactions();
+  renderAnalytics();
+  renderBudget();
+}
 
   openExpenseModalBtn?.addEventListener("click", () => openModal("expense"));
   openIncomeModalBtn?.addEventListener("click", () => openModal("income"));
@@ -2013,75 +1906,8 @@ function renderAnalyticsOperations() {
   closeCategoriesManagerBtn?.addEventListener("click", closeCategoriesManager);
 
   navWalletBtn?.addEventListener("click", showWalletView);
-  navHistoryBtn?.addEventListener("click", showHistoryView);
   navAnalyticsBtn?.addEventListener("click", showAnalyticsView);
   navBudgetBtn?.addEventListener("click", showBudgetView);
-
-  historyPeriodButtons.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      historyFilterPeriod = btn.dataset.period;
-
-      if (historyFilterPeriod === "range") {
-        const today = getTodayDateValue();
-        historyRangeStart = historyRangeStart || today;
-        historyRangeEnd = historyRangeEnd || today;
-
-        if (historyRangeFromInput) {
-          historyRangeFromInput.value = historyRangeStart;
-        }
-
-        if (historyRangeToInput) {
-          historyRangeToInput.value = historyRangeEnd;
-        }
-
-        setNativePickerVisibility(historyRangeFromInput, true);
-        setNativePickerVisibility(historyRangeToInput, true);
-        openNativePicker(historyRangeFromInput);
-      }
-
-      renderHistory();
-    });
-  });
-
-  historyMonthInput?.addEventListener("change", () => {
-    if (!historyMonthInput.value) return;
-    historySelectedMonth = historyMonthInput.value;
-    historyFilterPeriod = "month";
-    renderHistory();
-  });
-
-  historyRangeFromInput?.addEventListener("change", () => {
-    if (!historyRangeFromInput.value) return;
-    historyRangeStart = historyRangeFromInput.value;
-
-    if (!historyRangeEnd || historyRangeEnd < historyRangeStart) {
-      historyRangeEnd = historyRangeStart;
-      if (historyRangeToInput) historyRangeToInput.value = historyRangeEnd;
-    }
-
-    historyFilterPeriod = "range";
-    renderHistory();
-  });
-
-  historyRangeToInput?.addEventListener("change", () => {
-    if (!historyRangeToInput.value) return;
-    historyRangeEnd = historyRangeToInput.value;
-
-    if (!historyRangeStart || historyRangeStart > historyRangeEnd) {
-      historyRangeStart = historyRangeEnd;
-      if (historyRangeFromInput) historyRangeFromInput.value = historyRangeStart;
-    }
-
-    historyFilterPeriod = "range";
-    renderHistory();
-  });
-
-  historyTypeButtons.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      historyFilterType = btn.dataset.type;
-      renderHistory();
-    });
-  });
 
   analyticsPeriodButtons.forEach((btn) => {
     btn.addEventListener("click", () => {
