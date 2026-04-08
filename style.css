@@ -914,6 +914,40 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   border-radius: 20px;
 }
 
+.analytics-mode-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px;
+  margin: 2px auto 2px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(35, 38, 47, 0.94) 0%, rgba(29, 32, 41, 0.94) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow:
+    0 10px 28px rgba(0, 0, 0, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.analytics-mode-switch__btn {
+  min-width: 132px;
+  height: 42px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 15px;
+  font-weight: 820;
+  letter-spacing: -0.02em;
+}
+
+.analytics-mode-switch__btn.is-active {
+  background: rgba(111, 156, 255, 0.18);
+  color: #f7f8fb;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 0 14px rgba(111, 156, 255, 0.08);
+}
+
 .analytics-total-card .summary-value.is-positive {
   color: var(--green);
 }
@@ -1412,4 +1446,10 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   #historyTransactionsList .list-caption {
     font-size: 10px;
   }
+}
+
+.analytics-mode-switch__btn {
+  min-width: 120px;
+  height: 40px;
+  font-size: 14px;
 }
