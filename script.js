@@ -187,42 +187,62 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function setNativePickerVisibility(input, visible) {
-    if (!input) return;
+  if (!input) return;
 
-    if (visible) {
-      input.classList.remove("hidden");
-      input.style.display = "block";
-      input.style.width = "100%";
-      input.style.minWidth = "0";
-      input.style.maxWidth = "100%";
-      input.style.padding = "14px 16px";
-      input.style.border = "1px solid rgba(255,255,255,0.08)";
-      input.style.borderRadius = "18px";
-      input.style.background = "rgba(255,255,255,0.06)";
-      input.style.color = "#f3f4f8";
-      input.style.opacity = "1";
-      input.style.pointerEvents = "auto";
-      input.style.position = "static";
-      input.style.left = "auto";
-      input.style.height = "auto";
-    } else {
-      input.classList.add("hidden");
-      input.style.display = "";
-      input.style.width = "";
-      input.style.minWidth = "";
-      input.style.maxWidth = "";
-      input.style.padding = "";
-      input.style.border = "";
-      input.style.borderRadius = "";
-      input.style.background = "";
-      input.style.color = "";
-      input.style.opacity = "";
-      input.style.pointerEvents = "";
-      input.style.position = "";
-      input.style.left = "";
-      input.style.height = "";
-    }
+  const isMonthInput =
+    input.id === "historyMonthInput" || input.id === "analyticsMonthInput";
+
+  if (isMonthInput) {
+    input.classList.add("hidden");
+    input.style.display = "none";
+    input.style.width = "1px";
+    input.style.minWidth = "1px";
+    input.style.maxWidth = "1px";
+    input.style.height = "1px";
+    input.style.padding = "0";
+    input.style.border = "0";
+    input.style.background = "transparent";
+    input.style.opacity = "0";
+    input.style.pointerEvents = "none";
+    input.style.position = "absolute";
+    input.style.left = "-9999px";
+    return;
   }
+
+  if (visible) {
+    input.classList.remove("hidden");
+    input.style.display = "block";
+    input.style.width = "100%";
+    input.style.minWidth = "0";
+    input.style.maxWidth = "100%";
+    input.style.height = "48px";
+    input.style.padding = "0 16px";
+    input.style.border = "1px solid rgba(255,255,255,0.08)";
+    input.style.borderRadius = "18px";
+    input.style.background = "rgba(255,255,255,0.06)";
+    input.style.color = "#f3f4f8";
+    input.style.opacity = "1";
+    input.style.pointerEvents = "auto";
+    input.style.position = "static";
+    input.style.left = "auto";
+  } else {
+    input.classList.add("hidden");
+    input.style.display = "";
+    input.style.width = "";
+    input.style.minWidth = "";
+    input.style.maxWidth = "";
+    input.style.height = "";
+    input.style.padding = "";
+    input.style.border = "";
+    input.style.borderRadius = "";
+    input.style.background = "";
+    input.style.color = "";
+    input.style.opacity = "";
+    input.style.pointerEvents = "";
+    input.style.position = "";
+    input.style.left = "";
+  }
+}
 
   function openNativePicker(input) {
     if (!input) return;
