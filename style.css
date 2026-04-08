@@ -2209,3 +2209,49 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 #analyticsRangeToInput:not(.hidden) {
   display: block !important;
 }
+
+/* month selector over the visible month button */
+.month-filter-wrap {
+  position: relative;
+  display: inline-flex;
+  justify-content: center;
+}
+
+.month-filter-native {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  pointer-events: auto;
+}
+
+/* month select must never become a separate pill/card */
+#historyMonthInput,
+#analyticsMonthInput {
+  display: block !important;
+  width: 100% !important;
+  min-width: 100% !important;
+  max-width: 100% !important;
+  height: 100% !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  opacity: 0 !important;
+  pointer-events: auto !important;
+  position: absolute !important;
+  inset: 0 !important;
+  left: auto !important;
+}
+
+/* period label remains hidden */
+#historySelectedPeriodLabel,
+#analyticsSelectedPeriodLabel {
+  display: none !important;
+}
