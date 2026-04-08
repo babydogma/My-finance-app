@@ -2072,3 +2072,116 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     font-size: 12px;
   }
 }
+
+/* =========================================================
+   HISTORY / ANALYTICS FILTERS — FINAL
+   ========================================================= */
+
+.history-filter-group--primary {
+  justify-content: center;
+}
+
+.history-filter-group--secondary {
+  justify-content: center;
+}
+
+.history-filter-group--inputs {
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.history-filter-btn--month {
+  min-width: 168px;
+  height: 48px;
+  padding: 0 22px;
+  border-radius: 999px;
+  font-size: 17px;
+  font-weight: 860;
+  letter-spacing: -0.03em;
+}
+
+/* скрываем подпись вроде "апрель 2026 г." */
+#historySelectedPeriodLabel,
+#analyticsSelectedPeriodLabel {
+  display: none !important;
+}
+
+/* базовый вид нативных инпутов, когда JS их раскрывает */
+#historyMonthInput,
+#analyticsMonthInput,
+#historyRangeFromInput,
+#historyRangeToInput,
+#analyticsRangeFromInput,
+#analyticsRangeToInput {
+  appearance: none;
+  -webkit-appearance: none;
+  font: inherit;
+  color: var(--text);
+}
+
+/* красивый вид раскрытых полей */
+.history-filter-group--inputs .input:not(.hidden) {
+  width: 100%;
+  min-height: 48px;
+  padding: 0 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  background:
+    linear-gradient(180deg, rgba(42, 46, 61, 0.9) 0%, rgba(28, 31, 43, 0.92) 100%);
+  color: var(--text);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.03),
+    0 10px 24px rgba(0, 0, 0, 0.16);
+}
+
+.history-filter-group--inputs .input:not(.hidden)::-webkit-calendar-picker-indicator {
+  opacity: 0.9;
+  filter: invert(1);
+  cursor: pointer;
+}
+
+.history-filter-group--inputs .input:not(.hidden):focus {
+  outline: none;
+  border-color: rgba(111, 156, 255, 0.28);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.03),
+    0 0 0 1px rgba(111, 156, 255, 0.14),
+    0 10px 24px rgba(0, 0, 0, 0.16);
+}
+
+/* когда открыт диапазон — два поля друг под другом */
+#historyRangeFromInput:not(.hidden),
+#historyRangeToInput:not(.hidden),
+#analyticsRangeFromInput:not(.hidden),
+#analyticsRangeToInput:not(.hidden) {
+  display: block;
+}
+
+/* когда открыт выбор месяца */
+#historyMonthInput:not(.hidden),
+#analyticsMonthInput:not(.hidden) {
+  display: block;
+}
+
+/* на всякий случай выравниваем фильтры в аналитике */
+#analyticsView .history-filters,
+#historyView .history-filters {
+  gap: 12px;
+}
+
+@media (max-width: 420px) {
+  .history-filter-btn--month {
+    min-width: 156px;
+    height: 44px;
+    padding: 0 20px;
+    font-size: 16px;
+  }
+
+  .history-filter-group--inputs .input:not(.hidden) {
+    min-height: 44px;
+    padding: 0 14px;
+    border-radius: 16px;
+    font-size: 15px;
+  }
+}
