@@ -133,28 +133,31 @@
 
     <div class="history-filters">
       <div class="history-filter-group history-filter-group--primary">
-  <div class="month-filter-wrap">
-    <button
-      class="history-filter-btn history-filter-btn--month is-active"
-      type="button"
-      data-period="month"
-      id="historyMonthBtn"
-    >
-      Месяц
-    </button>
+        <div class="month-filter-wrap">
+          <button
+            class="history-filter-btn history-filter-btn--month is-active"
+            type="button"
+            data-period="month"
+            id="historyMonthBtn"
+          >
+            Месяц
+          </button>
 
-    <select id="historyMonthInput" class="month-filter-native" aria-label="Выбор месяца для истории"></select>
-  </div>
-</div>
+          <select
+            id="historyMonthInput"
+            class="month-filter-native"
+            aria-label="Выбор месяца для истории"
+          ></select>
+        </div>
+      </div>
+
+      <div class="history-filter-group history-filter-group--secondary">
+        <button class="history-filter-btn" type="button" data-period="today">Сегодня</button>
+        <button class="history-filter-btn" type="button" data-period="7">7 дней</button>
+        <button class="history-filter-btn" type="button" data-period="range">Период</button>
+      </div>
 
       <div class="history-filter-group history-filter-group--inputs">
-  <input class="input hidden" type="date" id="historyRangeFromInput" />
-  <input class="input hidden" type="date" id="historyRangeToInput" />
-  <div class="section-note hidden" id="historySelectedPeriodLabel"></div>
-</div>
-
-      <div class="history-filter-group history-filter-group--inputs">
-        <input class="input hidden" type="month" id="historyMonthInput" />
         <input class="input hidden" type="date" id="historyRangeFromInput" />
         <input class="input hidden" type="date" id="historyRangeToInput" />
         <div class="section-note hidden" id="historySelectedPeriodLabel"></div>
@@ -179,28 +182,31 @@
   <section class="section section--manager-top">
     <div class="history-filters">
       <div class="history-filter-group history-filter-group--primary">
-  <div class="month-filter-wrap">
-    <button
-      class="history-filter-btn history-filter-btn--month is-active"
-      type="button"
-      data-analytics-period="month"
-      id="analyticsMonthBtn"
-    >
-      Месяц
-    </button>
+        <div class="month-filter-wrap">
+          <button
+            class="history-filter-btn history-filter-btn--month is-active"
+            type="button"
+            data-analytics-period="month"
+            id="analyticsMonthBtn"
+          >
+            Месяц
+          </button>
 
-    <select id="analyticsMonthInput" class="month-filter-native" aria-label="Выбор месяца для аналитики"></select>
-  </div>
-</div>
+          <select
+            id="analyticsMonthInput"
+            class="month-filter-native"
+            aria-label="Выбор месяца для аналитики"
+          ></select>
+        </div>
+      </div>
+
+      <div class="history-filter-group history-filter-group--secondary">
+        <button class="history-filter-btn" type="button" data-analytics-period="today">Сегодня</button>
+        <button class="history-filter-btn" type="button" data-analytics-period="7">7 дней</button>
+        <button class="history-filter-btn" type="button" data-analytics-period="range">Период</button>
+      </div>
 
       <div class="history-filter-group history-filter-group--inputs">
-  <input class="input hidden" type="date" id="analyticsRangeFromInput" />
-  <input class="input hidden" type="date" id="analyticsRangeToInput" />
-  <div class="section-note hidden" id="analyticsSelectedPeriodLabel"></div>
-</div>
-
-      <div class="history-filter-group history-filter-group--inputs">
-        <input class="input hidden" type="month" id="analyticsMonthInput" />
         <input class="input hidden" type="date" id="analyticsRangeFromInput" />
         <input class="input hidden" type="date" id="analyticsRangeToInput" />
         <div class="section-note hidden" id="analyticsSelectedPeriodLabel"></div>
