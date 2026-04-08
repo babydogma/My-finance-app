@@ -862,13 +862,10 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   pointer-events: auto;
 }
 
-#historySelectedPeriodLabel,
 #analyticsSelectedPeriodLabel {
   display: none !important;
 }
 
-#historyRangeFromInput:not(.hidden),
-#historyRangeToInput:not(.hidden),
 #analyticsRangeFromInput:not(.hidden),
 #analyticsRangeToInput:not(.hidden) {
   display: block !important;
@@ -884,8 +881,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     0 10px 24px rgba(0, 0, 0, 0.16);
 }
 
-#historyRangeFromInput:not(.hidden)::-webkit-calendar-picker-indicator,
-#historyRangeToInput:not(.hidden)::-webkit-calendar-picker-indicator,
 #analyticsRangeFromInput:not(.hidden)::-webkit-calendar-picker-indicator,
 #analyticsRangeToInput:not(.hidden)::-webkit-calendar-picker-indicator {
   opacity: 0.9;
@@ -893,13 +888,11 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   cursor: pointer;
 }
 
-#historyView,
 #analyticsView,
 #budgetView {
   padding-bottom: 8px;
 }
 
-#historyView .section,
 #analyticsView .section,
 #budgetView .section {
   margin-top: 18px;
@@ -1352,13 +1345,11 @@ input[type="date"]::-webkit-calendar-picker-indicator {
    16. TRANSACTION DATE/TIME
    ========================================================= */
 
-#transactionsList .list-right,
-#historyTransactionsList .list-right {
+#transactionsList .list-right {
   min-width: 108px;
 }
 
-#transactionsList .list-caption,
-#historyTransactionsList .list-caption {
+#transactionsList .list-caption {
   display: block;
   text-align: right;
 }
@@ -1446,23 +1437,19 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     font-size: 12.5px;
   }
 
-  #historyRangeFromInput:not(.hidden),
-  #historyRangeToInput:not(.hidden),
   #analyticsRangeFromInput:not(.hidden),
   #analyticsRangeToInput:not(.hidden) {
-    min-height: 44px;
-    padding: 0 14px;
-    border-radius: 16px;
-    font-size: 15px;
-  }
+  min-height: 44px;
+  padding: 0 14px;
+  border-radius: 16px;
+  font-size: 15px;
+}
 
-  #transactionsList .list-right,
-  #historyTransactionsList .list-right {
-    min-width: 96px;
-  }
+  #transactionsList .list-right {
+  min-width: 96px;
+}
 
-  #transactionsList .list-caption,
-  #historyTransactionsList .list-caption {
-    font-size: 10px;
-  }
+  #transactionsList .list-caption {
+  font-size: 10px;
+ }
 }
