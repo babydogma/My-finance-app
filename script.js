@@ -37,17 +37,19 @@ document.addEventListener("DOMContentLoaded", async () => {
   const historyCountLabel = document.getElementById("historyCountLabel");
   const historyPeriodButtons = document.querySelectorAll("[data-period]");
   const historyTypeButtons = document.querySelectorAll("[data-type]");
+  const historyMonthBtn = document.getElementById("historyMonthBtn");
   const historyMonthInput = document.getElementById("historyMonthInput");
   const historyRangeFromInput = document.getElementById("historyRangeFromInput");
   const historyRangeToInput = document.getElementById("historyRangeToInput");
   const historySelectedPeriodLabel = document.getElementById("historySelectedPeriodLabel");
-  
+
   const analyticsPeriodButtons = document.querySelectorAll("[data-analytics-period]");
   const analyticsIncomeValue = document.getElementById("analyticsIncomeValue");
   const analyticsExpenseValue = document.getElementById("analyticsExpenseValue");
   const analyticsNetValue = document.getElementById("analyticsNetValue");
   const analyticsDonut = document.getElementById("analyticsDonut");
   const analyticsLegend = document.getElementById("analyticsLegend");
+  const analyticsMonthBtn = document.getElementById("analyticsMonthBtn");
   const analyticsMonthInput = document.getElementById("analyticsMonthInput");
   const analyticsRangeFromInput = document.getElementById("analyticsRangeFromInput");
   const analyticsRangeToInput = document.getElementById("analyticsRangeToInput");
@@ -94,7 +96,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   let historySelectedMonth = getCurrentMonthValue();
   let historyRangeStart = "";
   let historyRangeEnd = "";
-  
+
   let analyticsFilterPeriod = "month";
   let analyticsSelectedMonth = getCurrentMonthValue();
   let analyticsRangeStart = "";
@@ -166,55 +168,105 @@ document.addEventListener("DOMContentLoaded", async () => {
     const day = String(now.getDate()).padStart(2, "0");
     return `${year}-${month}-${day}`;
   }
-  
+
   function getCurrentMonthValue() {
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, "0");
-  return `${year}-${month}`;
-}
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    return `${year}-${month}`;
+  }
 
-function formatDateRangeLabel(fromValue, toValue) {
-  if (!fromValue || !toValue) return "";
-  return `${formatDateShort(fromValue)} — ${formatDateShort(toValue)}`;
-}
+  function formatDateRangeLabel(fromValue, toValue) {
+    if (!fromValue || !toValue) return "";
+    return `${formatDateShort(fromValue)} — ${formatDateShort(toValue)}`;
+  }
 
-function getStartOfTodayTime() {
-  const now = new Date();
-  return new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-}
+  function getStartOfTodayTime() {
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+  }
 
-function filterTransactionsByPeriod(items, period, selectedMonth, rangeStart, rangeEnd) {
-  const todayKey = getTodayDateValue();
-  const currentMonth = selectedMonth || getCurrentMonthValue();
-  const startOfToday = getStartOfTodayTime();
+  function setNativePickerVisibility(input, visible) {
+    if (!input) return;
 
-  return items.filter((item) => {
-    if (!item.created_at) return false;
+    if (visible) {
+      input.classList.remove("hidden");
+      input.style.display = "block";
+      input.style.width = "100%";
+      input.style.minWidth = "0";
+      input.style.maxWidth = "100%";
+      input.style.padding = "14px 16px";
+      input.style.border = "1px solid rgba(255,255,255,0.08)";
+      input.style.borderRadius = "18px";
+      input.style.background = "rgba(255,255,255,0.06)";
+      input.style.color = "#f3f4f8";
+      input.style.opacity = "1";
+      input.style.pointerEvents = "auto";
+      input.style.position = "static";
+      input.style.left = "auto";
+      input.style.height = "auto";
+    } else {
+      input.classList.add("hidden");
+      input.style.display = "";
+      input.style.width = "";
+      input.style.minWidth = "";
+      input.style.maxWidth = "";
+      input.style.padding = "";
+      input.style.border = "";
+      input.style.borderRadius = "";
+      input.style.background = "";
+      input.style.color = "";
+      input.style.opacity = "";
+      input.style.pointerEvents = "";
+      input.style.position = "";
+      input.style.left = "";
+      input.style.height = "";
+    }
+  }
 
-    const dateKey = String(item.created_at).slice(0, 10);
-    const time = new Date(item.created_at).getTime();
+  function openNativePicker(input) {
+    if (!input) return;
 
-    if (period === "month") {
-      return dateKey.slice(0, 7) === currentMonth;
+    if (typeof input.showPicker === "function") {
+      input.showPicker();
+      return;
     }
 
-    if (period === "today") {
-      return dateKey === todayKey;
-    }
+    input.focus();
+    input.click();
+  }
 
-    if (period === "7") {
-      return time >= startOfToday - 6 * 24 * 60 * 60 * 1000;
-    }
+  function filterTransactionsByPeriod(items, period, selectedMonth, rangeStart, rangeEnd) {
+    const todayKey = getTodayDateValue();
+    const currentMonth = selectedMonth || getCurrentMonthValue();
+    const startOfToday = getStartOfTodayTime();
 
-    if (period === "range") {
-      if (!rangeStart || !rangeEnd) return true;
-      return dateKey >= rangeStart && dateKey <= rangeEnd;
-    }
+    return items.filter((item) => {
+      if (!item.created_at) return false;
 
-    return true;
-  });
-}
+      const dateKey = String(item.created_at).slice(0, 10);
+      const time = new Date(item.created_at).getTime();
+
+      if (period === "month") {
+        return dateKey.slice(0, 7) === currentMonth;
+      }
+
+      if (period === "today") {
+        return dateKey === todayKey;
+      }
+
+      if (period === "7") {
+        return time >= startOfToday - 6 * 24 * 60 * 60 * 1000;
+      }
+
+      if (period === "range") {
+        if (!rangeStart || !rangeEnd) return true;
+        return dateKey >= rangeStart && dateKey <= rangeEnd;
+      }
+
+      return true;
+    });
+  }
 
   function getCurrentTime() {
     const now = new Date();
@@ -247,18 +299,6 @@ function filterTransactionsByPeriod(items, period, selectedMonth, rangeStart, ra
     });
   }
 
-  function getMonthRange(monthValue) {
-    if (!monthValue) return null;
-
-    const [year, month] = monthValue.split("-").map(Number);
-    if (!year || !month) return null;
-
-    const start = new Date(year, month - 1, 1).getTime();
-    const end = new Date(year, month, 1).getTime();
-
-    return { start, end };
-  }
-
   function formatMonthLabel(monthValue) {
     if (!monthValue) return "";
 
@@ -273,25 +313,37 @@ function filterTransactionsByPeriod(items, period, selectedMonth, rangeStart, ra
     });
   }
 
+  function formatMonthButtonLabel(monthValue) {
+    if (!monthValue) return "Месяц";
+
+    const [year, month] = monthValue.split("-").map(Number);
+    if (!year || !month) return "Месяц";
+
+    const date = new Date(year, month - 1, 1);
+    const monthLabel = date.toLocaleDateString("ru-RU", { month: "long" });
+
+    return monthLabel.charAt(0).toUpperCase() + monthLabel.slice(1);
+  }
+
   function getAnalyticsPeriodLabel() {
-  if (analyticsFilterPeriod === "month") {
-    return formatMonthLabel(analyticsSelectedMonth);
-  }
+    if (analyticsFilterPeriod === "month") {
+      return formatMonthLabel(analyticsSelectedMonth);
+    }
 
-  if (analyticsFilterPeriod === "today") {
-    return "сегодня";
-  }
+    if (analyticsFilterPeriod === "today") {
+      return "сегодня";
+    }
 
-  if (analyticsFilterPeriod === "7") {
-    return "за 7 дней";
-  }
+    if (analyticsFilterPeriod === "7") {
+      return "за 7 дней";
+    }
 
-  if (analyticsFilterPeriod === "range") {
-    return formatDateRangeLabel(analyticsRangeStart, analyticsRangeEnd);
-  }
+    if (analyticsFilterPeriod === "range") {
+      return formatDateRangeLabel(analyticsRangeStart, analyticsRangeEnd);
+    }
 
-  return "";
-}
+    return "";
+  }
 
   function escapeHtml(str) {
     return String(str)
@@ -654,14 +706,14 @@ function filterTransactionsByPeriod(items, period, selectedMonth, rangeStart, ra
   }
 
   function getAnalyticsFilteredTransactions() {
-  return filterTransactionsByPeriod(
-    state.transactions,
-    analyticsFilterPeriod,
-    analyticsSelectedMonth,
-    analyticsRangeStart,
-    analyticsRangeEnd
-  );
-}
+    return filterTransactionsByPeriod(
+      state.transactions,
+      analyticsFilterPeriod,
+      analyticsSelectedMonth,
+      analyticsRangeStart,
+      analyticsRangeEnd
+    );
+  }
 
   function getAnalyticsSummary() {
     const items = getAnalyticsFilteredTransactions();
@@ -711,22 +763,22 @@ function filterTransactionsByPeriod(items, period, selectedMonth, rangeStart, ra
   }
 
   function getHistoryFilteredTransactions() {
-  let filtered = [...state.transactions];
+    let filtered = [...state.transactions];
 
-  if (historyFilterType !== "all") {
-    filtered = filtered.filter((item) => item.type === historyFilterType);
+    if (historyFilterType !== "all") {
+      filtered = filtered.filter((item) => item.type === historyFilterType);
+    }
+
+    filtered = filterTransactionsByPeriod(
+      filtered,
+      historyFilterPeriod,
+      historySelectedMonth,
+      historyRangeStart,
+      historyRangeEnd
+    );
+
+    return sortTransactionsByLatest(filtered);
   }
-
-  filtered = filterTransactionsByPeriod(
-    filtered,
-    historyFilterPeriod,
-    historySelectedMonth,
-    historyRangeStart,
-    historyRangeEnd
-  );
-
-  return sortTransactionsByLatest(filtered);
-}
 
   function getCurrentMonthExpenseByCategory(categoryId) {
     const now = new Date();
@@ -828,10 +880,10 @@ function filterTransactionsByPeriod(items, period, selectedMonth, rangeStart, ra
         value: todayString,
       });
 
-    if (metaError) {
-      console.error(metaError);
-      alert("Ошибка сохранения даты начисления процентов");
-    }
+      if (metaError) {
+        console.error(metaError);
+        alert("Ошибка сохранения даты начисления процентов");
+      }
   }
 
   function renderBalance() {
@@ -1168,58 +1220,55 @@ function filterTransactionsByPeriod(items, period, selectedMonth, rangeStart, ra
   }
 
   function renderHistory() {
-  if (!historyTransactionsList) return;
+    if (!historyTransactionsList) return;
 
-  historyTransactionsList.innerHTML = "";
+    historyTransactionsList.innerHTML = "";
 
-  const filteredTransactions = getHistoryFilteredTransactions();
+    const filteredTransactions = getHistoryFilteredTransactions();
 
-  historyCountLabel.textContent = `${filteredTransactions.length} операций`;
+    historyCountLabel.textContent = `${filteredTransactions.length} операций`;
 
-  historyPeriodButtons.forEach((btn) => {
-    btn.classList.toggle("is-active", btn.dataset.period === historyFilterPeriod);
-  });
+    historyPeriodButtons.forEach((btn) => {
+      btn.classList.toggle("is-active", btn.dataset.period === historyFilterPeriod);
+    });
 
-  historyTypeButtons.forEach((btn) => {
-    btn.classList.toggle("is-active", btn.dataset.type === historyFilterType);
-  });
+    historyTypeButtons.forEach((btn) => {
+      btn.classList.toggle("is-active", btn.dataset.type === historyFilterType);
+    });
 
-  const isMonth = historyFilterPeriod === "month";
-  const isRange = historyFilterPeriod === "range";
+    const isMonth = historyFilterPeriod === "month";
+    const isRange = historyFilterPeriod === "range";
 
-  historyMonthInput?.classList.toggle("hidden", !isMonth);
-  historyRangeFromInput?.classList.toggle("hidden", !isRange);
-  historyRangeToInput?.classList.toggle("hidden", !isRange);
+    setNativePickerVisibility(historyMonthInput, isMonth);
+    setNativePickerVisibility(historyRangeFromInput, isRange);
+    setNativePickerVisibility(historyRangeToInput, isRange);
 
-  let label = "";
-  if (isMonth && historySelectedMonth) {
-    label = formatMonthLabel(historySelectedMonth);
-  } else if (isRange && historyRangeStart && historyRangeEnd) {
-    label = formatDateRangeLabel(historyRangeStart, historyRangeEnd);
+    if (historyMonthBtn) {
+      historyMonthBtn.textContent = formatMonthButtonLabel(historySelectedMonth);
+    }
+
+    if (historySelectedPeriodLabel) {
+      historySelectedPeriodLabel.classList.add("hidden");
+      historySelectedPeriodLabel.textContent = "";
+    }
+
+    if (filteredTransactions.length === 0) {
+      const empty = document.createElement("div");
+      empty.className = "list-card";
+      empty.innerHTML = `
+        <div class="list-body">
+          <h3 class="list-title">Ничего не найдено</h3>
+          <p class="list-subtitle">Попробуй другой период или тип операций</p>
+        </div>
+      `;
+      historyTransactionsList.appendChild(empty);
+      return;
+    }
+
+    filteredTransactions.forEach((transaction) => {
+      historyTransactionsList.appendChild(createTransactionCard(transaction));
+    });
   }
-
-  if (historySelectedPeriodLabel) {
-    historySelectedPeriodLabel.classList.toggle("hidden", !label);
-    historySelectedPeriodLabel.textContent = label;
-  }
-
-  if (filteredTransactions.length === 0) {
-    const empty = document.createElement("div");
-    empty.className = "list-card";
-    empty.innerHTML = `
-      <div class="list-body">
-        <h3 class="list-title">Ничего не найдено</h3>
-        <p class="list-subtitle">Попробуй другой период или тип операций</p>
-      </div>
-    `;
-    historyTransactionsList.appendChild(empty);
-    return;
-  }
-
-  filteredTransactions.forEach((transaction) => {
-    historyTransactionsList.appendChild(createTransactionCard(transaction));
-  });
-}
 
   function renderAnalytics() {
     if (!analyticsView) return;
@@ -1245,23 +1294,21 @@ function filterTransactionsByPeriod(items, period, selectedMonth, rangeStart, ra
     analyticsPeriodButtons.forEach((btn) => {
       btn.classList.toggle("is-active", btn.dataset.analyticsPeriod === analyticsFilterPeriod);
     });
+
     const isAnalyticsMonth = analyticsFilterPeriod === "month";
     const isAnalyticsRange = analyticsFilterPeriod === "range";
-    
-    analyticsMonthInput?.classList.toggle("hidden", !isAnalyticsMonth);
-    analyticsRangeFromInput?.classList.toggle("hidden", !isAnalyticsRange);
-    analyticsRangeToInput?.classList.toggle("hidden", !isAnalyticsRange);
-    
-    let analyticsLabel = "";
-    if (isAnalyticsMonth && analyticsSelectedMonth) {
-      analyticsLabel = formatMonthLabel(analyticsSelectedMonth);
-    } else if (isAnalyticsRange && analyticsRangeStart && analyticsRangeEnd) {
-      analyticsLabel = formatDateRangeLabel(analyticsRangeStart, analyticsRangeEnd);
+
+    setNativePickerVisibility(analyticsMonthInput, isAnalyticsMonth);
+    setNativePickerVisibility(analyticsRangeFromInput, isAnalyticsRange);
+    setNativePickerVisibility(analyticsRangeToInput, isAnalyticsRange);
+
+    if (analyticsMonthBtn) {
+      analyticsMonthBtn.textContent = formatMonthButtonLabel(analyticsSelectedMonth);
     }
-    
+
     if (analyticsSelectedPeriodLabel) {
-      analyticsSelectedPeriodLabel.classList.toggle("hidden", !analyticsLabel);
-      analyticsSelectedPeriodLabel.textContent = analyticsLabel;
+      analyticsSelectedPeriodLabel.classList.add("hidden");
+      analyticsSelectedPeriodLabel.textContent = "";
     }
 
     if (!breakdown.length) {
@@ -1733,65 +1780,73 @@ function filterTransactionsByPeriod(items, period, selectedMonth, rangeStart, ra
   navBudgetBtn?.addEventListener("click", showBudgetView);
 
   historyPeriodButtons.forEach((btn) => {
-  btn.addEventListener("click", () => {
-    historyFilterPeriod = btn.dataset.period;
+    btn.addEventListener("click", () => {
+      historyFilterPeriod = btn.dataset.period;
 
-    if (historyFilterPeriod === "month") {
-      historySelectedMonth = historySelectedMonth || getCurrentMonthValue();
-      if (historyMonthInput) {
-        historyMonthInput.value = historySelectedMonth;
-        historyMonthInput.classList.remove("hidden");
-        historyMonthInput.showPicker?.();
+      if (historyFilterPeriod === "month") {
+        historySelectedMonth = historySelectedMonth || getCurrentMonthValue();
+
+        if (historyMonthInput) {
+          historyMonthInput.value = historySelectedMonth;
+          setNativePickerVisibility(historyMonthInput, true);
+          openNativePicker(historyMonthInput);
+        }
       }
-    }
 
-    if (historyFilterPeriod === "range") {
-      const today = getTodayDateValue();
-      historyRangeStart = historyRangeStart || today;
-      historyRangeEnd = historyRangeEnd || today;
+      if (historyFilterPeriod === "range") {
+        const today = getTodayDateValue();
+        historyRangeStart = historyRangeStart || today;
+        historyRangeEnd = historyRangeEnd || today;
 
-      if (historyRangeFromInput) historyRangeFromInput.value = historyRangeStart;
-      if (historyRangeToInput) historyRangeToInput.value = historyRangeEnd;
+        if (historyRangeFromInput) {
+          historyRangeFromInput.value = historyRangeStart;
+        }
 
-      historyRangeFromInput?.showPicker?.();
-    }
+        if (historyRangeToInput) {
+          historyRangeToInput.value = historyRangeEnd;
+        }
 
+        setNativePickerVisibility(historyRangeFromInput, true);
+        setNativePickerVisibility(historyRangeToInput, true);
+        openNativePicker(historyRangeFromInput);
+      }
+
+      renderHistory();
+    });
+  });
+
+  historyMonthInput?.addEventListener("change", () => {
+    if (!historyMonthInput.value) return;
+    historySelectedMonth = historyMonthInput.value;
+    historyFilterPeriod = "month";
     renderHistory();
   });
-});
 
-historyMonthInput?.addEventListener("change", () => {
-  if (!historyMonthInput.value) return;
-  historySelectedMonth = historyMonthInput.value;
-  historyFilterPeriod = "month";
-  renderHistory();
-});
+  historyRangeFromInput?.addEventListener("change", () => {
+    if (!historyRangeFromInput.value) return;
+    historyRangeStart = historyRangeFromInput.value;
 
-historyRangeFromInput?.addEventListener("change", () => {
-  if (!historyRangeFromInput.value) return;
-  historyRangeStart = historyRangeFromInput.value;
+    if (!historyRangeEnd || historyRangeEnd < historyRangeStart) {
+      historyRangeEnd = historyRangeStart;
+      if (historyRangeToInput) historyRangeToInput.value = historyRangeEnd;
+    }
 
-  if (!historyRangeEnd || historyRangeEnd < historyRangeStart) {
-    historyRangeEnd = historyRangeStart;
-    if (historyRangeToInput) historyRangeToInput.value = historyRangeEnd;
-  }
+    historyFilterPeriod = "range";
+    renderHistory();
+  });
 
-  historyFilterPeriod = "range";
-  renderHistory();
-});
+  historyRangeToInput?.addEventListener("change", () => {
+    if (!historyRangeToInput.value) return;
+    historyRangeEnd = historyRangeToInput.value;
 
-historyRangeToInput?.addEventListener("change", () => {
-  if (!historyRangeToInput.value) return;
-  historyRangeEnd = historyRangeToInput.value;
+    if (!historyRangeStart || historyRangeStart > historyRangeEnd) {
+      historyRangeStart = historyRangeEnd;
+      if (historyRangeFromInput) historyRangeFromInput.value = historyRangeStart;
+    }
 
-  if (!historyRangeStart || historyRangeStart > historyRangeEnd) {
-    historyRangeStart = historyRangeEnd;
-    if (historyRangeFromInput) historyRangeFromInput.value = historyRangeStart;
-  }
-
-  historyFilterPeriod = "range";
-  renderHistory();
-});
+    historyFilterPeriod = "range";
+    renderHistory();
+  });
 
   historyTypeButtons.forEach((btn) => {
     btn.addEventListener("click", () => {
@@ -1801,65 +1856,73 @@ historyRangeToInput?.addEventListener("change", () => {
   });
 
   analyticsPeriodButtons.forEach((btn) => {
-  btn.addEventListener("click", () => {
-    analyticsFilterPeriod = btn.dataset.analyticsPeriod;
+    btn.addEventListener("click", () => {
+      analyticsFilterPeriod = btn.dataset.analyticsPeriod;
 
-    if (analyticsFilterPeriod === "month") {
-      analyticsSelectedMonth = analyticsSelectedMonth || getCurrentMonthValue();
-      if (analyticsMonthInput) {
-        analyticsMonthInput.value = analyticsSelectedMonth;
-        analyticsMonthInput.classList.remove("hidden");
-        analyticsMonthInput.showPicker?.();
+      if (analyticsFilterPeriod === "month") {
+        analyticsSelectedMonth = analyticsSelectedMonth || getCurrentMonthValue();
+
+        if (analyticsMonthInput) {
+          analyticsMonthInput.value = analyticsSelectedMonth;
+          setNativePickerVisibility(analyticsMonthInput, true);
+          openNativePicker(analyticsMonthInput);
+        }
       }
-    }
 
-    if (analyticsFilterPeriod === "range") {
-      const today = getTodayDateValue();
-      analyticsRangeStart = analyticsRangeStart || today;
-      analyticsRangeEnd = analyticsRangeEnd || today;
+      if (analyticsFilterPeriod === "range") {
+        const today = getTodayDateValue();
+        analyticsRangeStart = analyticsRangeStart || today;
+        analyticsRangeEnd = analyticsRangeEnd || today;
 
-      if (analyticsRangeFromInput) analyticsRangeFromInput.value = analyticsRangeStart;
-      if (analyticsRangeToInput) analyticsRangeToInput.value = analyticsRangeEnd;
+        if (analyticsRangeFromInput) {
+          analyticsRangeFromInput.value = analyticsRangeStart;
+        }
 
-      analyticsRangeFromInput?.showPicker?.();
-    }
+        if (analyticsRangeToInput) {
+          analyticsRangeToInput.value = analyticsRangeEnd;
+        }
 
+        setNativePickerVisibility(analyticsRangeFromInput, true);
+        setNativePickerVisibility(analyticsRangeToInput, true);
+        openNativePicker(analyticsRangeFromInput);
+      }
+
+      renderAnalytics();
+    });
+  });
+
+  analyticsMonthInput?.addEventListener("change", () => {
+    if (!analyticsMonthInput.value) return;
+    analyticsSelectedMonth = analyticsMonthInput.value;
+    analyticsFilterPeriod = "month";
     renderAnalytics();
   });
-});
 
-analyticsMonthInput?.addEventListener("change", () => {
-  if (!analyticsMonthInput.value) return;
-  analyticsSelectedMonth = analyticsMonthInput.value;
-  analyticsFilterPeriod = "month";
-  renderAnalytics();
-});
+  analyticsRangeFromInput?.addEventListener("change", () => {
+    if (!analyticsRangeFromInput.value) return;
+    analyticsRangeStart = analyticsRangeFromInput.value;
 
-analyticsRangeFromInput?.addEventListener("change", () => {
-  if (!analyticsRangeFromInput.value) return;
-  analyticsRangeStart = analyticsRangeFromInput.value;
+    if (!analyticsRangeEnd || analyticsRangeEnd < analyticsRangeStart) {
+      analyticsRangeEnd = analyticsRangeStart;
+      if (analyticsRangeToInput) analyticsRangeToInput.value = analyticsRangeEnd;
+    }
 
-  if (!analyticsRangeEnd || analyticsRangeEnd < analyticsRangeStart) {
-    analyticsRangeEnd = analyticsRangeStart;
-    if (analyticsRangeToInput) analyticsRangeToInput.value = analyticsRangeEnd;
-  }
+    analyticsFilterPeriod = "range";
+    renderAnalytics();
+  });
 
-  analyticsFilterPeriod = "range";
-  renderAnalytics();
-});
+  analyticsRangeToInput?.addEventListener("change", () => {
+    if (!analyticsRangeToInput.value) return;
+    analyticsRangeEnd = analyticsRangeToInput.value;
 
-analyticsRangeToInput?.addEventListener("change", () => {
-  if (!analyticsRangeToInput.value) return;
-  analyticsRangeEnd = analyticsRangeToInput.value;
+    if (!analyticsRangeStart || analyticsRangeStart > analyticsRangeEnd) {
+      analyticsRangeStart = analyticsRangeEnd;
+      if (analyticsRangeFromInput) analyticsRangeFromInput.value = analyticsRangeStart;
+    }
 
-  if (!analyticsRangeStart || analyticsRangeStart > analyticsRangeEnd) {
-    analyticsRangeStart = analyticsRangeEnd;
-    if (analyticsRangeFromInput) analyticsRangeFromInput.value = analyticsRangeStart;
-  }
-
-  analyticsFilterPeriod = "range";
-  renderAnalytics();
-});
+    analyticsFilterPeriod = "range";
+    renderAnalytics();
+  });
 
   closeModalBtn?.addEventListener("click", closeModal);
   saveBtn?.addEventListener("click", saveTransaction);
