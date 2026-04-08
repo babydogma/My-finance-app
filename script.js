@@ -344,6 +344,36 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     return monthLabel.charAt(0).toUpperCase() + monthLabel.slice(1);
   }
+  
+  function populateMonthSelect(selectEl, selectedValue) {
+  if (!selectEl) return;
+
+  const baseValue = selectedValue || getCurrentMonthValue();
+  const [baseYear, baseMonth] = baseValue.split("-").map(Number);
+  const baseDate = new Date(baseYear, baseMonth - 1, 1);
+
+  const options = [];
+
+  for (let offset = -18; offset <= 18; offset++) {
+    const d = new Date(baseDate.getFullYear(), baseDate.getMonth() + offset, 1);
+    const value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+    const label = d.toLocaleDateString("ru-RU", {
+      month: "long",
+      year: "numeric",
+    });
+
+    options.push({
+      value,
+      label: label.charAt(0).toUpperCase() + label.slice(1),
+    });
+  }
+
+  selectEl.innerHTML = options
+    .map((item) => `<option value="${item.value}">${item.label}</option>`)
+    .join("");
+
+  selectEl.value = baseValue;
+}
 
   function getAnalyticsPeriodLabel() {
     if (analyticsFilterPeriod === "month") {
@@ -1259,13 +1289,13 @@ document.addEventListener("DOMContentLoaded", async () => {
   const isMonth = historyFilterPeriod === "month";
   const isRange = historyFilterPeriod === "range";
 
-  setNativePickerVisibility(historyMonthInput, isMonth);
-  setNativePickerVisibility(historyRangeFromInput, isRange);
-  setNativePickerVisibility(historyRangeToInput, isRange);
+  populateMonthSelect(historyMonthInput, historySelectedMonth);
+setNativePickerVisibility(historyRangeFromInput, isRange);
+setNativePickerVisibility(historyRangeToInput, isRange);
 
-  if (historyMonthBtn) {
-    historyMonthBtn.textContent = formatMonthButtonLabel(historySelectedMonth);
-  }
+if (historyMonthBtn) {
+  historyMonthBtn.textContent = formatMonthButtonLabel(historySelectedMonth);
+}
 
   if (historySelectedPeriodLabel) {
     historySelectedPeriodLabel.classList.add("hidden");
@@ -1319,7 +1349,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 const isAnalyticsMonth = analyticsFilterPeriod === "month";
 const isAnalyticsRange = analyticsFilterPeriod === "range";
 
-setNativePickerVisibility(analyticsMonthInput, isAnalyticsMonth);
+populateMonthSelect(analyticsMonthInput, analyticsSelectedMonth);
 setNativePickerVisibility(analyticsRangeFromInput, isAnalyticsRange);
 setNativePickerVisibility(analyticsRangeToInput, isAnalyticsRange);
 
@@ -1803,16 +1833,6 @@ if (analyticsSelectedPeriodLabel) {
     btn.addEventListener("click", () => {
       historyFilterPeriod = btn.dataset.period;
 
-      if (historyFilterPeriod === "month") {
-        historySelectedMonth = historySelectedMonth || getCurrentMonthValue();
-
-        if (historyMonthInput) {
-          historyMonthInput.value = historySelectedMonth;
-          setNativePickerVisibility(historyMonthInput, true);
-          openNativePicker(historyMonthInput);
-        }
-      }
-
       if (historyFilterPeriod === "range") {
         const today = getTodayDateValue();
         historyRangeStart = historyRangeStart || today;
@@ -1878,16 +1898,6 @@ if (analyticsSelectedPeriodLabel) {
   analyticsPeriodButtons.forEach((btn) => {
     btn.addEventListener("click", () => {
       analyticsFilterPeriod = btn.dataset.analyticsPeriod;
-
-      if (analyticsFilterPeriod === "month") {
-        analyticsSelectedMonth = analyticsSelectedMonth || getCurrentMonthValue();
-
-        if (analyticsMonthInput) {
-          analyticsMonthInput.value = analyticsSelectedMonth;
-          setNativePickerVisibility(analyticsMonthInput, true);
-          openNativePicker(analyticsMonthInput);
-        }
-      }
 
       if (analyticsFilterPeriod === "range") {
         const today = getTodayDateValue();
