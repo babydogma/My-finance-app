@@ -13,6 +13,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   const closeBudgetModalBtn = document.getElementById("closeBudgetModalBtn");
   const saveBudgetBtn = document.getElementById("saveBudgetBtn");
   const deleteBudgetBtn = document.getElementById("deleteBudgetBtn");
+  
+  const analyticsCategoryModal = document.getElementById("analyticsCategoryModal");
+  const analyticsCategoryModalTitle = document.getElementById("analyticsCategoryModalTitle");
+  const analyticsCategoryModalPeriodLabel = document.getElementById("analyticsCategoryModalPeriodLabel");
+  const analyticsCategoryTransactionsList = document.getElementById("analyticsCategoryTransactionsList");
+  const closeAnalyticsCategoryModalBtn = document.getElementById("closeAnalyticsCategoryModalBtn");
 
   const openCategoriesManagerBtn = document.getElementById("openCategoriesManagerBtn");
   const closeCategoriesManagerBtn = document.getElementById("closeCategoriesManagerBtn");
@@ -103,6 +109,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   let analyticsRangeEnd = "";
 
   let activeBudgetCategoryId = null;
+  let activeAnalyticsCategoryId = null;
 
   const UNCATEGORIZED_ID = "uncategorized";
 
@@ -544,6 +551,47 @@ document.addEventListener("DOMContentLoaded", async () => {
     activeBudgetCategoryId = null;
     budgetAmountInput.value = "";
   }
+  
+  function openAnalyticsCategoryModal(categoryId) {
+  activeAnalyticsCategoryId = categoryId;
+
+  const isTransferCategory = categoryId === "transfers";
+  const title = isTransferCategory
+    ? "💸 Переводы"
+    : `${getCategoryIcon(categoryId)} ${getCategoryName(categoryId)}`;
+
+  const periodLabel = getAnalyticsPeriodLabel() || "Период";
+  const transactions = getAnalyticsTransactionsByCategory(categoryId);
+
+  analyticsCategoryModalTitle.textContent = title;
+  analyticsCategoryModalPeriodLabel.textContent = periodLabel;
+  analyticsCategoryTransactionsList.innerHTML = "";
+
+  if (!transactions.length) {
+    const empty = document.createElement("div");
+    empty.className = "list-card";
+    empty.innerHTML = `
+      <div class="list-body">
+        <h3 class="list-title">Операций нет</h3>
+        <p class="list-subtitle">За выбранный период ничего не найдено</p>
+      </div>
+    `;
+    analyticsCategoryTransactionsList.appendChild(empty);
+  } else {
+    transactions.forEach((transaction) => {
+      analyticsCategoryTransactionsList.appendChild(createTransactionCard(transaction));
+    });
+  }
+
+  analyticsCategoryModal.classList.remove("hidden");
+  document.body.style.overflow = "hidden";
+}
+
+function closeAnalyticsCategoryModal() {
+  analyticsCategoryModal.classList.add("hidden");
+  activeAnalyticsCategoryId = null;
+  document.body.style.overflow = "";
+}
 
   function resetForm() {
     amountInput.value = "";
@@ -811,6 +859,23 @@ document.addEventListener("DOMContentLoaded", async () => {
       })
       .sort((a, b) => b.amount - a.amount);
   }
+  
+  function getAnalyticsTransactionsByCategory(categoryId) {
+  const items = getAnalyticsFilteredTransactions();
+
+  if (categoryId === "transfers") {
+    return sortTransactionsByLatest(
+      items.filter((transaction) => transaction.type === "transfer")
+    );
+  }
+
+  return sortTransactionsByLatest(
+    items.filter((transaction) => {
+      if (transaction.type !== "expense") return false;
+      return (transaction.category_id || UNCATEGORIZED_ID) === categoryId;
+    })
+  );
+}
 
   function getHistoryFilteredTransactions() {
     let filtered = [...state.transactions];
@@ -1413,7 +1478,7 @@ if (historyMonthBtn) {
       <div class="analytics-panel__period">${escapeHtml(periodLabel)}</div>
     </div>
 
-    <div class="analytics-leader">
+    <button class="analytics-leader analytics-leader--button" type="button" data-analytics-category-id="${escapeHtml(topItem.id)}">
       <div class="analytics-leader__left">
         <div class="analytics-breakdown-row__rank analytics-breakdown-row__rank--leader">#1</div>
 
@@ -1426,7 +1491,7 @@ if (historyMonthBtn) {
 
       <div class="analytics-leader__value">${formatMoney(topItem.amount)}</div>
     </div>
-  </div>
+  </button>
 `;
 
   const restItems = breakdown.slice(1);
@@ -1436,7 +1501,8 @@ const listMarkup = restItems
     const percent = totalExpense > 0 ? Math.round((item.amount / totalExpense) * 100) : 0;
 
     return `
-      <div class="analytics-breakdown-row">
+      return `
+  <button class="analytics-breakdown-row analytics-breakdown-row--button" type="button" data-analytics-category-id="${escapeHtml(item.id)}">
         <div class="analytics-breakdown-row__left">
           <div class="analytics-breakdown-row__rank">#${index + 2}</div>
           <div class="analytics-breakdown-row__body">
@@ -1445,8 +1511,8 @@ const listMarkup = restItems
           </div>
         </div>
         <div class="analytics-breakdown-row__value">${formatMoney(item.amount)}</div>
-      </div>
-    `;
+      </button>
+`;
   })
   .join("");
 
@@ -1456,6 +1522,22 @@ const listMarkup = restItems
     </div>
   `;
 }
+
+analyticsDonut
+  .querySelectorAll("[data-analytics-category-id]")
+  .forEach((el) => {
+    el.addEventListener("click", () => {
+      openAnalyticsCategoryModal(el.dataset.analyticsCategoryId);
+    });
+  });
+
+analyticsLegend
+  .querySelectorAll("[data-analytics-category-id]")
+  .forEach((el) => {
+    el.addEventListener("click", () => {
+      openAnalyticsCategoryModal(el.dataset.analyticsCategoryId);
+    });
+  });
 
   function renderBudget() {
     if (!budgetList) return;
@@ -1476,7 +1558,7 @@ const listMarkup = restItems
       `;
       return;
     }
-
+    
     categories.forEach((category) => {
       const spent = Number(getCurrentMonthExpenseByCategory(category.id)) || 0;
       const limitRecord = getBudgetLimitByCategoryId(category.id);
@@ -2013,7 +2095,10 @@ const listMarkup = restItems
 
     if (event.key === "Escape" && !budgetModal.classList.contains("hidden")) {
       closeBudgetModal();
+    if (event.key === "Escape" && !analyticsCategoryModal.classList.contains("hidden")) {
+  closeAnalyticsCategoryModal();
     }
+  }
   });
 
   period7Btn?.addEventListener("click", () => {
@@ -2025,6 +2110,12 @@ const listMarkup = restItems
     currentPeriodDays = 30;
     renderBalanceResult();
   });
+  
+  closeAnalyticsCategoryModalBtn?.addEventListener("click", closeAnalyticsCategoryModal);
+
+analyticsCategoryModal?.addEventListener("click", (event) => {
+  if (event.target === analyticsCategoryModal) closeAnalyticsCategoryModal();
+});
 
   await loadDataFromSupabase();
   await applySafeInterestIfNeeded();
