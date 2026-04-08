@@ -44,7 +44,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   const analyticsDonut = document.getElementById("analyticsDonut");
   const analyticsLegend = document.getElementById("analyticsLegend");
   const analyticsMonthBtn = document.getElementById("analyticsMonthBtn");
-  const analyticsMonthInput = document.getElementById("analyticsMonthInput");
+  const analyticsMonthWheelWrap = document.getElementById("analyticsMonthWheelWrap");
+  const analyticsMonthWheelInline = document.getElementById("analyticsMonthWheelInline");
+  const analyticsMonthNamesColumn = document.getElementById("analyticsMonthNamesColumn");
+  const analyticsMonthYearsColumn = document.getElementById("analyticsMonthYearsColumn");
   const analyticsRangeFromInput = document.getElementById("analyticsRangeFromInput");
   const analyticsRangeToInput = document.getElementById("analyticsRangeToInput");
   const analyticsSelectedPeriodLabel = document.getElementById("analyticsSelectedPeriodLabel");
@@ -95,7 +98,10 @@ document.addEventListener("DOMContentLoaded", async () => {
   let analyticsSelectedMonth = getCurrentMonthValue();
   let analyticsRangeStart = "";
   let analyticsRangeEnd = "";
-
+  
+  let analyticsDraftMonth = "";
+  let analyticsDraftYear = "";
+  
   let analyticsMode = "categories";
   let analyticsOperationType = "all";
 
@@ -332,6 +338,149 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     return monthLabel.charAt(0).toUpperCase() + monthLabel.slice(1);
   }
+  
+  function getRussianMonthNames() {
+  return [
+    "Январь",
+    "Февраль",
+    "Март",
+    "Апрель",
+    "Май",
+    "Июнь",
+    "Июль",
+    "Август",
+    "Сентябрь",
+    "Октябрь",
+    "Ноябрь",
+    "Декабрь",
+  ];
+}
+
+function setAnalyticsDraftMonthFromValue(monthValue) {
+  const safeValue = monthValue || getCurrentMonthValue();
+  const [year, month] = safeValue.split("-");
+  analyticsDraftYear = year;
+  analyticsDraftMonth = month;
+}
+
+function getAnalyticsDraftMonthValue() {
+  return `${analyticsDraftYear}-${analyticsDraftMonth}`;
+}
+
+function getAnalyticsWheelYears() {
+  const currentYear = new Date().getFullYear();
+  const years = [];
+  for (let year = currentYear - 3; year <= currentYear + 4; year++) {
+    years.push(String(year));
+  }
+  return years;
+}
+
+function buildWheelColumnItems(items, activeValue, dataAttr) {
+  const spacer = `<div class="month-wheel__item month-wheel__item--spacer"></div>`;
+
+  const content = items
+    .map((item) => {
+      const value = typeof item === "string" ? item : item.value;
+      const label = typeof item === "string" ? item : item.label;
+      const activeClass = value === activeValue ? " is-active" : "";
+
+      return `
+        <button
+          class="month-wheel__item${activeClass}"
+          type="button"
+          ${dataAttr}="${value}"
+        >
+          ${label}
+        </button>
+      `;
+    })
+    .join("");
+
+  return `${spacer}${spacer}${content}${spacer}${spacer}`;
+}
+
+function syncWheelColumnPosition(container, activeSelector) {
+  if (!container) return;
+  const activeEl = container.querySelector(activeSelector);
+  if (!activeEl) return;
+
+  const top = activeEl.offsetTop - (container.clientHeight / 2) + (activeEl.clientHeight / 2);
+  container.scrollTo({ top, behavior: "auto" });
+}
+
+function renderAnalyticsMonthWheel() {
+  if (!analyticsMonthNamesColumn || !analyticsMonthYearsColumn) return;
+
+  const monthNames = getRussianMonthNames().map((label, index) => ({
+    value: String(index + 1).padStart(2, "0"),
+    label,
+  }));
+
+  const years = getAnalyticsWheelYears().map((year) => ({
+    value: year,
+    label: year,
+  }));
+
+  analyticsMonthNamesColumn.innerHTML = buildWheelColumnItems(
+    monthNames,
+    analyticsDraftMonth,
+    "data-wheel-month"
+  );
+
+  analyticsMonthYearsColumn.innerHTML = buildWheelColumnItems(
+    years,
+    analyticsDraftYear,
+    "data-wheel-year"
+  );
+
+  analyticsMonthNamesColumn.querySelectorAll("[data-wheel-month]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      analyticsDraftMonth = btn.dataset.wheelMonth;
+      analyticsSelectedMonth = getAnalyticsDraftMonthValue();
+      analyticsFilterPeriod = "month";
+      renderAnalytics();
+      requestAnimationFrame(() => syncWheelColumnPosition(
+        analyticsMonthNamesColumn,
+        `.month-wheel__item[data-wheel-month="${analyticsDraftMonth}"]`
+      ));
+    });
+  });
+
+  analyticsMonthYearsColumn.querySelectorAll("[data-wheel-year]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      analyticsDraftYear = btn.dataset.wheelYear;
+      analyticsSelectedMonth = getAnalyticsDraftMonthValue();
+      analyticsFilterPeriod = "month";
+      renderAnalytics();
+      requestAnimationFrame(() => syncWheelColumnPosition(
+        analyticsMonthYearsColumn,
+        `.month-wheel__item[data-wheel-year="${analyticsDraftYear}"]`
+      ));
+    });
+  });
+
+  requestAnimationFrame(() => {
+    syncWheelColumnPosition(
+      analyticsMonthNamesColumn,
+      `.month-wheel__item[data-wheel-month="${analyticsDraftMonth}"]`
+    );
+    syncWheelColumnPosition(
+      analyticsMonthYearsColumn,
+      `.month-wheel__item[data-wheel-year="${analyticsDraftYear}"]`
+    );
+  });
+}
+
+function openAnalyticsMonthWheel() {
+  setAnalyticsDraftMonthFromValue(analyticsSelectedMonth);
+  analyticsMonthWheelWrap?.classList.remove("hidden");
+  renderAnalyticsMonthWheel();
+}
+
+function closeAnalyticsMonthWheel() {
+  analyticsMonthWheelWrap?.classList.add("hidden");
+}
 
   function populateMonthSelect(selectEl, selectedValue) {
     if (!selectEl) return;
@@ -1226,6 +1375,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     analyticsPeriodButtons.forEach((btn) => {
+      analyticsMonthBtn?.addEventListener("click", () => {
+  analyticsFilterPeriod = "month";
+  renderAnalytics();
+  openAnalyticsMonthWheel();
+});
       btn.classList.toggle("is-active", btn.dataset.analyticsPeriod === analyticsFilterPeriod);
     });
 
@@ -1245,13 +1399,22 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const isAnalyticsRange = analyticsFilterPeriod === "range";
 
-    populateMonthSelect(analyticsMonthInput, analyticsSelectedMonth);
     setNativePickerVisibility(analyticsRangeFromInput, isAnalyticsRange);
     setNativePickerVisibility(analyticsRangeToInput, isAnalyticsRange);
 
     if (analyticsMonthBtn) {
-      analyticsMonthBtn.textContent = formatMonthButtonLabel(analyticsSelectedMonth);
-    }
+  analyticsMonthBtn.textContent = formatMonthButtonLabel(analyticsSelectedMonth);
+}
+
+if (analyticsMonthWheelWrap) {
+  const shouldShowWheel = analyticsFilterPeriod === "month";
+  analyticsMonthWheelWrap.classList.toggle("hidden", !shouldShowWheel);
+
+  if (shouldShowWheel) {
+    setAnalyticsDraftMonthFromValue(analyticsSelectedMonth);
+    renderAnalyticsMonthWheel();
+  }
+}
 
     if (analyticsSelectedPeriodLabel) {
       analyticsSelectedPeriodLabel.classList.add("hidden");
@@ -1782,6 +1945,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   navBudgetBtn?.addEventListener("click", showBudgetView);
 
   analyticsPeriodButtons.forEach((btn) => {
+    if (analyticsFilterPeriod !== "month") {
+  closeAnalyticsMonthWheel();
+}
     btn.addEventListener("click", () => {
       analyticsFilterPeriod = btn.dataset.analyticsPeriod;
 
@@ -1805,13 +1971,6 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       renderAnalytics();
     });
-  });
-
-  analyticsMonthInput?.addEventListener("change", () => {
-    if (!analyticsMonthInput.value) return;
-    analyticsSelectedMonth = analyticsMonthInput.value;
-    analyticsFilterPeriod = "month";
-    renderAnalytics();
   });
 
   analyticsRangeFromInput?.addEventListener("change", () => {
