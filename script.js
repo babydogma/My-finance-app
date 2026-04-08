@@ -13,7 +13,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const closeBudgetModalBtn = document.getElementById("closeBudgetModalBtn");
   const saveBudgetBtn = document.getElementById("saveBudgetBtn");
   const deleteBudgetBtn = document.getElementById("deleteBudgetBtn");
-  
+
   const analyticsCategoryModal = document.getElementById("analyticsCategoryModal");
   const analyticsCategoryModalTitle = document.getElementById("analyticsCategoryModalTitle");
   const analyticsCategoryModalPeriodLabel = document.getElementById("analyticsCategoryModalPeriodLabel");
@@ -48,7 +48,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const analyticsRangeFromInput = document.getElementById("analyticsRangeFromInput");
   const analyticsRangeToInput = document.getElementById("analyticsRangeToInput");
   const analyticsSelectedPeriodLabel = document.getElementById("analyticsSelectedPeriodLabel");
-  
+
   const analyticsModeCategoriesBtn = document.getElementById("analyticsModeCategoriesBtn");
   const analyticsModeOperationsBtn = document.getElementById("analyticsModeOperationsBtn");
   const analyticsOperationTypeFilters = document.getElementById("analyticsOperationTypeFilters");
@@ -79,10 +79,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const balanceEl = document.querySelector(".balance-amount");
   const accountsTotalEl = document.getElementById("accountsTotal");
-  const monthlyExpenseValueEl = document.getElementById("monthlyExpenseValue");
-  const monthlyIncomeValueEl = document.getElementById("monthlyIncomeValue");
   const accountsListEl = document.getElementById("accountsList");
-  const categoriesListEl = document.getElementById("categoriesList");
   const transactionsListEl = document.getElementById("transactionsList");
 
   const period7Btn = document.getElementById("period7Btn");
@@ -93,13 +90,12 @@ document.addEventListener("DOMContentLoaded", async () => {
   let currentMode = "expense";
   let editingTransactionId = null;
   let currentPeriodDays = 7;
-  let currentView = "wallet";
 
   let analyticsFilterPeriod = "month";
   let analyticsSelectedMonth = getCurrentMonthValue();
   let analyticsRangeStart = "";
   let analyticsRangeEnd = "";
-  
+
   let analyticsMode = "categories";
   let analyticsOperationType = "all";
 
@@ -107,15 +103,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   let activeAnalyticsCategoryId = null;
 
   const UNCATEGORIZED_ID = "uncategorized";
-
-  const ANALYTICS_COLORS = [
-    "#5a7a6c",
-    "#586b94",
-    "#8c703a",
-    "#6b5a8f",
-    "#8a5a55",
-    "#5a5d6a",
-  ];
 
   const state = {
     transactions: [],
@@ -189,61 +176,61 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function setNativePickerVisibility(input, visible) {
-  if (!input) return;
+    if (!input) return;
 
-  const isMonthInput = input.id === "analyticsMonthInput";
+    const isMonthInput = input.id === "analyticsMonthInput";
 
-  if (isMonthInput) {
-    input.classList.add("hidden");
-    input.style.display = "none";
-    input.style.width = "1px";
-    input.style.minWidth = "1px";
-    input.style.maxWidth = "1px";
-    input.style.height = "1px";
-    input.style.padding = "0";
-    input.style.border = "0";
-    input.style.background = "transparent";
-    input.style.opacity = "0";
-    input.style.pointerEvents = "none";
-    input.style.position = "absolute";
-    input.style.left = "-9999px";
-    return;
+    if (isMonthInput) {
+      input.classList.add("hidden");
+      input.style.display = "none";
+      input.style.width = "1px";
+      input.style.minWidth = "1px";
+      input.style.maxWidth = "1px";
+      input.style.height = "1px";
+      input.style.padding = "0";
+      input.style.border = "0";
+      input.style.background = "transparent";
+      input.style.opacity = "0";
+      input.style.pointerEvents = "none";
+      input.style.position = "absolute";
+      input.style.left = "-9999px";
+      return;
+    }
+
+    if (visible) {
+      input.classList.remove("hidden");
+      input.style.display = "block";
+      input.style.width = "100%";
+      input.style.minWidth = "0";
+      input.style.maxWidth = "100%";
+      input.style.height = "48px";
+      input.style.padding = "0 16px";
+      input.style.border = "1px solid rgba(255,255,255,0.08)";
+      input.style.borderRadius = "18px";
+      input.style.background = "rgba(255,255,255,0.06)";
+      input.style.color = "#f3f4f8";
+      input.style.opacity = "1";
+      input.style.pointerEvents = "auto";
+      input.style.position = "static";
+      input.style.left = "auto";
+    } else {
+      input.classList.add("hidden");
+      input.style.display = "";
+      input.style.width = "";
+      input.style.minWidth = "";
+      input.style.maxWidth = "";
+      input.style.height = "";
+      input.style.padding = "";
+      input.style.border = "";
+      input.style.borderRadius = "";
+      input.style.background = "";
+      input.style.color = "";
+      input.style.opacity = "";
+      input.style.pointerEvents = "";
+      input.style.position = "";
+      input.style.left = "";
+    }
   }
-
-  if (visible) {
-    input.classList.remove("hidden");
-    input.style.display = "block";
-    input.style.width = "100%";
-    input.style.minWidth = "0";
-    input.style.maxWidth = "100%";
-    input.style.height = "48px";
-    input.style.padding = "0 16px";
-    input.style.border = "1px solid rgba(255,255,255,0.08)";
-    input.style.borderRadius = "18px";
-    input.style.background = "rgba(255,255,255,0.06)";
-    input.style.color = "#f3f4f8";
-    input.style.opacity = "1";
-    input.style.pointerEvents = "auto";
-    input.style.position = "static";
-    input.style.left = "auto";
-  } else {
-    input.classList.add("hidden");
-    input.style.display = "";
-    input.style.width = "";
-    input.style.minWidth = "";
-    input.style.maxWidth = "";
-    input.style.height = "";
-    input.style.padding = "";
-    input.style.border = "";
-    input.style.borderRadius = "";
-    input.style.background = "";
-    input.style.color = "";
-    input.style.opacity = "";
-    input.style.pointerEvents = "";
-    input.style.position = "";
-    input.style.left = "";
-  }
-}
 
   function openNativePicker(input) {
     if (!input) return;
@@ -345,36 +332,36 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     return monthLabel.charAt(0).toUpperCase() + monthLabel.slice(1);
   }
-  
+
   function populateMonthSelect(selectEl, selectedValue) {
-  if (!selectEl) return;
+    if (!selectEl) return;
 
-  const baseValue = selectedValue || getCurrentMonthValue();
-  const [baseYear, baseMonth] = baseValue.split("-").map(Number);
-  const baseDate = new Date(baseYear, baseMonth - 1, 1);
+    const baseValue = selectedValue || getCurrentMonthValue();
+    const [baseYear, baseMonth] = baseValue.split("-").map(Number);
+    const baseDate = new Date(baseYear, baseMonth - 1, 1);
 
-  const options = [];
+    const options = [];
 
-  for (let offset = -18; offset <= 18; offset++) {
-    const d = new Date(baseDate.getFullYear(), baseDate.getMonth() + offset, 1);
-    const value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
-    const label = d.toLocaleDateString("ru-RU", {
-      month: "long",
-      year: "numeric",
-    });
+    for (let offset = -18; offset <= 18; offset++) {
+      const d = new Date(baseDate.getFullYear(), baseDate.getMonth() + offset, 1);
+      const value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+      const label = d.toLocaleDateString("ru-RU", {
+        month: "long",
+        year: "numeric",
+      });
 
-    options.push({
-      value,
-      label: label.charAt(0).toUpperCase() + label.slice(1),
-    });
+      options.push({
+        value,
+        label: label.charAt(0).toUpperCase() + label.slice(1),
+      });
+    }
+
+    selectEl.innerHTML = options
+      .map((item) => `<option value="${item.value}">${item.label}</option>`)
+      .join("");
+
+    selectEl.value = baseValue;
   }
-
-  selectEl.innerHTML = options
-    .map((item) => `<option value="${item.value}">${item.label}</option>`)
-    .join("");
-
-  selectEl.value = baseValue;
-}
 
   function getAnalyticsPeriodLabel() {
     if (analyticsFilterPeriod === "month") {
@@ -452,59 +439,54 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function setActiveNav(viewName) {
-  navWalletBtn?.classList.toggle("is-active", viewName === "wallet");
-  navAnalyticsBtn?.classList.toggle("is-active", viewName === "analytics");
-  navBudgetBtn?.classList.toggle("is-active", viewName === "budget");
-}
+    navWalletBtn?.classList.toggle("is-active", viewName === "wallet");
+    navAnalyticsBtn?.classList.toggle("is-active", viewName === "analytics");
+    navBudgetBtn?.classList.toggle("is-active", viewName === "budget");
+  }
 
   function showWalletView() {
-  document.querySelector(".app")?.classList.remove("app--budget", "app--history", "app--analytics");
-  currentView = "wallet";
-  mainView.classList.remove("hidden");
-  categoriesManagerView.classList.add("hidden");
-  analyticsView.classList.add("hidden");
-  budgetView.classList.add("hidden");
-  setActiveNav("wallet");
-}
+    document.querySelector(".app")?.classList.remove("app--budget", "app--analytics");
+    mainView.classList.remove("hidden");
+    categoriesManagerView.classList.add("hidden");
+    analyticsView.classList.add("hidden");
+    budgetView.classList.add("hidden");
+    setActiveNav("wallet");
+  }
 
   function openCategoriesManager() {
-  document.querySelector(".app")?.classList.remove("app--budget", "app--history", "app--analytics");
-  currentView = "categories";
-  mainView.classList.add("hidden");
-  categoriesManagerView.classList.remove("hidden");
-  analyticsView.classList.add("hidden");
-  budgetView.classList.add("hidden");
-  setActiveNav("wallet");
-}
+    document.querySelector(".app")?.classList.remove("app--budget", "app--analytics");
+    mainView.classList.add("hidden");
+    categoriesManagerView.classList.remove("hidden");
+    analyticsView.classList.add("hidden");
+    budgetView.classList.add("hidden");
+    setActiveNav("wallet");
+  }
 
   function closeCategoriesManager() {
     showWalletView();
   }
 
-
   function showAnalyticsView() {
-  document.querySelector(".app")?.classList.remove("app--budget", "app--history");
-  document.querySelector(".app")?.classList.add("app--analytics");
-  currentView = "analytics";
-  mainView.classList.add("hidden");
-  categoriesManagerView.classList.add("hidden");
-  analyticsView.classList.remove("hidden");
-  budgetView.classList.add("hidden");
-  setActiveNav("analytics");
-  renderAnalytics();
-}
+    document.querySelector(".app")?.classList.remove("app--budget");
+    document.querySelector(".app")?.classList.add("app--analytics");
+    mainView.classList.add("hidden");
+    categoriesManagerView.classList.add("hidden");
+    analyticsView.classList.remove("hidden");
+    budgetView.classList.add("hidden");
+    setActiveNav("analytics");
+    renderAnalytics();
+  }
 
   function showBudgetView() {
-  currentView = "budget";
-  document.querySelector(".app")?.classList.remove("app--history", "app--analytics");
-  document.querySelector(".app")?.classList.add("app--budget");
-  mainView.classList.add("hidden");
-  categoriesManagerView.classList.add("hidden");
-  analyticsView.classList.add("hidden");
-  budgetView.classList.remove("hidden");
-  setActiveNav("budget");
-  renderBudget();
-}
+    document.querySelector(".app")?.classList.remove("app--analytics");
+    document.querySelector(".app")?.classList.add("app--budget");
+    mainView.classList.add("hidden");
+    categoriesManagerView.classList.add("hidden");
+    analyticsView.classList.add("hidden");
+    budgetView.classList.remove("hidden");
+    setActiveNav("budget");
+    renderBudget();
+  }
 
   function openBudgetModal(categoryId) {
     const category = getCategoryById(categoryId);
@@ -528,47 +510,47 @@ document.addEventListener("DOMContentLoaded", async () => {
     activeBudgetCategoryId = null;
     budgetAmountInput.value = "";
   }
-  
+
   function openAnalyticsCategoryModal(categoryId) {
-  activeAnalyticsCategoryId = categoryId;
+    activeAnalyticsCategoryId = categoryId;
 
-  const isTransferCategory = categoryId === "transfers";
-  const title = isTransferCategory
-    ? "💸 Переводы"
-    : `${getCategoryIcon(categoryId)} ${getCategoryName(categoryId)}`;
+    const isTransferCategory = categoryId === "transfers";
+    const title = isTransferCategory
+      ? "💸 Переводы"
+      : `${getCategoryIcon(categoryId)} ${getCategoryName(categoryId)}`;
 
-  const periodLabel = getAnalyticsPeriodLabel() || "Период";
-  const transactions = getAnalyticsTransactionsByCategory(categoryId);
+    const periodLabel = getAnalyticsPeriodLabel() || "Период";
+    const transactions = getAnalyticsTransactionsByCategory(categoryId);
 
-  analyticsCategoryModalTitle.textContent = title;
-  analyticsCategoryModalPeriodLabel.textContent = periodLabel;
-  analyticsCategoryTransactionsList.innerHTML = "";
+    analyticsCategoryModalTitle.textContent = title;
+    analyticsCategoryModalPeriodLabel.textContent = periodLabel;
+    analyticsCategoryTransactionsList.innerHTML = "";
 
-  if (!transactions.length) {
-    const empty = document.createElement("div");
-    empty.className = "list-card";
-    empty.innerHTML = `
-      <div class="list-body">
-        <h3 class="list-title">Операций нет</h3>
-        <p class="list-subtitle">За выбранный период ничего не найдено</p>
-      </div>
-    `;
-    analyticsCategoryTransactionsList.appendChild(empty);
-  } else {
-    transactions.forEach((transaction) => {
-      analyticsCategoryTransactionsList.appendChild(createTransactionCard(transaction));
-    });
+    if (!transactions.length) {
+      const empty = document.createElement("div");
+      empty.className = "list-card";
+      empty.innerHTML = `
+        <div class="list-body">
+          <h3 class="list-title">Операций нет</h3>
+          <p class="list-subtitle">За выбранный период ничего не найдено</p>
+        </div>
+      `;
+      analyticsCategoryTransactionsList.appendChild(empty);
+    } else {
+      transactions.forEach((transaction) => {
+        analyticsCategoryTransactionsList.appendChild(createTransactionCard(transaction));
+      });
+    }
+
+    analyticsCategoryModal.classList.remove("hidden");
+    document.body.style.overflow = "hidden";
   }
 
-  analyticsCategoryModal.classList.remove("hidden");
-  document.body.style.overflow = "hidden";
-}
-
-function closeAnalyticsCategoryModal() {
-  analyticsCategoryModal.classList.add("hidden");
-  activeAnalyticsCategoryId = null;
-  document.body.style.overflow = "";
-}
+  function closeAnalyticsCategoryModal() {
+    analyticsCategoryModal.classList.add("hidden");
+    activeAnalyticsCategoryId = null;
+    document.body.style.overflow = "";
+  }
 
   function resetForm() {
     amountInput.value = "";
@@ -714,19 +696,6 @@ function closeAnalyticsCategoryModal() {
     return state.accounts.reduce((sum, account) => sum + getAccountBalance(account.name), 0);
   }
 
-  function calculateMonthlyStats() {
-    let income = 0;
-    let expense = 0;
-
-    state.transactions.forEach((transaction) => {
-      const amount = Number(transaction.amount) || 0;
-      if (transaction.type === "income") income += amount;
-      if (transaction.type === "expense") expense += amount;
-    });
-
-    return { income, expense };
-  }
-
   function getPeriodTransactions(days) {
     const now = Date.now();
     const rangeStart = now - days * 24 * 60 * 60 * 1000;
@@ -751,33 +720,6 @@ function closeAnalyticsCategoryModal() {
     });
 
     return income - expense;
-  }
-
-  function calculateCategories() {
-    const map = new Map();
-
-    state.transactions.forEach((transaction) => {
-      if (transaction.type !== "expense") return;
-
-      const categoryId = transaction.category_id || UNCATEGORIZED_ID;
-      const amount = Number(transaction.amount) || 0;
-      const current = map.get(categoryId) || 0;
-      map.set(categoryId, current + amount);
-    });
-
-    return [...map.entries()]
-      .map(([categoryId, amount]) => {
-        const category = getCategoryById(categoryId) || getCategoryById(UNCATEGORIZED_ID);
-
-        return {
-          id: category.id,
-          name: category.name,
-          icon: category.icon,
-          amount,
-          subtitle: "Расходы",
-        };
-      })
-      .sort((a, b) => b.amount - a.amount);
   }
 
   function getAnalyticsFilteredTransactions() {
@@ -813,7 +755,7 @@ function closeAnalyticsCategoryModal() {
     const items = getAnalyticsFilteredTransactions();
     const map = new Map();
 
-    items.forEach((transaction, index) => {
+    items.forEach((transaction) => {
       if (transaction.type !== "expense") return;
 
       const categoryId = transaction.category_id || UNCATEGORIZED_ID;
@@ -823,7 +765,7 @@ function closeAnalyticsCategoryModal() {
     });
 
     return [...map.entries()]
-      .map(([categoryId, amount], index) => {
+      .map(([categoryId, amount]) => {
         const category = getCategoryById(categoryId) || getCategoryById(UNCATEGORIZED_ID);
 
         return {
@@ -831,38 +773,37 @@ function closeAnalyticsCategoryModal() {
           name: category.name,
           icon: category.icon,
           amount,
-          color: ANALYTICS_COLORS[index % ANALYTICS_COLORS.length],
         };
       })
       .sort((a, b) => b.amount - a.amount);
   }
-  
-  function getAnalyticsTransactionsByCategory(categoryId) {
-  const items = getAnalyticsFilteredTransactions();
 
-  if (categoryId === "transfers") {
+  function getAnalyticsTransactionsByCategory(categoryId) {
+    const items = getAnalyticsFilteredTransactions();
+
+    if (categoryId === "transfers") {
+      return sortTransactionsByLatest(
+        items.filter((transaction) => transaction.type === "transfer")
+      );
+    }
+
     return sortTransactionsByLatest(
-      items.filter((transaction) => transaction.type === "transfer")
+      items.filter((transaction) => {
+        if (transaction.type !== "expense") return false;
+        return (transaction.category_id || UNCATEGORIZED_ID) === categoryId;
+      })
     );
   }
 
-  return sortTransactionsByLatest(
-    items.filter((transaction) => {
-      if (transaction.type !== "expense") return false;
-      return (transaction.category_id || UNCATEGORIZED_ID) === categoryId;
-    })
-  );
-}
+  function getAnalyticsOperationsFilteredTransactions() {
+    let items = getAnalyticsFilteredTransactions();
 
-function getAnalyticsOperationsFilteredTransactions() {
-  let items = getAnalyticsFilteredTransactions();
+    if (analyticsOperationType !== "all") {
+      items = items.filter((transaction) => transaction.type === analyticsOperationType);
+    }
 
-  if (analyticsOperationType !== "all") {
-    items = items.filter((transaction) => transaction.type === analyticsOperationType);
+    return sortTransactionsByLatest(items);
   }
-
-  return sortTransactionsByLatest(items);
-}
 
   function getCurrentMonthExpenseByCategory(categoryId) {
     const now = new Date();
@@ -964,28 +905,16 @@ function getAnalyticsOperationsFilteredTransactions() {
         value: todayString,
       });
 
-      if (metaError) {
-        console.error(metaError);
-        alert("Ошибка сохранения даты начисления процентов");
-      }
+    if (metaError) {
+      console.error(metaError);
+      alert("Ошибка сохранения даты начисления процентов");
+    }
   }
 
   function renderBalance() {
     const balance = calculateBalance();
     balanceEl.textContent = formatMoney(balance);
     accountsTotalEl.textContent = `Всего: ${formatMoney(balance)}`;
-  }
-
-  function renderMonthlyStats() {
-    const { income, expense } = calculateMonthlyStats();
-
-    if (monthlyExpenseValueEl) {
-      monthlyExpenseValueEl.textContent = formatMoney(expense);
-    }
-
-    if (monthlyIncomeValueEl) {
-      monthlyIncomeValueEl.textContent = formatMoney(income);
-    }
   }
 
   function renderBalanceResult() {
@@ -1046,61 +975,6 @@ function getAnalyticsOperationsFilteredTransactions() {
       accountsListEl.appendChild(card);
     });
   }
-
-  function createCategoryCard(category) {
-    const card = document.createElement("div");
-    card.className = "list-card";
-
-    const categoryTone =
-      category.id === "food"
-        ? "list-icon--green"
-        : category.id === "transport"
-        ? "list-icon--blue"
-        : category.id === "fun"
-        ? "list-icon--purple"
-        : category.id === "snack"
-        ? "list-icon--amber"
-        : "list-icon--neutral";
-
-    card.innerHTML = `
-      <div class="list-icon ${categoryTone}">${category.icon}</div>
-      <div class="list-body">
-        <div class="list-title-row">
-          <h3 class="list-title">${escapeHtml(category.name)}</h3>
-        </div>
-        <p class="list-subtitle">${escapeHtml(category.subtitle)}</p>
-      </div>
-      <div class="list-right">
-        <p class="list-value">${formatMoney(category.amount)}</p>
-      </div>
-    `;
-
-    return card;
-  }
-
-  function renderCategories() {
-  if (!categoriesListEl) return;
-
-  categoriesListEl.innerHTML = "";
-  const categories = calculateCategories();
-
-  if (categories.length === 0) {
-    const empty = document.createElement("div");
-    empty.className = "list-card";
-    empty.innerHTML = `
-      <div class="list-body">
-        <h3 class="list-title">Категорий пока нет</h3>
-        <p class="list-subtitle">Добавь первую расходную операцию</p>
-      </div>
-    `;
-    categoriesListEl.appendChild(empty);
-    return;
-  }
-
-  categories.forEach((category) => {
-    categoriesListEl.appendChild(createCategoryCard(category));
-  });
-}
 
   function renderCategoriesManager() {
     categoriesManagerList.innerHTML = "";
@@ -1305,204 +1179,204 @@ function getAnalyticsOperationsFilteredTransactions() {
     });
   }
 
-function renderAnalyticsOperations() {
-  if (!analyticsTransactionsList) return;
+  function renderAnalyticsOperations() {
+    if (!analyticsTransactionsList) return;
 
-  analyticsTransactionsList.innerHTML = "";
+    analyticsTransactionsList.innerHTML = "";
 
-  const items = getAnalyticsOperationsFilteredTransactions();
+    const items = getAnalyticsOperationsFilteredTransactions();
 
-  if (!items.length) {
-    const empty = document.createElement("div");
-    empty.className = "list-card";
-    empty.innerHTML = `
-      <div class="list-body">
-        <h3 class="list-title">Ничего не найдено</h3>
-        <p class="list-subtitle">За выбранный период нет операций</p>
-      </div>
-    `;
-    analyticsTransactionsList.appendChild(empty);
-    return;
+    if (!items.length) {
+      const empty = document.createElement("div");
+      empty.className = "list-card";
+      empty.innerHTML = `
+        <div class="list-body">
+          <h3 class="list-title">Ничего не найдено</h3>
+          <p class="list-subtitle">За выбранный период нет операций</p>
+        </div>
+      `;
+      analyticsTransactionsList.appendChild(empty);
+      return;
+    }
+
+    items.forEach((transaction) => {
+      analyticsTransactionsList.appendChild(createTransactionCard(transaction));
+    });
   }
 
-  items.forEach((transaction) => {
-    analyticsTransactionsList.appendChild(createTransactionCard(transaction));
-  });
-}
+  function renderAnalytics() {
+    if (!analyticsView) return;
 
- function renderAnalytics() {
-  if (!analyticsView) return;
+    const summary = getAnalyticsSummary();
+    const breakdown = getAnalyticsCategoryBreakdown();
 
-  const summary = getAnalyticsSummary();
-  const breakdown = getAnalyticsCategoryBreakdown();
+    analyticsIncomeValue.textContent = formatMoney(summary.income);
+    analyticsExpenseValue.textContent = formatMoney(summary.expense);
 
-  analyticsIncomeValue.textContent = formatMoney(summary.income);
-  analyticsExpenseValue.textContent = formatMoney(summary.expense);
+    analyticsNetValue.classList.remove("is-positive", "is-negative");
 
-  analyticsNetValue.classList.remove("is-positive", "is-negative");
+    if (summary.net > 0) {
+      analyticsNetValue.textContent = `+${formatMoney(summary.net)}`;
+      analyticsNetValue.classList.add("is-positive");
+    } else if (summary.net < 0) {
+      analyticsNetValue.textContent = `−${formatMoney(Math.abs(summary.net))}`;
+      analyticsNetValue.classList.add("is-negative");
+    } else {
+      analyticsNetValue.textContent = formatMoney(0);
+    }
 
-  if (summary.net > 0) {
-    analyticsNetValue.textContent = `+${formatMoney(summary.net)}`;
-    analyticsNetValue.classList.add("is-positive");
-  } else if (summary.net < 0) {
-    analyticsNetValue.textContent = `−${formatMoney(Math.abs(summary.net))}`;
-    analyticsNetValue.classList.add("is-negative");
-  } else {
-    analyticsNetValue.textContent = formatMoney(0);
-  }
+    analyticsPeriodButtons.forEach((btn) => {
+      btn.classList.toggle("is-active", btn.dataset.analyticsPeriod === analyticsFilterPeriod);
+    });
 
-  analyticsPeriodButtons.forEach((btn) => {
-    btn.classList.toggle("is-active", btn.dataset.analyticsPeriod === analyticsFilterPeriod);
-  });
+    analyticsTypeButtons.forEach((btn) => {
+      btn.classList.toggle("is-active", btn.dataset.analyticsType === analyticsOperationType);
+    });
 
-  analyticsTypeButtons.forEach((btn) => {
-    btn.classList.toggle("is-active", btn.dataset.analyticsType === analyticsOperationType);
-  });
+    analyticsModeCategoriesBtn?.classList.toggle("is-active", analyticsMode === "categories");
+    analyticsModeOperationsBtn?.classList.toggle("is-active", analyticsMode === "operations");
 
-  analyticsModeCategoriesBtn?.classList.toggle("is-active", analyticsMode === "categories");
-  analyticsModeOperationsBtn?.classList.toggle("is-active", analyticsMode === "operations");
-  
-  analyticsCategoriesSection?.classList.toggle("hidden", analyticsMode !== "categories");
-  analyticsTotalsSection?.classList.toggle("hidden", analyticsMode !== "categories");
-  analyticsCategoriesBreakdownSection?.classList.toggle("hidden", analyticsMode !== "categories");
-  
-  analyticsOperationsSection?.classList.toggle("hidden", analyticsMode !== "operations");
-  analyticsOperationTypeFilters?.classList.toggle("hidden", analyticsMode !== "operations");
+    analyticsCategoriesSection?.classList.toggle("hidden", analyticsMode !== "categories");
+    analyticsTotalsSection?.classList.toggle("hidden", analyticsMode !== "categories");
+    analyticsCategoriesBreakdownSection?.classList.toggle("hidden", analyticsMode !== "categories");
 
-  const isAnalyticsRange = analyticsFilterPeriod === "range";
+    analyticsOperationsSection?.classList.toggle("hidden", analyticsMode !== "operations");
+    analyticsOperationTypeFilters?.classList.toggle("hidden", analyticsMode !== "operations");
 
-  populateMonthSelect(analyticsMonthInput, analyticsSelectedMonth);
-  setNativePickerVisibility(analyticsRangeFromInput, isAnalyticsRange);
-  setNativePickerVisibility(analyticsRangeToInput, isAnalyticsRange);
+    const isAnalyticsRange = analyticsFilterPeriod === "range";
 
-  if (analyticsMonthBtn) {
-    analyticsMonthBtn.textContent = formatMonthButtonLabel(analyticsSelectedMonth);
-  }
+    populateMonthSelect(analyticsMonthInput, analyticsSelectedMonth);
+    setNativePickerVisibility(analyticsRangeFromInput, isAnalyticsRange);
+    setNativePickerVisibility(analyticsRangeToInput, isAnalyticsRange);
 
-  if (analyticsSelectedPeriodLabel) {
-    analyticsSelectedPeriodLabel.classList.add("hidden");
-    analyticsSelectedPeriodLabel.textContent = "";
-    analyticsSelectedPeriodLabel.style.display = "none";
-  }
+    if (analyticsMonthBtn) {
+      analyticsMonthBtn.textContent = formatMonthButtonLabel(analyticsSelectedMonth);
+    }
 
-  renderAnalyticsOperations();
+    if (analyticsSelectedPeriodLabel) {
+      analyticsSelectedPeriodLabel.classList.add("hidden");
+      analyticsSelectedPeriodLabel.textContent = "";
+      analyticsSelectedPeriodLabel.style.display = "none";
+    }
 
-  const periodLabel = getAnalyticsPeriodLabel() || "Период";
-  const totalExpense = breakdown.reduce((sum, item) => sum + item.amount, 0);
+    renderAnalyticsOperations();
 
-  if (!breakdown.length) {
+    const periodLabel = getAnalyticsPeriodLabel() || "Период";
+    const totalExpense = breakdown.reduce((sum, item) => sum + item.amount, 0);
+
+    if (!breakdown.length) {
+      analyticsDonut.innerHTML = `
+        <div class="analytics-panel">
+          <div class="analytics-panel__eyebrow">Расходы по категориям</div>
+
+          <div class="analytics-panel__headline">
+            <div class="analytics-panel__total">${formatMoney(0)}</div>
+            <div class="analytics-panel__period">${escapeHtml(periodLabel)}</div>
+          </div>
+
+          <div class="analytics-leader analytics-leader--empty">
+            <div class="analytics-leader__left">
+              <div class="analytics-breakdown-row__rank analytics-breakdown-row__rank--leader">#1</div>
+
+              <div class="analytics-leader__content">
+                <div class="analytics-leader__label">Лидер</div>
+                <div class="analytics-leader__title">Нет данных</div>
+                <div class="analytics-leader__meta">За выбранный период нет расходов</div>
+              </div>
+            </div>
+
+            <div class="analytics-leader__value">—</div>
+          </div>
+        </div>
+      `;
+
+      analyticsLegend.innerHTML = `
+        <div class="analytics-breakdown-list analytics-breakdown-list--empty">
+          <div class="analytics-empty">Нет данных по расходам за выбранный период</div>
+        </div>
+      `;
+      return;
+    }
+
+    const topItem = breakdown[0];
+    const topPercent = totalExpense > 0 ? Math.round((topItem.amount / totalExpense) * 100) : 0;
+
     analyticsDonut.innerHTML = `
       <div class="analytics-panel">
         <div class="analytics-panel__eyebrow">Расходы по категориям</div>
 
         <div class="analytics-panel__headline">
-          <div class="analytics-panel__total">${formatMoney(0)}</div>
+          <div class="analytics-panel__total">${formatMoney(totalExpense)}</div>
           <div class="analytics-panel__period">${escapeHtml(periodLabel)}</div>
         </div>
 
-        <div class="analytics-leader analytics-leader--empty">
+        <button
+          class="analytics-leader analytics-leader--button"
+          type="button"
+          data-analytics-category-id="${escapeHtml(topItem.id)}"
+        >
           <div class="analytics-leader__left">
             <div class="analytics-breakdown-row__rank analytics-breakdown-row__rank--leader">#1</div>
 
             <div class="analytics-leader__content">
               <div class="analytics-leader__label">Лидер</div>
-              <div class="analytics-leader__title">Нет данных</div>
-              <div class="analytics-leader__meta">За выбранный период нет расходов</div>
+              <div class="analytics-leader__title">${escapeHtml(topItem.icon)} ${escapeHtml(topItem.name)}</div>
+              <div class="analytics-leader__meta">${topPercent}% от расходов</div>
             </div>
           </div>
 
-          <div class="analytics-leader__value">—</div>
-        </div>
+          <div class="analytics-leader__value">${formatMoney(topItem.amount)}</div>
+        </button>
       </div>
     `;
+
+    const restItems = breakdown.slice(1);
+
+    const listMarkup = restItems
+      .map((item, index) => {
+        const percent = totalExpense > 0 ? Math.round((item.amount / totalExpense) * 100) : 0;
+
+        return `
+          <button
+            class="analytics-breakdown-row analytics-breakdown-row--button"
+            type="button"
+            data-analytics-category-id="${escapeHtml(item.id)}"
+          >
+            <div class="analytics-breakdown-row__left">
+              <div class="analytics-breakdown-row__rank">#${index + 2}</div>
+              <div class="analytics-breakdown-row__body">
+                <div class="analytics-breakdown-row__title">${escapeHtml(item.icon)} ${escapeHtml(item.name)}</div>
+                <div class="analytics-breakdown-row__subtitle">${percent}% от расходов</div>
+              </div>
+            </div>
+            <div class="analytics-breakdown-row__value">${formatMoney(item.amount)}</div>
+          </button>
+        `;
+      })
+      .join("");
 
     analyticsLegend.innerHTML = `
-      <div class="analytics-breakdown-list analytics-breakdown-list--empty">
-        <div class="analytics-empty">Нет данных по расходам за выбранный период</div>
+      <div class="analytics-breakdown-list">
+        ${listMarkup}
       </div>
     `;
-    return;
+
+    analyticsDonut
+      .querySelectorAll("[data-analytics-category-id]")
+      .forEach((el) => {
+        el.addEventListener("click", () => {
+          openAnalyticsCategoryModal(el.dataset.analyticsCategoryId);
+        });
+      });
+
+    analyticsLegend
+      .querySelectorAll("[data-analytics-category-id]")
+      .forEach((el) => {
+        el.addEventListener("click", () => {
+          openAnalyticsCategoryModal(el.dataset.analyticsCategoryId);
+        });
+      });
   }
-
-  const topItem = breakdown[0];
-  const topPercent = totalExpense > 0 ? Math.round((topItem.amount / totalExpense) * 100) : 0;
-
-  analyticsDonut.innerHTML = `
-    <div class="analytics-panel">
-      <div class="analytics-panel__eyebrow">Расходы по категориям</div>
-
-      <div class="analytics-panel__headline">
-        <div class="analytics-panel__total">${formatMoney(totalExpense)}</div>
-        <div class="analytics-panel__period">${escapeHtml(periodLabel)}</div>
-      </div>
-
-      <button
-        class="analytics-leader analytics-leader--button"
-        type="button"
-        data-analytics-category-id="${escapeHtml(topItem.id)}"
-      >
-        <div class="analytics-leader__left">
-          <div class="analytics-breakdown-row__rank analytics-breakdown-row__rank--leader">#1</div>
-
-          <div class="analytics-leader__content">
-            <div class="analytics-leader__label">Лидер</div>
-            <div class="analytics-leader__title">${escapeHtml(topItem.icon)} ${escapeHtml(topItem.name)}</div>
-            <div class="analytics-leader__meta">${topPercent}% от расходов</div>
-          </div>
-        </div>
-
-        <div class="analytics-leader__value">${formatMoney(topItem.amount)}</div>
-      </button>
-    </div>
-  `;
-
-  const restItems = breakdown.slice(1);
-
-  const listMarkup = restItems
-    .map((item, index) => {
-      const percent = totalExpense > 0 ? Math.round((item.amount / totalExpense) * 100) : 0;
-
-      return `
-        <button
-          class="analytics-breakdown-row analytics-breakdown-row--button"
-          type="button"
-          data-analytics-category-id="${escapeHtml(item.id)}"
-        >
-          <div class="analytics-breakdown-row__left">
-            <div class="analytics-breakdown-row__rank">#${index + 2}</div>
-            <div class="analytics-breakdown-row__body">
-              <div class="analytics-breakdown-row__title">${escapeHtml(item.icon)} ${escapeHtml(item.name)}</div>
-              <div class="analytics-breakdown-row__subtitle">${percent}% от расходов</div>
-            </div>
-          </div>
-          <div class="analytics-breakdown-row__value">${formatMoney(item.amount)}</div>
-        </button>
-      `;
-    })
-    .join("");
-
-  analyticsLegend.innerHTML = `
-    <div class="analytics-breakdown-list">
-      ${listMarkup}
-    </div>
-  `;
-
-  analyticsDonut
-    .querySelectorAll("[data-analytics-category-id]")
-    .forEach((el) => {
-      el.addEventListener("click", () => {
-        openAnalyticsCategoryModal(el.dataset.analyticsCategoryId);
-      });
-    });
-
-  analyticsLegend
-    .querySelectorAll("[data-analytics-category-id]")
-    .forEach((el) => {
-      el.addEventListener("click", () => {
-        openAnalyticsCategoryModal(el.dataset.analyticsCategoryId);
-      });
-    });
-}
 
   function renderBudget() {
     if (!budgetList) return;
@@ -1523,7 +1397,7 @@ function renderAnalyticsOperations() {
       `;
       return;
     }
-    
+
     categories.forEach((category) => {
       const spent = Number(getCurrentMonthExpenseByCategory(category.id)) || 0;
       const limitRecord = getBudgetLimitByCategoryId(category.id);
@@ -1886,17 +1760,15 @@ function renderAnalyticsOperations() {
   }
 
   function renderAll() {
-  ensureUncategorizedCategory();
-  renderBalance();
-  renderBalanceResult();
-  renderMonthlyStats();
-  renderAccounts();
-  renderCategories();
-  renderCategoriesManager();
-  renderTransactions();
-  renderAnalytics();
-  renderBudget();
-}
+    ensureUncategorizedCategory();
+    renderBalance();
+    renderBalanceResult();
+    renderAccounts();
+    renderCategoriesManager();
+    renderTransactions();
+    renderAnalytics();
+    renderBudget();
+  }
 
   openExpenseModalBtn?.addEventListener("click", () => openModal("expense"));
   openIncomeModalBtn?.addEventListener("click", () => openModal("income"));
@@ -1967,24 +1839,24 @@ function renderAnalyticsOperations() {
     analyticsFilterPeriod = "range";
     renderAnalytics();
   });
-  
+
   analyticsModeCategoriesBtn?.addEventListener("click", () => {
-  analyticsMode = "categories";
-  renderAnalytics();
-});
+    analyticsMode = "categories";
+    renderAnalytics();
+  });
 
-analyticsModeOperationsBtn?.addEventListener("click", () => {
-  analyticsMode = "operations";
-  renderAnalytics();
-});
-
-analyticsTypeButtons.forEach((btn) => {
-  btn.addEventListener("click", () => {
-    analyticsOperationType = btn.dataset.analyticsType;
+  analyticsModeOperationsBtn?.addEventListener("click", () => {
     analyticsMode = "operations";
     renderAnalytics();
   });
-});
+
+  analyticsTypeButtons.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      analyticsOperationType = btn.dataset.analyticsType;
+      analyticsMode = "operations";
+      renderAnalytics();
+    });
+  });
 
   closeModalBtn?.addEventListener("click", closeModal);
   saveBtn?.addEventListener("click", saveTransaction);
@@ -2004,22 +1876,22 @@ analyticsTypeButtons.forEach((btn) => {
   });
 
   document.addEventListener("keydown", (event) => {
-  if (event.key !== "Escape") return;
+    if (event.key !== "Escape") return;
 
-  if (modal && !modal.classList.contains("hidden")) {
-    closeModal();
-    return;
-  }
+    if (modal && !modal.classList.contains("hidden")) {
+      closeModal();
+      return;
+    }
 
-  if (budgetModal && !budgetModal.classList.contains("hidden")) {
-    closeBudgetModal();
-    return;
-  }
+    if (budgetModal && !budgetModal.classList.contains("hidden")) {
+      closeBudgetModal();
+      return;
+    }
 
-  if (analyticsCategoryModal && !analyticsCategoryModal.classList.contains("hidden")) {
-    closeAnalyticsCategoryModal();
-  }
-});
+    if (analyticsCategoryModal && !analyticsCategoryModal.classList.contains("hidden")) {
+      closeAnalyticsCategoryModal();
+    }
+  });
 
   period7Btn?.addEventListener("click", () => {
     currentPeriodDays = 7;
@@ -2030,12 +1902,12 @@ analyticsTypeButtons.forEach((btn) => {
     currentPeriodDays = 30;
     renderBalanceResult();
   });
-  
+
   closeAnalyticsCategoryModalBtn?.addEventListener("click", closeAnalyticsCategoryModal);
 
-analyticsCategoryModal?.addEventListener("click", (event) => {
-  if (event.target === analyticsCategoryModal) closeAnalyticsCategoryModal();
-});
+  analyticsCategoryModal?.addEventListener("click", (event) => {
+    if (event.target === analyticsCategoryModal) closeAnalyticsCategoryModal();
+  });
 
   await loadDataFromSupabase();
   await applySafeInterestIfNeeded();
