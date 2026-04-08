@@ -113,60 +113,6 @@
       </section>
     </div>
 
-    <!-- HISTORY VIEW -->
-<div id="historyView" class="hidden">
-  <section class="section section--manager-top">
-    <div class="section-head">
-      <h2 class="section-title">История</h2>
-      <div class="section-note" id="historyCountLabel">0 операций</div>
-    </div>
-
-    <div class="history-filters">
-      <div class="history-filter-group history-filter-group--primary">
-        <div class="month-filter-wrap">
-          <button
-            class="history-filter-btn history-filter-btn--month is-active"
-            type="button"
-            data-period="month"
-            id="historyMonthBtn"
-          >
-            Месяц
-          </button>
-
-          <select
-            id="historyMonthInput"
-            class="month-filter-native"
-            aria-label="Выбор месяца для истории"
-          ></select>
-        </div>
-      </div>
-
-      <div class="history-filter-group history-filter-group--secondary">
-        <button class="history-filter-btn" type="button" data-period="today">Сегодня</button>
-        <button class="history-filter-btn" type="button" data-period="7">7 дней</button>
-        <button class="history-filter-btn" type="button" data-period="range">Период</button>
-      </div>
-
-      <div class="history-filter-group history-filter-group--inputs">
-        <input class="input hidden" type="date" id="historyRangeFromInput" />
-        <input class="input hidden" type="date" id="historyRangeToInput" />
-        <div class="section-note hidden" id="historySelectedPeriodLabel"></div>
-      </div>
-
-      <div class="history-filter-group">
-        <button class="history-filter-btn is-active" type="button" data-type="all">Все</button>
-        <button class="history-filter-btn" type="button" data-type="income">Доходы</button>
-        <button class="history-filter-btn" type="button" data-type="expense">Расходы</button>
-        <button class="history-filter-btn" type="button" data-type="transfer">Переводы</button>
-      </div>
-    </div>
-  </section>
-
-  <section class="section">
-    <div class="list" id="historyTransactionsList"></div>
-  </section>
-</div>
-
   <!-- ANALYTICS VIEW -->
 <div id="analyticsView" class="hidden">
   <section class="section section--manager-top">
