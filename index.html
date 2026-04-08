@@ -168,8 +168,27 @@
 </div>
 
     <!-- ANALYTICS VIEW -->
+<!-- ANALYTICS VIEW -->
 <div id="analyticsView" class="hidden">
   <section class="section section--manager-top">
+    <div class="analytics-mode-switch">
+      <button
+        class="analytics-mode-switch__btn is-active"
+        type="button"
+        id="analyticsModeCategoriesBtn"
+      >
+        Категории
+      </button>
+
+      <button
+        class="analytics-mode-switch__btn"
+        type="button"
+        id="analyticsModeOperationsBtn"
+      >
+        Операции
+      </button>
+    </div>
+
     <div class="history-filters">
       <div class="history-filter-group history-filter-group--primary">
         <div class="month-filter-wrap">
@@ -201,6 +220,16 @@
         <input class="input hidden" type="date" id="analyticsRangeToInput" />
         <div class="section-note hidden" id="analyticsSelectedPeriodLabel"></div>
       </div>
+
+      <div
+        class="history-filter-group hidden"
+        id="analyticsOperationTypeFilters"
+      >
+        <button class="history-filter-btn is-active" type="button" data-analytics-type="all">Все</button>
+        <button class="history-filter-btn" type="button" data-analytics-type="income">Доходы</button>
+        <button class="history-filter-btn" type="button" data-analytics-type="expense">Расходы</button>
+        <button class="history-filter-btn" type="button" data-analytics-type="transfer">Переводы</button>
+      </div>
     </div>
   </section>
 
@@ -225,11 +254,15 @@
     </div>
   </section>
 
-  <section class="section">
+  <section class="section" id="analyticsCategoriesSection">
     <div class="manager-card analytics-chart-card analytics-chart-card--clean">
       <div class="analytics-overview" id="analyticsDonut"></div>
       <div class="analytics-breakdown" id="analyticsLegend"></div>
     </div>
+  </section>
+
+  <section class="section hidden" id="analyticsOperationsSection">
+    <div class="list" id="analyticsTransactionsList"></div>
   </section>
 </div>
 
