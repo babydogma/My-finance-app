@@ -60,6 +60,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   const analyticsRangeFromInput = document.getElementById("analyticsRangeFromInput");
   const analyticsRangeToInput = document.getElementById("analyticsRangeToInput");
   const analyticsSelectedPeriodLabel = document.getElementById("analyticsSelectedPeriodLabel");
+  
+  const analyticsModeCategoriesBtn = document.getElementById("analyticsModeCategoriesBtn");
+  const analyticsModeOperationsBtn = document.getElementById("analyticsModeOperationsBtn");
+  const analyticsOperationTypeFilters = document.getElementById("analyticsOperationTypeFilters");
+  const analyticsTypeButtons = document.querySelectorAll("[data-analytics-type]");
+  const analyticsCategoriesSection = document.getElementById("analyticsCategoriesSection");
+  const analyticsOperationsSection = document.getElementById("analyticsOperationsSection");
+  const analyticsTransactionsList = document.getElementById("analyticsTransactionsList");
 
   const budgetList = document.getElementById("budgetList");
   const budgetCountLabel = document.getElementById("budgetCountLabel");
@@ -107,6 +115,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   let analyticsSelectedMonth = getCurrentMonthValue();
   let analyticsRangeStart = "";
   let analyticsRangeEnd = "";
+  
+  let analyticsMode = "categories";
+  let analyticsOperationType = "all";
 
   let activeBudgetCategoryId = null;
   let activeAnalyticsCategoryId = null;
@@ -877,6 +888,16 @@ function closeAnalyticsCategoryModal() {
   );
 }
 
+function getAnalyticsOperationsFilteredTransactions() {
+  let items = getAnalyticsFilteredTransactions();
+
+  if (analyticsOperationType !== "all") {
+    items = items.filter((transaction) => transaction.type === analyticsOperationType);
+  }
+
+  return sortTransactionsByLatest(items);
+}
+
   function getHistoryFilteredTransactions() {
     let filtered = [...state.transactions];
 
@@ -1388,6 +1409,31 @@ if (historyMonthBtn) {
   });
 }
 
+function renderAnalyticsOperations() {
+  if (!analyticsTransactionsList) return;
+
+  analyticsTransactionsList.innerHTML = "";
+
+  const items = getAnalyticsOperationsFilteredTransactions();
+
+  if (!items.length) {
+    const empty = document.createElement("div");
+    empty.className = "list-card";
+    empty.innerHTML = `
+      <div class="list-body">
+        <h3 class="list-title">Ничего не найдено</h3>
+        <p class="list-subtitle">За выбранный период нет операций</p>
+      </div>
+    `;
+    analyticsTransactionsList.appendChild(empty);
+    return;
+  }
+
+  items.forEach((transaction) => {
+    analyticsTransactionsList.appendChild(createTransactionCard(transaction));
+  });
+}
+
  function renderAnalytics() {
   if (!analyticsView) return;
 
@@ -1413,6 +1459,35 @@ if (historyMonthBtn) {
     btn.classList.toggle("is-active", btn.dataset.analyticsPeriod === analyticsFilterPeriod);
   });
 
+  analyticsTypeButtons.forEach((btn) => {
+    btn.classList.toggle("is-active", btn.dataset.analyticsType === analyticsOperationType);
+  });
+  
+  analyticsModeCategoriesBtn?.addEventListener("click", () => {
+  analyticsMode = "categories";
+  renderAnalytics();
+});
+
+analyticsModeOperationsBtn?.addEventListener("click", () => {
+  analyticsMode = "operations";
+  renderAnalytics();
+});
+
+analyticsTypeButtons.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    analyticsOperationType = btn.dataset.analyticsType;
+    analyticsMode = "operations";
+    renderAnalytics();
+  });
+});
+
+  analyticsModeCategoriesBtn?.classList.toggle("is-active", analyticsMode === "categories");
+  analyticsModeOperationsBtn?.classList.toggle("is-active", analyticsMode === "operations");
+
+  analyticsCategoriesSection?.classList.toggle("hidden", analyticsMode !== "categories");
+  analyticsOperationsSection?.classList.toggle("hidden", analyticsMode !== "operations");
+  analyticsOperationTypeFilters?.classList.toggle("hidden", analyticsMode !== "operations");
+
   const isAnalyticsRange = analyticsFilterPeriod === "range";
 
   populateMonthSelect(analyticsMonthInput, analyticsSelectedMonth);
@@ -1428,6 +1503,8 @@ if (historyMonthBtn) {
     analyticsSelectedPeriodLabel.textContent = "";
     analyticsSelectedPeriodLabel.style.display = "none";
   }
+
+  renderAnalyticsOperations();
 
   const periodLabel = getAnalyticsPeriodLabel() || "Период";
   const totalExpense = breakdown.reduce((sum, item) => sum + item.amount, 0);
