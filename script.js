@@ -1323,106 +1323,123 @@ if (historyMonthBtn) {
   });
 }
 
-  function renderAnalytics() {
-    if (!analyticsView) return;
+ function renderAnalytics() {
+  if (!analyticsView) return;
 
-    const summary = getAnalyticsSummary();
-    const breakdown = getAnalyticsCategoryBreakdown();
+  const summary = getAnalyticsSummary();
+  const breakdown = getAnalyticsCategoryBreakdown();
 
-    analyticsIncomeValue.textContent = formatMoney(summary.income);
-    analyticsExpenseValue.textContent = formatMoney(summary.expense);
+  analyticsIncomeValue.textContent = formatMoney(summary.income);
+  analyticsExpenseValue.textContent = formatMoney(summary.expense);
 
-    analyticsNetValue.classList.remove("is-positive", "is-negative");
+  analyticsNetValue.classList.remove("is-positive", "is-negative");
 
-    if (summary.net > 0) {
-      analyticsNetValue.textContent = `+${formatMoney(summary.net)}`;
-      analyticsNetValue.classList.add("is-positive");
-    } else if (summary.net < 0) {
-      analyticsNetValue.textContent = `−${formatMoney(Math.abs(summary.net))}`;
-      analyticsNetValue.classList.add("is-negative");
-    } else {
-      analyticsNetValue.textContent = formatMoney(0);
-    }
+  if (summary.net > 0) {
+    analyticsNetValue.textContent = `+${formatMoney(summary.net)}`;
+    analyticsNetValue.classList.add("is-positive");
+  } else if (summary.net < 0) {
+    analyticsNetValue.textContent = `−${formatMoney(Math.abs(summary.net))}`;
+    analyticsNetValue.classList.add("is-negative");
+  } else {
+    analyticsNetValue.textContent = formatMoney(0);
+  }
 
-    analyticsPeriodButtons.forEach((btn) => {
-  btn.classList.toggle("is-active", btn.dataset.analyticsPeriod === analyticsFilterPeriod);
-});
+  analyticsPeriodButtons.forEach((btn) => {
+    btn.classList.toggle("is-active", btn.dataset.analyticsPeriod === analyticsFilterPeriod);
+  });
 
-const isAnalyticsMonth = analyticsFilterPeriod === "month";
-const isAnalyticsRange = analyticsFilterPeriod === "range";
+  const isAnalyticsRange = analyticsFilterPeriod === "range";
 
-populateMonthSelect(analyticsMonthInput, analyticsSelectedMonth);
-setNativePickerVisibility(analyticsRangeFromInput, isAnalyticsRange);
-setNativePickerVisibility(analyticsRangeToInput, isAnalyticsRange);
+  populateMonthSelect(analyticsMonthInput, analyticsSelectedMonth);
+  setNativePickerVisibility(analyticsRangeFromInput, isAnalyticsRange);
+  setNativePickerVisibility(analyticsRangeToInput, isAnalyticsRange);
 
-if (analyticsMonthBtn) {
-  analyticsMonthBtn.textContent = formatMonthButtonLabel(analyticsSelectedMonth);
-}
+  if (analyticsMonthBtn) {
+    analyticsMonthBtn.textContent = formatMonthButtonLabel(analyticsSelectedMonth);
+  }
 
-if (analyticsSelectedPeriodLabel) {
-  analyticsSelectedPeriodLabel.classList.add("hidden");
-  analyticsSelectedPeriodLabel.textContent = "";
-  analyticsSelectedPeriodLabel.style.display = "none";
-}
+  if (analyticsSelectedPeriodLabel) {
+    analyticsSelectedPeriodLabel.classList.add("hidden");
+    analyticsSelectedPeriodLabel.textContent = "";
+    analyticsSelectedPeriodLabel.style.display = "none";
+  }
 
-    if (!breakdown.length) {
-      analyticsDonut.innerHTML = `
-  <div class="analytics-overview-card analytics-overview-card--empty">
-    <div class="analytics-overview-card__total">${formatMoney(0)}</div>
-  </div>
-`;
+  const periodLabel = getAnalyticsPeriodLabel() || "Период";
+  const totalExpense = breakdown.reduce((sum, item) => sum + item.amount, 0);
 
-      analyticsLegend.innerHTML = `
-        <div class="analytics-empty analytics-empty--clean">
-          Нет данных по расходам за выбранный период
-        </div>
-      `;
-      return;
-    }
-
-    const totalExpense = breakdown.reduce((sum, item) => sum + item.amount, 0);
-    const topItem = breakdown[0];
-    const topPercent = totalExpense > 0 ? Math.round((topItem.amount / totalExpense) * 100) : 0;
-
+  if (!breakdown.length) {
     analyticsDonut.innerHTML = `
-  <div class="analytics-overview-card">
-    <div class="analytics-overview-card__label">Расходы по категориям</div>
-    <div class="analytics-overview-card__total">${formatMoney(totalExpense)}</div>
-
-    <div class="analytics-overview-card__leader">
-      <div class="analytics-overview-card__leader-label">Главная категория</div>
-      <div class="analytics-overview-card__leader-title">${escapeHtml(topItem.icon)} ${escapeHtml(topItem.name)}</div>
-      <div class="analytics-overview-card__leader-meta">${topPercent}% • ${formatMoney(topItem.amount)}</div>
-    </div>
-  </div>
-`;
-
-    const listMarkup = breakdown
-      .map((item, index) => {
-        const percent = totalExpense > 0 ? Math.round((item.amount / totalExpense) * 100) : 0;
-
-        return `
-          <div class="analytics-breakdown-row">
-            <div class="analytics-breakdown-row__left">
-              <div class="analytics-breakdown-row__rank">#${index + 1}</div>
-              <span class="analytics-breakdown-row__dot" style="background:${item.color};"></span>
-              <div class="analytics-breakdown-row__body">
-                <div class="analytics-breakdown-row__title">${escapeHtml(item.icon)} ${escapeHtml(item.name)}</div>
-                <div class="analytics-breakdown-row__subtitle">${percent}% от расходов</div>
-              </div>
-            </div>
-            <div class="analytics-breakdown-row__value">${formatMoney(item.amount)}</div>
+      <div class="analytics-panel">
+        <div class="analytics-panel__top">
+          <div>
+            <div class="analytics-panel__eyebrow">Расходы по категориям</div>
+            <div class="analytics-panel__total">${formatMoney(0)}</div>
           </div>
-        `;
-      })
-      .join("");
+          <div class="analytics-panel__period">${escapeHtml(periodLabel)}</div>
+        </div>
 
-    analyticsLegend.innerHTML = `
-      <div class="analytics-breakdown-list">
-        ${listMarkup}
+        <div class="analytics-leader analytics-leader--empty">
+          <div class="analytics-leader__label">Лидер</div>
+          <div class="analytics-leader__title">Нет данных</div>
+          <div class="analytics-leader__meta">За выбранный период нет расходов</div>
+        </div>
       </div>
     `;
+
+    analyticsLegend.innerHTML = `
+      <div class="analytics-breakdown-list analytics-breakdown-list--empty">
+        <div class="analytics-empty">Нет данных по расходам за выбранный период</div>
+      </div>
+    `;
+    return;
   }
+
+  const topItem = breakdown[0];
+  const topPercent = totalExpense > 0 ? Math.round((topItem.amount / totalExpense) * 100) : 0;
+
+  analyticsDonut.innerHTML = `
+    <div class="analytics-panel">
+      <div class="analytics-panel__top">
+        <div>
+          <div class="analytics-panel__eyebrow">Расходы по категориям</div>
+          <div class="analytics-panel__total">${formatMoney(totalExpense)}</div>
+        </div>
+        <div class="analytics-panel__period">${escapeHtml(periodLabel)}</div>
+      </div>
+
+      <div class="analytics-leader">
+        <div class="analytics-leader__label">Лидер</div>
+        <div class="analytics-leader__title">${escapeHtml(topItem.icon)} ${escapeHtml(topItem.name)}</div>
+        <div class="analytics-leader__meta">${topPercent}% • ${formatMoney(topItem.amount)}</div>
+      </div>
+    </div>
+  `;
+
+  const listMarkup = breakdown
+    .map((item, index) => {
+      const percent = totalExpense > 0 ? Math.round((item.amount / totalExpense) * 100) : 0;
+
+      return `
+        <div class="analytics-breakdown-row">
+          <div class="analytics-breakdown-row__left">
+            <div class="analytics-breakdown-row__rank">#${index + 1}</div>
+            <div class="analytics-breakdown-row__body">
+              <div class="analytics-breakdown-row__title">${escapeHtml(item.icon)} ${escapeHtml(item.name)}</div>
+              <div class="analytics-breakdown-row__subtitle">${percent}% от расходов</div>
+            </div>
+          </div>
+          <div class="analytics-breakdown-row__value">${formatMoney(item.amount)}</div>
+        </div>
+      `;
+    })
+    .join("");
+
+  analyticsLegend.innerHTML = `
+    <div class="analytics-breakdown-list">
+      ${listMarkup}
+    </div>
+  `;
+}
 
   function renderBudget() {
     if (!budgetList) return;
