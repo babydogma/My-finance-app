@@ -2185,3 +2185,27 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     font-size: 15px;
   }
 }
+
+/* month picker must stay hidden, only button should be visible */
+#historyMonthInput,
+#analyticsMonthInput {
+  display: none !important;
+  width: 1px !important;
+  min-width: 1px !important;
+  max-width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  position: absolute !important;
+  left: -9999px !important;
+}
+
+/* period date inputs stay visible only when opened */
+#historyRangeFromInput:not(.hidden),
+#historyRangeToInput:not(.hidden),
+#analyticsRangeFromInput:not(.hidden),
+#analyticsRangeToInput:not(.hidden) {
+  display: block !important;
+}
