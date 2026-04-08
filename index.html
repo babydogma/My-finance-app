@@ -138,23 +138,28 @@
 
     <div class="history-filters">
       <div class="history-filter-group history-filter-group--primary">
-        <div class="month-filter-wrap">
-          <button
-            class="history-filter-btn history-filter-btn--month is-active"
-            type="button"
-            data-analytics-period="month"
-            id="analyticsMonthBtn"
-          >
-            Месяц
-          </button>
+  <div class="month-filter-wrap month-filter-wrap--inline">
+    <button
+      class="history-filter-btn history-filter-btn--month is-active"
+      type="button"
+      data-analytics-period="month"
+      id="analyticsMonthBtn"
+    >
+      Месяц
+    </button>
+  </div>
+</div>
 
-          <select
-            id="analyticsMonthInput"
-            class="month-filter-native"
-            aria-label="Выбор месяца для аналитики"
-          ></select>
-        </div>
-      </div>
+<div class="history-filter-group history-filter-group--month-wheel hidden" id="analyticsMonthWheelWrap">
+  <div class="month-wheel" id="analyticsMonthWheelInline">
+    <div class="month-wheel__fade month-wheel__fade--top"></div>
+    <div class="month-wheel__fade month-wheel__fade--bottom"></div>
+    <div class="month-wheel__center-line"></div>
+
+    <div class="month-wheel__column" id="analyticsMonthNamesColumn"></div>
+    <div class="month-wheel__column" id="analyticsMonthYearsColumn"></div>
+  </div>
+</div>
 
       <div class="history-filter-group history-filter-group--secondary">
         <button class="history-filter-btn" type="button" data-analytics-period="today">Сегодня</button>
