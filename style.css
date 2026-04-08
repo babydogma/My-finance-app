@@ -613,11 +613,35 @@ button {
 
 .modal-sheet {
   width: min(480px, 100%);
+  max-height: calc(100vh - 24px);
   padding: 18px 16px 20px;
   border-radius: 28px 28px 20px 20px;
   background: linear-gradient(180deg, rgba(28, 30, 38, 0.98) 0%, rgba(23, 25, 32, 0.99) 100%);
   border: 1px solid var(--border-strong);
   box-shadow: 0 -12px 44px rgba(0, 0, 0, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+#analyticsCategoryModal {
+  z-index: 120;
+}
+
+#transactionModal {
+  z-index: 140;
+}
+
+#budgetModal {
+  z-index: 130;
+}
+
+#analyticsCategoryModal .modal-sheet {
+  padding-bottom: 28px;
+}
+
+#analyticsCategoryTransactionsList {
+  padding-bottom: 8px;
 }
 
 .modal-handle {
