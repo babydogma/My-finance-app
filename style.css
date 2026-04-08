@@ -1991,3 +1991,84 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     font-size: 13.5px;
   }
 }
+
+/* history / analytics filters rebuild */
+
+.history-filter-group--primary {
+  justify-content: center;
+}
+
+.history-filter-btn--month {
+  min-width: 156px;
+  height: 40px;
+  padding: 0 18px;
+  font-size: 13.5px;
+  font-weight: 830;
+}
+
+.history-filter-group--secondary {
+  justify-content: center;
+}
+
+.history-filter-group--inputs {
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+#historyMonthInput,
+#analyticsMonthInput {
+  width: 1px;
+  min-width: 1px;
+  max-width: 1px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  opacity: 0;
+  pointer-events: none;
+}
+
+#historyRangeFromInput,
+#historyRangeToInput,
+#analyticsRangeFromInput,
+#analyticsRangeToInput {
+  width: 1px;
+  min-width: 1px;
+  max-width: 1px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  opacity: 0;
+  pointer-events: none;
+}
+
+#historySelectedPeriodLabel,
+#analyticsSelectedPeriodLabel {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text);
+  font-size: 12.5px;
+  font-weight: 810;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+@media (max-width: 420px) {
+  .history-filter-btn--month {
+    min-width: 144px;
+    height: 38px;
+    font-size: 13px;
+  }
+
+  #historySelectedPeriodLabel,
+  #analyticsSelectedPeriodLabel {
+    min-height: 32px;
+    padding: 0 12px;
+    font-size: 12px;
+  }
+}
