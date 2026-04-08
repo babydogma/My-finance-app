@@ -1045,26 +1045,28 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function renderCategories() {
-    categoriesListEl.innerHTML = "";
-    const categories = calculateCategories();
+  if (!categoriesListEl) return;
 
-    if (categories.length === 0) {
-      const empty = document.createElement("div");
-      empty.className = "list-card";
-      empty.innerHTML = `
-        <div class="list-body">
-          <h3 class="list-title">Категорий пока нет</h3>
-          <p class="list-subtitle">Добавь первую расходную операцию</p>
-        </div>
-      `;
-      categoriesListEl.appendChild(empty);
-      return;
-    }
+  categoriesListEl.innerHTML = "";
+  const categories = calculateCategories();
 
-    categories.forEach((category) => {
-      categoriesListEl.appendChild(createCategoryCard(category));
-    });
+  if (categories.length === 0) {
+    const empty = document.createElement("div");
+    empty.className = "list-card";
+    empty.innerHTML = `
+      <div class="list-body">
+        <h3 class="list-title">Категорий пока нет</h3>
+        <p class="list-subtitle">Добавь первую расходную операцию</p>
+      </div>
+    `;
+    categoriesListEl.appendChild(empty);
+    return;
   }
+
+  categories.forEach((category) => {
+    categoriesListEl.appendChild(createCategoryCard(category));
+  });
+}
 
   function renderCategoriesManager() {
     categoriesManagerList.innerHTML = "";
