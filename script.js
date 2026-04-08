@@ -66,6 +66,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   const analyticsOperationTypeFilters = document.getElementById("analyticsOperationTypeFilters");
   const analyticsTypeButtons = document.querySelectorAll("[data-analytics-type]");
   const analyticsCategoriesSection = document.getElementById("analyticsCategoriesSection");
+  const analyticsTotalsSection = document.getElementById("analyticsTotalsSection");
+  const analyticsCategoriesBreakdownSection = document.getElementById("analyticsCategoriesBreakdownSection");
   const analyticsOperationsSection = document.getElementById("analyticsOperationsSection");
   const analyticsTransactionsList = document.getElementById("analyticsTransactionsList");
 
@@ -1462,29 +1464,14 @@ function renderAnalyticsOperations() {
   analyticsTypeButtons.forEach((btn) => {
     btn.classList.toggle("is-active", btn.dataset.analyticsType === analyticsOperationType);
   });
-  
-  analyticsModeCategoriesBtn?.addEventListener("click", () => {
-  analyticsMode = "categories";
-  renderAnalytics();
-});
-
-analyticsModeOperationsBtn?.addEventListener("click", () => {
-  analyticsMode = "operations";
-  renderAnalytics();
-});
-
-analyticsTypeButtons.forEach((btn) => {
-  btn.addEventListener("click", () => {
-    analyticsOperationType = btn.dataset.analyticsType;
-    analyticsMode = "operations";
-    renderAnalytics();
-  });
-});
 
   analyticsModeCategoriesBtn?.classList.toggle("is-active", analyticsMode === "categories");
   analyticsModeOperationsBtn?.classList.toggle("is-active", analyticsMode === "operations");
-
+  
   analyticsCategoriesSection?.classList.toggle("hidden", analyticsMode !== "categories");
+  analyticsTotalsSection?.classList.toggle("hidden", analyticsMode !== "categories");
+  analyticsCategoriesBreakdownSection?.classList.toggle("hidden", analyticsMode !== "categories");
+  
   analyticsOperationsSection?.classList.toggle("hidden", analyticsMode !== "operations");
   analyticsOperationTypeFilters?.classList.toggle("hidden", analyticsMode !== "operations");
 
@@ -2154,6 +2141,24 @@ analyticsTypeButtons.forEach((btn) => {
     analyticsFilterPeriod = "range";
     renderAnalytics();
   });
+  
+  analyticsModeCategoriesBtn?.addEventListener("click", () => {
+  analyticsMode = "categories";
+  renderAnalytics();
+});
+
+analyticsModeOperationsBtn?.addEventListener("click", () => {
+  analyticsMode = "operations";
+  renderAnalytics();
+});
+
+analyticsTypeButtons.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    analyticsOperationType = btn.dataset.analyticsType;
+    analyticsMode = "operations";
+    renderAnalytics();
+  });
+});
 
   closeModalBtn?.addEventListener("click", closeModal);
   saveBtn?.addEventListener("click", saveTransaction);
