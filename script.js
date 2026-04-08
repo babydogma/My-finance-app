@@ -1315,11 +1315,10 @@ if (analyticsSelectedPeriodLabel) {
 
     if (!breakdown.length) {
       analyticsDonut.innerHTML = `
-        <div class="analytics-overview-card analytics-overview-card--empty">
-          <div class="analytics-overview-card__total">${formatMoney(0)}</div>
-          <div class="analytics-overview-card__period">${getAnalyticsPeriodLabel()}</div>
-        </div>
-      `;
+  <div class="analytics-overview-card analytics-overview-card--empty">
+    <div class="analytics-overview-card__total">${formatMoney(0)}</div>
+  </div>
+`;
 
       analyticsLegend.innerHTML = `
         <div class="analytics-empty analytics-empty--clean">
@@ -1334,18 +1333,17 @@ if (analyticsSelectedPeriodLabel) {
     const topPercent = totalExpense > 0 ? Math.round((topItem.amount / totalExpense) * 100) : 0;
 
     analyticsDonut.innerHTML = `
-      <div class="analytics-overview-card">
-        <div class="analytics-overview-card__label">Расходы по категориям</div>
-        <div class="analytics-overview-card__total">${formatMoney(totalExpense)}</div>
-        <div class="analytics-overview-card__period">${getAnalyticsPeriodLabel()}</div>
+  <div class="analytics-overview-card">
+    <div class="analytics-overview-card__label">Расходы по категориям</div>
+    <div class="analytics-overview-card__total">${formatMoney(totalExpense)}</div>
 
-        <div class="analytics-overview-card__leader">
-          <div class="analytics-overview-card__leader-label">Главная категория</div>
-          <div class="analytics-overview-card__leader-title">${escapeHtml(topItem.icon)} ${escapeHtml(topItem.name)}</div>
-          <div class="analytics-overview-card__leader-meta">${topPercent}% • ${formatMoney(topItem.amount)}</div>
-        </div>
-      </div>
-    `;
+    <div class="analytics-overview-card__leader">
+      <div class="analytics-overview-card__leader-label">Главная категория</div>
+      <div class="analytics-overview-card__leader-title">${escapeHtml(topItem.icon)} ${escapeHtml(topItem.name)}</div>
+      <div class="analytics-overview-card__leader-meta">${topPercent}% • ${formatMoney(topItem.amount)}</div>
+    </div>
+  </div>
+`;
 
     const listMarkup = breakdown
       .map((item, index) => {
