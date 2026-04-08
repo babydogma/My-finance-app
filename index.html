@@ -167,26 +167,27 @@
   </section>
 </div>
 
-    <!-- ANALYTICS VIEW -->
-<!-- ANALYTICS VIEW -->
+  <!-- ANALYTICS VIEW -->
 <div id="analyticsView" class="hidden">
   <section class="section section--manager-top">
-    <div class="analytics-mode-switch">
-      <button
-        class="analytics-mode-switch__btn is-active"
-        type="button"
-        id="analyticsModeCategoriesBtn"
-      >
-        Категории
-      </button>
+    <div class="analytics-mode-switch-wrap">
+      <div class="analytics-mode-switch">
+        <button
+          class="analytics-mode-switch__btn is-active"
+          type="button"
+          id="analyticsModeCategoriesBtn"
+        >
+          Категории
+        </button>
 
-      <button
-        class="analytics-mode-switch__btn"
-        type="button"
-        id="analyticsModeOperationsBtn"
-      >
-        Операции
-      </button>
+        <button
+          class="analytics-mode-switch__btn"
+          type="button"
+          id="analyticsModeOperationsBtn"
+        >
+          Операции
+        </button>
+      </div>
     </div>
 
     <div class="history-filters">
@@ -222,7 +223,7 @@
       </div>
 
       <div
-        class="history-filter-group hidden"
+        class="history-filter-group analytics-operation-type-group hidden"
         id="analyticsOperationTypeFilters"
       >
         <button class="history-filter-btn is-active" type="button" data-analytics-type="all">Все</button>
@@ -233,7 +234,7 @@
     </div>
   </section>
 
-  <section class="section">
+  <section class="section" id="analyticsCategoriesSection">
     <div class="summary">
       <div class="summary-card">
         <p class="summary-label">Доходы за период</p>
@@ -247,14 +248,14 @@
     </div>
   </section>
 
-  <section class="section">
+  <section class="section" id="analyticsTotalsSection">
     <div class="manager-card analytics-total-card">
       <p class="summary-label">Итог за период</p>
       <p class="summary-value" id="analyticsNetValue">0 ₽</p>
     </div>
   </section>
 
-  <section class="section" id="analyticsCategoriesSection">
+  <section class="section" id="analyticsCategoriesBreakdownSection">
     <div class="manager-card analytics-chart-card analytics-chart-card--clean">
       <div class="analytics-overview" id="analyticsDonut"></div>
       <div class="analytics-breakdown" id="analyticsLegend"></div>
