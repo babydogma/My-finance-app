@@ -918,9 +918,9 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   gap: 14px;
 }
 
-.analytics-panel__top {
+.analytics-panel__headline {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 12px;
 }
@@ -943,13 +943,13 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 .analytics-panel__period {
   flex: 0 0 auto;
-  min-height: 30px;
-  padding: 0 12px;
+  min-height: 34px;
+  padding: 0 14px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.06);
   color: rgba(255, 255, 255, 0.74);
-  font-size: 12px;
-  font-weight: 760;
+  font-size: 12.5px;
+  font-weight: 780;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -961,7 +961,9 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .analytics-leader {
   display: flex;
   align-items: center;
-  min-height: 92px;
+  justify-content: space-between;
+  gap: 14px;
+  min-height: 94px;
   padding: 14px 16px;
   border-radius: 20px;
   background:
@@ -990,9 +992,9 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .analytics-leader__label {
-  font-size: 11px;
-  font-weight: 760;
-  color: rgba(255, 255, 255, 0.42);
+  font-size: 12px;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.56);
   line-height: 1.1;
 }
 
@@ -1007,10 +1009,28 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 .analytics-leader__meta {
   margin-top: 4px;
-  font-size: 13px;
+  font-size: 12.5px;
   font-weight: 690;
-  color: rgba(255, 255, 255, 0.58);
+  color: rgba(255, 255, 255, 0.52);
   line-height: 1.12;
+}
+
+.analytics-leader__value {
+  flex: 0 0 auto;
+  text-align: right;
+  font-size: 16px;
+  font-weight: 830;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  color: #f4e1a1;
+  white-space: nowrap;
+  padding-left: 10px;
+}
+
+.analytics-breakdown-row__rank--leader {
+  min-width: 34px;
+  height: 24px;
+  font-size: 11px;
 }
 
 .analytics-breakdown-list {
@@ -1098,9 +1118,14 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   padding-left: 10px;
 }
 
-.analytics-breakdown-row:first-child .analytics-breakdown-row__title,
-.analytics-breakdown-row:first-child .analytics-breakdown-row__value {
-  color: #f4e1a1;
+.analytics-breakdown-row:nth-child(1) .analytics-breakdown-row__rank {
+  background: rgba(210, 218, 230, 0.14);
+  color: #d8dee9;
+}
+
+.analytics-breakdown-row:nth-child(2) .analytics-breakdown-row__rank {
+  background: rgba(170, 118, 74, 0.16);
+  color: #d89a63;
 }
 
 .analytics-empty {
