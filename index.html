@@ -124,34 +124,38 @@
     </div>
 
     <!-- HISTORY VIEW -->
-    <div id="historyView" class="hidden">
-      <section class="section section--manager-top">
-        <div class="section-head">
-          <h2 class="section-title">История</h2>
-          <div class="section-note" id="historyCountLabel">0 операций</div>
-        </div>
+      <div class="history-filters">
+  <div class="history-filter-group history-filter-group--primary">
+    <button
+      class="history-filter-btn history-filter-btn--month is-active"
+      type="button"
+      data-period="month"
+      id="historyMonthBtn"
+    >
+      Месяц
+    </button>
+  </div>
 
-        <div class="history-filters">
-          <div class="history-filter-group">
-  <button class="history-filter-btn is-active" type="button" data-period="today">Сегодня</button>
-  <button class="history-filter-btn" type="button" data-period="7">7 дней</button>
-  <button class="history-filter-btn" type="button" data-period="30">30 дней</button>
-  <button class="history-filter-btn" type="button" data-period="customMonth" id="historyCustomMonthBtn">Период</button>
-  <button class="history-filter-btn" type="button" data-period="all">Всё</button>
+  <div class="history-filter-group history-filter-group--secondary">
+    <button class="history-filter-btn" type="button" data-period="today">Сегодня</button>
+    <button class="history-filter-btn" type="button" data-period="7">7 дней</button>
+    <button class="history-filter-btn" type="button" data-period="range" id="historyRangeBtn">Период</button>
+  </div>
+
+  <div class="history-filter-group history-filter-group--inputs">
+    <input class="input hidden" type="month" id="historyMonthInput" />
+    <input class="input hidden" type="date" id="historyRangeFromInput" />
+    <input class="input hidden" type="date" id="historyRangeToInput" />
+    <div class="section-note hidden" id="historySelectedPeriodLabel"></div>
+  </div>
+
+  <div class="history-filter-group">
+    <button class="history-filter-btn is-active" type="button" data-type="all">Все</button>
+    <button class="history-filter-btn" type="button" data-type="income">Доходы</button>
+    <button class="history-filter-btn" type="button" data-type="expense">Расходы</button>
+    <button class="history-filter-btn" type="button" data-type="transfer">Переводы</button>
+  </div>
 </div>
-
-<div class="history-filter-group">
-  <input class="input hidden" type="month" id="historyMonthInput" />
-  <div class="section-note hidden" id="historySelectedPeriodLabel"></div>
-</div>
-
-          <div class="history-filter-group">
-            <button class="history-filter-btn is-active" type="button" data-type="all">Все</button>
-            <button class="history-filter-btn" type="button" data-type="income">Доходы</button>
-            <button class="history-filter-btn" type="button" data-type="expense">Расходы</button>
-            <button class="history-filter-btn" type="button" data-type="transfer">Переводы</button>
-          </div>
-        </div>
       </section>
 
       <section class="section">
@@ -160,16 +164,33 @@
     </div>
 
     <!-- ANALYTICS VIEW -->
-<div id="analyticsView" class="hidden">
-  <section class="section section--manager-top">
-    <div class="history-filters">
-      <div class="history-filter-group">
-        <button class="history-filter-btn is-active" type="button" data-analytics-period="7">7 дней</button>
-        <button class="history-filter-btn" type="button" data-analytics-period="30">30 дней</button>
-        <button class="history-filter-btn" type="button" data-analytics-period="all">Всё</button>
-      </div>
+<section class="section section--manager-top">
+  <div class="history-filters">
+    <div class="history-filter-group history-filter-group--primary">
+      <button
+        class="history-filter-btn history-filter-btn--month is-active"
+        type="button"
+        data-analytics-period="month"
+        id="analyticsMonthBtn"
+      >
+        Месяц
+      </button>
     </div>
-  </section>
+
+    <div class="history-filter-group history-filter-group--secondary">
+      <button class="history-filter-btn" type="button" data-analytics-period="today">Сегодня</button>
+      <button class="history-filter-btn" type="button" data-analytics-period="7">7 дней</button>
+      <button class="history-filter-btn" type="button" data-analytics-period="range" id="analyticsRangeBtn">Период</button>
+    </div>
+
+    <div class="history-filter-group history-filter-group--inputs">
+      <input class="input hidden" type="month" id="analyticsMonthInput" />
+      <input class="input hidden" type="date" id="analyticsRangeFromInput" />
+      <input class="input hidden" type="date" id="analyticsRangeToInput" />
+      <div class="section-note hidden" id="analyticsSelectedPeriodLabel"></div>
+    </div>
+  </div>
+</section>
 
   <section class="section">
     <div class="summary">
