@@ -26,12 +26,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const navWalletBtn = document.getElementById("navWalletBtn");
   const navAnalyticsBtn = document.getElementById("navAnalyticsBtn");
-  const navBudgetBtn = document.getElementById("navBudgetBtn");
 
   const mainView = document.getElementById("mainView");
   const categoriesManagerView = document.getElementById("categoriesManagerView");
   const analyticsView = document.getElementById("analyticsView");
-  const budgetView = document.getElementById("budgetView");
 
   const categoriesManagerList = document.getElementById("categoriesManagerList");
   const newCategoryNameInput = document.getElementById("newCategoryNameInput");
@@ -61,9 +59,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   const analyticsCategoriesBreakdownSection = document.getElementById("analyticsCategoriesBreakdownSection");
   const analyticsOperationsSection = document.getElementById("analyticsOperationsSection");
   const analyticsTransactionsList = document.getElementById("analyticsTransactionsList");
-
-  const budgetList = document.getElementById("budgetList");
-  const budgetCountLabel = document.getElementById("budgetCountLabel");
 
   const modalTitle = modal?.querySelector(".modal-title");
 
@@ -557,7 +552,6 @@ function closeAnalyticsMonthWheel() {
   function setActiveNav(viewName) {
     navWalletBtn?.classList.toggle("is-active", viewName === "wallet");
     navAnalyticsBtn?.classList.toggle("is-active", viewName === "analytics");
-    navBudgetBtn?.classList.toggle("is-active", viewName === "budget");
   }
 
   function showWalletView() {
@@ -565,7 +559,6 @@ function closeAnalyticsMonthWheel() {
     mainView.classList.remove("hidden");
     categoriesManagerView.classList.add("hidden");
     analyticsView.classList.add("hidden");
-    budgetView.classList.add("hidden");
     setActiveNav("wallet");
   }
 
@@ -574,7 +567,6 @@ function closeAnalyticsMonthWheel() {
     mainView.classList.add("hidden");
     categoriesManagerView.classList.remove("hidden");
     analyticsView.classList.add("hidden");
-    budgetView.classList.add("hidden");
     setActiveNav("wallet");
   }
 
@@ -588,20 +580,8 @@ function closeAnalyticsMonthWheel() {
     mainView.classList.add("hidden");
     categoriesManagerView.classList.add("hidden");
     analyticsView.classList.remove("hidden");
-    budgetView.classList.add("hidden");
     setActiveNav("analytics");
     renderAnalytics();
-  }
-
-  function showBudgetView() {
-    document.querySelector(".app")?.classList.remove("app--analytics");
-    document.querySelector(".app")?.classList.add("app--budget");
-    mainView.classList.add("hidden");
-    categoriesManagerView.classList.add("hidden");
-    analyticsView.classList.add("hidden");
-    budgetView.classList.remove("hidden");
-    setActiveNav("budget");
-    renderBudget();
   }
 
   function openBudgetModal(categoryId) {
@@ -1521,84 +1501,6 @@ const topExceeded = isBudgetExceeded(topItem.amount, topItem.id);
     });
 }
 
-  function renderBudget() {
-    if (!budgetList) return;
-
-    budgetList.innerHTML = "";
-
-    const categories = getBudgetCategories();
-
-    if (budgetCountLabel) {
-      budgetCountLabel.textContent = `${categories.length} категорий`;
-    }
-
-    if (!categories.length) {
-      budgetList.innerHTML = `
-        <div class="manager-card">
-          <div class="budget-empty">Категорий пока нет</div>
-        </div>
-      `;
-      return;
-    }
-
-    categories.forEach((category) => {
-      const spent = Number(getCurrentMonthExpenseByCategory(category.id)) || 0;
-      const limitRecord = getBudgetLimitByCategoryId(category.id);
-      const limit = limitRecord ? Number(limitRecord.monthly_limit) || 0 : 0;
-      const remains = Math.max(limit - spent, 0);
-      const progressPercent = limit > 0 ? Math.min((spent / limit) * 100, 100) : 0;
-
-      const toneClass =
-        category.id === "food"
-          ? "list-icon--green"
-          : category.id === "transport"
-          ? "list-icon--blue"
-          : category.id === "fun"
-          ? "list-icon--purple"
-          : category.id === "snack"
-          ? "list-icon--amber"
-          : "list-icon--neutral";
-
-      let fillClass = "budget-progress__fill";
-      if (limit > 0 && progressPercent >= 100) {
-        fillClass += " is-danger";
-      } else if (limit > 0 && progressPercent >= 75) {
-        fillClass += " is-warning";
-      }
-
-      const spentText = formatMoney(spent);
-      const limitText = limit > 0 ? formatMoney(limit) : "Без лимита";
-      const remainsText = limit > 0 ? formatMoney(remains) : "—";
-
-      const card = document.createElement("div");
-      card.className = "list-card budget-card";
-
-      card.innerHTML = `
-        <div class="list-icon ${toneClass}">${escapeHtml(category.icon || "📦")}</div>
-
-        <div class="list-body">
-          <div class="budget-top">
-            <div class="budget-top__left">
-              <h3 class="list-title">${escapeHtml(category.name || "Без названия")}</h3>
-              <p class="budget-remains">Осталось ${remainsText}</p>
-            </div>
-
-            <div class="budget-top__right">
-              <p class="budget-ratio">${spentText} <span>из ${limitText}</span></p>
-            </div>
-          </div>
-
-          <div class="budget-progress">
-            <div class="${fillClass}" style="width:${progressPercent}%;"></div>
-          </div>
-        </div>
-      `;
-
-      card.addEventListener("click", () => openBudgetModal(category.id));
-      budgetList.appendChild(card);
-    });
-  }
-
   function buildTransactionFromForm() {
     const amount = Number(amountInput.value.trim());
     const comment = commentInput.value.trim();
@@ -1910,7 +1812,6 @@ const topExceeded = isBudgetExceeded(topItem.amount, topItem.id);
     renderCategoriesManager();
     renderTransactions();
     renderAnalytics();
-    renderBudget();
   }
 
   openExpenseModalBtn?.addEventListener("click", () => openModal("expense"));
@@ -1922,7 +1823,6 @@ const topExceeded = isBudgetExceeded(topItem.amount, topItem.id);
 
   navWalletBtn?.addEventListener("click", showWalletView);
   navAnalyticsBtn?.addEventListener("click", showAnalyticsView);
-  navBudgetBtn?.addEventListener("click", showBudgetView);
 
   analyticsPeriodButtons.forEach((btn) => {
   btn.addEventListener("click", () => {
