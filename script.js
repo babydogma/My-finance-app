@@ -146,6 +146,12 @@ function getAnalyticsSpentLimitLabel(spent, categoryId) {
   return `${formatMoney(spent)} / ${getBudgetLimitLabel(categoryId)}`;
 }
 
+function isBudgetExceeded(spent, categoryId) {
+  const record = getBudgetLimitByCategoryId(categoryId);
+  const limit = record ? Number(record.monthly_limit) || 0 : 0;
+  return limit > 0 && spent > limit;
+}
+
   function getAppMetaValue(key) {
     const item = state.appMeta.find((entry) => entry.key === key);
     return item ? item.value : "";
@@ -1430,7 +1436,8 @@ if (analyticsCategoryBudgetBtn) {
   }
 
   const topItem = breakdown[0];
-  const topPercent = totalExpense > 0 ? Math.round((topItem.amount / totalExpense) * 100) : 0;
+const topPercent = totalExpense > 0 ? Math.round((topItem.amount / totalExpense) * 100) : 0;
+const topExceeded = isBudgetExceeded(topItem.amount, topItem.id);
 
   analyticsDonut.innerHTML = `
     <div class="analytics-panel">
@@ -1456,7 +1463,9 @@ if (analyticsCategoryBudgetBtn) {
           </div>
         </div>
 
-        <div class="analytics-leader__value">${getAnalyticsSpentLimitLabel(topItem.amount, topItem.id)}</div>
+        <div class="analytics-leader__value ${topExceeded ? "analytics-limit-value--danger" : ""}">
+  ${getAnalyticsSpentLimitLabel(topItem.amount, topItem.id)}
+</div>
       </button>
     </div>
   `;
@@ -1466,6 +1475,7 @@ if (analyticsCategoryBudgetBtn) {
   const listMarkup = restItems
     .map((item, index) => {
       const percent = totalExpense > 0 ? Math.round((item.amount / totalExpense) * 100) : 0;
+      const exceeded = isBudgetExceeded(item.amount, item.id);
 
       return `
         <button
@@ -1480,7 +1490,9 @@ if (analyticsCategoryBudgetBtn) {
               <div class="analytics-breakdown-row__subtitle">${percent}% от расходов</div>
             </div>
           </div>
-          <div class="analytics-breakdown-row__value">${getAnalyticsSpentLimitLabel(item.amount, item.id)}</div>
+          <div class="analytics-breakdown-row__value ${exceeded ? "analytics-limit-value--danger" : ""}">
+  ${getAnalyticsSpentLimitLabel(item.amount, item.id)}
+</div>
         </button>
       `;
     })
