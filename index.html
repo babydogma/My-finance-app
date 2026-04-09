@@ -150,14 +150,35 @@
   </div>
 </div>
 
-<div class="history-filter-group history-filter-group--month-wheel hidden" id="analyticsMonthWheelWrap">
-  <div class="month-wheel" id="analyticsMonthWheelInline">
-    <div class="month-wheel__fade month-wheel__fade--top"></div>
-    <div class="month-wheel__fade month-wheel__fade--bottom"></div>
-    <div class="month-wheel__center-line"></div>
+<div class="analytics-month-popover hidden" id="analyticsMonthWheelWrap">
+  <div class="analytics-month-popover__panel">
+    <div class="month-wheel" id="analyticsMonthWheelInline">
+      <div class="month-wheel__fade month-wheel__fade--top"></div>
+      <div class="month-wheel__fade month-wheel__fade--bottom"></div>
+      <div class="month-wheel__center-line"></div>
 
-    <div class="month-wheel__column" id="analyticsMonthNamesColumn"></div>
-    <div class="month-wheel__column" id="analyticsMonthYearsColumn"></div>
+      <div class="month-wheel__column" id="analyticsMonthNamesColumn"></div>
+      <div class="month-wheel__column" id="analyticsMonthYearsColumn"></div>
+    </div>
+
+    <div class="analytics-month-popover__actions">
+      <button
+        class="analytics-month-popover__reset"
+        type="button"
+        id="analyticsMonthResetBtn"
+      >
+        Сбросить
+      </button>
+
+      <button
+        class="analytics-month-popover__apply"
+        type="button"
+        id="analyticsMonthApplyBtn"
+        aria-label="Подтвердить выбор месяца"
+      >
+        ✓
+      </button>
+    </div>
   </div>
 </div>
 
