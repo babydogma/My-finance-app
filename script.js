@@ -45,7 +45,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   const analyticsLegend = document.getElementById("analyticsLegend");
   const analyticsMonthBtn = document.getElementById("analyticsMonthBtn");
   const analyticsMonthWheelWrap = document.getElementById("analyticsMonthWheelWrap");
-  const analyticsMonthWheelInline = document.getElementById("analyticsMonthWheelInline");
   const analyticsMonthNamesColumn = document.getElementById("analyticsMonthNamesColumn");
   const analyticsMonthYearsColumn = document.getElementById("analyticsMonthYearsColumn");
   const analyticsRangeFromInput = document.getElementById("analyticsRangeFromInput");
@@ -182,61 +181,42 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   function setNativePickerVisibility(input, visible) {
-    if (!input) return;
+  if (!input) return;
 
-    const isMonthInput = input.id === "analyticsMonthInput";
-
-    if (isMonthInput) {
-      input.classList.add("hidden");
-      input.style.display = "none";
-      input.style.width = "1px";
-      input.style.minWidth = "1px";
-      input.style.maxWidth = "1px";
-      input.style.height = "1px";
-      input.style.padding = "0";
-      input.style.border = "0";
-      input.style.background = "transparent";
-      input.style.opacity = "0";
-      input.style.pointerEvents = "none";
-      input.style.position = "absolute";
-      input.style.left = "-9999px";
-      return;
-    }
-
-    if (visible) {
-      input.classList.remove("hidden");
-      input.style.display = "block";
-      input.style.width = "100%";
-      input.style.minWidth = "0";
-      input.style.maxWidth = "100%";
-      input.style.height = "48px";
-      input.style.padding = "0 16px";
-      input.style.border = "1px solid rgba(255,255,255,0.08)";
-      input.style.borderRadius = "18px";
-      input.style.background = "rgba(255,255,255,0.06)";
-      input.style.color = "#f3f4f8";
-      input.style.opacity = "1";
-      input.style.pointerEvents = "auto";
-      input.style.position = "static";
-      input.style.left = "auto";
-    } else {
-      input.classList.add("hidden");
-      input.style.display = "";
-      input.style.width = "";
-      input.style.minWidth = "";
-      input.style.maxWidth = "";
-      input.style.height = "";
-      input.style.padding = "";
-      input.style.border = "";
-      input.style.borderRadius = "";
-      input.style.background = "";
-      input.style.color = "";
-      input.style.opacity = "";
-      input.style.pointerEvents = "";
-      input.style.position = "";
-      input.style.left = "";
-    }
+  if (visible) {
+    input.classList.remove("hidden");
+    input.style.display = "block";
+    input.style.width = "100%";
+    input.style.minWidth = "0";
+    input.style.maxWidth = "100%";
+    input.style.height = "48px";
+    input.style.padding = "0 16px";
+    input.style.border = "1px solid rgba(255,255,255,0.08)";
+    input.style.borderRadius = "18px";
+    input.style.background = "rgba(255,255,255,0.06)";
+    input.style.color = "#f3f4f8";
+    input.style.opacity = "1";
+    input.style.pointerEvents = "auto";
+    input.style.position = "static";
+    input.style.left = "auto";
+  } else {
+    input.classList.add("hidden");
+    input.style.display = "";
+    input.style.width = "";
+    input.style.minWidth = "";
+    input.style.maxWidth = "";
+    input.style.height = "";
+    input.style.padding = "";
+    input.style.border = "";
+    input.style.borderRadius = "";
+    input.style.background = "";
+    input.style.color = "";
+    input.style.opacity = "";
+    input.style.pointerEvents = "";
+    input.style.position = "";
+    input.style.left = "";
   }
+}
 
   function openNativePicker(input) {
     if (!input) return;
@@ -481,36 +461,6 @@ function openAnalyticsMonthWheel() {
 function closeAnalyticsMonthWheel() {
   analyticsMonthWheelWrap?.classList.add("hidden");
 }
-
-  function populateMonthSelect(selectEl, selectedValue) {
-    if (!selectEl) return;
-
-    const baseValue = selectedValue || getCurrentMonthValue();
-    const [baseYear, baseMonth] = baseValue.split("-").map(Number);
-    const baseDate = new Date(baseYear, baseMonth - 1, 1);
-
-    const options = [];
-
-    for (let offset = -18; offset <= 18; offset++) {
-      const d = new Date(baseDate.getFullYear(), baseDate.getMonth() + offset, 1);
-      const value = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
-      const label = d.toLocaleDateString("ru-RU", {
-        month: "long",
-        year: "numeric",
-      });
-
-      options.push({
-        value,
-        label: label.charAt(0).toUpperCase() + label.slice(1),
-      });
-    }
-
-    selectEl.innerHTML = options
-      .map((item) => `<option value="${item.value}">${item.label}</option>`)
-      .join("");
-
-    selectEl.value = baseValue;
-  }
 
   function getAnalyticsPeriodLabel() {
     if (analyticsFilterPeriod === "month") {
@@ -1375,10 +1325,7 @@ function closeAnalyticsMonthWheel() {
     }
 
     analyticsPeriodButtons.forEach((btn) => {
-      analyticsMonthBtn?.addEventListener("click", () => {
-  analyticsFilterPeriod = "month";
-  renderAnalytics();
-  openAnalyticsMonthWheel();
+  btn.classList.toggle("is-active", btn.dataset.analyticsPeriod === analyticsFilterPeriod);
 });
       btn.classList.toggle("is-active", btn.dataset.analyticsPeriod === analyticsFilterPeriod);
     });
@@ -1945,33 +1892,40 @@ if (analyticsMonthWheelWrap) {
   navBudgetBtn?.addEventListener("click", showBudgetView);
 
   analyticsPeriodButtons.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    analyticsFilterPeriod = btn.dataset.analyticsPeriod;
+    
+    analyticsMonthBtn?.addEventListener("click", () => {
+  analyticsFilterPeriod = "month";
+  openAnalyticsMonthWheel();
+  renderAnalytics();
+});
+
     if (analyticsFilterPeriod !== "month") {
-  closeAnalyticsMonthWheel();
-}
-    btn.addEventListener("click", () => {
-      analyticsFilterPeriod = btn.dataset.analyticsPeriod;
+      closeAnalyticsMonthWheel();
+    }
 
-      if (analyticsFilterPeriod === "range") {
-        const today = getTodayDateValue();
-        analyticsRangeStart = analyticsRangeStart || today;
-        analyticsRangeEnd = analyticsRangeEnd || today;
+    if (analyticsFilterPeriod === "range") {
+      const today = getTodayDateValue();
+      analyticsRangeStart = analyticsRangeStart || today;
+      analyticsRangeEnd = analyticsRangeEnd || today;
 
-        if (analyticsRangeFromInput) {
-          analyticsRangeFromInput.value = analyticsRangeStart;
-        }
-
-        if (analyticsRangeToInput) {
-          analyticsRangeToInput.value = analyticsRangeEnd;
-        }
-
-        setNativePickerVisibility(analyticsRangeFromInput, true);
-        setNativePickerVisibility(analyticsRangeToInput, true);
-        openNativePicker(analyticsRangeFromInput);
+      if (analyticsRangeFromInput) {
+        analyticsRangeFromInput.value = analyticsRangeStart;
       }
 
-      renderAnalytics();
-    });
+      if (analyticsRangeToInput) {
+        analyticsRangeToInput.value = analyticsRangeEnd;
+      }
+
+      setNativePickerVisibility(analyticsRangeFromInput, true);
+      setNativePickerVisibility(analyticsRangeToInput, true);
+      openNativePicker(analyticsRangeFromInput);
+    }
+
+    renderAnalytics();
   });
+});
 
   analyticsRangeFromInput?.addEventListener("change", () => {
     if (!analyticsRangeFromInput.value) return;
