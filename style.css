@@ -1352,6 +1352,11 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   box-shadow: none;
 }
 
+.analytics-limit-value--danger {
+  color: #ff8c82 !important;
+  text-shadow: 0 0 14px rgba(255, 114, 104, 0.16);
+}
+
 /* =========================================================
    15. BUDGET VIEW
    ========================================================= */
