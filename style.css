@@ -173,7 +173,6 @@ button {
 
 .app--history .header,
 .app--analytics .header,
-.app--budget .header {
   display: none;
 }
 
@@ -538,8 +537,8 @@ button {
 
 .bottom-nav {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 6px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
   padding: 8px;
   border-radius: 26px;
   background: rgba(31, 34, 43, 0.78);
@@ -972,13 +971,11 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   cursor: pointer;
 }
 
-#analyticsView,
-#budgetView {
+#analyticsView {
   padding-bottom: 8px;
 }
 
-#analyticsView .section,
-#budgetView .section {
+#analyticsView .section {
   margin-top: 18px;
 }
 
