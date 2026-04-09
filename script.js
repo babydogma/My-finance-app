@@ -46,6 +46,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   const analyticsMonthWheelWrap = document.getElementById("analyticsMonthWheelWrap");
   const analyticsMonthNamesColumn = document.getElementById("analyticsMonthNamesColumn");
   const analyticsMonthYearsColumn = document.getElementById("analyticsMonthYearsColumn");
+  const analyticsMonthResetBtn = document.getElementById("analyticsMonthResetBtn");
+  const analyticsMonthApplyBtn = document.getElementById("analyticsMonthApplyBtn");
   const analyticsRangeFromInput = document.getElementById("analyticsRangeFromInput");
   const analyticsRangeToInput = document.getElementById("analyticsRangeToInput");
   const analyticsSelectedPeriodLabel = document.getElementById("analyticsSelectedPeriodLabel");
@@ -93,10 +95,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   let analyticsSelectedMonth = getCurrentMonthValue();
   let analyticsRangeStart = "";
   let analyticsRangeEnd = "";
-  
+
   let analyticsDraftMonth = "";
   let analyticsDraftYear = "";
-  
+  let isAnalyticsMonthWheelOpen = false;
+
   let analyticsMode = "categories";
   let analyticsOperationType = "all";
 
@@ -130,22 +133,22 @@ document.addEventListener("DOMContentLoaded", async () => {
   function getBudgetLimitByCategoryId(categoryId) {
     return state.budgetLimits.find((item) => item.category_id === categoryId);
   }
-  
+
   function getBudgetLimitLabel(categoryId) {
-  const record = getBudgetLimitByCategoryId(categoryId);
-  const amount = record ? Number(record.monthly_limit) || 0 : 0;
-  return amount > 0 ? formatMoney(amount) : "—";
-}
+    const record = getBudgetLimitByCategoryId(categoryId);
+    const amount = record ? Number(record.monthly_limit) || 0 : 0;
+    return amount > 0 ? formatMoney(amount) : "—";
+  }
 
-function getAnalyticsSpentLimitLabel(spent, categoryId) {
-  return `${formatMoney(spent)} / ${getBudgetLimitLabel(categoryId)}`;
-}
+  function getAnalyticsSpentLimitLabel(spent, categoryId) {
+    return `${formatMoney(spent)} / ${getBudgetLimitLabel(categoryId)}`;
+  }
 
-function isBudgetExceeded(spent, categoryId) {
-  const record = getBudgetLimitByCategoryId(categoryId);
-  const limit = record ? Number(record.monthly_limit) || 0 : 0;
-  return limit > 0 && spent > limit;
-}
+  function isBudgetExceeded(spent, categoryId) {
+    const record = getBudgetLimitByCategoryId(categoryId);
+    const limit = record ? Number(record.monthly_limit) || 0 : 0;
+    return limit > 0 && spent > limit;
+  }
 
   function getAppMetaValue(key) {
     const item = state.appMeta.find((entry) => entry.key === key);
@@ -193,42 +196,42 @@ function isBudgetExceeded(spent, categoryId) {
   }
 
   function setNativePickerVisibility(input, visible) {
-  if (!input) return;
+    if (!input) return;
 
-  if (visible) {
-    input.classList.remove("hidden");
-    input.style.display = "block";
-    input.style.width = "100%";
-    input.style.minWidth = "0";
-    input.style.maxWidth = "100%";
-    input.style.height = "48px";
-    input.style.padding = "0 16px";
-    input.style.border = "1px solid rgba(255,255,255,0.08)";
-    input.style.borderRadius = "18px";
-    input.style.background = "rgba(255,255,255,0.06)";
-    input.style.color = "#f3f4f8";
-    input.style.opacity = "1";
-    input.style.pointerEvents = "auto";
-    input.style.position = "static";
-    input.style.left = "auto";
-  } else {
-    input.classList.add("hidden");
-    input.style.display = "";
-    input.style.width = "";
-    input.style.minWidth = "";
-    input.style.maxWidth = "";
-    input.style.height = "";
-    input.style.padding = "";
-    input.style.border = "";
-    input.style.borderRadius = "";
-    input.style.background = "";
-    input.style.color = "";
-    input.style.opacity = "";
-    input.style.pointerEvents = "";
-    input.style.position = "";
-    input.style.left = "";
+    if (visible) {
+      input.classList.remove("hidden");
+      input.style.display = "block";
+      input.style.width = "100%";
+      input.style.minWidth = "0";
+      input.style.maxWidth = "100%";
+      input.style.height = "48px";
+      input.style.padding = "0 16px";
+      input.style.border = "1px solid rgba(255,255,255,0.08)";
+      input.style.borderRadius = "18px";
+      input.style.background = "rgba(255,255,255,0.06)";
+      input.style.color = "#f3f4f8";
+      input.style.opacity = "1";
+      input.style.pointerEvents = "auto";
+      input.style.position = "static";
+      input.style.left = "auto";
+    } else {
+      input.classList.add("hidden");
+      input.style.display = "";
+      input.style.width = "";
+      input.style.minWidth = "";
+      input.style.maxWidth = "";
+      input.style.height = "";
+      input.style.padding = "";
+      input.style.border = "";
+      input.style.borderRadius = "";
+      input.style.background = "";
+      input.style.color = "";
+      input.style.opacity = "";
+      input.style.pointerEvents = "";
+      input.style.position = "";
+      input.style.left = "";
+    }
   }
-}
 
   function openNativePicker(input) {
     if (!input) return;
@@ -330,149 +333,166 @@ function isBudgetExceeded(spent, categoryId) {
 
     return monthLabel.charAt(0).toUpperCase() + monthLabel.slice(1);
   }
-  
+
   function getRussianMonthNames() {
-  return [
-    "Январь",
-    "Февраль",
-    "Март",
-    "Апрель",
-    "Май",
-    "Июнь",
-    "Июль",
-    "Август",
-    "Сентябрь",
-    "Октябрь",
-    "Ноябрь",
-    "Декабрь",
-  ];
-}
-
-function setAnalyticsDraftMonthFromValue(monthValue) {
-  const safeValue = monthValue || getCurrentMonthValue();
-  const [year, month] = safeValue.split("-");
-  analyticsDraftYear = year;
-  analyticsDraftMonth = month;
-}
-
-function getAnalyticsDraftMonthValue() {
-  return `${analyticsDraftYear}-${analyticsDraftMonth}`;
-}
-
-function getAnalyticsWheelYears() {
-  const currentYear = new Date().getFullYear();
-  const years = [];
-  for (let year = currentYear - 3; year <= currentYear + 4; year++) {
-    years.push(String(year));
+    return [
+      "Январь",
+      "Февраль",
+      "Март",
+      "Апрель",
+      "Май",
+      "Июнь",
+      "Июль",
+      "Август",
+      "Сентябрь",
+      "Октябрь",
+      "Ноябрь",
+      "Декабрь",
+    ];
   }
-  return years;
-}
 
-function buildWheelColumnItems(items, activeValue, dataAttr) {
-  const spacer = `<div class="month-wheel__item month-wheel__item--spacer"></div>`;
+  function setAnalyticsDraftMonthFromValue(monthValue) {
+    const safeValue = monthValue || getCurrentMonthValue();
+    const [year, month] = safeValue.split("-");
+    analyticsDraftYear = year;
+    analyticsDraftMonth = month;
+  }
 
-  const content = items
-    .map((item) => {
-      const value = typeof item === "string" ? item : item.value;
-      const label = typeof item === "string" ? item : item.label;
-      const activeClass = value === activeValue ? " is-active" : "";
+  function getAnalyticsDraftMonthValue() {
+    return `${analyticsDraftYear}-${analyticsDraftMonth}`;
+  }
 
-      return `
-        <button
-          class="month-wheel__item${activeClass}"
-          type="button"
-          ${dataAttr}="${value}"
-        >
-          ${label}
-        </button>
-      `;
-    })
-    .join("");
+  function getAnalyticsWheelYears() {
+    const currentYear = new Date().getFullYear();
+    const years = [];
+    for (let year = currentYear - 3; year <= currentYear + 4; year++) {
+      years.push(String(year));
+    }
+    return years;
+  }
 
-  return `${spacer}${spacer}${content}${spacer}${spacer}`;
-}
+  function buildWheelColumnItems(items, activeValue, dataAttr) {
+    const spacer = `<div class="month-wheel__item month-wheel__item--spacer"></div>`;
 
-function syncWheelColumnPosition(container, activeSelector) {
-  if (!container) return;
-  const activeEl = container.querySelector(activeSelector);
-  if (!activeEl) return;
+    const content = items
+      .map((item) => {
+        const value = typeof item === "string" ? item : item.value;
+        const label = typeof item === "string" ? item : item.label;
+        const activeClass = value === activeValue ? " is-active" : "";
 
-  const top = activeEl.offsetTop - (container.clientHeight / 2) + (activeEl.clientHeight / 2);
-  container.scrollTo({ top, behavior: "auto" });
-}
+        return `
+          <button
+            class="month-wheel__item${activeClass}"
+            type="button"
+            ${dataAttr}="${value}"
+          >
+            ${label}
+          </button>
+        `;
+      })
+      .join("");
 
-function renderAnalyticsMonthWheel() {
-  if (!analyticsMonthNamesColumn || !analyticsMonthYearsColumn) return;
+    return `${spacer}${spacer}${content}${spacer}${spacer}`;
+  }
 
-  const monthNames = getRussianMonthNames().map((label, index) => ({
-    value: String(index + 1).padStart(2, "0"),
-    label,
-  }));
+  function syncWheelColumnPosition(container, activeSelector) {
+    if (!container) return;
+    const activeEl = container.querySelector(activeSelector);
+    if (!activeEl) return;
 
-  const years = getAnalyticsWheelYears().map((year) => ({
-    value: year,
-    label: year,
-  }));
+    const top =
+      activeEl.offsetTop - container.clientHeight / 2 + activeEl.clientHeight / 2;
+    container.scrollTo({ top, behavior: "auto" });
+  }
 
-  analyticsMonthNamesColumn.innerHTML = buildWheelColumnItems(
-    monthNames,
-    analyticsDraftMonth,
-    "data-wheel-month"
-  );
+  function renderAnalyticsMonthWheel() {
+    if (!analyticsMonthNamesColumn || !analyticsMonthYearsColumn) return;
 
-  analyticsMonthYearsColumn.innerHTML = buildWheelColumnItems(
-    years,
-    analyticsDraftYear,
-    "data-wheel-year"
-  );
+    const monthNames = getRussianMonthNames().map((label, index) => ({
+      value: String(index + 1).padStart(2, "0"),
+      label,
+    }));
 
-  analyticsMonthNamesColumn.querySelectorAll("[data-wheel-month]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      analyticsDraftMonth = btn.dataset.wheelMonth;
-      analyticsSelectedMonth = getAnalyticsDraftMonthValue();
-      analyticsFilterPeriod = "month";
-      renderAnalytics();
-      requestAnimationFrame(() => syncWheelColumnPosition(
+    const years = getAnalyticsWheelYears().map((year) => ({
+      value: year,
+      label: year,
+    }));
+
+    analyticsMonthNamesColumn.innerHTML = buildWheelColumnItems(
+      monthNames,
+      analyticsDraftMonth,
+      "data-wheel-month"
+    );
+
+    analyticsMonthYearsColumn.innerHTML = buildWheelColumnItems(
+      years,
+      analyticsDraftYear,
+      "data-wheel-year"
+    );
+
+    analyticsMonthNamesColumn.querySelectorAll("[data-wheel-month]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        analyticsDraftMonth = btn.dataset.wheelMonth;
+        renderAnalyticsMonthWheel();
+
+        requestAnimationFrame(() =>
+          syncWheelColumnPosition(
+            analyticsMonthNamesColumn,
+            `.month-wheel__item[data-wheel-month="${analyticsDraftMonth}"]`
+          )
+        );
+      });
+    });
+
+    analyticsMonthYearsColumn.querySelectorAll("[data-wheel-year]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        analyticsDraftYear = btn.dataset.wheelYear;
+        renderAnalyticsMonthWheel();
+
+        requestAnimationFrame(() =>
+          syncWheelColumnPosition(
+            analyticsMonthYearsColumn,
+            `.month-wheel__item[data-wheel-year="${analyticsDraftYear}"]`
+          )
+        );
+      });
+    });
+
+    requestAnimationFrame(() => {
+      syncWheelColumnPosition(
         analyticsMonthNamesColumn,
         `.month-wheel__item[data-wheel-month="${analyticsDraftMonth}"]`
-      ));
-    });
-  });
-
-  analyticsMonthYearsColumn.querySelectorAll("[data-wheel-year]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      analyticsDraftYear = btn.dataset.wheelYear;
-      analyticsSelectedMonth = getAnalyticsDraftMonthValue();
-      analyticsFilterPeriod = "month";
-      renderAnalytics();
-      requestAnimationFrame(() => syncWheelColumnPosition(
+      );
+      syncWheelColumnPosition(
         analyticsMonthYearsColumn,
         `.month-wheel__item[data-wheel-year="${analyticsDraftYear}"]`
-      ));
+      );
     });
-  });
+  }
 
-  requestAnimationFrame(() => {
-    syncWheelColumnPosition(
-      analyticsMonthNamesColumn,
-      `.month-wheel__item[data-wheel-month="${analyticsDraftMonth}"]`
-    );
-    syncWheelColumnPosition(
-      analyticsMonthYearsColumn,
-      `.month-wheel__item[data-wheel-year="${analyticsDraftYear}"]`
-    );
-  });
-}
+  function openAnalyticsMonthWheel() {
+    setAnalyticsDraftMonthFromValue(analyticsSelectedMonth);
+    isAnalyticsMonthWheelOpen = true;
+    analyticsMonthWheelWrap?.classList.remove("hidden");
+    renderAnalyticsMonthWheel();
+  }
 
-function openAnalyticsMonthWheel() {
-  setAnalyticsDraftMonthFromValue(analyticsSelectedMonth);
-  analyticsMonthWheelWrap?.classList.remove("hidden");
-  renderAnalyticsMonthWheel();
-}
+  function closeAnalyticsMonthWheel() {
+    isAnalyticsMonthWheelOpen = false;
+    analyticsMonthWheelWrap?.classList.add("hidden");
+  }
 
-function closeAnalyticsMonthWheel() {
-  analyticsMonthWheelWrap?.classList.add("hidden");
-}
+  function applyAnalyticsMonthWheel() {
+    analyticsSelectedMonth = getAnalyticsDraftMonthValue();
+    analyticsFilterPeriod = "month";
+    closeAnalyticsMonthWheel();
+    renderAnalytics();
+  }
+
+  function resetAnalyticsMonthWheel() {
+    setAnalyticsDraftMonthFromValue(getCurrentMonthValue());
+    renderAnalyticsMonthWheel();
+  }
 
   function getAnalyticsPeriodLabel() {
     if (analyticsFilterPeriod === "month") {
@@ -555,18 +575,20 @@ function closeAnalyticsMonthWheel() {
   }
 
   function showWalletView() {
-    document.querySelector(".app")?.classList.remove("app--budget", "app--analytics");
+    document.querySelector(".app")?.classList.remove("app--analytics");
     mainView.classList.remove("hidden");
     categoriesManagerView.classList.add("hidden");
     analyticsView.classList.add("hidden");
+    closeAnalyticsMonthWheel();
     setActiveNav("wallet");
   }
 
   function openCategoriesManager() {
-    document.querySelector(".app")?.classList.remove("app--budget", "app--analytics");
+    document.querySelector(".app")?.classList.remove("app--analytics");
     mainView.classList.add("hidden");
     categoriesManagerView.classList.remove("hidden");
     analyticsView.classList.add("hidden");
+    closeAnalyticsMonthWheel();
     setActiveNav("wallet");
   }
 
@@ -575,7 +597,6 @@ function closeAnalyticsMonthWheel() {
   }
 
   function showAnalyticsView() {
-    document.querySelector(".app")?.classList.remove("app--budget");
     document.querySelector(".app")?.classList.add("app--analytics");
     mainView.classList.add("hidden");
     categoriesManagerView.classList.add("hidden");
@@ -619,20 +640,20 @@ function closeAnalyticsMonthWheel() {
     const transactions = getAnalyticsTransactionsByCategory(categoryId);
 
     analyticsCategoryModalTitle.textContent = title;
-analyticsCategoryModalPeriodLabel.textContent = periodLabel;
-analyticsCategoryTransactionsList.innerHTML = "";
+    analyticsCategoryModalPeriodLabel.textContent = periodLabel;
+    analyticsCategoryTransactionsList.innerHTML = "";
 
-if (analyticsCategoryBudgetBtn) {
-  if (isTransferCategory) {
-    analyticsCategoryBudgetBtn.textContent = "—";
-    analyticsCategoryBudgetBtn.onclick = null;
-    analyticsCategoryBudgetBtn.disabled = true;
-  } else {
-    analyticsCategoryBudgetBtn.textContent = getBudgetLimitLabel(categoryId);
-    analyticsCategoryBudgetBtn.disabled = false;
-    analyticsCategoryBudgetBtn.onclick = () => openBudgetModal(categoryId);
-  }
-}
+    if (analyticsCategoryBudgetBtn) {
+      if (isTransferCategory) {
+        analyticsCategoryBudgetBtn.textContent = "—";
+        analyticsCategoryBudgetBtn.onclick = null;
+        analyticsCategoryBudgetBtn.disabled = true;
+      } else {
+        analyticsCategoryBudgetBtn.textContent = getBudgetLimitLabel(categoryId);
+        analyticsCategoryBudgetBtn.disabled = false;
+        analyticsCategoryBudgetBtn.onclick = () => openBudgetModal(categoryId);
+      }
+    }
 
     if (!transactions.length) {
       const empty = document.createElement("div");
@@ -737,7 +758,9 @@ if (analyticsCategoryBudgetBtn) {
       fillExpenseCategorySelect(transaction.category_id || UNCATEGORIZED_ID);
 
       amountInput.value = transaction.amount;
-      dateInput.value = transaction.created_at ? String(transaction.created_at).slice(0, 10) : getTodayDateValue();
+      dateInput.value = transaction.created_at
+        ? String(transaction.created_at).slice(0, 10)
+        : getTodayDateValue();
       accountSelect.value = transaction.account;
       commentInput.value = transaction.title === "Новая трата" ? "" : transaction.title;
     } else if (transaction.type === "income") {
@@ -750,7 +773,9 @@ if (analyticsCategoryBudgetBtn) {
       toAccountField.classList.add("hidden");
 
       amountInput.value = transaction.amount;
-      dateInput.value = transaction.created_at ? String(transaction.created_at).slice(0, 10) : getTodayDateValue();
+      dateInput.value = transaction.created_at
+        ? String(transaction.created_at).slice(0, 10)
+        : getTodayDateValue();
       accountSelect.value = transaction.account;
       commentInput.value = transaction.title === "Новый доход" ? "" : transaction.title;
     } else if (transaction.type === "transfer") {
@@ -763,7 +788,9 @@ if (analyticsCategoryBudgetBtn) {
       toAccountField.classList.remove("hidden");
 
       amountInput.value = transaction.amount;
-      dateInput.value = transaction.created_at ? String(transaction.created_at).slice(0, 10) : getTodayDateValue();
+      dateInput.value = transaction.created_at
+        ? String(transaction.created_at).slice(0, 10)
+        : getTodayDateValue();
       fromAccountSelect.value = transaction.from_account;
       toAccountSelect.value = transaction.to_account;
       commentInput.value = transaction.title === "Перевод" ? "" : transaction.title;
@@ -911,25 +938,6 @@ if (analyticsCategoryBudgetBtn) {
     }
 
     return sortTransactionsByLatest(items);
-  }
-
-  function getCurrentMonthExpenseByCategory(categoryId) {
-    const now = new Date();
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
-
-    return state.transactions.reduce((sum, transaction) => {
-      if (transaction.type !== "expense") return sum;
-      if ((transaction.category_id || UNCATEGORIZED_ID) !== categoryId) return sum;
-
-      const time = transaction.created_at ? new Date(transaction.created_at).getTime() : 0;
-      if (time < startOfMonth) return sum;
-
-      return sum + (Number(transaction.amount) || 0);
-    }, 0);
-  }
-
-  function getBudgetCategories() {
-    return state.categories.filter((category) => category.id !== UNCATEGORIZED_ID);
   }
 
   async function applySafeInterestIfNeeded() {
@@ -1164,7 +1172,9 @@ if (analyticsCategoryBudgetBtn) {
       deleteBtn?.addEventListener("click", async () => {
         if (category.locked) return;
 
-        const ok = confirm(`Удалить категорию "${category.name}"? Все старые расходы перейдут в "Без категории". Лимит бюджета тоже удалится.`);
+        const ok = confirm(
+          `Удалить категорию "${category.name}"? Все старые расходы перейдут в "Без категории". Лимит бюджета тоже удалится.`
+        );
         if (!ok) return;
 
         const { error: txError } = await supabaseClient
@@ -1221,7 +1231,7 @@ if (analyticsCategoryBudgetBtn) {
         : getCategoryIcon(transaction.category_id || UNCATEGORIZED_ID);
 
     const toneKey =
-      transaction.type === "expense" ? (transaction.category_id || UNCATEGORIZED_ID) : "";
+      transaction.type === "expense" ? transaction.category_id || UNCATEGORIZED_ID : "";
 
     const iconToneClass = getIconToneClass(transaction.type, toneKey);
 
@@ -1313,193 +1323,187 @@ if (analyticsCategoryBudgetBtn) {
   }
 
   function renderAnalytics() {
-  if (!analyticsView) return;
+    if (!analyticsView) return;
 
-  const summary = getAnalyticsSummary();
-  const breakdown = getAnalyticsCategoryBreakdown();
+    const summary = getAnalyticsSummary();
+    const breakdown = getAnalyticsCategoryBreakdown();
 
-  analyticsIncomeValue.textContent = formatMoney(summary.income);
-  analyticsExpenseValue.textContent = formatMoney(summary.expense);
+    analyticsIncomeValue.textContent = formatMoney(summary.income);
+    analyticsExpenseValue.textContent = formatMoney(summary.expense);
 
-  analyticsNetValue.classList.remove("is-positive", "is-negative");
+    analyticsNetValue.classList.remove("is-positive", "is-negative");
 
-  if (summary.net > 0) {
-    analyticsNetValue.textContent = `+${formatMoney(summary.net)}`;
-    analyticsNetValue.classList.add("is-positive");
-  } else if (summary.net < 0) {
-    analyticsNetValue.textContent = `−${formatMoney(Math.abs(summary.net))}`;
-    analyticsNetValue.classList.add("is-negative");
-  } else {
-    analyticsNetValue.textContent = formatMoney(0);
-  }
-
-  analyticsPeriodButtons.forEach((btn) => {
-    btn.classList.toggle("is-active", btn.dataset.analyticsPeriod === analyticsFilterPeriod);
-  });
-
-  analyticsTypeButtons.forEach((btn) => {
-    btn.classList.toggle("is-active", btn.dataset.analyticsType === analyticsOperationType);
-  });
-
-  analyticsModeCategoriesBtn?.classList.toggle("is-active", analyticsMode === "categories");
-  analyticsModeOperationsBtn?.classList.toggle("is-active", analyticsMode === "operations");
-
-  analyticsCategoriesSection?.classList.toggle("hidden", analyticsMode !== "categories");
-  analyticsTotalsSection?.classList.toggle("hidden", analyticsMode !== "categories");
-  analyticsCategoriesBreakdownSection?.classList.toggle("hidden", analyticsMode !== "categories");
-
-  analyticsOperationsSection?.classList.toggle("hidden", analyticsMode !== "operations");
-  analyticsOperationTypeFilters?.classList.toggle("hidden", analyticsMode !== "operations");
-
-  const isAnalyticsRange = analyticsFilterPeriod === "range";
-
-  setNativePickerVisibility(analyticsRangeFromInput, isAnalyticsRange);
-  setNativePickerVisibility(analyticsRangeToInput, isAnalyticsRange);
-
-  if (analyticsMonthBtn) {
-    analyticsMonthBtn.textContent = formatMonthButtonLabel(analyticsSelectedMonth);
-  }
-
-  if (analyticsMonthWheelWrap) {
-    const shouldShowWheel = analyticsFilterPeriod === "month";
-    analyticsMonthWheelWrap.classList.toggle("hidden", !shouldShowWheel);
-
-    if (shouldShowWheel) {
-      setAnalyticsDraftMonthFromValue(analyticsSelectedMonth);
-      renderAnalyticsMonthWheel();
+    if (summary.net > 0) {
+      analyticsNetValue.textContent = `+${formatMoney(summary.net)}`;
+      analyticsNetValue.classList.add("is-positive");
+    } else if (summary.net < 0) {
+      analyticsNetValue.textContent = `−${formatMoney(Math.abs(summary.net))}`;
+      analyticsNetValue.classList.add("is-negative");
+    } else {
+      analyticsNetValue.textContent = formatMoney(0);
     }
-  }
 
-  if (analyticsSelectedPeriodLabel) {
-    analyticsSelectedPeriodLabel.classList.add("hidden");
-    analyticsSelectedPeriodLabel.textContent = "";
-    analyticsSelectedPeriodLabel.style.display = "none";
-  }
+    analyticsPeriodButtons.forEach((btn) => {
+      btn.classList.toggle("is-active", btn.dataset.analyticsPeriod === analyticsFilterPeriod);
+    });
 
-  renderAnalyticsOperations();
+    analyticsTypeButtons.forEach((btn) => {
+      btn.classList.toggle("is-active", btn.dataset.analyticsType === analyticsOperationType);
+    });
 
-  const periodLabel = getAnalyticsPeriodLabel() || "Период";
-  const totalExpense = breakdown.reduce((sum, item) => sum + item.amount, 0);
+    analyticsModeCategoriesBtn?.classList.toggle("is-active", analyticsMode === "categories");
+    analyticsModeOperationsBtn?.classList.toggle("is-active", analyticsMode === "operations");
 
-  if (!breakdown.length) {
+    analyticsCategoriesSection?.classList.toggle("hidden", analyticsMode !== "categories");
+    analyticsTotalsSection?.classList.toggle("hidden", analyticsMode !== "categories");
+    analyticsCategoriesBreakdownSection?.classList.toggle("hidden", analyticsMode !== "categories");
+
+    analyticsOperationsSection?.classList.toggle("hidden", analyticsMode !== "operations");
+    analyticsOperationTypeFilters?.classList.toggle("hidden", analyticsMode !== "operations");
+
+    const isAnalyticsRange = analyticsFilterPeriod === "range";
+
+    setNativePickerVisibility(analyticsRangeFromInput, isAnalyticsRange);
+    setNativePickerVisibility(analyticsRangeToInput, isAnalyticsRange);
+
+    if (analyticsMonthBtn) {
+      analyticsMonthBtn.textContent = formatMonthButtonLabel(analyticsSelectedMonth);
+    }
+
+    if (analyticsMonthWheelWrap) {
+      analyticsMonthWheelWrap.classList.toggle("hidden", !isAnalyticsMonthWheelOpen);
+    }
+
+    if (analyticsSelectedPeriodLabel) {
+      analyticsSelectedPeriodLabel.classList.add("hidden");
+      analyticsSelectedPeriodLabel.textContent = "";
+      analyticsSelectedPeriodLabel.style.display = "none";
+    }
+
+    renderAnalyticsOperations();
+
+    const periodLabel = getAnalyticsPeriodLabel() || "Период";
+    const totalExpense = breakdown.reduce((sum, item) => sum + item.amount, 0);
+
+    if (!breakdown.length) {
+      analyticsDonut.innerHTML = `
+        <div class="analytics-panel">
+          <div class="analytics-panel__eyebrow">Расходы по категориям</div>
+
+          <div class="analytics-panel__headline">
+            <div class="analytics-panel__total">${formatMoney(0)}</div>
+            <div class="analytics-panel__period">${escapeHtml(periodLabel)}</div>
+          </div>
+
+          <div class="analytics-leader analytics-leader--empty">
+            <div class="analytics-leader__left">
+              <div class="analytics-breakdown-row__rank analytics-breakdown-row__rank--leader">#1</div>
+
+              <div class="analytics-leader__content">
+                <div class="analytics-leader__label">Лидер</div>
+                <div class="analytics-leader__title">Нет данных</div>
+                <div class="analytics-leader__meta">За выбранный период нет расходов</div>
+              </div>
+            </div>
+
+            <div class="analytics-leader__value">—</div>
+          </div>
+        </div>
+      `;
+
+      analyticsLegend.innerHTML = `
+        <div class="analytics-breakdown-list analytics-breakdown-list--empty">
+          <div class="analytics-empty">Нет данных по расходам за выбранный период</div>
+        </div>
+      `;
+      return;
+    }
+
+    const topItem = breakdown[0];
+    const topPercent = totalExpense > 0 ? Math.round((topItem.amount / totalExpense) * 100) : 0;
+    const topExceeded = isBudgetExceeded(topItem.amount, topItem.id);
+
     analyticsDonut.innerHTML = `
       <div class="analytics-panel">
         <div class="analytics-panel__eyebrow">Расходы по категориям</div>
 
         <div class="analytics-panel__headline">
-          <div class="analytics-panel__total">${formatMoney(0)}</div>
+          <div class="analytics-panel__total">${formatMoney(totalExpense)}</div>
           <div class="analytics-panel__period">${escapeHtml(periodLabel)}</div>
         </div>
 
-        <div class="analytics-leader analytics-leader--empty">
+        <button
+          class="analytics-leader analytics-leader--button"
+          type="button"
+          data-analytics-category-id="${escapeHtml(topItem.id)}"
+        >
           <div class="analytics-leader__left">
             <div class="analytics-breakdown-row__rank analytics-breakdown-row__rank--leader">#1</div>
 
             <div class="analytics-leader__content">
               <div class="analytics-leader__label">Лидер</div>
-              <div class="analytics-leader__title">Нет данных</div>
-              <div class="analytics-leader__meta">За выбранный период нет расходов</div>
+              <div class="analytics-leader__title">${escapeHtml(topItem.icon)} ${escapeHtml(topItem.name)}</div>
+              <div class="analytics-leader__meta">${topPercent}% от расходов</div>
             </div>
           </div>
 
-          <div class="analytics-leader__value">—</div>
-        </div>
+          <div class="analytics-leader__value ${topExceeded ? "analytics-limit-value--danger" : ""}">
+            ${getAnalyticsSpentLimitLabel(topItem.amount, topItem.id)}
+          </div>
+        </button>
       </div>
     `;
+
+    const restItems = breakdown.slice(1);
+
+    const listMarkup = restItems
+      .map((item, index) => {
+        const percent = totalExpense > 0 ? Math.round((item.amount / totalExpense) * 100) : 0;
+        const exceeded = isBudgetExceeded(item.amount, item.id);
+
+        return `
+          <button
+            class="analytics-breakdown-row analytics-breakdown-row--button"
+            type="button"
+            data-analytics-category-id="${escapeHtml(item.id)}"
+          >
+            <div class="analytics-breakdown-row__left">
+              <div class="analytics-breakdown-row__rank">#${index + 2}</div>
+              <div class="analytics-breakdown-row__body">
+                <div class="analytics-breakdown-row__title">${escapeHtml(item.icon)} ${escapeHtml(item.name)}</div>
+                <div class="analytics-breakdown-row__subtitle">${percent}% от расходов</div>
+              </div>
+            </div>
+            <div class="analytics-breakdown-row__value ${exceeded ? "analytics-limit-value--danger" : ""}">
+              ${getAnalyticsSpentLimitLabel(item.amount, item.id)}
+            </div>
+          </button>
+        `;
+      })
+      .join("");
 
     analyticsLegend.innerHTML = `
-      <div class="analytics-breakdown-list analytics-breakdown-list--empty">
-        <div class="analytics-empty">Нет данных по расходам за выбранный период</div>
+      <div class="analytics-breakdown-list">
+        ${listMarkup}
       </div>
     `;
-    return;
+
+    analyticsDonut
+      .querySelectorAll("[data-analytics-category-id]")
+      .forEach((el) => {
+        el.addEventListener("click", () => {
+          openAnalyticsCategoryModal(el.dataset.analyticsCategoryId);
+        });
+      });
+
+    analyticsLegend
+      .querySelectorAll("[data-analytics-category-id]")
+      .forEach((el) => {
+        el.addEventListener("click", () => {
+          openAnalyticsCategoryModal(el.dataset.analyticsCategoryId);
+        });
+      });
   }
-
-  const topItem = breakdown[0];
-const topPercent = totalExpense > 0 ? Math.round((topItem.amount / totalExpense) * 100) : 0;
-const topExceeded = isBudgetExceeded(topItem.amount, topItem.id);
-
-  analyticsDonut.innerHTML = `
-    <div class="analytics-panel">
-      <div class="analytics-panel__eyebrow">Расходы по категориям</div>
-
-      <div class="analytics-panel__headline">
-        <div class="analytics-panel__total">${formatMoney(totalExpense)}</div>
-        <div class="analytics-panel__period">${escapeHtml(periodLabel)}</div>
-      </div>
-
-      <button
-        class="analytics-leader analytics-leader--button"
-        type="button"
-        data-analytics-category-id="${escapeHtml(topItem.id)}"
-      >
-        <div class="analytics-leader__left">
-          <div class="analytics-breakdown-row__rank analytics-breakdown-row__rank--leader">#1</div>
-
-          <div class="analytics-leader__content">
-            <div class="analytics-leader__label">Лидер</div>
-            <div class="analytics-leader__title">${escapeHtml(topItem.icon)} ${escapeHtml(topItem.name)}</div>
-            <div class="analytics-leader__meta">${topPercent}% от расходов</div>
-          </div>
-        </div>
-
-        <div class="analytics-leader__value ${topExceeded ? "analytics-limit-value--danger" : ""}">
-  ${getAnalyticsSpentLimitLabel(topItem.amount, topItem.id)}
-</div>
-      </button>
-    </div>
-  `;
-
-  const restItems = breakdown.slice(1);
-
-  const listMarkup = restItems
-    .map((item, index) => {
-      const percent = totalExpense > 0 ? Math.round((item.amount / totalExpense) * 100) : 0;
-      const exceeded = isBudgetExceeded(item.amount, item.id);
-
-      return `
-        <button
-          class="analytics-breakdown-row analytics-breakdown-row--button"
-          type="button"
-          data-analytics-category-id="${escapeHtml(item.id)}"
-        >
-          <div class="analytics-breakdown-row__left">
-            <div class="analytics-breakdown-row__rank">#${index + 2}</div>
-            <div class="analytics-breakdown-row__body">
-              <div class="analytics-breakdown-row__title">${escapeHtml(item.icon)} ${escapeHtml(item.name)}</div>
-              <div class="analytics-breakdown-row__subtitle">${percent}% от расходов</div>
-            </div>
-          </div>
-          <div class="analytics-breakdown-row__value ${exceeded ? "analytics-limit-value--danger" : ""}">
-  ${getAnalyticsSpentLimitLabel(item.amount, item.id)}
-</div>
-        </button>
-      `;
-    })
-    .join("");
-
-  analyticsLegend.innerHTML = `
-    <div class="analytics-breakdown-list">
-      ${listMarkup}
-    </div>
-  `;
-
-  analyticsDonut
-    .querySelectorAll("[data-analytics-category-id]")
-    .forEach((el) => {
-      el.addEventListener("click", () => {
-        openAnalyticsCategoryModal(el.dataset.analyticsCategoryId);
-      });
-    });
-
-  analyticsLegend
-    .querySelectorAll("[data-analytics-category-id]")
-    .forEach((el) => {
-      el.addEventListener("click", () => {
-        openAnalyticsCategoryModal(el.dataset.analyticsCategoryId);
-      });
-    });
-}
 
   function buildTransactionFromForm() {
     const amount = Number(amountInput.value.trim());
@@ -1825,40 +1829,55 @@ const topExceeded = isBudgetExceeded(topItem.amount, topItem.id);
   navAnalyticsBtn?.addEventListener("click", showAnalyticsView);
 
   analyticsPeriodButtons.forEach((btn) => {
-  btn.addEventListener("click", () => {
-    analyticsFilterPeriod = btn.dataset.analyticsPeriod;
+    btn.addEventListener("click", () => {
+      analyticsFilterPeriod = btn.dataset.analyticsPeriod;
 
-    if (analyticsFilterPeriod !== "month") {
+      if (analyticsFilterPeriod !== "month") {
+        closeAnalyticsMonthWheel();
+      }
+
+      if (analyticsFilterPeriod === "range") {
+        const today = getTodayDateValue();
+        analyticsRangeStart = analyticsRangeStart || today;
+        analyticsRangeEnd = analyticsRangeEnd || today;
+
+        if (analyticsRangeFromInput) {
+          analyticsRangeFromInput.value = analyticsRangeStart;
+        }
+
+        if (analyticsRangeToInput) {
+          analyticsRangeToInput.value = analyticsRangeEnd;
+        }
+
+        setNativePickerVisibility(analyticsRangeFromInput, true);
+        setNativePickerVisibility(analyticsRangeToInput, true);
+        openNativePicker(analyticsRangeFromInput);
+      }
+
+      renderAnalytics();
+    });
+  });
+
+  analyticsMonthBtn?.addEventListener("click", (event) => {
+    event.stopPropagation();
+    analyticsFilterPeriod = "month";
+
+    if (isAnalyticsMonthWheelOpen) {
       closeAnalyticsMonthWheel();
-    }
-
-    if (analyticsFilterPeriod === "range") {
-      const today = getTodayDateValue();
-      analyticsRangeStart = analyticsRangeStart || today;
-      analyticsRangeEnd = analyticsRangeEnd || today;
-
-      if (analyticsRangeFromInput) {
-        analyticsRangeFromInput.value = analyticsRangeStart;
-      }
-
-      if (analyticsRangeToInput) {
-        analyticsRangeToInput.value = analyticsRangeEnd;
-      }
-
-      setNativePickerVisibility(analyticsRangeFromInput, true);
-      setNativePickerVisibility(analyticsRangeToInput, true);
-      openNativePicker(analyticsRangeFromInput);
+    } else {
+      openAnalyticsMonthWheel();
     }
 
     renderAnalytics();
   });
-});
 
-analyticsMonthBtn?.addEventListener("click", () => {
-  analyticsFilterPeriod = "month";
-  openAnalyticsMonthWheel();
-  renderAnalytics();
-});
+  analyticsMonthResetBtn?.addEventListener("click", () => {
+    resetAnalyticsMonthWheel();
+  });
+
+  analyticsMonthApplyBtn?.addEventListener("click", () => {
+    applyAnalyticsMonthWheel();
+  });
 
   analyticsRangeFromInput?.addEventListener("change", () => {
     if (!analyticsRangeFromInput.value) return;
@@ -1870,6 +1889,7 @@ analyticsMonthBtn?.addEventListener("click", () => {
     }
 
     analyticsFilterPeriod = "range";
+    closeAnalyticsMonthWheel();
     renderAnalytics();
   });
 
@@ -1883,6 +1903,7 @@ analyticsMonthBtn?.addEventListener("click", () => {
     }
 
     analyticsFilterPeriod = "range";
+    closeAnalyticsMonthWheel();
     renderAnalytics();
   });
 
@@ -1921,6 +1942,23 @@ analyticsMonthBtn?.addEventListener("click", () => {
     if (event.target === budgetModal) closeBudgetModal();
   });
 
+  closeAnalyticsCategoryModalBtn?.addEventListener("click", closeAnalyticsCategoryModal);
+
+  analyticsCategoryModal?.addEventListener("click", (event) => {
+    if (event.target === analyticsCategoryModal) closeAnalyticsCategoryModal();
+  });
+
+  document.addEventListener("click", (event) => {
+    if (!isAnalyticsMonthWheelOpen || !analyticsMonthWheelWrap) return;
+
+    const clickedInsidePopover = analyticsMonthWheelWrap.contains(event.target);
+    const clickedMonthBtn = analyticsMonthBtn?.contains(event.target);
+
+    if (!clickedInsidePopover && !clickedMonthBtn) {
+      closeAnalyticsMonthWheel();
+    }
+  });
+
   document.addEventListener("keydown", (event) => {
     if (event.key !== "Escape") return;
 
@@ -1936,6 +1974,11 @@ analyticsMonthBtn?.addEventListener("click", () => {
 
     if (analyticsCategoryModal && !analyticsCategoryModal.classList.contains("hidden")) {
       closeAnalyticsCategoryModal();
+      return;
+    }
+
+    if (isAnalyticsMonthWheelOpen) {
+      closeAnalyticsMonthWheel();
     }
   });
 
@@ -1947,12 +1990,6 @@ analyticsMonthBtn?.addEventListener("click", () => {
   period30Btn?.addEventListener("click", () => {
     currentPeriodDays = 30;
     renderBalanceResult();
-  });
-
-  closeAnalyticsCategoryModalBtn?.addEventListener("click", closeAnalyticsCategoryModal);
-
-  analyticsCategoryModal?.addEventListener("click", (event) => {
-    if (event.target === analyticsCategoryModal) closeAnalyticsCategoryModal();
   });
 
   await loadDataFromSupabase();
