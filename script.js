@@ -17,6 +17,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const analyticsCategoryModal = document.getElementById("analyticsCategoryModal");
   const analyticsCategoryModalTitle = document.getElementById("analyticsCategoryModalTitle");
   const analyticsCategoryModalPeriodLabel = document.getElementById("analyticsCategoryModalPeriodLabel");
+  const analyticsCategoryBudgetBtn = document.getElementById("analyticsCategoryBudgetBtn");
   const analyticsCategoryTransactionsList = document.getElementById("analyticsCategoryTransactionsList");
   const closeAnalyticsCategoryModalBtn = document.getElementById("closeAnalyticsCategoryModalBtn");
 
@@ -134,6 +135,16 @@ document.addEventListener("DOMContentLoaded", async () => {
   function getBudgetLimitByCategoryId(categoryId) {
     return state.budgetLimits.find((item) => item.category_id === categoryId);
   }
+  
+  function getBudgetLimitLabel(categoryId) {
+  const record = getBudgetLimitByCategoryId(categoryId);
+  const amount = record ? Number(record.monthly_limit) || 0 : 0;
+  return amount > 0 ? formatMoney(amount) : "—";
+}
+
+function getAnalyticsSpentLimitLabel(spent, categoryId) {
+  return `${formatMoney(spent)} / ${getBudgetLimitLabel(categoryId)}`;
+}
 
   function getAppMetaValue(key) {
     const item = state.appMeta.find((entry) => entry.key === key);
@@ -622,8 +633,20 @@ function closeAnalyticsMonthWheel() {
     const transactions = getAnalyticsTransactionsByCategory(categoryId);
 
     analyticsCategoryModalTitle.textContent = title;
-    analyticsCategoryModalPeriodLabel.textContent = periodLabel;
-    analyticsCategoryTransactionsList.innerHTML = "";
+analyticsCategoryModalPeriodLabel.textContent = periodLabel;
+analyticsCategoryTransactionsList.innerHTML = "";
+
+if (analyticsCategoryBudgetBtn) {
+  if (isTransferCategory) {
+    analyticsCategoryBudgetBtn.textContent = "—";
+    analyticsCategoryBudgetBtn.onclick = null;
+    analyticsCategoryBudgetBtn.disabled = true;
+  } else {
+    analyticsCategoryBudgetBtn.textContent = getBudgetLimitLabel(categoryId);
+    analyticsCategoryBudgetBtn.disabled = false;
+    analyticsCategoryBudgetBtn.onclick = () => openBudgetModal(categoryId);
+  }
+}
 
     if (!transactions.length) {
       const empty = document.createElement("div");
@@ -1433,7 +1456,7 @@ function closeAnalyticsMonthWheel() {
           </div>
         </div>
 
-        <div class="analytics-leader__value">${formatMoney(topItem.amount)}</div>
+        <div class="analytics-leader__value">${getAnalyticsSpentLimitLabel(topItem.amount, topItem.id)}</div>
       </button>
     </div>
   `;
@@ -1457,7 +1480,7 @@ function closeAnalyticsMonthWheel() {
               <div class="analytics-breakdown-row__subtitle">${percent}% от расходов</div>
             </div>
           </div>
-          <div class="analytics-breakdown-row__value">${formatMoney(item.amount)}</div>
+          <div class="analytics-breakdown-row__value">${getAnalyticsSpentLimitLabel(item.amount, item.id)}</div>
         </button>
       `;
     })
