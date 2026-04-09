@@ -1304,189 +1304,187 @@ function closeAnalyticsMonthWheel() {
   }
 
   function renderAnalytics() {
-    if (!analyticsView) return;
+  if (!analyticsView) return;
 
-    const summary = getAnalyticsSummary();
-    const breakdown = getAnalyticsCategoryBreakdown();
+  const summary = getAnalyticsSummary();
+  const breakdown = getAnalyticsCategoryBreakdown();
 
-    analyticsIncomeValue.textContent = formatMoney(summary.income);
-    analyticsExpenseValue.textContent = formatMoney(summary.expense);
+  analyticsIncomeValue.textContent = formatMoney(summary.income);
+  analyticsExpenseValue.textContent = formatMoney(summary.expense);
 
-    analyticsNetValue.classList.remove("is-positive", "is-negative");
+  analyticsNetValue.classList.remove("is-positive", "is-negative");
 
-    if (summary.net > 0) {
-      analyticsNetValue.textContent = `+${formatMoney(summary.net)}`;
-      analyticsNetValue.classList.add("is-positive");
-    } else if (summary.net < 0) {
-      analyticsNetValue.textContent = `−${formatMoney(Math.abs(summary.net))}`;
-      analyticsNetValue.classList.add("is-negative");
-    } else {
-      analyticsNetValue.textContent = formatMoney(0);
-    }
-
-    analyticsPeriodButtons.forEach((btn) => {
-  btn.classList.toggle("is-active", btn.dataset.analyticsPeriod === analyticsFilterPeriod);
-});
-      btn.classList.toggle("is-active", btn.dataset.analyticsPeriod === analyticsFilterPeriod);
-    });
-
-    analyticsTypeButtons.forEach((btn) => {
-      btn.classList.toggle("is-active", btn.dataset.analyticsType === analyticsOperationType);
-    });
-
-    analyticsModeCategoriesBtn?.classList.toggle("is-active", analyticsMode === "categories");
-    analyticsModeOperationsBtn?.classList.toggle("is-active", analyticsMode === "operations");
-
-    analyticsCategoriesSection?.classList.toggle("hidden", analyticsMode !== "categories");
-    analyticsTotalsSection?.classList.toggle("hidden", analyticsMode !== "categories");
-    analyticsCategoriesBreakdownSection?.classList.toggle("hidden", analyticsMode !== "categories");
-
-    analyticsOperationsSection?.classList.toggle("hidden", analyticsMode !== "operations");
-    analyticsOperationTypeFilters?.classList.toggle("hidden", analyticsMode !== "operations");
-
-    const isAnalyticsRange = analyticsFilterPeriod === "range";
-
-    setNativePickerVisibility(analyticsRangeFromInput, isAnalyticsRange);
-    setNativePickerVisibility(analyticsRangeToInput, isAnalyticsRange);
-
-    if (analyticsMonthBtn) {
-  analyticsMonthBtn.textContent = formatMonthButtonLabel(analyticsSelectedMonth);
-}
-
-if (analyticsMonthWheelWrap) {
-  const shouldShowWheel = analyticsFilterPeriod === "month";
-  analyticsMonthWheelWrap.classList.toggle("hidden", !shouldShowWheel);
-
-  if (shouldShowWheel) {
-    setAnalyticsDraftMonthFromValue(analyticsSelectedMonth);
-    renderAnalyticsMonthWheel();
+  if (summary.net > 0) {
+    analyticsNetValue.textContent = `+${formatMoney(summary.net)}`;
+    analyticsNetValue.classList.add("is-positive");
+  } else if (summary.net < 0) {
+    analyticsNetValue.textContent = `−${formatMoney(Math.abs(summary.net))}`;
+    analyticsNetValue.classList.add("is-negative");
+  } else {
+    analyticsNetValue.textContent = formatMoney(0);
   }
-}
 
-    if (analyticsSelectedPeriodLabel) {
-      analyticsSelectedPeriodLabel.classList.add("hidden");
-      analyticsSelectedPeriodLabel.textContent = "";
-      analyticsSelectedPeriodLabel.style.display = "none";
+  analyticsPeriodButtons.forEach((btn) => {
+    btn.classList.toggle("is-active", btn.dataset.analyticsPeriod === analyticsFilterPeriod);
+  });
+
+  analyticsTypeButtons.forEach((btn) => {
+    btn.classList.toggle("is-active", btn.dataset.analyticsType === analyticsOperationType);
+  });
+
+  analyticsModeCategoriesBtn?.classList.toggle("is-active", analyticsMode === "categories");
+  analyticsModeOperationsBtn?.classList.toggle("is-active", analyticsMode === "operations");
+
+  analyticsCategoriesSection?.classList.toggle("hidden", analyticsMode !== "categories");
+  analyticsTotalsSection?.classList.toggle("hidden", analyticsMode !== "categories");
+  analyticsCategoriesBreakdownSection?.classList.toggle("hidden", analyticsMode !== "categories");
+
+  analyticsOperationsSection?.classList.toggle("hidden", analyticsMode !== "operations");
+  analyticsOperationTypeFilters?.classList.toggle("hidden", analyticsMode !== "operations");
+
+  const isAnalyticsRange = analyticsFilterPeriod === "range";
+
+  setNativePickerVisibility(analyticsRangeFromInput, isAnalyticsRange);
+  setNativePickerVisibility(analyticsRangeToInput, isAnalyticsRange);
+
+  if (analyticsMonthBtn) {
+    analyticsMonthBtn.textContent = formatMonthButtonLabel(analyticsSelectedMonth);
+  }
+
+  if (analyticsMonthWheelWrap) {
+    const shouldShowWheel = analyticsFilterPeriod === "month";
+    analyticsMonthWheelWrap.classList.toggle("hidden", !shouldShowWheel);
+
+    if (shouldShowWheel) {
+      setAnalyticsDraftMonthFromValue(analyticsSelectedMonth);
+      renderAnalyticsMonthWheel();
     }
+  }
 
-    renderAnalyticsOperations();
+  if (analyticsSelectedPeriodLabel) {
+    analyticsSelectedPeriodLabel.classList.add("hidden");
+    analyticsSelectedPeriodLabel.textContent = "";
+    analyticsSelectedPeriodLabel.style.display = "none";
+  }
 
-    const periodLabel = getAnalyticsPeriodLabel() || "Период";
-    const totalExpense = breakdown.reduce((sum, item) => sum + item.amount, 0);
+  renderAnalyticsOperations();
 
-    if (!breakdown.length) {
-      analyticsDonut.innerHTML = `
-        <div class="analytics-panel">
-          <div class="analytics-panel__eyebrow">Расходы по категориям</div>
+  const periodLabel = getAnalyticsPeriodLabel() || "Период";
+  const totalExpense = breakdown.reduce((sum, item) => sum + item.amount, 0);
 
-          <div class="analytics-panel__headline">
-            <div class="analytics-panel__total">${formatMoney(0)}</div>
-            <div class="analytics-panel__period">${escapeHtml(periodLabel)}</div>
-          </div>
-
-          <div class="analytics-leader analytics-leader--empty">
-            <div class="analytics-leader__left">
-              <div class="analytics-breakdown-row__rank analytics-breakdown-row__rank--leader">#1</div>
-
-              <div class="analytics-leader__content">
-                <div class="analytics-leader__label">Лидер</div>
-                <div class="analytics-leader__title">Нет данных</div>
-                <div class="analytics-leader__meta">За выбранный период нет расходов</div>
-              </div>
-            </div>
-
-            <div class="analytics-leader__value">—</div>
-          </div>
-        </div>
-      `;
-
-      analyticsLegend.innerHTML = `
-        <div class="analytics-breakdown-list analytics-breakdown-list--empty">
-          <div class="analytics-empty">Нет данных по расходам за выбранный период</div>
-        </div>
-      `;
-      return;
-    }
-
-    const topItem = breakdown[0];
-    const topPercent = totalExpense > 0 ? Math.round((topItem.amount / totalExpense) * 100) : 0;
-
+  if (!breakdown.length) {
     analyticsDonut.innerHTML = `
       <div class="analytics-panel">
         <div class="analytics-panel__eyebrow">Расходы по категориям</div>
 
         <div class="analytics-panel__headline">
-          <div class="analytics-panel__total">${formatMoney(totalExpense)}</div>
+          <div class="analytics-panel__total">${formatMoney(0)}</div>
           <div class="analytics-panel__period">${escapeHtml(periodLabel)}</div>
         </div>
 
-        <button
-          class="analytics-leader analytics-leader--button"
-          type="button"
-          data-analytics-category-id="${escapeHtml(topItem.id)}"
-        >
+        <div class="analytics-leader analytics-leader--empty">
           <div class="analytics-leader__left">
             <div class="analytics-breakdown-row__rank analytics-breakdown-row__rank--leader">#1</div>
 
             <div class="analytics-leader__content">
               <div class="analytics-leader__label">Лидер</div>
-              <div class="analytics-leader__title">${escapeHtml(topItem.icon)} ${escapeHtml(topItem.name)}</div>
-              <div class="analytics-leader__meta">${topPercent}% от расходов</div>
+              <div class="analytics-leader__title">Нет данных</div>
+              <div class="analytics-leader__meta">За выбранный период нет расходов</div>
             </div>
           </div>
 
-          <div class="analytics-leader__value">${formatMoney(topItem.amount)}</div>
-        </button>
+          <div class="analytics-leader__value">—</div>
+        </div>
       </div>
     `;
-
-    const restItems = breakdown.slice(1);
-
-    const listMarkup = restItems
-      .map((item, index) => {
-        const percent = totalExpense > 0 ? Math.round((item.amount / totalExpense) * 100) : 0;
-
-        return `
-          <button
-            class="analytics-breakdown-row analytics-breakdown-row--button"
-            type="button"
-            data-analytics-category-id="${escapeHtml(item.id)}"
-          >
-            <div class="analytics-breakdown-row__left">
-              <div class="analytics-breakdown-row__rank">#${index + 2}</div>
-              <div class="analytics-breakdown-row__body">
-                <div class="analytics-breakdown-row__title">${escapeHtml(item.icon)} ${escapeHtml(item.name)}</div>
-                <div class="analytics-breakdown-row__subtitle">${percent}% от расходов</div>
-              </div>
-            </div>
-            <div class="analytics-breakdown-row__value">${formatMoney(item.amount)}</div>
-          </button>
-        `;
-      })
-      .join("");
 
     analyticsLegend.innerHTML = `
-      <div class="analytics-breakdown-list">
-        ${listMarkup}
+      <div class="analytics-breakdown-list analytics-breakdown-list--empty">
+        <div class="analytics-empty">Нет данных по расходам за выбранный период</div>
       </div>
     `;
-
-    analyticsDonut
-      .querySelectorAll("[data-analytics-category-id]")
-      .forEach((el) => {
-        el.addEventListener("click", () => {
-          openAnalyticsCategoryModal(el.dataset.analyticsCategoryId);
-        });
-      });
-
-    analyticsLegend
-      .querySelectorAll("[data-analytics-category-id]")
-      .forEach((el) => {
-        el.addEventListener("click", () => {
-          openAnalyticsCategoryModal(el.dataset.analyticsCategoryId);
-        });
-      });
+    return;
   }
+
+  const topItem = breakdown[0];
+  const topPercent = totalExpense > 0 ? Math.round((topItem.amount / totalExpense) * 100) : 0;
+
+  analyticsDonut.innerHTML = `
+    <div class="analytics-panel">
+      <div class="analytics-panel__eyebrow">Расходы по категориям</div>
+
+      <div class="analytics-panel__headline">
+        <div class="analytics-panel__total">${formatMoney(totalExpense)}</div>
+        <div class="analytics-panel__period">${escapeHtml(periodLabel)}</div>
+      </div>
+
+      <button
+        class="analytics-leader analytics-leader--button"
+        type="button"
+        data-analytics-category-id="${escapeHtml(topItem.id)}"
+      >
+        <div class="analytics-leader__left">
+          <div class="analytics-breakdown-row__rank analytics-breakdown-row__rank--leader">#1</div>
+
+          <div class="analytics-leader__content">
+            <div class="analytics-leader__label">Лидер</div>
+            <div class="analytics-leader__title">${escapeHtml(topItem.icon)} ${escapeHtml(topItem.name)}</div>
+            <div class="analytics-leader__meta">${topPercent}% от расходов</div>
+          </div>
+        </div>
+
+        <div class="analytics-leader__value">${formatMoney(topItem.amount)}</div>
+      </button>
+    </div>
+  `;
+
+  const restItems = breakdown.slice(1);
+
+  const listMarkup = restItems
+    .map((item, index) => {
+      const percent = totalExpense > 0 ? Math.round((item.amount / totalExpense) * 100) : 0;
+
+      return `
+        <button
+          class="analytics-breakdown-row analytics-breakdown-row--button"
+          type="button"
+          data-analytics-category-id="${escapeHtml(item.id)}"
+        >
+          <div class="analytics-breakdown-row__left">
+            <div class="analytics-breakdown-row__rank">#${index + 2}</div>
+            <div class="analytics-breakdown-row__body">
+              <div class="analytics-breakdown-row__title">${escapeHtml(item.icon)} ${escapeHtml(item.name)}</div>
+              <div class="analytics-breakdown-row__subtitle">${percent}% от расходов</div>
+            </div>
+          </div>
+          <div class="analytics-breakdown-row__value">${formatMoney(item.amount)}</div>
+        </button>
+      `;
+    })
+    .join("");
+
+  analyticsLegend.innerHTML = `
+    <div class="analytics-breakdown-list">
+      ${listMarkup}
+    </div>
+  `;
+
+  analyticsDonut
+    .querySelectorAll("[data-analytics-category-id]")
+    .forEach((el) => {
+      el.addEventListener("click", () => {
+        openAnalyticsCategoryModal(el.dataset.analyticsCategoryId);
+      });
+    });
+
+  analyticsLegend
+    .querySelectorAll("[data-analytics-category-id]")
+    .forEach((el) => {
+      el.addEventListener("click", () => {
+        openAnalyticsCategoryModal(el.dataset.analyticsCategoryId);
+      });
+    });
+}
 
   function renderBudget() {
     if (!budgetList) return;
@@ -1894,12 +1892,6 @@ if (analyticsMonthWheelWrap) {
   analyticsPeriodButtons.forEach((btn) => {
   btn.addEventListener("click", () => {
     analyticsFilterPeriod = btn.dataset.analyticsPeriod;
-    
-    analyticsMonthBtn?.addEventListener("click", () => {
-  analyticsFilterPeriod = "month";
-  openAnalyticsMonthWheel();
-  renderAnalytics();
-});
 
     if (analyticsFilterPeriod !== "month") {
       closeAnalyticsMonthWheel();
@@ -1925,6 +1917,12 @@ if (analyticsMonthWheelWrap) {
 
     renderAnalytics();
   });
+});
+
+analyticsMonthBtn?.addEventListener("click", () => {
+  analyticsFilterPeriod = "month";
+  openAnalyticsMonthWheel();
+  renderAnalytics();
 });
 
   analyticsRangeFromInput?.addEventListener("change", () => {
