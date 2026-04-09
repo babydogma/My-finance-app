@@ -171,8 +171,7 @@ button {
   min-width: 108px;
 }
 
-.app--history .header,
-.app--analytics .header,
+.app--analytics .header {
   display: none;
 }
 
@@ -181,6 +180,10 @@ button {
    ========================================================= */
 
 .balance {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   text-align: center;
   margin-top: 2px;
 }
@@ -190,10 +193,13 @@ button {
   font-size: 15px;
   font-weight: 800;
   letter-spacing: -0.02em;
+  text-align: center;
 }
 
 .balance-amount {
   margin: 0;
+  width: 100%;
+  text-align: center;
   font-size: clamp(40px, 8vw, 58px);
   line-height: 0.95;
   font-weight: 900;
@@ -207,6 +213,7 @@ button {
   justify-content: center;
   gap: 8px;
   flex-wrap: wrap;
+  width: 100%;
   margin-top: 10px;
 }
 
@@ -1355,121 +1362,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 /* =========================================================
-   15. BUDGET VIEW
-   ========================================================= */
-
-.section-head--budget {
-  margin-bottom: 2px;
-}
-
-#budgetList {
-  gap: 12px;
-}
-
-.budget-card {
-  cursor: pointer;
-  align-items: stretch;
-  padding-top: 11px;
-  padding-bottom: 11px;
-}
-
-.budget-card .list-body {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 10px;
-}
-
-.budget-top {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 10px;
-}
-
-.budget-top__left {
-  min-width: 0;
-  flex: 1;
-}
-
-.budget-top__right {
-  flex: 0 0 auto;
-  text-align: right;
-  padding-left: 10px;
-}
-
-.budget-card .list-title {
-  font-size: 13.5px;
-  font-weight: 790;
-  margin: 0;
-}
-
-.budget-remains {
-  margin: 4px 0 0;
-  color: rgba(255, 255, 255, 0.44);
-  font-size: 10.5px;
-  font-weight: 600;
-  line-height: 1.15;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.budget-ratio {
-  margin: 0;
-  color: var(--text);
-  font-size: 12.5px;
-  font-weight: 780;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
-  white-space: nowrap;
-}
-
-.budget-ratio span {
-  color: rgba(255, 255, 255, 0.52);
-  font-weight: 650;
-}
-
-.budget-progress {
-  margin-top: 0;
-  width: 100%;
-  height: 7px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.055);
-  overflow: hidden;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,0.02);
-}
-
-.budget-progress__fill {
-  height: 100%;
-  width: 0%;
-  border-radius: 999px;
-  background: linear-gradient(90deg, rgba(111, 156, 255, 0.72) 0%, rgba(129, 168, 255, 0.92) 100%);
-  box-shadow:
-    0 0 16px rgba(111, 156, 255, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
-}
-
-.budget-progress__fill.is-warning {
-  background: linear-gradient(90deg, rgba(232, 186, 69, 0.78) 0%, rgba(243, 198, 83, 0.96) 100%);
-  box-shadow: 0 0 16px rgba(232, 186, 69, 0.18);
-}
-
-.budget-progress__fill.is-danger {
-  background: linear-gradient(90deg, rgba(255, 118, 107, 0.82) 0%, rgba(255, 136, 126, 0.98) 100%);
-  box-shadow: 0 0 16px rgba(255, 118, 107, 0.2);
-}
-
-.budget-empty {
-  text-align: center;
-  color: var(--text-muted);
-  font-size: 14px;
-  font-weight: 700;
-  padding: 18px 6px;
-}
-
-/* =========================================================
-   16. TRANSACTION DATE/TIME
+   15. TRANSACTION DATE/TIME
    ========================================================= */
 
 #transactionsList .list-right {
@@ -1482,7 +1375,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 /* =========================================================
-   17. RESPONSIVE
+   16. RESPONSIVE
    ========================================================= */
 
 @media (max-width: 420px) {
@@ -1490,12 +1383,12 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     padding-left: 12px;
     padding-right: 12px;
   }
-  
+
   .analytics-mode-switch__btn {
-  min-width: 126px;
-  height: 42px;
-  font-size: 15px;
-}
+    min-width: 126px;
+    height: 42px;
+    font-size: 15px;
+  }
 
   .header-switch__item {
     min-width: 96px;
@@ -1552,33 +1445,33 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   }
 
   .history-filter-btn--month {
-  min-width: 210px;
-  height: 56px;
-  padding: 0 26px;
-  font-size: 20px;
-}
+    min-width: 210px;
+    height: 56px;
+    padding: 0 26px;
+    font-size: 20px;
+  }
 
-.month-wheel {
-  width: min(350px, 100%);
-  height: 204px;
-  padding: 12px;
-  border-radius: 24px;
-}
+  .month-wheel {
+    width: min(350px, 100%);
+    height: 204px;
+    padding: 12px;
+    border-radius: 24px;
+  }
 
-.month-wheel__item {
-  height: 44px;
-  font-size: 17px;
-}
+  .month-wheel__item {
+    height: 44px;
+    font-size: 17px;
+  }
 
-.month-wheel__item.is-active {
-  font-size: 20px;
-}
+  .month-wheel__item.is-active {
+    font-size: 20px;
+  }
 
-.month-wheel__center-line {
-  height: 44px;
-  left: 12px;
-  right: 12px;
-}
+  .month-wheel__center-line {
+    height: 44px;
+    left: 12px;
+    right: 12px;
+  }
 
   .history-filter-btn {
     height: 34px;
@@ -1588,17 +1481,17 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
   #analyticsRangeFromInput:not(.hidden),
   #analyticsRangeToInput:not(.hidden) {
-  min-height: 44px;
-  padding: 0 14px;
-  border-radius: 16px;
-  font-size: 15px;
-}
+    min-height: 44px;
+    padding: 0 14px;
+    border-radius: 16px;
+    font-size: 15px;
+  }
 
   #transactionsList .list-right {
-  min-width: 96px;
-}
+    min-width: 96px;
+  }
 
   #transactionsList .list-caption {
-  font-size: 10px;
- }
+    font-size: 10px;
+  }
 }
