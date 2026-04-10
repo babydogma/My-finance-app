@@ -998,7 +998,8 @@ function renderSafeBucketsModal() {
   const unassignedBalance = getUnassignedSafeBalance();
 
   safeBucketsModalTotalLabel.textContent = `Общий баланс: ${formatMoney(totalSafeBalance)}`;
-  safeBucketsUnassignedValue.textContent = formatMoney(unassignedBalance);
+  safeBucketsUnassignedValue.textContent =
+    Math.abs(unassignedBalance) < 0.009 ? formatMoney(0) : formatMoney(unassignedBalance);
 
   safeBucketsUnassignedCard?.classList.toggle(
     "safe-buckets-unassigned-card--danger",
@@ -1022,35 +1023,56 @@ function renderSafeBucketsModal() {
 
   state.safeBuckets.forEach((bucket) => {
     const balance = getSafeBucketBalance(bucket.id);
-    const lockedAttr = bucket.is_locked ? "disabled" : "";
+    const isLocked = Boolean(bucket.is_locked);
 
     const card = document.createElement("div");
-    card.className = "list-card safe-bucket-card";
+    card.className = `list-card safe-bucket-card${isLocked ? " safe-bucket-card--system" : ""}`;
 
     card.innerHTML = `
       <div class="safe-bucket-card__icon list-icon list-icon--amber">${bucket.icon}</div>
 
       <div class="safe-bucket-card__content">
-        <div class="safe-bucket-card__top">
+        <div class="safe-bucket-card__header">
           <div class="safe-bucket-card__title-wrap">
             <h3 class="list-title">${escapeHtml(bucket.name)}</h3>
             <p class="safe-bucket-card__subtitle">
-              ${bucket.is_locked ? "Системный сейф" : "Внутренний сейф"}
+              ${isLocked ? "Системный сейф" : "Внутренний сейф"}
             </p>
           </div>
 
-          <div class="safe-bucket-card__value">
-            ${formatMoney(balance)}
+          <div class="safe-bucket-card__tools">
+            <button
+              class="safe-bucket-icon-btn safe-bucket-icon-btn--edit"
+              type="button"
+              data-safe-edit-id="${bucket.id}"
+              aria-label="Изменить сумму сейфа"
+              title="Изменить сумму"
+            >
+              ✏️
+            </button>
+
+            ${
+              isLocked
+                ? ""
+                : `
+              <button
+                class="safe-bucket-icon-btn safe-bucket-icon-btn--delete"
+                type="button"
+                data-safe-delete-id="${bucket.id}"
+                aria-label="Удалить сейф"
+                title="Удалить сейф"
+              >
+                🗑️
+              </button>
+            `
+            }
           </div>
         </div>
 
-        <div class="safe-bucket-card__actions">
-          <button class="mini-btn mini-btn-edit" type="button" data-safe-edit-id="${bucket.id}">
-            Изм.
-          </button>
-          <button class="mini-btn mini-btn-delete" type="button" data-safe-delete-id="${bucket.id}" ${lockedAttr}>
-            Удал.
-          </button>
+        <div class="safe-bucket-card__footer">
+          <div class="safe-bucket-card__value">
+            ${formatMoney(balance)}
+          </div>
         </div>
       </div>
     `;
@@ -1059,13 +1081,12 @@ function renderSafeBucketsModal() {
     const deleteBtn = card.querySelector("[data-safe-delete-id]");
 
     editBtn?.addEventListener("click", () => {
-  openSafeBucketAmountModal(bucket.id);
-});
+      openSafeBucketAmountModal(bucket.id);
+    });
 
     deleteBtn?.addEventListener("click", async () => {
-      if (bucket.is_locked) return;
-
       const balanceBeforeDelete = getSafeBucketBalance(bucket.id);
+
       if (Math.abs(balanceBeforeDelete) > 0.009) {
         alert("Нельзя удалить сейф, пока в нём есть деньги");
         return;
