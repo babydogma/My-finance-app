@@ -2091,67 +2091,68 @@ const deleteBtn = card.querySelector("[data-delete-id]");
     closeBudgetModal();
   }
 
+  async function loadDataFromSupabase() {
   const [
-  { data: accounts, error: accountsError },
-  { data: categories, error: categoriesError },
-  { data: transactions, error: transactionsError },
-  { data: budgetLimits, error: budgetLimitsError },
-  { data: safeBuckets, error: safeBucketsError },
-  { data: appMeta, error: appMetaError },
-] = await Promise.all([
-  supabaseClient.from("accounts").select("*").order("sort_order", { ascending: true }),
-  supabaseClient.from("categories").select("*").order("sort_order", { ascending: true }),
-  supabaseClient.from("transactions").select("*").order("created_at", { ascending: false }),
-  supabaseClient.from("budget_limits").select("*"),
-  supabaseClient.from("safe_buckets").select("*").order("sort_order", { ascending: true }),
-  supabaseClient.from("app_meta").select("*"),
-]);
+    { data: accounts, error: accountsError },
+    { data: categories, error: categoriesError },
+    { data: transactions, error: transactionsError },
+    { data: budgetLimits, error: budgetLimitsError },
+    { data: safeBuckets, error: safeBucketsError },
+    { data: appMeta, error: appMetaError },
+  ] = await Promise.all([
+    supabaseClient.from("accounts").select("*").order("sort_order", { ascending: true }),
+    supabaseClient.from("categories").select("*").order("sort_order", { ascending: true }),
+    supabaseClient.from("transactions").select("*").order("created_at", { ascending: false }),
+    supabaseClient.from("budget_limits").select("*"),
+    supabaseClient.from("safe_buckets").select("*").order("sort_order", { ascending: true }),
+    supabaseClient.from("app_meta").select("*"),
+  ]);
 
-    if (accountsError) {
-      console.error(accountsError);
-      alert("Ошибка загрузки счетов из Supabase");
-      return;
-    }
-
-    if (categoriesError) {
-      console.error(categoriesError);
-      alert("Ошибка загрузки категорий из Supabase");
-      return;
-    }
-
-    if (transactionsError) {
-      console.error(transactionsError);
-      alert("Ошибка загрузки операций из Supabase");
-      return;
-    }
-
-    if (budgetLimitsError) {
-      console.error(budgetLimitsError);
-      alert("Ошибка загрузки лимитов бюджета из Supabase");
-      return;
-    }
-    
-    if (safeBucketsError) {
-  console.error(safeBucketsError);
-  alert("Ошибка загрузки сейфов из Supabase");
-  return;
-}
-
-    if (appMetaError) {
-      console.error(appMetaError);
-      alert("Ошибка загрузки служебных данных приложения");
-      return;
-    }
-
-    state.accounts = accounts || [];
-state.categories = categories || [];
-state.transactions = transactions || [];
-state.budgetLimits = budgetLimits || [];
-state.safeBuckets = safeBuckets || [];
-state.appMeta = appMeta || [];
-
-    ensureUncategorizedCategory();
+  if (accountsError) {
+    console.error(accountsError);
+    alert("Ошибка загрузки счетов из Supabase");
+    return;
   }
+
+  if (categoriesError) {
+    console.error(categoriesError);
+    alert("Ошибка загрузки категорий из Supabase");
+    return;
+  }
+
+  if (transactionsError) {
+    console.error(transactionsError);
+    alert("Ошибка загрузки операций из Supabase");
+    return;
+  }
+
+  if (budgetLimitsError) {
+    console.error(budgetLimitsError);
+    alert("Ошибка загрузки лимитов бюджета из Supabase");
+    return;
+  }
+
+  if (safeBucketsError) {
+    console.error(safeBucketsError);
+    alert("Ошибка загрузки сейфов из Supabase");
+    return;
+  }
+
+  if (appMetaError) {
+    console.error(appMetaError);
+    alert("Ошибка загрузки служебных данных приложения");
+    return;
+  }
+
+  state.accounts = accounts || [];
+  state.categories = categories || [];
+  state.transactions = transactions || [];
+  state.budgetLimits = budgetLimits || [];
+  state.safeBuckets = safeBuckets || [];
+  state.appMeta = appMeta || [];
+
+  ensureUncategorizedCategory();
+}
 
   function renderAll() {
     ensureUncategorizedCategory();
