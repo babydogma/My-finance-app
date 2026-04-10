@@ -135,82 +135,6 @@
         </button>
       </div>
     </div>
-    
-    <div id="insightsView" class="hidden">
-  <section class="section section--manager-top">
-    <div class="section-head">
-      <h2 class="section-title">Итоги</h2>
-      <div class="section-note" id="insightsPeriodLabel">за период</div>
-    </div>
-  </section>
-
-  <section class="section">
-    <div class="summary">
-      <div class="summary-card">
-        <p class="summary-label">Доходы</p>
-        <p class="summary-value" id="insightsIncomeValue">0 ₽</p>
-      </div>
-
-      <div class="summary-card">
-        <p class="summary-label">Расходы</p>
-        <p class="summary-value" id="insightsExpenseValue">0 ₽</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="section">
-    <div class="manager-card analytics-total-card">
-      <p class="summary-label">Итог за период</p>
-      <p class="summary-value" id="insightsNetValue">0 ₽</p>
-    </div>
-  </section>
-
-  <section class="section">
-    <div class="summary">
-      <div class="summary-card">
-        <p class="summary-label">Обязательные расходы</p>
-        <p class="summary-value" id="insightsRequiredValue">0 ₽</p>
-      </div>
-
-      <div class="summary-card">
-        <p class="summary-label">Гибкие расходы</p>
-        <p class="summary-value" id="insightsFlexibleValue">0 ₽</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="section">
-    <div class="summary">
-      <div class="summary-card">
-        <p class="summary-label">Отложено в сейфы</p>
-        <p class="summary-value" id="insightsSavedValue">0 ₽</p>
-      </div>
-
-      <div class="summary-card">
-        <p class="summary-label">Начислено процентов</p>
-        <p class="summary-value" id="insightsInterestValue">0 ₽</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="section">
-    <div class="manager-card insights-card">
-      <p class="summary-label">Рекомендация</p>
-      <p class="insights-recommendation" id="insightsRecommendationText">—</p>
-    </div>
-  </section>
-
-  <section class="section">
-    <div class="manager-card insights-card">
-      <div class="section-head">
-        <h2 class="section-title">Сейфы</h2>
-        <div class="section-note">текущее состояние</div>
-      </div>
-
-      <div class="list insights-safe-list" id="insightsSafeList"></div>
-    </div>
-  </section>
-</div>
 
     <div class="history-filters">
       <div class="history-filter-group history-filter-group--primary">
@@ -315,7 +239,84 @@
   </section>
 </div>
 
-  <!-- BOTTOM NAV -->
+<!-- INSIGHTS VIEW -->
+<div id="insightsView" class="hidden">
+  <section class="section section--manager-top">
+    <div class="section-head">
+      <h2 class="section-title">Итоги</h2>
+      <div class="section-note" id="insightsPeriodLabel">за период</div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="summary">
+      <div class="summary-card">
+        <p class="summary-label">Доходы</p>
+        <p class="summary-value" id="insightsIncomeValue">0 ₽</p>
+      </div>
+
+      <div class="summary-card">
+        <p class="summary-label">Расходы</p>
+        <p class="summary-value" id="insightsExpenseValue">0 ₽</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="manager-card analytics-total-card">
+      <p class="summary-label">Итог за период</p>
+      <p class="summary-value" id="insightsNetValue">0 ₽</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="summary">
+      <div class="summary-card">
+        <p class="summary-label">Обязательные расходы</p>
+        <p class="summary-value" id="insightsRequiredValue">0 ₽</p>
+      </div>
+
+      <div class="summary-card">
+        <p class="summary-label">Гибкие расходы</p>
+        <p class="summary-value" id="insightsFlexibleValue">0 ₽</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="summary">
+      <div class="summary-card">
+        <p class="summary-label">Отложено в сейфы</p>
+        <p class="summary-value" id="insightsSavedValue">0 ₽</p>
+      </div>
+
+      <div class="summary-card">
+        <p class="summary-label">Начислено процентов</p>
+        <p class="summary-value" id="insightsInterestValue">0 ₽</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="manager-card insights-card">
+      <p class="summary-label">Рекомендация</p>
+      <p class="insights-recommendation" id="insightsRecommendationText">—</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="manager-card insights-card">
+      <div class="section-head">
+        <h2 class="section-title">Сейфы</h2>
+        <div class="section-note">текущее состояние</div>
+      </div>
+
+      <div class="list insights-safe-list" id="insightsSafeList"></div>
+    </div>
+  </section>
+</div>
+
+<!-- BOTTOM NAV -->
   <div class="bottom-nav-wrap">
   <nav class="bottom-nav bottom-nav--triple">
     <button class="nav-item is-active" type="button" id="navWalletBtn">
