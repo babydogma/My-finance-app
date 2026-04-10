@@ -179,6 +179,7 @@ function getSafeAccountName() {
 
 function getSafeBucketBalance(bucketId) {
   let balance = 0;
+  const freeBucketId = getFreeSafeBucket()?.id || null;
 
   state.transactions.forEach((transaction) => {
     const amount = Number(transaction.amount) || 0;
@@ -198,9 +199,17 @@ function getSafeBucketBalance(bucketId) {
         balance -= amount;
       }
     }
+
+    if (transaction.type === "expense" && transaction.account === getSafeAccountName()) {
+      const expenseBucketId = transaction.from_safe_bucket_id || freeBucketId;
+
+      if (expenseBucketId === bucketId) {
+        balance -= amount;
+      }
+    }
   });
 
-  return balance;
+  return roundToTwo(balance);
 }
 
 function getAllSafeBucketsBalance() {
@@ -213,6 +222,57 @@ function getUnassignedSafeBalance() {
   const totalSafeBalance = getAccountBalance(getSafeAccountName());
   const distributedBalance = getAllSafeBucketsBalance();
   return totalSafeBalance - distributedBalance;
+}
+
+function getFreeSafeBucket() {
+  return (
+    state.safeBuckets.find(
+      (bucket) => String(bucket.name || "").trim().toLowerCase() === "свободные"
+    ) || null
+  );
+}
+
+async function setSafeBucketTargetAmount(bucketId, nextAmount) {
+  const target = roundToTwo(Number(nextAmount) || 0);
+
+  if (target < 0) {
+    alert("Сумма сейфа не может быть меньше нуля");
+    return false;
+  }
+
+  const current = roundToTwo(getSafeBucketBalance(bucketId));
+  const diff = roundToTwo(target - current);
+
+  if (Math.abs(diff) < 0.009) {
+    return true;
+  }
+
+  const adjustmentTransaction = {
+    id: crypto.randomUUID(),
+    type: "transfer",
+    title: "Корректировка сейфа",
+    account: null,
+    category_id: null,
+    from_account: getSafeAccountName(),
+    to_account: getSafeAccountName(),
+    from_safe_bucket_id: diff < 0 ? bucketId : null,
+    to_safe_bucket_id: diff > 0 ? bucketId : null,
+    amount: Math.abs(diff),
+    time_label: getCurrentTime(),
+    created_at: new Date().toISOString(),
+  };
+
+  const { error } = await supabaseClient
+    .from("transactions")
+    .insert(adjustmentTransaction);
+
+  if (error) {
+    alert("Ошибка корректировки суммы сейфа");
+    console.error(error);
+    return false;
+  }
+
+  return true;
 }
 
 function fillSafeBucketSelect(selectEl, placeholder, selectedId = "") {
@@ -930,33 +990,36 @@ function renderSafeBucketsModal() {
 
   state.safeBuckets.forEach((bucket) => {
     const balance = getSafeBucketBalance(bucket.id);
-
-    const card = document.createElement("div");
-    card.className = "list-card";
-
     const lockedAttr = bucket.is_locked ? "disabled" : "";
 
+    const card = document.createElement("div");
+    card.className = "list-card safe-bucket-card";
+
     card.innerHTML = `
-      <div class="list-icon list-icon--amber">${bucket.icon}</div>
+      <div class="safe-bucket-card__icon list-icon list-icon--amber">${bucket.icon}</div>
 
-      <div class="list-body">
-        <div class="list-title-row">
-          <h3 class="list-title">${escapeHtml(bucket.name)}</h3>
+      <div class="safe-bucket-card__content">
+        <div class="safe-bucket-card__top">
+          <div class="safe-bucket-card__title-wrap">
+            <h3 class="list-title">${escapeHtml(bucket.name)}</h3>
+            <p class="safe-bucket-card__subtitle">
+              ${bucket.is_locked ? "Системный сейф" : "Внутренний сейф"}
+            </p>
+          </div>
+
+          <div class="safe-bucket-card__value">
+            ${formatMoney(balance)}
+          </div>
         </div>
-        <p class="list-subtitle">${bucket.is_locked ? "Системный сейф" : "Можно редактировать"}</p>
-      </div>
 
-      <div class="list-right">
-        <p class="list-value">${formatMoney(balance)}</p>
-      </div>
-
-      <div class="category-manager-actions">
-        <button class="mini-btn mini-btn-edit" type="button" data-safe-edit-id="${bucket.id}" ${lockedAttr}>
-          Изм.
-        </button>
-        <button class="mini-btn mini-btn-delete" type="button" data-safe-delete-id="${bucket.id}" ${lockedAttr}>
-          Удал.
-        </button>
+        <div class="safe-bucket-card__actions">
+          <button class="mini-btn mini-btn-edit" type="button" data-safe-edit-id="${bucket.id}">
+            Изм.
+          </button>
+          <button class="mini-btn mini-btn-delete" type="button" data-safe-delete-id="${bucket.id}" ${lockedAttr}>
+            Удал.
+          </button>
+        </div>
       </div>
     `;
 
@@ -964,33 +1027,23 @@ function renderSafeBucketsModal() {
     const deleteBtn = card.querySelector("[data-safe-delete-id]");
 
     editBtn?.addEventListener("click", async () => {
-      const nextName = prompt("Новое название сейфа", bucket.name);
-      if (nextName === null) return;
+      const nextAmountRaw = prompt(
+        `Новая сумма для сейфа "${bucket.name}"`,
+        String(balance).replace(".", ",")
+      );
 
-      const cleanedName = nextName.trim();
-      if (!cleanedName) {
-        alert("Название сейфа не может быть пустым");
+      if (nextAmountRaw === null) return;
+
+      const normalized = nextAmountRaw.replace(/\s/g, "").replace(",", ".");
+      const nextAmount = Number(normalized);
+
+      if (Number.isNaN(nextAmount) || nextAmount < 0) {
+        alert("Введи корректную сумму");
         return;
       }
 
-      const nextIcon = prompt("Новый эмодзи сейфа", bucket.icon);
-      if (nextIcon === null) return;
-
-      const cleanedIcon = nextIcon.trim() || "🗂️";
-
-      const { error } = await supabaseClient
-        .from("safe_buckets")
-        .update({
-          name: cleanedName,
-          icon: cleanedIcon,
-        })
-        .eq("id", bucket.id);
-
-      if (error) {
-        alert("Ошибка обновления сейфа");
-        console.error(error);
-        return;
-      }
+      const ok = await setSafeBucketTargetAmount(bucket.id, nextAmount);
+      if (!ok) return;
 
       await loadDataFromSupabase();
       renderAll();
@@ -2167,18 +2220,27 @@ const deleteBtn = card.querySelector("[data-delete-id]");
       return null;
     }
 
-    return {
-      id: editingTransactionId || crypto.randomUUID(),
-      type: "expense",
-      title: comment || "Новая трата",
-      account,
-      category_id: categoryId,
-      from_account: null,
-      to_account: null,
-      amount,
-      time_label: getCurrentTime(),
-      created_at: createdAt,
-    };
+    const freeSafeBucket = account === getSafeAccountName() ? getFreeSafeBucket() : null;
+
+if (account === getSafeAccountName() && !freeSafeBucket) {
+  alert('Не найден сейф "Свободные". Создай его или переименуй существующий.');
+  return null;
+}
+
+return {
+  id: editingTransactionId || crypto.randomUUID(),
+  type: "expense",
+  title: comment || "Новая трата",
+  account,
+  category_id: categoryId,
+  from_account: null,
+  to_account: null,
+  from_safe_bucket_id: freeSafeBucket?.id || null,
+  to_safe_bucket_id: null,
+  amount,
+  time_label: getCurrentTime(),
+  created_at: createdAt,
+};
   }
 
   async function saveTransaction() {
