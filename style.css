@@ -1427,6 +1427,48 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   box-shadow: none;
 }
 
+.analytics-category-type-btn {
+  min-height: 34px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 820;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.analytics-category-type-btn--required {
+  background: rgba(255, 114, 104, 0.14);
+  color: #ff9a92;
+}
+
+.analytics-category-type-btn--flex {
+  background: rgba(255, 255, 255, 0.06);
+  color: #dfe4ee;
+}
+
+.analytics-required-flag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 6px;
+  font-size: 12px;
+  line-height: 1;
+}
+
+.category-required-flag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  line-height: 1;
+}
+
+.mini-btn-type {
+  background: rgba(255, 114, 104, 0.12);
+  color: #ff9a92;
+}
+
 .analytics-limit-value--danger {
   color: #ff8c82 !important;
   text-shadow: 0 0 14px rgba(255, 114, 104, 0.16);
