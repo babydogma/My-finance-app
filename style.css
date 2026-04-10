@@ -941,6 +941,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
   scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+  overscroll-behavior: contain;
   padding: 0 4px;
 }
 
@@ -953,12 +955,19 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   height: 56px;
   border: none;
   background: transparent;
-  color: rgba(255, 255, 255, 0.32);
+  color: rgba(255, 255, 255, 0.26);
   font-size: 18px;
   font-weight: 760;
   letter-spacing: -0.03em;
   text-align: center;
   scroll-snap-align: center;
+  transition:
+    color 0.18s ease,
+    opacity 0.18s ease,
+    transform 0.18s ease,
+    font-size 0.18s ease;
+  opacity: 0.62;
+  transform: scale(0.94);
 }
 
 .month-wheel__item--spacer {
@@ -969,6 +978,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   color: #f7f8fb;
   font-size: 28px;
   font-weight: 880;
+  opacity: 1;
+  transform: scale(1);
 }
 
 .month-wheel__center-line {
@@ -995,7 +1006,12 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 .month-wheel__fade--top {
   top: 0;
-  background: linear-gradient(180deg, rgba(18, 21, 28, 0.98) 0%, rgba(18, 21, 28, 0) 100%);
+  background: linear-gradient(180deg, rgba(18, 21, 28, 0.94) 0%, rgba(18, 21, 28, 0.08) 72%, rgba(18, 21, 28, 0) 100%);
+}
+
+.month-wheel__fade--bottom {
+  bottom: 0;
+  background: linear-gradient(0deg, rgba(18, 21, 28, 0.94) 0%, rgba(18, 21, 28, 0.08) 72%, rgba(18, 21, 28, 0) 100%);
 }
 
 .month-wheel__fade--bottom {
