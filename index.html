@@ -347,26 +347,28 @@
   </div>
   
   <div class="modal hidden" id="safeBucketsModal">
-  <div class="modal-sheet">
+  <div class="modal-sheet safe-buckets-sheet">
     <div class="modal-handle"></div>
 
-    <div class="section-head">
-      <h3 class="modal-title" id="safeBucketsModalTitle" style="margin:0; text-align:left;">Сейфы Яндекса</h3>
-      <button class="manager-back-btn" type="button" id="closeSafeBucketsModalBtn">Закрыть</button>
-    </div>
-
-    <div class="section-note" id="safeBucketsModalTotalLabel" style="margin-bottom:12px;">Общий баланс: 0 ₽</div>
-
-    <div class="analytics-category-extra-card" id="safeBucketsUnassignedCard">
-      <div class="analytics-category-extra-row">
-        <div class="analytics-category-extra-label">Не распределено</div>
-        <div class="analytics-category-extra-value" id="safeBucketsUnassignedValue">0 ₽</div>
+    <div class="safe-buckets-header">
+      <div>
+        <h3 class="modal-title safe-buckets-title" id="safeBucketsModalTitle">Сейфы Яндекса</h3>
+        <div class="safe-buckets-total" id="safeBucketsModalTotalLabel">Общий баланс: 0 ₽</div>
       </div>
+
+      <button class="manager-back-btn safe-buckets-close-btn" type="button" id="closeSafeBucketsModalBtn">
+        Закрыть
+      </button>
     </div>
 
-    <div class="list" id="safeBucketsList"></div>
+    <div class="safe-buckets-summary" id="safeBucketsUnassignedCard">
+      <div class="safe-buckets-summary__label">Не распределено</div>
+      <div class="safe-buckets-summary__value" id="safeBucketsUnassignedValue">0 ₽</div>
+    </div>
 
-    <div class="manager-card" style="margin-top:14px;">
+    <div class="list safe-buckets-list" id="safeBucketsList"></div>
+
+    <div class="safe-buckets-create-card">
       <div class="field">
         <input class="input" id="newSafeBucketNameInput" type="text" placeholder="Название сейфа" />
       </div>
@@ -382,44 +384,6 @@
   </div>
 </div>
 
-<div class="modal hidden" id="safeBucketAmountModal">
-  <div class="modal-sheet safe-bucket-amount-sheet">
-    <div class="modal-handle"></div>
-
-    <div class="section-head safe-bucket-amount-head">
-      <h3 class="modal-title safe-bucket-amount-title" id="safeBucketAmountModalTitle">
-        Сумма сейфа
-      </h3>
-      <button class="manager-back-btn" type="button" id="closeSafeBucketAmountModalBtn">
-        Закрыть
-      </button>
-    </div>
-
-    <div class="safe-bucket-amount-current" id="safeBucketAmountCurrentValue">
-      Сейчас: 0 ₽
-    </div>
-
-    <div class="field">
-      <input
-        class="input safe-bucket-amount-input"
-        id="safeBucketAmountInput"
-        type="text"
-        inputmode="decimal"
-        placeholder="Введите новую сумму"
-      />
-    </div>
-
-    <div class="safe-bucket-amount-actions">
-      <button class="btn btn-secondary" type="button" id="cancelSafeBucketAmountBtn">
-        Отмена
-      </button>
-      <button class="btn btn-primary" type="button" id="saveSafeBucketAmountBtn">
-        Сохранить
-      </button>
-    </div>
-  </div>
-</div>
-  
   <div class="modal hidden" id="analyticsCategoryModal">
   <div class="modal-sheet">
     <div class="modal-handle"></div>
