@@ -1568,45 +1568,47 @@ async function addSafeBucket() {
   }
 
   function renderAccounts() {
-    accountsListEl.innerHTML = "";
+  accountsListEl.innerHTML = "";
 
-    state.accounts.forEach((account) => {
-      const currentBalance = getAccountBalance(account.name);
+  state.accounts.forEach((account) => {
+    const currentBalance = getAccountBalance(account.name);
 
-      const card = document.createElement("div");
-card.className = "list-card";
+    const card = document.createElement("div");
+    card.className = "list-card";
 
-if (account.name === getSafeAccountName()) {
-  card.classList.add("list-card--clickable");
+    if (account.name === getSafeAccountName()) {
+      card.classList.add("list-card--clickable");
+    }
+
+    const accountTone =
+      account.id === "yandex"
+        ? "list-icon--green"
+        : account.id === "cash"
+        ? "list-icon--blue"
+        : account.id === "cash_reserve"
+        ? "list-icon--neutral"
+        : "list-icon--amber";
+
+    card.innerHTML = `
+      <div class="list-icon ${accountTone}">${account.icon}</div>
+      <div class="list-body">
+        <div class="list-title-row">
+          <h3 class="list-title">${escapeHtml(account.name)}</h3>
+        </div>
+        <p class="list-subtitle">${escapeHtml(account.subtitle)}</p>
+      </div>
+      <div class="list-right">
+        <p class="list-value">${formatMoney(currentBalance)}</p>
+      </div>
+    `;
+
+    if (account.name === getSafeAccountName()) {
+      card.addEventListener("click", openSafeBucketsModal);
+    }
+
+    accountsListEl.appendChild(card);
+  });
 }
-
-      const accountTone =
-        account.id === "yandex"
-          ? "list-icon--green"
-          : account.id === "cash"
-          ? "list-icon--blue"
-          : account.id === "cash_reserve"
-          ? "list-icon--neutral"
-          : "list-icon--amber";
-
-      card.innerHTML = `
-        <div class="list-icon ${accountTone}">${account.icon}</div>
-        <div class="list-body">
-          <div class="list-title-row">
-            <h3 class="list-title">${escapeHtml(account.name)}</h3>
-          </div>
-          <p class="list-subtitle">${escapeHtml(account.subtitle)}</p>
-        </div>
-        <div class="list-right">
-          <p class="list-value">${formatMoney(currentBalance)}</p>
-        </div>
-      `;
-
-      if (account.name === getSafeAccountName()) {
-  card.addEventListener("click", openSafeBucketsModal);
-      accountsListEl.appendChild(card);
-    });
-  }
 
   function renderCategoriesManager() {
     categoriesManagerList.innerHTML = "";
