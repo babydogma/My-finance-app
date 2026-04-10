@@ -18,6 +18,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const analyticsCategoryModalTitle = document.getElementById("analyticsCategoryModalTitle");
   const analyticsCategoryModalPeriodLabel = document.getElementById("analyticsCategoryModalPeriodLabel");
   const analyticsCategoryBudgetBtn = document.getElementById("analyticsCategoryBudgetBtn");
+  const analyticsCategoryTypeBtn = document.getElementById("analyticsCategoryTypeBtn");
   const analyticsCategoryTransactionsList = document.getElementById("analyticsCategoryTransactionsList");
   const closeAnalyticsCategoryModalBtn = document.getElementById("closeAnalyticsCategoryModalBtn");
 
@@ -132,6 +133,15 @@ let analyticsYearScrollTimer = null;
     const category = getCategoryById(categoryId);
     return category ? category.icon : "📦";
   }
+  
+  function isRequiredCategory(categoryId) {
+  const category = getCategoryById(categoryId);
+  return Boolean(category?.is_required);
+}
+
+function getCategoryTypeLabel(categoryId) {
+  return isRequiredCategory(categoryId) ? "Обязательная" : "Гибкая";
+}
 
   function getBudgetLimitByCategoryId(categoryId) {
     return state.budgetLimits.find((item) => item.category_id === categoryId);
@@ -671,12 +681,13 @@ function updateAnalyticsWheelDraftFromScroll() {
 
     if (!exists) {
       state.categories.unshift({
-        id: UNCATEGORIZED_ID,
-        name: "Без категории",
-        icon: "📦",
-        locked: true,
-        sort_order: 1,
-      });
+  id: UNCATEGORIZED_ID,
+  name: "Без категории",
+  icon: "📦",
+  locked: true,
+  is_required: false,
+  sort_order: 1,
+});
     }
   }
 
@@ -781,6 +792,40 @@ function updateAnalyticsWheelDraftFromScroll() {
         analyticsCategoryBudgetBtn.onclick = () => openBudgetModal(categoryId);
       }
     }
+    
+    if (analyticsCategoryTypeBtn) {
+  if (isTransferCategory) {
+    analyticsCategoryTypeBtn.textContent = "Гибкая";
+    analyticsCategoryTypeBtn.disabled = true;
+    analyticsCategoryTypeBtn.onclick = null;
+    analyticsCategoryTypeBtn.classList.remove("analytics-category-type-btn--required");
+    analyticsCategoryTypeBtn.classList.add("analytics-category-type-btn--flex");
+  } else {
+    const required = isRequiredCategory(categoryId);
+
+    analyticsCategoryTypeBtn.textContent = required ? "Обязательная" : "Гибкая";
+    analyticsCategoryTypeBtn.disabled = false;
+    analyticsCategoryTypeBtn.classList.toggle("analytics-category-type-btn--required", required);
+    analyticsCategoryTypeBtn.classList.toggle("analytics-category-type-btn--flex", !required);
+
+    analyticsCategoryTypeBtn.onclick = async () => {
+      const { error } = await supabaseClient
+        .from("categories")
+        .update({ is_required: !required })
+        .eq("id", categoryId);
+
+      if (error) {
+        alert("Ошибка обновления типа категории");
+        console.error(error);
+        return;
+      }
+
+      await loadDataFromSupabase();
+      openAnalyticsCategoryModal(categoryId);
+      renderAll();
+    };
+  }
+}
 
     if (!transactions.length) {
       const empty = document.createElement("div");
@@ -1031,11 +1076,12 @@ function updateAnalyticsWheelDraftFromScroll() {
         const category = getCategoryById(categoryId) || getCategoryById(UNCATEGORIZED_ID);
 
         return {
-          id: category.id,
-          name: category.name,
-          icon: category.icon,
-          amount,
-        };
+  id: category.id,
+  name: category.name,
+  icon: category.icon,
+  is_required: Boolean(category.is_required),
+  amount,
+};
       })
       .sort((a, b) => b.amount - a.amount);
   }
@@ -1241,27 +1287,32 @@ function updateAnalyticsWheelDraftFromScroll() {
           : "list-icon--neutral";
 
       card.innerHTML = `
-        <div class="list-icon ${managerTone}">${category.icon}</div>
+  <div class="list-icon ${managerTone}">${category.icon}</div>
 
-        <div class="list-body">
-          <div class="list-title-row">
-            <h3 class="list-title">${escapeHtml(category.name)}</h3>
-          </div>
-          <p class="list-subtitle">${lockedSubtitle}</p>
-        </div>
+  <div class="list-body">
+    <div class="list-title-row">
+      <h3 class="list-title">${escapeHtml(category.name)}</h3>
+      ${category.is_required ? '<span class="category-required-flag">🚩</span>' : ""}
+    </div>
+    <p class="list-subtitle">${lockedSubtitle} • ${category.is_required ? "Обязательная" : "Гибкая"}</p>
+  </div>
 
-        <div class="category-manager-actions">
-          <button class="mini-btn mini-btn-edit" type="button" data-edit-id="${category.id}" ${lockedAttr}>
-            Изм.
-          </button>
-          <button class="mini-btn mini-btn-delete" type="button" data-delete-id="${category.id}" ${lockedAttr}>
-            Удал.
-          </button>
-        </div>
-      `;
+  <div class="category-manager-actions">
+    <button class="mini-btn mini-btn-edit" type="button" data-edit-id="${category.id}" ${lockedAttr}>
+      Изм.
+    </button>
+    <button class="mini-btn mini-btn-type" type="button" data-type-id="${category.id}" ${lockedAttr}>
+      ${category.is_required ? "Гибкая" : "Обязат."}
+    </button>
+    <button class="mini-btn mini-btn-delete" type="button" data-delete-id="${category.id}" ${lockedAttr}>
+      Удал.
+    </button>
+  </div>
+`;
 
       const editBtn = card.querySelector("[data-edit-id]");
-      const deleteBtn = card.querySelector("[data-delete-id]");
+const typeBtn = card.querySelector("[data-type-id]");
+const deleteBtn = card.querySelector("[data-delete-id]");
 
       editBtn?.addEventListener("click", async () => {
         const nextName = prompt("Новое название категории", category.name);
@@ -1295,6 +1346,24 @@ function updateAnalyticsWheelDraftFromScroll() {
         await loadDataFromSupabase();
         renderAll();
       });
+      
+      typeBtn?.addEventListener("click", async () => {
+  if (category.locked) return;
+
+  const { error } = await supabaseClient
+    .from("categories")
+    .update({ is_required: !category.is_required })
+    .eq("id", category.id);
+
+  if (error) {
+    alert("Ошибка обновления типа категории");
+    console.error(error);
+    return;
+  }
+
+  await loadDataFromSupabase();
+  renderAll();
+});
 
       deleteBtn?.addEventListener("click", async () => {
         if (category.locked) return;
@@ -1569,7 +1638,10 @@ function updateAnalyticsWheelDraftFromScroll() {
 
             <div class="analytics-leader__content">
               <div class="analytics-leader__label">Лидер</div>
-              <div class="analytics-leader__title">${escapeHtml(topItem.icon)} ${escapeHtml(topItem.name)}</div>
+              <div class="analytics-leader__title">
+  ${topItem.is_required ? '<span class="analytics-required-flag">🚩</span>' : ""}
+  ${escapeHtml(topItem.icon)} ${escapeHtml(topItem.name)}
+</div>
               <div class="analytics-leader__meta">${topPercent}% от расходов</div>
             </div>
           </div>
@@ -1597,7 +1669,10 @@ function updateAnalyticsWheelDraftFromScroll() {
             <div class="analytics-breakdown-row__left">
               <div class="analytics-breakdown-row__rank">#${index + 2}</div>
               <div class="analytics-breakdown-row__body">
-                <div class="analytics-breakdown-row__title">${escapeHtml(item.icon)} ${escapeHtml(item.name)}</div>
+                <div class="analytics-breakdown-row__title">
+  ${item.is_required ? '<span class="analytics-required-flag">🚩</span>' : ""}
+  ${escapeHtml(item.icon)} ${escapeHtml(item.name)}
+</div>
                 <div class="analytics-breakdown-row__subtitle">${percent}% от расходов</div>
               </div>
             </div>
@@ -1792,12 +1867,13 @@ function updateAnalyticsWheelDraftFromScroll() {
     }
 
     const newCategory = {
-      id: crypto.randomUUID(),
-      name,
-      icon,
-      locked: false,
-      sort_order: state.categories.length + 1,
-    };
+  id: crypto.randomUUID(),
+  name,
+  icon,
+  locked: false,
+  is_required: false,
+  sort_order: state.categories.length + 1,
+};
 
     const { error } = await supabaseClient
       .from("categories")
