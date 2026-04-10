@@ -105,6 +105,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const closeSafeBucketAmountModalBtn = document.getElementById("closeSafeBucketAmountModalBtn");
   const cancelSafeBucketAmountBtn = document.getElementById("cancelSafeBucketAmountBtn");
   const saveSafeBucketAmountBtn = document.getElementById("saveSafeBucketAmountBtn");
+  const deleteSafeBucketBtn = document.getElementById("deleteSafeBucketBtn");
 
   const period7Btn = document.getElementById("period7Btn");
   const period30Btn = document.getElementById("period30Btn");
@@ -970,7 +971,7 @@ function closeSafeBucketsModal() {
 
 function openSafeBucketAmountModal(bucketId) {
   const bucket = getSafeBucketById(bucketId);
-  if (!bucket) return;
+  if (!bucket || !safeBucketAmountModal) return;
 
   activeSafeBucketAmountId = bucketId;
 
@@ -980,15 +981,25 @@ function openSafeBucketAmountModal(bucketId) {
   safeBucketAmountCurrentValue.textContent = `Сейчас: ${formatMoney(balance)}`;
   safeBucketAmountInput.value = String(balance).replace(".", ",");
 
+  if (deleteSafeBucketBtn) {
+    deleteSafeBucketBtn.classList.toggle("hidden", Boolean(bucket.is_locked));
+  }
+
   safeBucketAmountModal.classList.remove("hidden");
   safeBucketAmountInput.focus();
   safeBucketAmountInput.select();
 }
 
 function closeSafeBucketAmountModal() {
+  if (!safeBucketAmountModal) return;
+
   safeBucketAmountModal.classList.add("hidden");
   activeSafeBucketAmountId = null;
   safeBucketAmountInput.value = "";
+
+  if (deleteSafeBucketBtn) {
+    deleteSafeBucketBtn.classList.add("hidden");
+  }
 }
 
 function renderSafeBucketsModal() {
@@ -1023,88 +1034,28 @@ function renderSafeBucketsModal() {
     const balance = getSafeBucketBalance(bucket.id);
     const isLocked = Boolean(bucket.is_locked);
 
-    const card = document.createElement("div");
+    const card = document.createElement("button");
+    card.type = "button";
     card.className = `safe-bucket-row${isLocked ? " safe-bucket-row--system" : ""}`;
+    card.dataset.safeBucketOpenId = bucket.id;
 
     card.innerHTML = `
-      <div class="safe-bucket-row__main">
-        <div class="safe-bucket-row__left">
-          <div class="safe-bucket-row__icon">${bucket.icon}</div>
+      <div class="safe-bucket-row__left">
+        <div class="safe-bucket-row__icon">${bucket.icon}</div>
 
-          <div class="safe-bucket-row__text">
-            <div class="safe-bucket-row__title">${escapeHtml(bucket.name)}</div>
-            <div class="safe-bucket-row__meta">
-              ${isLocked ? "Системный сейф" : "Внутренний сейф"}
-            </div>
+        <div class="safe-bucket-row__text">
+          <div class="safe-bucket-row__title">${escapeHtml(bucket.name)}</div>
+          <div class="safe-bucket-row__meta">
+            ${isLocked ? "Системный сейф" : "Внутренний сейф"}
           </div>
         </div>
-
-        <div class="safe-bucket-row__actions">
-          <button
-            class="safe-bucket-action safe-bucket-action--edit"
-            type="button"
-            data-safe-edit-id="${bucket.id}"
-            aria-label="Изменить сумму"
-            title="Изменить сумму"
-          >
-            ✏️
-          </button>
-
-          ${
-            isLocked
-              ? ""
-              : `
-            <button
-              class="safe-bucket-action safe-bucket-action--delete"
-              type="button"
-              data-safe-delete-id="${bucket.id}"
-              aria-label="Удалить сейф"
-              title="Удалить сейф"
-            >
-              🗑️
-            </button>
-          `
-          }
-        </div>
       </div>
 
-      <div class="safe-bucket-row__bottom">
-        <div class="safe-bucket-row__amount">${formatMoney(balance)}</div>
-      </div>
+      <div class="safe-bucket-row__amount">${formatMoney(balance)}</div>
     `;
 
-    const editBtn = card.querySelector("[data-safe-edit-id]");
-    const deleteBtn = card.querySelector("[data-safe-delete-id]");
-
-    editBtn?.addEventListener("click", () => {
+    card.addEventListener("click", () => {
       openSafeBucketAmountModal(bucket.id);
-    });
-
-    deleteBtn?.addEventListener("click", async () => {
-      const balanceBeforeDelete = getSafeBucketBalance(bucket.id);
-
-      if (Math.abs(balanceBeforeDelete) > 0.009) {
-        alert("Нельзя удалить сейф, пока в нём есть деньги");
-        return;
-      }
-
-      const ok = confirm(`Удалить сейф "${bucket.name}"?`);
-      if (!ok) return;
-
-      const { error } = await supabaseClient
-        .from("safe_buckets")
-        .delete()
-        .eq("id", bucket.id);
-
-      if (error) {
-        alert("Ошибка удаления сейфа");
-        console.error(error);
-        return;
-      }
-
-      await loadDataFromSupabase();
-      renderAll();
-      renderSafeBucketsModal();
     });
 
     safeBucketsList.appendChild(card);
@@ -1158,6 +1109,38 @@ async function saveSafeBucketAmount() {
 
   const ok = await setSafeBucketTargetAmount(activeSafeBucketAmountId, nextAmount);
   if (!ok) return;
+
+  await loadDataFromSupabase();
+  renderAll();
+  renderSafeBucketsModal();
+  closeSafeBucketAmountModal();
+}
+
+async function deleteSafeBucketFromModal() {
+  if (!activeSafeBucketAmountId) return;
+
+  const bucket = getSafeBucketById(activeSafeBucketAmountId);
+  if (!bucket || bucket.is_locked) return;
+
+  const balanceBeforeDelete = getSafeBucketBalance(bucket.id);
+  if (Math.abs(balanceBeforeDelete) > 0.009) {
+    alert("Нельзя удалить сейф, пока в нём есть деньги");
+    return;
+  }
+
+  const ok = confirm(`Удалить сейф "${bucket.name}"?`);
+  if (!ok) return;
+
+  const { error } = await supabaseClient
+    .from("safe_buckets")
+    .delete()
+    .eq("id", bucket.id);
+
+  if (error) {
+    alert("Ошибка удаления сейфа");
+    console.error(error);
+    return;
+  }
 
   await loadDataFromSupabase();
   renderAll();
@@ -2641,6 +2624,7 @@ addSafeBucketBtn?.addEventListener("click", addSafeBucket);
 closeSafeBucketAmountModalBtn?.addEventListener("click", closeSafeBucketAmountModal);
 cancelSafeBucketAmountBtn?.addEventListener("click", closeSafeBucketAmountModal);
 saveSafeBucketAmountBtn?.addEventListener("click", saveSafeBucketAmount);
+deleteSafeBucketBtn?.addEventListener("click", deleteSafeBucketFromModal);
 
   modal?.addEventListener("click", (event) => {
     if (event.target === modal) closeModal();
