@@ -795,7 +795,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   display: flex;
   align-items: flex-start;
   gap: 14px;
-  padding: 16px;
+  padding: 14px 14px 12px;
+  border-radius: 28px;
 }
 
 .safe-bucket-card__icon {
@@ -808,10 +809,10 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .safe-bucket-card__top {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 10px;
 }
 
 .safe-bucket-card__title-wrap {
@@ -835,13 +836,15 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 .safe-bucket-card__value {
   flex: 0 0 auto;
+  min-width: 104px;
   padding: 10px 14px;
-  border-radius: 16px;
+  border-radius: 18px;
   background: rgba(109, 141, 255, 0.14);
   color: #f5f7ff;
-  font-size: 17px;
+  font-size: 16px;
   font-weight: 900;
   line-height: 1;
+  text-align: center;
   white-space: nowrap;
 }
 
@@ -849,12 +852,12 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
-  margin-top: 14px;
+  margin-top: 12px;
 }
 
 #safeBucketsList .mini-btn {
-  min-width: 86px;
-  height: 42px;
+  min-width: 84px;
+  height: 40px;
   border-radius: 16px;
   font-size: 15px;
   font-weight: 850;
@@ -881,6 +884,46 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 #safeBucketsUnassignedCard .analytics-category-extra-row {
   align-items: center;
+}
+
+.safe-bucket-amount-sheet {
+  max-width: 420px;
+  width: calc(100% - 28px);
+  margin: 0 auto;
+  padding: 18px;
+  border-radius: 28px;
+}
+
+.safe-bucket-amount-head {
+  margin-bottom: 10px;
+  align-items: center;
+}
+
+.safe-bucket-amount-title {
+  margin: 0;
+  text-align: left;
+}
+
+.safe-bucket-amount-current {
+  margin-bottom: 14px;
+  color: rgba(231, 227, 220, 0.72);
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.safe-bucket-amount-input {
+  height: 56px;
+  font-size: 22px;
+  font-weight: 850;
+  text-align: center;
+}
+
+.safe-bucket-amount-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 14px;
 }
 
 #safeBucketsUnassignedCard .analytics-category-extra-label {
@@ -1670,6 +1713,29 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     grid-template-columns: repeat(2, 1fr);
     gap: 8px;
   }
+  
+  .safe-bucket-card__value {
+  min-width: 92px;
+  font-size: 15px;
+  padding: 9px 12px;
+}
+
+#safeBucketsList .mini-btn {
+  min-width: 78px;
+  height: 38px;
+  font-size: 14px;
+}
+
+.safe-bucket-amount-sheet {
+  width: calc(100% - 20px);
+  padding: 16px;
+  border-radius: 24px;
+}
+
+.safe-bucket-amount-input {
+  height: 52px;
+  font-size: 20px;
+}
 
   .modal-actions--triple {
     grid-template-columns: 1fr 1fr;
