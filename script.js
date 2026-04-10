@@ -86,6 +86,17 @@ document.addEventListener("DOMContentLoaded", async () => {
   const accountsTotalEl = document.getElementById("accountsTotal");
   const accountsListEl = document.getElementById("accountsList");
   const transactionsListEl = document.getElementById("transactionsList");
+  
+  const safeBucketsModal = document.getElementById("safeBucketsModal");
+  const safeBucketsModalTitle = document.getElementById("safeBucketsModalTitle");
+  const safeBucketsModalTotalLabel = document.getElementById("safeBucketsModalTotalLabel");
+  const safeBucketsUnassignedCard = document.getElementById("safeBucketsUnassignedCard");
+  const safeBucketsUnassignedValue = document.getElementById("safeBucketsUnassignedValue");
+  const safeBucketsList = document.getElementById("safeBucketsList");
+  const closeSafeBucketsModalBtn = document.getElementById("closeSafeBucketsModalBtn");
+  const newSafeBucketNameInput = document.getElementById("newSafeBucketNameInput");
+  const newSafeBucketIconInput = document.getElementById("newSafeBucketIconInput");
+  const addSafeBucketBtn = document.getElementById("addSafeBucketBtn");
 
   const period7Btn = document.getElementById("period7Btn");
   const period30Btn = document.getElementById("period30Btn");
@@ -160,6 +171,48 @@ function getSafeBucketName(bucketId) {
 function getSafeBucketIcon(bucketId) {
   const bucket = getSafeBucketById(bucketId);
   return bucket ? bucket.icon : "🗂️";
+}
+
+function getSafeAccountName() {
+  return "Сейфы Яндекса";
+}
+
+function getSafeBucketBalance(bucketId) {
+  let balance = 0;
+
+  state.transactions.forEach((transaction) => {
+    const amount = Number(transaction.amount) || 0;
+
+    if (transaction.type === "transfer") {
+      if (
+        transaction.to_account === getSafeAccountName() &&
+        transaction.to_safe_bucket_id === bucketId
+      ) {
+        balance += amount;
+      }
+
+      if (
+        transaction.from_account === getSafeAccountName() &&
+        transaction.from_safe_bucket_id === bucketId
+      ) {
+        balance -= amount;
+      }
+    }
+  });
+
+  return balance;
+}
+
+function getAllSafeBucketsBalance() {
+  return state.safeBuckets.reduce((sum, bucket) => {
+    return sum + getSafeBucketBalance(bucket.id);
+  }, 0);
+}
+
+function getUnassignedSafeBalance() {
+  const totalSafeBalance = getAccountBalance(getSafeAccountName());
+  const distributedBalance = getAllSafeBucketsBalance();
+  return totalSafeBalance - distributedBalance;
 }
 
 function fillSafeBucketSelect(selectEl, placeholder, selectedId = "") {
@@ -826,6 +879,189 @@ function updateAnalyticsWheelDraftFromScroll() {
     activeBudgetCategoryId = null;
     budgetAmountInput.value = "";
   }
+  
+  function openSafeBucketsModal() {
+  if (!safeBucketsModal) return;
+
+  safeBucketsModalTitle.textContent = "Сейфы Яндекса";
+  renderSafeBucketsModal();
+
+  safeBucketsModal.classList.remove("hidden");
+  document.body.style.overflow = "hidden";
+}
+
+function closeSafeBucketsModal() {
+  if (!safeBucketsModal) return;
+
+  safeBucketsModal.classList.add("hidden");
+  document.body.style.overflow = "";
+  newSafeBucketNameInput.value = "";
+  newSafeBucketIconInput.value = "";
+}
+
+function renderSafeBucketsModal() {
+  if (!safeBucketsList) return;
+
+  const totalSafeBalance = getAccountBalance(getSafeAccountName());
+  const unassignedBalance = getUnassignedSafeBalance();
+
+  safeBucketsModalTotalLabel.textContent = `Общий баланс: ${formatMoney(totalSafeBalance)}`;
+  safeBucketsUnassignedValue.textContent = formatMoney(unassignedBalance);
+
+  safeBucketsUnassignedCard?.classList.toggle(
+    "safe-buckets-unassigned-card--danger",
+    Math.abs(unassignedBalance) > 0.009
+  );
+
+  safeBucketsList.innerHTML = "";
+
+  if (!state.safeBuckets.length) {
+    const empty = document.createElement("div");
+    empty.className = "list-card";
+    empty.innerHTML = `
+      <div class="list-body">
+        <h3 class="list-title">Сейфов пока нет</h3>
+        <p class="list-subtitle">Добавь первый внутренний сейф ниже</p>
+      </div>
+    `;
+    safeBucketsList.appendChild(empty);
+    return;
+  }
+
+  state.safeBuckets.forEach((bucket) => {
+    const balance = getSafeBucketBalance(bucket.id);
+
+    const card = document.createElement("div");
+    card.className = "list-card";
+
+    const lockedAttr = bucket.is_locked ? "disabled" : "";
+
+    card.innerHTML = `
+      <div class="list-icon list-icon--amber">${bucket.icon}</div>
+
+      <div class="list-body">
+        <div class="list-title-row">
+          <h3 class="list-title">${escapeHtml(bucket.name)}</h3>
+        </div>
+        <p class="list-subtitle">${bucket.is_locked ? "Системный сейф" : "Можно редактировать"}</p>
+      </div>
+
+      <div class="list-right">
+        <p class="list-value">${formatMoney(balance)}</p>
+      </div>
+
+      <div class="category-manager-actions">
+        <button class="mini-btn mini-btn-edit" type="button" data-safe-edit-id="${bucket.id}" ${lockedAttr}>
+          Изм.
+        </button>
+        <button class="mini-btn mini-btn-delete" type="button" data-safe-delete-id="${bucket.id}" ${lockedAttr}>
+          Удал.
+        </button>
+      </div>
+    `;
+
+    const editBtn = card.querySelector("[data-safe-edit-id]");
+    const deleteBtn = card.querySelector("[data-safe-delete-id]");
+
+    editBtn?.addEventListener("click", async () => {
+      const nextName = prompt("Новое название сейфа", bucket.name);
+      if (nextName === null) return;
+
+      const cleanedName = nextName.trim();
+      if (!cleanedName) {
+        alert("Название сейфа не может быть пустым");
+        return;
+      }
+
+      const nextIcon = prompt("Новый эмодзи сейфа", bucket.icon);
+      if (nextIcon === null) return;
+
+      const cleanedIcon = nextIcon.trim() || "🗂️";
+
+      const { error } = await supabaseClient
+        .from("safe_buckets")
+        .update({
+          name: cleanedName,
+          icon: cleanedIcon,
+        })
+        .eq("id", bucket.id);
+
+      if (error) {
+        alert("Ошибка обновления сейфа");
+        console.error(error);
+        return;
+      }
+
+      await loadDataFromSupabase();
+      renderAll();
+      renderSafeBucketsModal();
+    });
+
+    deleteBtn?.addEventListener("click", async () => {
+      if (bucket.is_locked) return;
+
+      const balanceBeforeDelete = getSafeBucketBalance(bucket.id);
+      if (Math.abs(balanceBeforeDelete) > 0.009) {
+        alert("Нельзя удалить сейф, пока в нём есть деньги");
+        return;
+      }
+
+      const ok = confirm(`Удалить сейф "${bucket.name}"?`);
+      if (!ok) return;
+
+      const { error } = await supabaseClient
+        .from("safe_buckets")
+        .delete()
+        .eq("id", bucket.id);
+
+      if (error) {
+        alert("Ошибка удаления сейфа");
+        console.error(error);
+        return;
+      }
+
+      await loadDataFromSupabase();
+      renderAll();
+      renderSafeBucketsModal();
+    });
+
+    safeBucketsList.appendChild(card);
+  });
+}
+
+async function addSafeBucket() {
+  const name = newSafeBucketNameInput.value.trim();
+  const icon = newSafeBucketIconInput.value.trim() || "🗂️";
+
+  if (!name) {
+    alert("Введите название сейфа");
+    return;
+  }
+
+  const newSafeBucket = {
+    name,
+    icon,
+    is_locked: false,
+    sort_order: state.safeBuckets.length + 1,
+  };
+
+  const { error } = await supabaseClient
+    .from("safe_buckets")
+    .insert(newSafeBucket);
+
+  if (error) {
+    alert("Ошибка добавления сейфа");
+    console.error(error);
+    return;
+  }
+
+  newSafeBucketNameInput.value = "";
+  newSafeBucketIconInput.value = "";
+
+  await loadDataFromSupabase();
+  renderAll();
+  renderSafeBucketsModal();
+}
 
   function openAnalyticsCategoryModal(categoryId) {
     activeAnalyticsCategoryId = categoryId;
@@ -1338,7 +1574,11 @@ function updateAnalyticsWheelDraftFromScroll() {
       const currentBalance = getAccountBalance(account.name);
 
       const card = document.createElement("div");
-      card.className = "list-card";
+card.className = "list-card";
+
+if (account.name === getSafeAccountName()) {
+  card.classList.add("list-card--clickable");
+}
 
       const accountTone =
         account.id === "yandex"
@@ -1362,6 +1602,8 @@ function updateAnalyticsWheelDraftFromScroll() {
         </div>
       `;
 
+      if (account.name === getSafeAccountName()) {
+  card.addEventListener("click", openSafeBucketsModal);
       accountsListEl.appendChild(card);
     });
   }
@@ -2281,6 +2523,8 @@ toAccountSelect?.addEventListener("change", updateTransferSafeFields);
   closeBudgetModalBtn?.addEventListener("click", closeBudgetModal);
   saveBudgetBtn?.addEventListener("click", saveBudgetLimit);
   deleteBudgetBtn?.addEventListener("click", deleteBudgetLimit);
+  closeSafeBucketsModalBtn?.addEventListener("click", closeSafeBucketsModal);
+addSafeBucketBtn?.addEventListener("click", addSafeBucket);
 
   modal?.addEventListener("click", (event) => {
     if (event.target === modal) closeModal();
@@ -2289,6 +2533,10 @@ toAccountSelect?.addEventListener("change", updateTransferSafeFields);
   budgetModal?.addEventListener("click", (event) => {
     if (event.target === budgetModal) closeBudgetModal();
   });
+  
+  safeBucketsModal?.addEventListener("click", (event) => {
+  if (event.target === safeBucketsModal) closeSafeBucketsModal();
+});
 
   closeAnalyticsCategoryModalBtn?.addEventListener("click", closeAnalyticsCategoryModal);
 
@@ -2319,6 +2567,11 @@ toAccountSelect?.addEventListener("change", updateTransferSafeFields);
       closeBudgetModal();
       return;
     }
+    
+    if (safeBucketsModal && !safeBucketsModal.classList.contains("hidden")) {
+  closeSafeBucketsModal();
+  return;
+}
 
     if (analyticsCategoryModal && !analyticsCategoryModal.classList.contains("hidden")) {
       closeAnalyticsCategoryModal();
