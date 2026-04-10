@@ -780,6 +780,10 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   filter: invert(1) brightness(0.9);
 }
 
+.transfer-safe-field {
+  transition: opacity 0.16s ease, transform 0.16s ease;
+}
+
 /* =========================================================
    13. HISTORY / ANALYTICS FILTERS
    ========================================================= */
