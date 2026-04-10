@@ -381,6 +381,44 @@
     </div>
   </div>
 </div>
+
+<div class="modal hidden" id="safeBucketAmountModal">
+  <div class="modal-sheet safe-bucket-amount-sheet">
+    <div class="modal-handle"></div>
+
+    <div class="section-head safe-bucket-amount-head">
+      <h3 class="modal-title safe-bucket-amount-title" id="safeBucketAmountModalTitle">
+        Сумма сейфа
+      </h3>
+      <button class="manager-back-btn" type="button" id="closeSafeBucketAmountModalBtn">
+        Закрыть
+      </button>
+    </div>
+
+    <div class="safe-bucket-amount-current" id="safeBucketAmountCurrentValue">
+      Сейчас: 0 ₽
+    </div>
+
+    <div class="field">
+      <input
+        class="input safe-bucket-amount-input"
+        id="safeBucketAmountInput"
+        type="text"
+        inputmode="decimal"
+        placeholder="Введите новую сумму"
+      />
+    </div>
+
+    <div class="safe-bucket-amount-actions">
+      <button class="btn btn-secondary" type="button" id="cancelSafeBucketAmountBtn">
+        Отмена
+      </button>
+      <button class="btn btn-primary" type="button" id="saveSafeBucketAmountBtn">
+        Сохранить
+      </button>
+    </div>
+  </div>
+</div>
   
   <div class="modal hidden" id="analyticsCategoryModal">
   <div class="modal-sheet">
