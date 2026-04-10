@@ -812,6 +812,47 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   letter-spacing: -0.03em;
 }
 
+.safe-buckets-rate-row {
+  width: 100%;
+  margin-bottom: 12px;
+  border: none;
+  padding: 12px 14px;
+  border-radius: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  background: linear-gradient(180deg, rgba(42, 46, 58, 0.84) 0%, rgba(33, 36, 46, 0.9) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  color: var(--text);
+  text-align: left;
+}
+
+.safe-buckets-rate-row:active {
+  transform: scale(0.993);
+}
+
+.safe-buckets-rate-row__label {
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 15px;
+  font-weight: 840;
+  line-height: 1.08;
+}
+
+.safe-buckets-rate-row__value {
+  min-width: 104px;
+  padding: 10px 14px;
+  border-radius: 16px;
+  background: rgba(111, 156, 255, 0.12);
+  color: #f7f8fb;
+  font-size: 15px;
+  font-weight: 900;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+}
+
 .safe-buckets-close-btn {
   flex: 0 0 auto;
   min-width: 112px;
@@ -1024,6 +1065,18 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   min-width: 118px;
   font-size: 14px;
   padding: 9px 12px;
+}
+
+.safe-buckets-rate-row__value {
+  min-width: 92px;
+  font-size: 14px;
+  padding: 9px 12px;
+}
+
+.safe-interest-sheet {
+  width: calc(100% - 20px);
+  padding: 16px;
+  border-radius: 24px;
 }
 }
 /* =========================================================
@@ -1825,6 +1878,14 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 .safe-bucket-amount-actions {
   align-items: stretch;
+}
+
+.safe-interest-sheet {
+  max-width: 420px;
+  width: calc(100% - 28px);
+  margin: 0 auto;
+  padding: 18px;
+  border-radius: 28px;
 }
 
   .modal-actions--triple {
