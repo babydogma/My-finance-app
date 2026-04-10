@@ -99,6 +99,17 @@ document.addEventListener("DOMContentLoaded", async () => {
   const addSafeBucketBtn = document.getElementById("addSafeBucketBtn");
   
   const safeBucketAmountModal = document.getElementById("safeBucketAmountModal");
+  
+  const safeBucketsRateBtn = document.getElementById("safeBucketsRateBtn");
+  const safeBucketsRateValue = document.getElementById("safeBucketsRateValue");
+  
+  const safeInterestRateModal = document.getElementById("safeInterestRateModal");
+  const safeInterestRateCurrentValue = document.getElementById("safeInterestRateCurrentValue");
+  const safeInterestRateInput = document.getElementById("safeInterestRateInput");
+  const closeSafeInterestRateModalBtn = document.getElementById("closeSafeInterestRateModalBtn");
+  const cancelSafeInterestRateBtn = document.getElementById("cancelSafeInterestRateBtn");
+  const saveSafeInterestRateBtn = document.getElementById("saveSafeInterestRateBtn");
+
   const safeBucketAmountModalTitle = document.getElementById("safeBucketAmountModalTitle");
   const safeBucketAmountCurrentValue = document.getElementById("safeBucketAmountCurrentValue");
   const safeBucketAmountInput = document.getElementById("safeBucketAmountInput");
@@ -187,6 +198,21 @@ function getSafeAccountName() {
   return "Сейфы Яндекса";
 }
 
+function getSafeInterestAnnualRate() {
+  const raw = Number(getAppMetaValue("safe_interest_annual_rate"));
+  if (Number.isFinite(raw) && raw >= 0) {
+    return raw;
+  }
+  return 0.12;
+}
+
+function formatPercentLabel(rateDecimal) {
+  const percent = (Number(rateDecimal) || 0) * 100;
+  return `${new Intl.NumberFormat("ru-RU", {
+    maximumFractionDigits: 2,
+  }).format(percent)}%`;
+}
+
 function getSafeBucketBalance(bucketId) {
   let balance = 0;
   const freeBucketId = getFreeSafeBucket()?.id || null;
@@ -207,6 +233,12 @@ function getSafeBucketBalance(bucketId) {
         transaction.from_safe_bucket_id === bucketId
       ) {
         balance -= amount;
+      }
+    }
+
+    if (transaction.type === "income" && transaction.account === getSafeAccountName()) {
+      if (transaction.to_safe_bucket_id === bucketId) {
+        balance += amount;
       }
     }
 
@@ -1002,6 +1034,51 @@ function closeSafeBucketAmountModal() {
   }
 }
 
+function openSafeInterestRateModal() {
+  const annualRate = getSafeInterestAnnualRate();
+
+  safeInterestRateCurrentValue.textContent = `Сейчас: ${formatPercentLabel(annualRate)}`;
+  safeInterestRateInput.value = String(roundToTwo(annualRate * 100)).replace(".", ",");
+
+  safeInterestRateModal.classList.remove("hidden");
+  safeInterestRateInput.focus();
+  safeInterestRateInput.select();
+}
+
+function closeSafeInterestRateModal() {
+  safeInterestRateModal.classList.add("hidden");
+  safeInterestRateInput.value = "";
+}
+
+async function saveSafeInterestRate() {
+  const normalized = safeInterestRateInput.value.replace(/\s/g, "").replace(",", ".");
+  const percentValue = Number(normalized);
+
+  if (Number.isNaN(percentValue) || percentValue < 0) {
+    alert("Введи корректный процент");
+    return;
+  }
+
+  const decimalRate = roundToTwo(percentValue / 100);
+
+  const { error } = await supabaseClient
+    .from("app_meta")
+    .upsert({
+      key: "safe_interest_annual_rate",
+      value: String(decimalRate),
+    });
+
+  if (error) {
+    alert("Ошибка сохранения годового процента");
+    console.error(error);
+    return;
+  }
+
+  await loadDataFromSupabase();
+  renderSafeBucketsModal();
+  closeSafeInterestRateModal();
+}
+
 function renderSafeBucketsModal() {
   if (!safeBucketsList) return;
 
@@ -1009,6 +1086,9 @@ function renderSafeBucketsModal() {
   const unassignedBalance = getUnassignedSafeBalance();
 
   safeBucketsModalTotalLabel.textContent = `Общий баланс: ${formatMoney(totalSafeBalance)}`;
+  if (safeBucketsRateValue) {
+  safeBucketsRateValue.textContent = formatPercentLabel(getSafeInterestAnnualRate());
+}
   safeBucketsUnassignedValue.textContent =
     Math.abs(unassignedBalance) < 0.009 ? formatMoney(0) : formatMoney(unassignedBalance);
 
@@ -1536,61 +1616,64 @@ async function deleteSafeBucketFromModal() {
   }
 
   async function applySafeInterestIfNeeded() {
-    const annualRate = 0.12;
-    const dailyRate = annualRate / 365;
+  const annualRate = getSafeInterestAnnualRate();
+  const dailyRate = annualRate / 365;
 
-    const today = new Date();
-    const todayString = getDateOnlyString(today);
+  const today = new Date();
+  const todayString = getDateOnlyString(today);
 
-    const lastAppliedDate = getAppMetaValue("safe_interest_last_applied_date");
+  const lastAppliedDate = getAppMetaValue("safe_interest_last_applied_date");
 
-    if (lastAppliedDate === todayString) {
-      return;
-    }
+  if (lastAppliedDate === todayString) {
+    return;
+  }
 
-    let startDate;
+  let startDate;
 
-    if (!lastAppliedDate) {
-      startDate = new Date(today);
-      startDate.setDate(startDate.getDate() - 1);
-    } else {
-      startDate = new Date(`${lastAppliedDate}T00:00:00`);
-    }
+  if (!lastAppliedDate) {
+    startDate = new Date(today);
+    startDate.setDate(startDate.getDate() - 1);
+  } else {
+    startDate = new Date(`${lastAppliedDate}T00:00:00`);
+  }
 
-    const daysToApply = [];
-    const cursor = new Date(startDate);
+  const daysToApply = [];
+  const cursor = new Date(startDate);
 
-    while (true) {
-      cursor.setDate(cursor.getDate() + 1);
-      const cursorString = getDateOnlyString(cursor);
+  while (true) {
+    cursor.setDate(cursor.getDate() + 1);
+    const cursorString = getDateOnlyString(cursor);
 
-      if (cursorString > todayString) break;
-      daysToApply.push(new Date(cursor));
-    }
+    if (cursorString > todayString) break;
+    daysToApply.push(new Date(cursor));
+  }
 
-    if (!daysToApply.length) {
-      return;
-    }
+  if (!daysToApply.length) {
+    return;
+  }
 
-    for (const day of daysToApply) {
-      const safeBalance = getSafeBalance();
+  for (const day of daysToApply) {
+    const dayString = getDateOnlyString(day);
 
-      if (safeBalance <= 0) continue;
+    for (const bucket of state.safeBuckets) {
+      const bucketBalance = getSafeBucketBalance(bucket.id);
 
-      const interestAmount = roundToTwo(safeBalance * dailyRate);
+      if (bucketBalance <= 0) continue;
+
+      const interestAmount = roundToTwo(bucketBalance * dailyRate);
 
       if (interestAmount <= 0) continue;
-
-      const dayString = getDateOnlyString(day);
 
       const interestTransaction = {
         id: crypto.randomUUID(),
         type: "income",
         title: "Проценты по сейфу",
-        account: "Сейфы Яндекса",
+        account: getSafeAccountName(),
         category_id: null,
         from_account: null,
         to_account: null,
+        from_safe_bucket_id: null,
+        to_safe_bucket_id: bucket.id,
         amount: interestAmount,
         time_label: "00:01",
         created_at: `${dayString}T00:01:00`,
@@ -1602,25 +1685,26 @@ async function deleteSafeBucketFromModal() {
 
       if (insertError) {
         console.error(insertError);
-        alert("Ошибка начисления процентов по сейфу");
+        alert("Ошибка начисления процентов по сейфам");
         return;
       }
 
       state.transactions.push(interestTransaction);
     }
-
-    const { error: metaError } = await supabaseClient
-      .from("app_meta")
-      .upsert({
-        key: "safe_interest_last_applied_date",
-        value: todayString,
-      });
-
-    if (metaError) {
-      console.error(metaError);
-      alert("Ошибка сохранения даты начисления процентов");
-    }
   }
+
+  const { error: metaError } = await supabaseClient
+    .from("app_meta")
+    .upsert({
+      key: "safe_interest_last_applied_date",
+      value: todayString,
+    });
+
+  if (metaError) {
+    console.error(metaError);
+    alert("Ошибка сохранения даты начисления процентов");
+  }
+}
 
   function renderBalance() {
     const balance = calculateBalance();
@@ -1879,11 +1963,18 @@ const deleteBtn = card.querySelector("[data-delete-id]");
   subtitle = `${escapeHtml(fromLabel)} → ${escapeHtml(toLabel)}`;
   signedAmount = formatMoney(transaction.amount);
 }
-     else if (transaction.type === "income") {
-      subtitle = `${escapeHtml(transaction.account)} • доход`;
-      signedAmount = `+${formatMoney(transaction.amount)}`;
-      valueClass = "list-value list-value--green";
-    } else {
+
+else if (transaction.type === "income") {
+  const incomeBucketLabel =
+    transaction.account === getSafeAccountName() && transaction.to_safe_bucket_id
+      ? ` • ${getSafeBucketName(transaction.to_safe_bucket_id)}`
+      : "";
+
+  subtitle = `${escapeHtml(transaction.account)}${escapeHtml(incomeBucketLabel)} • доход`;
+  signedAmount = `+${formatMoney(transaction.amount)}`;
+  valueClass = "list-value list-value--green";
+
+     } else {
       subtitle = `${escapeHtml(getCategoryName(transaction.category_id || UNCATEGORIZED_ID))} • ${escapeHtml(transaction.account)}`;
       signedAmount = `−${formatMoney(transaction.amount)}`;
       valueClass = "list-value list-value--red";
@@ -2625,6 +2716,13 @@ closeSafeBucketAmountModalBtn?.addEventListener("click", closeSafeBucketAmountMo
 cancelSafeBucketAmountBtn?.addEventListener("click", closeSafeBucketAmountModal);
 saveSafeBucketAmountBtn?.addEventListener("click", saveSafeBucketAmount);
 deleteSafeBucketBtn?.addEventListener("click", deleteSafeBucketFromModal);
+safeBucketsRateBtn?.addEventListener("click", openSafeInterestRateModal);
+closeSafeInterestRateModalBtn?.addEventListener("click", closeSafeInterestRateModal);
+cancelSafeInterestRateBtn?.addEventListener("click", closeSafeInterestRateModal);
+saveSafeInterestRateBtn?.addEventListener("click", saveSafeInterestRate);
+safeInterestRateModal?.addEventListener("click", (event) => {
+  if (event.target === safeInterestRateModal) closeSafeInterestRateModal();
+});
 
   modal?.addEventListener("click", (event) => {
     if (event.target === modal) closeModal();
@@ -2690,6 +2788,11 @@ deleteSafeBucketBtn?.addEventListener("click", deleteSafeBucketFromModal);
     if (isAnalyticsMonthWheelOpen) {
       closeAnalyticsMonthWheel();
     }
+    
+    if (safeInterestRateModal && !safeInterestRateModal.classList.contains("hidden")) {
+  closeSafeInterestRateModal();
+  return;
+}
   });
 
   period7Btn?.addEventListener("click", () => {
