@@ -402,8 +402,36 @@
         Закрыть
       </button>
     </div>
-    
-    <div class="modal hidden" id="safeInterestRateModal">
+
+    <div class="safe-bucket-amount-current" id="safeBucketAmountCurrentValue">
+      Сейчас: 0 ₽
+    </div>
+
+    <div class="field">
+      <input
+        class="input safe-bucket-amount-input"
+        id="safeBucketAmountInput"
+        type="text"
+        inputmode="decimal"
+        placeholder="Введите новую сумму"
+      />
+    </div>
+
+    <div class="modal-actions modal-actions--triple safe-bucket-amount-actions">
+      <button class="btn btn-danger hidden" type="button" id="deleteSafeBucketBtn">
+        Удалить
+      </button>
+      <button class="btn btn-secondary" type="button" id="cancelSafeBucketAmountBtn">
+        Отмена
+      </button>
+      <button class="btn btn-primary" type="button" id="saveSafeBucketAmountBtn">
+        Сохранить
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="modal hidden" id="safeInterestRateModal">
   <div class="modal-sheet safe-interest-sheet">
     <div class="modal-handle"></div>
 
@@ -433,34 +461,6 @@
         Отмена
       </button>
       <button class="btn btn-primary" type="button" id="saveSafeInterestRateBtn">
-        Сохранить
-      </button>
-    </div>
-  </div>
-</div>
-
-    <div class="safe-bucket-amount-current" id="safeBucketAmountCurrentValue">
-      Сейчас: 0 ₽
-    </div>
-
-    <div class="field">
-      <input
-        class="input safe-bucket-amount-input"
-        id="safeBucketAmountInput"
-        type="text"
-        inputmode="decimal"
-        placeholder="Введите новую сумму"
-      />
-    </div>
-
-    <div class="modal-actions modal-actions--triple safe-bucket-amount-actions">
-      <button class="btn btn-danger hidden" type="button" id="deleteSafeBucketBtn">
-        Удалить
-      </button>
-      <button class="btn btn-secondary" type="button" id="cancelSafeBucketAmountBtn">
-        Отмена
-      </button>
-      <button class="btn btn-primary" type="button" id="saveSafeBucketAmountBtn">
         Сохранить
       </button>
     </div>
