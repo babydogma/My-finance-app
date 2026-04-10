@@ -346,6 +346,42 @@
     </div>
   </div>
   
+  <div class="modal hidden" id="safeBucketsModal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+
+    <div class="section-head">
+      <h3 class="modal-title" id="safeBucketsModalTitle" style="margin:0; text-align:left;">Сейфы Яндекса</h3>
+      <button class="manager-back-btn" type="button" id="closeSafeBucketsModalBtn">Закрыть</button>
+    </div>
+
+    <div class="section-note" id="safeBucketsModalTotalLabel" style="margin-bottom:12px;">Общий баланс: 0 ₽</div>
+
+    <div class="analytics-category-extra-card" id="safeBucketsUnassignedCard">
+      <div class="analytics-category-extra-row">
+        <div class="analytics-category-extra-label">Не распределено</div>
+        <div class="analytics-category-extra-value" id="safeBucketsUnassignedValue">0 ₽</div>
+      </div>
+    </div>
+
+    <div class="list" id="safeBucketsList"></div>
+
+    <div class="manager-card" style="margin-top:14px;">
+      <div class="field">
+        <input class="input" id="newSafeBucketNameInput" type="text" placeholder="Название сейфа" />
+      </div>
+
+      <div class="field">
+        <input class="input" id="newSafeBucketIconInput" type="text" placeholder="Эмодзи, например 🏠" maxlength="4" />
+      </div>
+
+      <button class="btn btn-primary manager-add-btn" type="button" id="addSafeBucketBtn">
+        Добавить сейф
+      </button>
+    </div>
+  </div>
+</div>
+  
   <div class="modal hidden" id="analyticsCategoryModal">
   <div class="modal-sheet">
     <div class="modal-handle"></div>
