@@ -97,8 +97,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   let analyticsRangeEnd = "";
 
   let analyticsDraftMonth = "";
-  let analyticsDraftYear = "";
-  let isAnalyticsMonthWheelOpen = false;
+let analyticsDraftYear = "";
+let isAnalyticsMonthWheelOpen = false;
+
+let analyticsMonthScrollTimer = null;
+let analyticsYearScrollTimer = null;
 
   let analyticsMode = "categories";
   let analyticsOperationType = "all";
@@ -429,6 +432,57 @@ document.addEventListener("DOMContentLoaded", async () => {
   return closest?.getAttribute(attrName) || null;
 }
 
+function setWheelActiveState(container, attrName, activeValue) {
+  if (!container) return;
+
+  container.querySelectorAll(`.month-wheel__item[${attrName}]`).forEach((item) => {
+    item.classList.toggle("is-active", item.getAttribute(attrName) === activeValue);
+  });
+}
+
+function snapWheelToValue(container, attrName, value, behavior = "smooth") {
+  if (!container || !value) return;
+
+  const activeEl = container.querySelector(`.month-wheel__item[${attrName}="${value}"]`);
+  if (!activeEl) return;
+
+  const top =
+    activeEl.offsetTop - container.clientHeight / 2 + activeEl.clientHeight / 2;
+
+  container.scrollTo({ top, behavior });
+}
+
+function bindWheelScroll(container, attrName, onChange) {
+  if (!container) return;
+
+  container.addEventListener(
+    "scroll",
+    () => {
+      const timerName = attrName === "data-wheel-month"
+        ? "analyticsMonthScrollTimer"
+        : "analyticsYearScrollTimer";
+
+      clearTimeout(window[timerName]);
+
+      const centeredValue = getCenteredWheelValue(container, attrName);
+      if (centeredValue) {
+        onChange(centeredValue);
+        setWheelActiveState(container, attrName, centeredValue);
+      }
+
+      window[timerName] = setTimeout(() => {
+        const finalValue = getCenteredWheelValue(container, attrName);
+        if (!finalValue) return;
+
+        onChange(finalValue);
+        setWheelActiveState(container, attrName, finalValue);
+        snapWheelToValue(container, attrName, finalValue, "smooth");
+      }, 90);
+    },
+    { passive: true }
+  );
+}
+
 function updateAnalyticsWheelDraftFromScroll() {
   const nextMonth = getCenteredWheelValue(analyticsMonthNamesColumn, "data-wheel-month");
   const nextYear = getCenteredWheelValue(analyticsMonthYearsColumn, "data-wheel-year");
@@ -467,13 +521,12 @@ function updateAnalyticsWheelDraftFromScroll() {
   analyticsMonthNamesColumn.querySelectorAll("[data-wheel-month]").forEach((btn) => {
     btn.addEventListener("click", () => {
       analyticsDraftMonth = btn.dataset.wheelMonth;
-      renderAnalyticsMonthWheel();
-
-      requestAnimationFrame(() =>
-        syncWheelColumnPosition(
-          analyticsMonthNamesColumn,
-          `.month-wheel__item[data-wheel-month="${analyticsDraftMonth}"]`
-        )
+      setWheelActiveState(analyticsMonthNamesColumn, "data-wheel-month", analyticsDraftMonth);
+      snapWheelToValue(
+        analyticsMonthNamesColumn,
+        "data-wheel-month",
+        analyticsDraftMonth,
+        "smooth"
       );
     });
   });
@@ -481,85 +534,71 @@ function updateAnalyticsWheelDraftFromScroll() {
   analyticsMonthYearsColumn.querySelectorAll("[data-wheel-year]").forEach((btn) => {
     btn.addEventListener("click", () => {
       analyticsDraftYear = btn.dataset.wheelYear;
-      renderAnalyticsMonthWheel();
-
-      requestAnimationFrame(() =>
-        syncWheelColumnPosition(
-          analyticsMonthYearsColumn,
-          `.month-wheel__item[data-wheel-year="${analyticsDraftYear}"]`
-        )
+      setWheelActiveState(analyticsMonthYearsColumn, "data-wheel-year", analyticsDraftYear);
+      snapWheelToValue(
+        analyticsMonthYearsColumn,
+        "data-wheel-year",
+        analyticsDraftYear,
+        "smooth"
       );
     });
   });
 
-  analyticsMonthNamesColumn.onscroll = null;
-  analyticsMonthYearsColumn.onscroll = null;
+  bindWheelScroll(analyticsMonthNamesColumn, "data-wheel-month", (value) => {
+    analyticsDraftMonth = value;
+  });
 
-  let monthScrollTimer = null;
-  let yearScrollTimer = null;
-
-  analyticsMonthNamesColumn.onscroll = () => {
-    clearTimeout(monthScrollTimer);
-    monthScrollTimer = setTimeout(() => {
-      const nextMonth = getCenteredWheelValue(
-        analyticsMonthNamesColumn,
-        "data-wheel-month"
-      );
-
-      if (nextMonth) {
-        analyticsDraftMonth = nextMonth;
-        renderAnalyticsMonthWheel();
-
-        requestAnimationFrame(() =>
-          syncWheelColumnPosition(
-            analyticsMonthNamesColumn,
-            `.month-wheel__item[data-wheel-month="${analyticsDraftMonth}"]`
-          )
-        );
-      }
-    }, 80);
-  };
-
-  analyticsMonthYearsColumn.onscroll = () => {
-    clearTimeout(yearScrollTimer);
-    yearScrollTimer = setTimeout(() => {
-      const nextYear = getCenteredWheelValue(
-        analyticsMonthYearsColumn,
-        "data-wheel-year"
-      );
-
-      if (nextYear) {
-        analyticsDraftYear = nextYear;
-        renderAnalyticsMonthWheel();
-
-        requestAnimationFrame(() =>
-          syncWheelColumnPosition(
-            analyticsMonthYearsColumn,
-            `.month-wheel__item[data-wheel-year="${analyticsDraftYear}"]`
-          )
-        );
-      }
-    }, 80);
-  };
+  bindWheelScroll(analyticsMonthYearsColumn, "data-wheel-year", (value) => {
+    analyticsDraftYear = value;
+  });
 
   requestAnimationFrame(() => {
-    syncWheelColumnPosition(
+    setWheelActiveState(analyticsMonthNamesColumn, "data-wheel-month", analyticsDraftMonth);
+    setWheelActiveState(analyticsMonthYearsColumn, "data-wheel-year", analyticsDraftYear);
+
+    snapWheelToValue(
       analyticsMonthNamesColumn,
-      `.month-wheel__item[data-wheel-month="${analyticsDraftMonth}"]`
+      "data-wheel-month",
+      analyticsDraftMonth,
+      "auto"
     );
-    syncWheelColumnPosition(
+
+    snapWheelToValue(
       analyticsMonthYearsColumn,
-      `.month-wheel__item[data-wheel-year="${analyticsDraftYear}"]`
+      "data-wheel-year",
+      analyticsDraftYear,
+      "auto"
     );
   });
 }
 
   function openAnalyticsMonthWheel() {
-    setAnalyticsDraftMonthFromValue(analyticsSelectedMonth);
-    isAnalyticsMonthWheelOpen = true;
-    analyticsMonthWheelWrap?.classList.remove("hidden");
+  setAnalyticsDraftMonthFromValue(analyticsSelectedMonth);
+  isAnalyticsMonthWheelOpen = true;
+  analyticsMonthWheelWrap?.classList.remove("hidden");
+
+  if (!analyticsMonthNamesColumn?.children.length || !analyticsMonthYearsColumn?.children.length) {
     renderAnalyticsMonthWheel();
+  } else {
+    setWheelActiveState(analyticsMonthNamesColumn, "data-wheel-month", analyticsDraftMonth);
+    setWheelActiveState(analyticsMonthYearsColumn, "data-wheel-year", analyticsDraftYear);
+
+    requestAnimationFrame(() => {
+      snapWheelToValue(
+        analyticsMonthNamesColumn,
+        "data-wheel-month",
+        analyticsDraftMonth,
+        "auto"
+      );
+      snapWheelToValue(
+        analyticsMonthYearsColumn,
+        "data-wheel-year",
+        analyticsDraftYear,
+        "auto"
+      );
+    });
   }
+}
 
   function closeAnalyticsMonthWheel() {
     isAnalyticsMonthWheelOpen = false;
