@@ -27,10 +27,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const navWalletBtn = document.getElementById("navWalletBtn");
   const navAnalyticsBtn = document.getElementById("navAnalyticsBtn");
-
+  const navInsightsBtn = document.getElementById("navInsightsBtn");
+  
   const mainView = document.getElementById("mainView");
   const categoriesManagerView = document.getElementById("categoriesManagerView");
   const analyticsView = document.getElementById("analyticsView");
+  const insightsView = document.getElementById("insightsView");
 
   const categoriesManagerList = document.getElementById("categoriesManagerList");
   const newCategoryNameInput = document.getElementById("newCategoryNameInput");
@@ -62,6 +64,17 @@ document.addEventListener("DOMContentLoaded", async () => {
   const analyticsCategoriesBreakdownSection = document.getElementById("analyticsCategoriesBreakdownSection");
   const analyticsOperationsSection = document.getElementById("analyticsOperationsSection");
   const analyticsTransactionsList = document.getElementById("analyticsTransactionsList");
+  
+  const insightsPeriodLabel = document.getElementById("insightsPeriodLabel");
+  const insightsIncomeValue = document.getElementById("insightsIncomeValue");
+  const insightsExpenseValue = document.getElementById("insightsExpenseValue");
+  const insightsNetValue = document.getElementById("insightsNetValue");
+  const insightsRequiredValue = document.getElementById("insightsRequiredValue");
+  const insightsFlexibleValue = document.getElementById("insightsFlexibleValue");
+  const insightsSavedValue = document.getElementById("insightsSavedValue");
+  const insightsInterestValue = document.getElementById("insightsInterestValue");
+  const insightsRecommendationText = document.getElementById("insightsRecommendationText");
+  const insightsSafeList = document.getElementById("insightsSafeList");
 
   const modalTitle = modal?.querySelector(".modal-title");
 
@@ -924,40 +937,55 @@ function updateAnalyticsWheelDraftFromScroll() {
   }
 
   function setActiveNav(viewName) {
-    navWalletBtn?.classList.toggle("is-active", viewName === "wallet");
-    navAnalyticsBtn?.classList.toggle("is-active", viewName === "analytics");
-  }
+  navWalletBtn?.classList.toggle("is-active", viewName === "wallet");
+  navAnalyticsBtn?.classList.toggle("is-active", viewName === "analytics");
+  navInsightsBtn?.classList.toggle("is-active", viewName === "insights");
+}
 
   function showWalletView() {
-    document.querySelector(".app")?.classList.remove("app--analytics");
-    mainView.classList.remove("hidden");
-    categoriesManagerView.classList.add("hidden");
-    analyticsView.classList.add("hidden");
-    closeAnalyticsMonthWheel();
-    setActiveNav("wallet");
-  }
+  document.querySelector(".app")?.classList.remove("app--analytics");
+  mainView.classList.remove("hidden");
+  categoriesManagerView.classList.add("hidden");
+  analyticsView.classList.add("hidden");
+  insightsView.classList.add("hidden");
+  closeAnalyticsMonthWheel();
+  setActiveNav("wallet");
+}
 
   function openCategoriesManager() {
-    document.querySelector(".app")?.classList.remove("app--analytics");
-    mainView.classList.add("hidden");
-    categoriesManagerView.classList.remove("hidden");
-    analyticsView.classList.add("hidden");
-    closeAnalyticsMonthWheel();
-    setActiveNav("wallet");
-  }
+  document.querySelector(".app")?.classList.remove("app--analytics");
+  mainView.classList.add("hidden");
+  categoriesManagerView.classList.remove("hidden");
+  analyticsView.classList.add("hidden");
+  insightsView.classList.add("hidden");
+  closeAnalyticsMonthWheel();
+  setActiveNav("wallet");
+}
 
   function closeCategoriesManager() {
     showWalletView();
   }
 
   function showAnalyticsView() {
-    document.querySelector(".app")?.classList.add("app--analytics");
-    mainView.classList.add("hidden");
-    categoriesManagerView.classList.add("hidden");
-    analyticsView.classList.remove("hidden");
-    setActiveNav("analytics");
-    renderAnalytics();
-  }
+  document.querySelector(".app")?.classList.add("app--analytics");
+  mainView.classList.add("hidden");
+  categoriesManagerView.classList.add("hidden");
+  analyticsView.classList.remove("hidden");
+  insightsView.classList.add("hidden");
+  setActiveNav("analytics");
+  renderAnalytics();
+}
+
+  function showInsightsView() {
+  document.querySelector(".app")?.classList.add("app--analytics");
+  mainView.classList.add("hidden");
+  categoriesManagerView.classList.add("hidden");
+  analyticsView.classList.add("hidden");
+  insightsView.classList.remove("hidden");
+  closeAnalyticsMonthWheel();
+  setActiveNav("insights");
+  renderInsights();
+}
 
   function openBudgetModal(categoryId) {
     const category = getCategoryById(categoryId);
@@ -1614,6 +1642,68 @@ async function deleteSafeBucketFromModal() {
 
     return sortTransactionsByLatest(items);
   }
+  
+  function getInsightsSummary() {
+  const items = getAnalyticsFilteredTransactions();
+
+  let income = 0;
+  let expense = 0;
+  let requiredExpense = 0;
+  let flexibleExpense = 0;
+  let savedToSafes = 0;
+  let safeInterest = 0;
+
+  items.forEach((transaction) => {
+    const amount = Number(transaction.amount) || 0;
+
+    if (transaction.type === "income") {
+      income += amount;
+
+      if (
+        transaction.account === getSafeAccountName() &&
+        transaction.title === "Проценты по сейфу"
+      ) {
+        safeInterest += amount;
+      }
+    }
+
+    if (transaction.type === "expense") {
+      expense += amount;
+
+      const categoryId = transaction.category_id || UNCATEGORIZED_ID;
+      if (isRequiredCategory(categoryId)) {
+        requiredExpense += amount;
+      } else {
+        flexibleExpense += amount;
+      }
+    }
+
+    if (
+      transaction.type === "transfer" &&
+      transaction.to_account === getSafeAccountName() &&
+      transaction.from_account !== getSafeAccountName()
+    ) {
+      savedToSafes += amount;
+    }
+  });
+
+  const net = income - expense;
+  const recommendedToSave = Math.max(
+    0,
+    roundToTwo(income - requiredExpense - flexibleExpense * 0.5)
+  );
+
+  return {
+    income,
+    expense,
+    net,
+    requiredExpense,
+    flexibleExpense,
+    savedToSafes,
+    safeInterest,
+    recommendedToSave,
+  };
+}
 
   async function applySafeInterestIfNeeded() {
   const annualRate = getSafeInterestAnnualRate();
@@ -2238,6 +2328,93 @@ else if (transaction.type === "income") {
         });
       });
   }
+  
+  function renderInsights() {
+  if (!insightsView) return;
+
+  const summary = getInsightsSummary();
+  const periodLabel = getAnalyticsPeriodLabel() || "за период";
+
+  insightsPeriodLabel.textContent = periodLabel;
+  insightsIncomeValue.textContent = formatMoney(summary.income);
+  insightsExpenseValue.textContent = formatMoney(summary.expense);
+  insightsRequiredValue.textContent = formatMoney(summary.requiredExpense);
+  insightsFlexibleValue.textContent = formatMoney(summary.flexibleExpense);
+  insightsSavedValue.textContent = formatMoney(summary.savedToSafes);
+  insightsInterestValue.textContent = formatMoney(summary.safeInterest);
+
+  insightsNetValue.classList.remove("is-positive", "is-negative");
+
+  if (summary.net > 0) {
+    insightsNetValue.textContent = `+${formatMoney(summary.net)}`;
+    insightsNetValue.classList.add("is-positive");
+  } else if (summary.net < 0) {
+    insightsNetValue.textContent = `−${formatMoney(Math.abs(summary.net))}`;
+    insightsNetValue.classList.add("is-negative");
+  } else {
+    insightsNetValue.textContent = formatMoney(0);
+  }
+
+  const requiredShare = summary.income > 0
+    ? Math.round((summary.requiredExpense / summary.income) * 100)
+    : 0;
+
+  const flexibleShare = summary.income > 0
+    ? Math.round((summary.flexibleExpense / summary.income) * 100)
+    : 0;
+
+  let recommendation = "";
+
+  if (summary.income <= 0) {
+    recommendation = "За выбранный период нет доходов. Сначала накопи базу данных, потом советы станут точнее.";
+  } else if (summary.net <= 0) {
+    recommendation = `Период закрывается в минус. В первую очередь режь гибкие траты: сейчас они занимают ${flexibleShare}% дохода.`;
+  } else if (summary.flexibleExpense > summary.requiredExpense) {
+    recommendation = `Гибкие траты слишком жирные: ${flexibleShare}% дохода против ${requiredShare}% обязательных. Реально можно отложить около ${formatMoney(summary.recommendedToSave)}.`;
+  } else {
+    recommendation = `Ситуация нормальная. Безопасно можно отложить около ${formatMoney(summary.recommendedToSave)} без удара по обязательным расходам.`;
+  }
+
+  insightsRecommendationText.textContent = recommendation;
+
+  if (insightsSafeList) {
+    insightsSafeList.innerHTML = "";
+
+    const unassignedRow = document.createElement("div");
+    unassignedRow.className = "list-card";
+    unassignedRow.innerHTML = `
+      <div class="list-icon list-icon--neutral">🧩</div>
+      <div class="list-body">
+        <div class="list-title-row">
+          <h3 class="list-title">Не распределено</h3>
+        </div>
+        <p class="list-subtitle">Остаток на счёте сейфов вне внутренних сейфов</p>
+      </div>
+      <div class="list-right">
+        <p class="list-value">${formatMoney(getUnassignedSafeBalance())}</p>
+      </div>
+    `;
+    insightsSafeList.appendChild(unassignedRow);
+
+    state.safeBuckets.forEach((bucket) => {
+      const row = document.createElement("div");
+      row.className = "list-card";
+      row.innerHTML = `
+        <div class="list-icon list-icon--amber">${bucket.icon}</div>
+        <div class="list-body">
+          <div class="list-title-row">
+            <h3 class="list-title">${escapeHtml(bucket.name)}</h3>
+          </div>
+          <p class="list-subtitle">${bucket.is_locked ? "Системный сейф" : "Внутренний сейф"}</p>
+        </div>
+        <div class="list-right">
+          <p class="list-value">${formatMoney(getSafeBucketBalance(bucket.id))}</p>
+        </div>
+      `;
+      insightsSafeList.appendChild(row);
+    });
+  }
+}
 
   function buildTransactionFromForm() {
     const amount = Number(amountInput.value.trim());
@@ -2584,14 +2761,15 @@ return {
 }
 
   function renderAll() {
-    ensureUncategorizedCategory();
-    renderBalance();
-    renderBalanceResult();
-    renderAccounts();
-    renderCategoriesManager();
-    renderTransactions();
-    renderAnalytics();
-  }
+  ensureUncategorizedCategory();
+  renderBalance();
+  renderBalanceResult();
+  renderAccounts();
+  renderCategoriesManager();
+  renderTransactions();
+  renderAnalytics();
+  renderInsights();
+}
 
   openExpenseModalBtn?.addEventListener("click", () => openModal("expense"));
   openIncomeModalBtn?.addEventListener("click", () => openModal("income"));
@@ -2603,7 +2781,8 @@ toAccountSelect?.addEventListener("change", updateTransferSafeFields);
   closeCategoriesManagerBtn?.addEventListener("click", closeCategoriesManager);
 
   navWalletBtn?.addEventListener("click", showWalletView);
-  navAnalyticsBtn?.addEventListener("click", showAnalyticsView);
+navAnalyticsBtn?.addEventListener("click", showAnalyticsView);
+navInsightsBtn?.addEventListener("click", showInsightsView);
 
   analyticsPeriodButtons.forEach((btn) => {
     btn.addEventListener("click", () => {
