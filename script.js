@@ -97,6 +97,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   const newSafeBucketNameInput = document.getElementById("newSafeBucketNameInput");
   const newSafeBucketIconInput = document.getElementById("newSafeBucketIconInput");
   const addSafeBucketBtn = document.getElementById("addSafeBucketBtn");
+  
+  const safeBucketAmountModal = document.getElementById("safeBucketAmountModal");
+  const safeBucketAmountModalTitle = document.getElementById("safeBucketAmountModalTitle");
+  const safeBucketAmountCurrentValue = document.getElementById("safeBucketAmountCurrentValue");
+  const safeBucketAmountInput = document.getElementById("safeBucketAmountInput");
+  const closeSafeBucketAmountModalBtn = document.getElementById("closeSafeBucketAmountModalBtn");
+  const cancelSafeBucketAmountBtn = document.getElementById("cancelSafeBucketAmountBtn");
+  const saveSafeBucketAmountBtn = document.getElementById("saveSafeBucketAmountBtn");
 
   const period7Btn = document.getElementById("period7Btn");
   const period30Btn = document.getElementById("period30Btn");
@@ -123,7 +131,8 @@ let analyticsYearScrollTimer = null;
   let analyticsOperationType = "all";
 
   let activeBudgetCategoryId = null;
-  let activeAnalyticsCategoryId = null;
+let activeAnalyticsCategoryId = null;
+let activeSafeBucketAmountId = null;
 
   const UNCATEGORIZED_ID = "uncategorized";
 
@@ -959,6 +968,29 @@ function closeSafeBucketsModal() {
   newSafeBucketIconInput.value = "";
 }
 
+function openSafeBucketAmountModal(bucketId) {
+  const bucket = getSafeBucketById(bucketId);
+  if (!bucket) return;
+
+  activeSafeBucketAmountId = bucketId;
+
+  const balance = getSafeBucketBalance(bucketId);
+
+  safeBucketAmountModalTitle.textContent = `${bucket.icon} ${bucket.name}`;
+  safeBucketAmountCurrentValue.textContent = `Сейчас: ${formatMoney(balance)}`;
+  safeBucketAmountInput.value = String(balance).replace(".", ",");
+
+  safeBucketAmountModal.classList.remove("hidden");
+  safeBucketAmountInput.focus();
+  safeBucketAmountInput.select();
+}
+
+function closeSafeBucketAmountModal() {
+  safeBucketAmountModal.classList.add("hidden");
+  activeSafeBucketAmountId = null;
+  safeBucketAmountInput.value = "";
+}
+
 function renderSafeBucketsModal() {
   if (!safeBucketsList) return;
 
@@ -1026,29 +1058,9 @@ function renderSafeBucketsModal() {
     const editBtn = card.querySelector("[data-safe-edit-id]");
     const deleteBtn = card.querySelector("[data-safe-delete-id]");
 
-    editBtn?.addEventListener("click", async () => {
-      const nextAmountRaw = prompt(
-        `Новая сумма для сейфа "${bucket.name}"`,
-        String(balance).replace(".", ",")
-      );
-
-      if (nextAmountRaw === null) return;
-
-      const normalized = nextAmountRaw.replace(/\s/g, "").replace(",", ".");
-      const nextAmount = Number(normalized);
-
-      if (Number.isNaN(nextAmount) || nextAmount < 0) {
-        alert("Введи корректную сумму");
-        return;
-      }
-
-      const ok = await setSafeBucketTargetAmount(bucket.id, nextAmount);
-      if (!ok) return;
-
-      await loadDataFromSupabase();
-      renderAll();
-      renderSafeBucketsModal();
-    });
+    editBtn?.addEventListener("click", () => {
+  openSafeBucketAmountModal(bucket.id);
+});
 
     deleteBtn?.addEventListener("click", async () => {
       if (bucket.is_locked) return;
@@ -1114,6 +1126,26 @@ async function addSafeBucket() {
   await loadDataFromSupabase();
   renderAll();
   renderSafeBucketsModal();
+}
+
+async function saveSafeBucketAmount() {
+  if (!activeSafeBucketAmountId) return;
+
+  const normalized = safeBucketAmountInput.value.replace(/\s/g, "").replace(",", ".");
+  const nextAmount = Number(normalized);
+
+  if (Number.isNaN(nextAmount) || nextAmount < 0) {
+    alert("Введи корректную сумму");
+    return;
+  }
+
+  const ok = await setSafeBucketTargetAmount(activeSafeBucketAmountId, nextAmount);
+  if (!ok) return;
+
+  await loadDataFromSupabase();
+  renderAll();
+  renderSafeBucketsModal();
+  closeSafeBucketAmountModal();
 }
 
   function openAnalyticsCategoryModal(categoryId) {
@@ -2589,6 +2621,9 @@ toAccountSelect?.addEventListener("change", updateTransferSafeFields);
   deleteBudgetBtn?.addEventListener("click", deleteBudgetLimit);
   closeSafeBucketsModalBtn?.addEventListener("click", closeSafeBucketsModal);
 addSafeBucketBtn?.addEventListener("click", addSafeBucket);
+closeSafeBucketAmountModalBtn?.addEventListener("click", closeSafeBucketAmountModal);
+cancelSafeBucketAmountBtn?.addEventListener("click", closeSafeBucketAmountModal);
+saveSafeBucketAmountBtn?.addEventListener("click", saveSafeBucketAmount);
 
   modal?.addEventListener("click", (event) => {
     if (event.target === modal) closeModal();
@@ -2600,6 +2635,10 @@ addSafeBucketBtn?.addEventListener("click", addSafeBucket);
   
   safeBucketsModal?.addEventListener("click", (event) => {
   if (event.target === safeBucketsModal) closeSafeBucketsModal();
+});
+
+  safeBucketAmountModal?.addEventListener("click", (event) => {
+  if (event.target === safeBucketAmountModal) closeSafeBucketAmountModal();
 });
 
   closeAnalyticsCategoryModalBtn?.addEventListener("click", closeAnalyticsCategoryModal);
@@ -2634,6 +2673,11 @@ addSafeBucketBtn?.addEventListener("click", addSafeBucket);
     
     if (safeBucketsModal && !safeBucketsModal.classList.contains("hidden")) {
   closeSafeBucketsModal();
+  return;
+}
+
+    if (safeBucketAmountModal && !safeBucketAmountModal.classList.contains("hidden")) {
+  closeSafeBucketAmountModal();
   return;
 }
 
