@@ -71,12 +71,16 @@ document.addEventListener("DOMContentLoaded", async () => {
   const accountSelect = document.getElementById("accountSelect");
   const fromAccountSelect = document.getElementById("fromAccountSelect");
   const toAccountSelect = document.getElementById("toAccountSelect");
+  const fromSafeBucketSelect = document.getElementById("fromSafeBucketSelect");
+  const toSafeBucketSelect = document.getElementById("toSafeBucketSelect");
   const commentInput = document.getElementById("commentInput");
-
+  
   const categoryField = document.getElementById("categoryField");
   const accountField = document.getElementById("accountField");
   const fromAccountField = document.getElementById("fromAccountField");
   const toAccountField = document.getElementById("toAccountField");
+  const fromSafeBucketField = document.getElementById("fromSafeBucketField");
+  const toSafeBucketField = document.getElementById("toSafeBucketField");
 
   const balanceEl = document.querySelector(".balance-amount");
   const accountsTotalEl = document.getElementById("accountsTotal");
@@ -113,12 +117,13 @@ let analyticsYearScrollTimer = null;
   const UNCATEGORIZED_ID = "uncategorized";
 
   const state = {
-    transactions: [],
-    accounts: [],
-    categories: [],
-    budgetLimits: [],
-    appMeta: [],
-  };
+  transactions: [],
+  accounts: [],
+  categories: [],
+  budgetLimits: [],
+  safeBuckets: [],
+  appMeta: [],
+};
 
   function getCategoryById(categoryId) {
     return state.categories.find((item) => item.id === categoryId);
@@ -141,6 +146,62 @@ let analyticsYearScrollTimer = null;
 
 function getCategoryTypeLabel(categoryId) {
   return isRequiredCategory(categoryId) ? "Обязательная" : "Гибкая";
+}
+
+function getSafeBucketById(bucketId) {
+  return state.safeBuckets.find((item) => item.id === bucketId);
+}
+
+function getSafeBucketName(bucketId) {
+  const bucket = getSafeBucketById(bucketId);
+  return bucket ? bucket.name : "";
+}
+
+function getSafeBucketIcon(bucketId) {
+  const bucket = getSafeBucketById(bucketId);
+  return bucket ? bucket.icon : "🗂️";
+}
+
+function fillSafeBucketSelect(selectEl, placeholder, selectedId = "") {
+  if (!selectEl) return;
+
+  selectEl.innerHTML = `<option value="">${placeholder}</option>`;
+
+  state.safeBuckets.forEach((bucket) => {
+    const option = document.createElement("option");
+    option.value = bucket.id;
+    option.textContent = `${bucket.icon} ${bucket.name}`;
+
+    if (selectedId && selectedId === bucket.id) {
+      option.selected = true;
+    }
+
+    selectEl.appendChild(option);
+  });
+}
+
+function updateTransferSafeFields() {
+  const fromIsSafes = fromAccountSelect?.value === "Сейфы Яндекса";
+  const toIsSafes = toAccountSelect?.value === "Сейфы Яндекса";
+
+  fromSafeBucketField?.classList.toggle("hidden", !fromIsSafes);
+  toSafeBucketField?.classList.toggle("hidden", !toIsSafes);
+
+  if (!fromIsSafes && fromSafeBucketSelect) {
+    fromSafeBucketSelect.value = "";
+  }
+
+  if (!toIsSafes && toSafeBucketSelect) {
+    toSafeBucketSelect.value = "";
+  }
+
+  if (fromIsSafes) {
+    fillSafeBucketSelect(fromSafeBucketSelect, "Из какого сейфа", fromSafeBucketSelect?.value || "");
+  }
+
+  if (toIsSafes) {
+    fillSafeBucketSelect(toSafeBucketSelect, "В какой сейф", toSafeBucketSelect?.value || "");
+  }
 }
 
   function getBudgetLimitByCategoryId(categoryId) {
@@ -854,14 +915,27 @@ function updateAnalyticsWheelDraftFromScroll() {
   }
 
   function resetForm() {
-    amountInput.value = "";
-    dateInput.value = getTodayDateValue();
-    commentInput.value = "";
-    categorySelect.innerHTML = `<option value="">Выбери категорию</option>`;
-    accountSelect.selectedIndex = 0;
-    fromAccountSelect.selectedIndex = 0;
-    toAccountSelect.selectedIndex = 0;
+  amountInput.value = "";
+  dateInput.value = getTodayDateValue();
+  commentInput.value = "";
+  categorySelect.innerHTML = `<option value="">Выбери категорию</option>`;
+  accountSelect.selectedIndex = 0;
+  fromAccountSelect.selectedIndex = 0;
+  toAccountSelect.selectedIndex = 0;
+
+  if (fromSafeBucketSelect) {
+    fromSafeBucketSelect.innerHTML = `<option value="">Из какого сейфа</option>`;
+    fromSafeBucketSelect.value = "";
   }
+
+  if (toSafeBucketSelect) {
+    toSafeBucketSelect.innerHTML = `<option value="">В какой сейф</option>`;
+    toSafeBucketSelect.value = "";
+  }
+
+  fromSafeBucketField?.classList.add("hidden");
+  toSafeBucketField?.classList.add("hidden");
+}
 
   function openModal(mode) {
     currentMode = mode;
@@ -891,18 +965,25 @@ function updateAnalyticsWheelDraftFromScroll() {
       toAccountField.classList.add("hidden");
 
       accountSelect.value = "Яндекс Банк";
-    } else if (mode === "transfer") {
-      modalTitle.textContent = "Сделать перевод";
-      saveBtn.textContent = "Сохранить перевод";
+   } else if (mode === "transfer") {
+  modalTitle.textContent = "Сделать перевод";
+  saveBtn.textContent = "Сохранить перевод";
 
-      categoryField.classList.add("hidden");
-      accountField.classList.add("hidden");
-      fromAccountField.classList.remove("hidden");
-      toAccountField.classList.remove("hidden");
+  categoryField.classList.add("hidden");
+  accountField.classList.add("hidden");
+  fromAccountField.classList.remove("hidden");
+  toAccountField.classList.remove("hidden");
 
-      fromAccountSelect.value = "Яндекс Банк";
-      toAccountSelect.value = "Наличные";
-    }
+  fromAccountSelect.value = "Яндекс Банк";
+  toAccountSelect.value = "Наличные";
+
+  fromSafeBucketField.classList.add("hidden");
+  toSafeBucketField.classList.add("hidden");
+
+  fillSafeBucketSelect(fromSafeBucketSelect, "Из какого сейфа");
+  fillSafeBucketSelect(toSafeBucketSelect, "В какой сейф");
+  updateTransferSafeFields();
+}
 
     modal.classList.remove("hidden");
     document.body.style.overflow = "hidden";
@@ -951,22 +1032,42 @@ function updateAnalyticsWheelDraftFromScroll() {
       accountSelect.value = transaction.account;
       commentInput.value = transaction.title === "Новый доход" ? "" : transaction.title;
     } else if (transaction.type === "transfer") {
-      modalTitle.textContent = "Редактировать перевод";
-      saveBtn.textContent = "Сохранить";
+  modalTitle.textContent = "Редактировать перевод";
+  saveBtn.textContent = "Сохранить";
 
-      categoryField.classList.add("hidden");
-      accountField.classList.add("hidden");
-      fromAccountField.classList.remove("hidden");
-      toAccountField.classList.remove("hidden");
+  categoryField.classList.add("hidden");
+  accountField.classList.add("hidden");
+  fromAccountField.classList.remove("hidden");
+  toAccountField.classList.remove("hidden");
 
-      amountInput.value = transaction.amount;
-      dateInput.value = transaction.created_at
-        ? String(transaction.created_at).slice(0, 10)
-        : getTodayDateValue();
-      fromAccountSelect.value = transaction.from_account;
-      toAccountSelect.value = transaction.to_account;
-      commentInput.value = transaction.title === "Перевод" ? "" : transaction.title;
-    }
+  amountInput.value = transaction.amount;
+  dateInput.value = transaction.created_at
+    ? String(transaction.created_at).slice(0, 10)
+    : getTodayDateValue();
+  fromAccountSelect.value = transaction.from_account;
+  toAccountSelect.value = transaction.to_account;
+  commentInput.value = transaction.title === "Перевод" ? "" : transaction.title;
+
+  fillSafeBucketSelect(
+    fromSafeBucketSelect,
+    "Из какого сейфа",
+    transaction.from_safe_bucket_id || ""
+  );
+  fillSafeBucketSelect(
+    toSafeBucketSelect,
+    "В какой сейф",
+    transaction.to_safe_bucket_id || ""
+  );
+  updateTransferSafeFields();
+
+  if (transaction.from_safe_bucket_id) {
+    fromSafeBucketSelect.value = transaction.from_safe_bucket_id;
+  }
+
+  if (transaction.to_safe_bucket_id) {
+    toSafeBucketSelect.value = transaction.to_safe_bucket_id;
+  }
+}
 
     modal.classList.remove("hidden");
     document.body.style.overflow = "hidden";
@@ -1436,9 +1537,20 @@ const deleteBtn = card.querySelector("[data-delete-id]");
     let valueClass = "list-value";
 
     if (transaction.type === "transfer") {
-      subtitle = `${escapeHtml(transaction.from_account)} → ${escapeHtml(transaction.to_account)}`;
-      signedAmount = formatMoney(transaction.amount);
-    } else if (transaction.type === "income") {
+  const fromLabel =
+    transaction.from_account === "Сейфы Яндекса" && transaction.from_safe_bucket_id
+      ? `${transaction.from_account} • ${getSafeBucketName(transaction.from_safe_bucket_id)}`
+      : transaction.from_account;
+
+  const toLabel =
+    transaction.to_account === "Сейфы Яндекса" && transaction.to_safe_bucket_id
+      ? `${transaction.to_account} • ${getSafeBucketName(transaction.to_safe_bucket_id)}`
+      : transaction.to_account;
+
+  subtitle = `${escapeHtml(fromLabel)} → ${escapeHtml(toLabel)}`;
+  signedAmount = formatMoney(transaction.amount);
+}
+     else if (transaction.type === "income") {
       subtitle = `${escapeHtml(transaction.account)} • доход`;
       signedAmount = `+${formatMoney(transaction.amount)}`;
       valueClass = "list-value list-value--green";
@@ -1728,37 +1840,59 @@ const deleteBtn = card.querySelector("[data-delete-id]");
     const createdAt = `${selectedDate}T${preservedTime}`;
 
     if (currentMode === "transfer") {
-      const fromAccount = fromAccountSelect.value;
-      const toAccount = toAccountSelect.value;
+  const fromAccount = fromAccountSelect.value;
+  const toAccount = toAccountSelect.value;
+  const fromSafeBucketId =
+    fromAccount === "Сейфы Яндекса" ? fromSafeBucketSelect.value : null;
+  const toSafeBucketId =
+    toAccount === "Сейфы Яндекса" ? toSafeBucketSelect.value : null;
 
-      if (fromAccount === "С какого счёта") {
-        alert("Выбери счёт списания");
-        return null;
-      }
+  if (fromAccount === "С какого счёта") {
+    alert("Выбери счёт списания");
+    return null;
+  }
 
-      if (toAccount === "На какой счёт") {
-        alert("Выбери счёт зачисления");
-        return null;
-      }
+  if (toAccount === "На какой счёт") {
+    alert("Выбери счёт зачисления");
+    return null;
+  }
 
-      if (fromAccount === toAccount) {
-        alert("Счета должны быть разными");
-        return null;
-      }
+  if (fromAccount === toAccount) {
+    const sameBuckets =
+      fromAccount !== "Сейфы Яндекса" ||
+      (fromSafeBucketId && toSafeBucketId && fromSafeBucketId === toSafeBucketId);
 
-      return {
-        id: editingTransactionId || crypto.randomUUID(),
-        type: "transfer",
-        title: comment || "Перевод",
-        account: null,
-        category_id: null,
-        from_account: fromAccount,
-        to_account: toAccount,
-        amount,
-        time_label: getCurrentTime(),
-        created_at: createdAt,
-      };
+    if (sameBuckets) {
+      alert("Счета должны быть разными");
+      return null;
     }
+  }
+
+  if (fromAccount === "Сейфы Яндекса" && !fromSafeBucketId) {
+    alert("Выбери сейф списания");
+    return null;
+  }
+
+  if (toAccount === "Сейфы Яндекса" && !toSafeBucketId) {
+    alert("Выбери сейф зачисления");
+    return null;
+  }
+
+  return {
+    id: editingTransactionId || crypto.randomUUID(),
+    type: "transfer",
+    title: comment || "Перевод",
+    account: null,
+    category_id: null,
+    from_account: fromAccount,
+    to_account: toAccount,
+    from_safe_bucket_id: fromSafeBucketId,
+    to_safe_bucket_id: toSafeBucketId,
+    amount,
+    time_label: getCurrentTime(),
+    created_at: createdAt,
+  };
+}
 
     const account = accountSelect.value;
 
@@ -1957,20 +2091,21 @@ const deleteBtn = card.querySelector("[data-delete-id]");
     closeBudgetModal();
   }
 
-  async function loadDataFromSupabase() {
-    const [
-      { data: accounts, error: accountsError },
-      { data: categories, error: categoriesError },
-      { data: transactions, error: transactionsError },
-      { data: budgetLimits, error: budgetLimitsError },
-      { data: appMeta, error: appMetaError },
-    ] = await Promise.all([
-      supabaseClient.from("accounts").select("*").order("sort_order", { ascending: true }),
-      supabaseClient.from("categories").select("*").order("sort_order", { ascending: true }),
-      supabaseClient.from("transactions").select("*").order("created_at", { ascending: false }),
-      supabaseClient.from("budget_limits").select("*"),
-      supabaseClient.from("app_meta").select("*"),
-    ]);
+  const [
+  { data: accounts, error: accountsError },
+  { data: categories, error: categoriesError },
+  { data: transactions, error: transactionsError },
+  { data: budgetLimits, error: budgetLimitsError },
+  { data: safeBuckets, error: safeBucketsError },
+  { data: appMeta, error: appMetaError },
+] = await Promise.all([
+  supabaseClient.from("accounts").select("*").order("sort_order", { ascending: true }),
+  supabaseClient.from("categories").select("*").order("sort_order", { ascending: true }),
+  supabaseClient.from("transactions").select("*").order("created_at", { ascending: false }),
+  supabaseClient.from("budget_limits").select("*"),
+  supabaseClient.from("safe_buckets").select("*").order("sort_order", { ascending: true }),
+  supabaseClient.from("app_meta").select("*"),
+]);
 
     if (accountsError) {
       console.error(accountsError);
@@ -1995,6 +2130,12 @@ const deleteBtn = card.querySelector("[data-delete-id]");
       alert("Ошибка загрузки лимитов бюджета из Supabase");
       return;
     }
+    
+    if (safeBucketsError) {
+  console.error(safeBucketsError);
+  alert("Ошибка загрузки сейфов из Supabase");
+  return;
+}
 
     if (appMetaError) {
       console.error(appMetaError);
@@ -2003,10 +2144,11 @@ const deleteBtn = card.querySelector("[data-delete-id]");
     }
 
     state.accounts = accounts || [];
-    state.categories = categories || [];
-    state.transactions = transactions || [];
-    state.budgetLimits = budgetLimits || [];
-    state.appMeta = appMeta || [];
+state.categories = categories || [];
+state.transactions = transactions || [];
+state.budgetLimits = budgetLimits || [];
+state.safeBuckets = safeBuckets || [];
+state.appMeta = appMeta || [];
 
     ensureUncategorizedCategory();
   }
@@ -2024,6 +2166,8 @@ const deleteBtn = card.querySelector("[data-delete-id]");
   openExpenseModalBtn?.addEventListener("click", () => openModal("expense"));
   openIncomeModalBtn?.addEventListener("click", () => openModal("income"));
   openTransferModalBtn?.addEventListener("click", () => openModal("transfer"));
+  fromAccountSelect?.addEventListener("change", updateTransferSafeFields);
+toAccountSelect?.addEventListener("change", updateTransferSafeFields);
 
   openCategoriesManagerBtn?.addEventListener("click", openCategoriesManager);
   closeCategoriesManagerBtn?.addEventListener("click", closeCategoriesManager);
