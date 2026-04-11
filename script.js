@@ -8,11 +8,13 @@ document.addEventListener("DOMContentLoaded", async () => {
   const deleteTransactionBtn = document.getElementById("deleteTransactionBtn");
 
   const budgetModal = document.getElementById("budgetModal");
-  const budgetModalTitle = document.getElementById("budgetModalTitle");
-  const budgetAmountInput = document.getElementById("budgetAmountInput");
-  const closeBudgetModalBtn = document.getElementById("closeBudgetModalBtn");
-  const saveBudgetBtn = document.getElementById("saveBudgetBtn");
-  const deleteBudgetBtn = document.getElementById("deleteBudgetBtn");
+const budgetModalTitle = document.getElementById("budgetModalTitle");
+const budgetCategoryNameInput = document.getElementById("budgetCategoryNameInput");
+const budgetCategoryIconInput = document.getElementById("budgetCategoryIconInput");
+const budgetAmountInput = document.getElementById("budgetAmountInput");
+const closeBudgetModalBtn = document.getElementById("closeBudgetModalBtn");
+const saveBudgetBtn = document.getElementById("saveBudgetBtn");
+const deleteBudgetBtn = document.getElementById("deleteBudgetBtn");
 
   const analyticsCategoryModal = document.getElementById("analyticsCategoryModal");
   const analyticsCategoryModalTitle = document.getElementById("analyticsCategoryModalTitle");
@@ -129,12 +131,14 @@ document.addEventListener("DOMContentLoaded", async () => {
   const saveSafeInterestRateBtn = document.getElementById("saveSafeInterestRateBtn");
 
   const safeBucketAmountModalTitle = document.getElementById("safeBucketAmountModalTitle");
-  const safeBucketAmountCurrentValue = document.getElementById("safeBucketAmountCurrentValue");
-  const safeBucketAmountInput = document.getElementById("safeBucketAmountInput");
-  const closeSafeBucketAmountModalBtn = document.getElementById("closeSafeBucketAmountModalBtn");
-  const cancelSafeBucketAmountBtn = document.getElementById("cancelSafeBucketAmountBtn");
-  const saveSafeBucketAmountBtn = document.getElementById("saveSafeBucketAmountBtn");
-  const deleteSafeBucketBtn = document.getElementById("deleteSafeBucketBtn");
+const safeBucketAmountCurrentValue = document.getElementById("safeBucketAmountCurrentValue");
+const safeBucketNameInput = document.getElementById("safeBucketNameInput");
+const safeBucketIconInput = document.getElementById("safeBucketIconInput");
+const safeBucketAmountInput = document.getElementById("safeBucketAmountInput");
+const closeSafeBucketAmountModalBtn = document.getElementById("closeSafeBucketAmountModalBtn");
+const cancelSafeBucketAmountBtn = document.getElementById("cancelSafeBucketAmountBtn");
+const saveSafeBucketAmountBtn = document.getElementById("saveSafeBucketAmountBtn");
+const deleteSafeBucketBtn = document.getElementById("deleteSafeBucketBtn");
 
   const period7Btn = document.getElementById("period7Btn");
   const period30Btn = document.getElementById("period30Btn");
@@ -1100,27 +1104,31 @@ function updateAnalyticsWheelDraftFromScroll() {
 }
 
   function openBudgetModal(categoryId) {
-    const category = getCategoryById(categoryId);
-    if (!category) return;
+  const category = getCategoryById(categoryId);
+  if (!category) return;
 
-    activeBudgetCategoryId = categoryId;
+  activeBudgetCategoryId = categoryId;
 
-    const existing = getBudgetLimitByCategoryId(categoryId);
+  const existing = getBudgetLimitByCategoryId(categoryId);
 
-    budgetModalTitle.textContent = `${category.icon} ${category.name}`;
-    budgetAmountInput.value = existing ? Number(existing.monthly_limit) : "";
-    deleteBudgetBtn.classList.toggle("hidden", !existing);
+  budgetModalTitle.textContent = `Редактирование: ${category.icon} ${category.name}`;
+  budgetCategoryNameInput.value = category.name || "";
+  budgetCategoryIconInput.value = category.icon || "";
+  budgetAmountInput.value = existing ? Number(existing.monthly_limit) : "";
+  deleteBudgetBtn.classList.toggle("hidden", !existing);
 
-    budgetModal.classList.remove("hidden");
-    document.body.style.overflow = "hidden";
-  }
+  budgetModal.classList.remove("hidden");
+  document.body.style.overflow = "hidden";
+}
 
-  function closeBudgetModal() {
-    budgetModal.classList.add("hidden");
-    document.body.style.overflow = "";
-    activeBudgetCategoryId = null;
-    budgetAmountInput.value = "";
-  }
+function closeBudgetModal() {
+  budgetModal.classList.add("hidden");
+  document.body.style.overflow = "";
+  activeBudgetCategoryId = null;
+  budgetCategoryNameInput.value = "";
+  budgetCategoryIconInput.value = "";
+  budgetAmountInput.value = "";
+}
   
   function openSafeBucketsModal() {
   if (!safeBucketsModal) return;
@@ -1151,6 +1159,8 @@ function openSafeBucketAmountModal(bucketId) {
 
   safeBucketAmountModalTitle.textContent = `${bucket.icon} ${bucket.name}`;
   safeBucketAmountCurrentValue.textContent = `Сейчас: ${formatMoney(balance)}`;
+  safeBucketNameInput.value = bucket.name || "";
+  safeBucketIconInput.value = bucket.icon || "";
   safeBucketAmountInput.value = String(balance).replace(".", ",");
 
   if (deleteSafeBucketBtn) {
@@ -1167,6 +1177,8 @@ function closeSafeBucketAmountModal() {
 
   safeBucketAmountModal.classList.add("hidden");
   activeSafeBucketAmountId = null;
+  safeBucketNameInput.value = "";
+  safeBucketIconInput.value = "";
   safeBucketAmountInput.value = "";
 
   if (deleteSafeBucketBtn) {
@@ -1319,11 +1331,40 @@ async function addSafeBucket() {
 async function saveSafeBucketAmount() {
   if (!activeSafeBucketAmountId) return;
 
+  const bucket = getSafeBucketById(activeSafeBucketAmountId);
+  if (!bucket) return;
+
+  const nextName = safeBucketNameInput.value.trim();
+  const nextIcon = safeBucketIconInput.value.trim();
   const normalized = safeBucketAmountInput.value.replace(/\s/g, "").replace(",", ".");
   const nextAmount = Number(normalized);
 
+  if (!nextName) {
+    alert("Введи название сейфа");
+    return;
+  }
+
+  if (!nextIcon) {
+    alert("Введи эмодзи сейфа");
+    return;
+  }
+
   if (Number.isNaN(nextAmount) || nextAmount < 0) {
     alert("Введи корректную сумму");
+    return;
+  }
+
+  const { error: updateBucketError } = await supabaseClient
+    .from("safe_buckets")
+    .update({
+      name: nextName,
+      icon: nextIcon,
+    })
+    .eq("id", activeSafeBucketAmountId);
+
+  if (updateBucketError) {
+    alert("Ошибка сохранения сейфа");
+    console.error(updateBucketError);
     return;
   }
 
@@ -2768,47 +2809,76 @@ return {
   }
 
   async function saveBudgetLimit() {
-    if (!activeBudgetCategoryId) return;
+  if (!activeBudgetCategoryId) return;
 
-    const amount = Number(budgetAmountInput.value.trim());
+  const category = getCategoryById(activeBudgetCategoryId);
+  if (!category) return;
 
-    if (Number.isNaN(amount) || amount < 0) {
-      alert("Введи корректный лимит");
+  const nextName = budgetCategoryNameInput.value.trim();
+  const nextIcon = budgetCategoryIconInput.value.trim();
+  const amount = Number(budgetAmountInput.value.trim());
+
+  if (!nextName) {
+    alert("Введи название категории");
+    return;
+  }
+
+  if (!nextIcon) {
+    alert("Введи эмодзи категории");
+    return;
+  }
+
+  if (Number.isNaN(amount) || amount < 0) {
+    alert("Введи корректный лимит");
+    return;
+  }
+
+  const { error: categoryError } = await supabaseClient
+    .from("categories")
+    .update({
+      name: nextName,
+      icon: nextIcon,
+    })
+    .eq("id", activeBudgetCategoryId);
+
+  if (categoryError) {
+    alert("Ошибка сохранения категории");
+    console.error(categoryError);
+    return;
+  }
+
+  const existing = getBudgetLimitByCategoryId(activeBudgetCategoryId);
+
+  if (existing) {
+    const { error } = await supabaseClient
+      .from("budget_limits")
+      .update({ monthly_limit: amount })
+      .eq("category_id", activeBudgetCategoryId);
+
+    if (error) {
+      alert("Ошибка обновления лимита");
+      console.error(error);
       return;
     }
+  } else {
+    const { error } = await supabaseClient
+      .from("budget_limits")
+      .insert({
+        category_id: activeBudgetCategoryId,
+        monthly_limit: amount,
+      });
 
-    const existing = getBudgetLimitByCategoryId(activeBudgetCategoryId);
-
-    if (existing) {
-      const { error } = await supabaseClient
-        .from("budget_limits")
-        .update({ monthly_limit: amount })
-        .eq("category_id", activeBudgetCategoryId);
-
-      if (error) {
-        alert("Ошибка обновления лимита");
-        console.error(error);
-        return;
-      }
-    } else {
-      const { error } = await supabaseClient
-        .from("budget_limits")
-        .insert({
-          category_id: activeBudgetCategoryId,
-          monthly_limit: amount,
-        });
-
-      if (error) {
-        alert("Ошибка сохранения лимита");
-        console.error(error);
-        return;
-      }
+    if (error) {
+      alert("Ошибка сохранения лимита");
+      console.error(error);
+      return;
     }
-
-    await loadDataFromSupabase();
-    renderAll();
-    closeBudgetModal();
   }
+
+  await loadDataFromSupabase();
+  renderAll();
+  closeBudgetModal();
+}
 
   async function deleteBudgetLimit() {
     if (!activeBudgetCategoryId) return;
