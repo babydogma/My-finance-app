@@ -287,6 +287,91 @@ function getFreeSafeBucket() {
   );
 }
 
+function normalizeMoneyBucketName(value) {
+  return String(value || "").trim().toLowerCase();
+}
+
+function getSafeBucketsByNames(names) {
+  const normalizedNames = names.map(normalizeMoneyBucketName);
+
+  return state.safeBuckets.filter((bucket) =>
+    normalizedNames.includes(normalizeMoneyBucketName(bucket.name))
+  );
+}
+
+function getFreeSafeBalance() {
+  const freeBucket = getFreeSafeBucket();
+  return freeBucket ? getSafeBucketBalance(freeBucket.id) : 0;
+}
+
+function getStrictSafeBalance() {
+  return getSafeBucketsByNames(["Налоги", "Квартира"]).reduce((sum, bucket) => {
+    return sum + getSafeBucketBalance(bucket.id);
+  }, 0);
+}
+
+function getSoftReserveSafeBalance() {
+  return getSafeBucketsByNames(["Накопления"]).reduce((sum, bucket) => {
+    return sum + getSafeBucketBalance(bucket.id);
+  }, 0);
+}
+
+function getCashReserveBalance() {
+  return getAccountBalance("Наличный резерв");
+}
+
+function getSecondLineReserveBalance() {
+  return getSoftReserveSafeBalance() + getCashReserveBalance();
+}
+
+function getAvailableNowBalance() {
+  return roundToTwo(getFreeSafeBalance());
+}
+
+function getFlexibleBudgetStats(filteredTransactions) {
+  const byCategory = new Map();
+
+  filteredTransactions.forEach((transaction) => {
+    if (transaction.type !== "expense") return;
+
+    const categoryId = transaction.category_id || UNCATEGORIZED_ID;
+    if (isRequiredCategory(categoryId)) return;
+
+    const current = byCategory.get(categoryId) || 0;
+    byCategory.set(categoryId, current + (Number(transaction.amount) || 0));
+  });
+
+  let exceededCount = 0;
+  let nearLimitCount = 0;
+  let limitedCount = 0;
+
+  byCategory.forEach((spent, categoryId) => {
+    const limitRecord = getBudgetLimitByCategoryId(categoryId);
+    const limit = limitRecord ? Number(limitRecord.monthly_limit) || 0 : 0;
+
+    if (limit <= 0) return;
+
+    limitedCount += 1;
+
+    if (spent > limit) {
+      exceededCount += 1;
+      return;
+    }
+
+    if (spent >= limit * 0.85) {
+      nearLimitCount += 1;
+    }
+  });
+
+  return {
+    exceededCount,
+    nearLimitCount,
+    limitedCount,
+  };
+}
+
+
+
 async function setSafeBucketTargetAmount(bucketId, nextAmount) {
   const target = roundToTwo(Number(nextAmount) || 0);
 
@@ -1687,11 +1772,16 @@ async function deleteSafeBucketFromModal() {
     }
   });
 
+  const budgetStats = getFlexibleBudgetStats(items);
+
+  const freeSafeBalance = getFreeSafeBalance();
+  const secondLineReserveBalance = getSecondLineReserveBalance();
+  const strictSafeBalance = getStrictSafeBalance();
+  const cashReserveBalance = getCashReserveBalance();
+  const savingsSafeBalance = getSoftReserveSafeBalance();
+  const availableNowBalance = getAvailableNowBalance();
+
   const net = income - expense;
-  const recommendedToSave = Math.max(
-    0,
-    roundToTwo(income - requiredExpense - flexibleExpense * 0.5)
-  );
 
   return {
     income,
@@ -1701,7 +1791,17 @@ async function deleteSafeBucketFromModal() {
     flexibleExpense,
     savedToSafes,
     safeInterest,
-    recommendedToSave,
+
+    freeSafeBalance,
+    availableNowBalance,
+    secondLineReserveBalance,
+    strictSafeBalance,
+    cashReserveBalance,
+    savingsSafeBalance,
+
+    flexibleLimitedCount: budgetStats.limitedCount,
+    flexibleExceededCount: budgetStats.exceededCount,
+    flexibleNearLimitCount: budgetStats.nearLimitCount,
   };
 }
 
@@ -2356,45 +2456,42 @@ else if (transaction.type === "income") {
   }
 
   const requiredShare = summary.income > 0
-    ? Math.round((summary.requiredExpense / summary.income) * 100)
-    : 0;
+  ? Math.round((summary.requiredExpense / summary.income) * 100)
+  : 0;
 
-  const flexibleShare = summary.income > 0
-    ? Math.round((summary.flexibleExpense / summary.income) * 100)
-    : 0;
+const flexibleShare = summary.income > 0
+  ? Math.round((summary.flexibleExpense / summary.income) * 100)
+  : 0;
 
-  let recommendation = "";
+let recommendation = "";
 
-  if (summary.income <= 0) {
-    recommendation = "За выбранный период нет доходов. Сначала накопи базу данных, потом советы станут точнее.";
-  } else if (summary.net <= 0) {
-    recommendation = `Период закрывается в минус. В первую очередь режь гибкие траты: сейчас они занимают ${flexibleShare}% дохода.`;
-  } else if (summary.flexibleExpense > summary.requiredExpense) {
-    recommendation = `Гибкие траты слишком жирные: ${flexibleShare}% дохода против ${requiredShare}% обязательных. Реально можно отложить около ${formatMoney(summary.recommendedToSave)}.`;
-  } else {
-    recommendation = `Ситуация нормальная. Безопасно можно отложить около ${formatMoney(summary.recommendedToSave)} без удара по обязательным расходам.`;
-  }
+if (summary.income <= 0) {
+  recommendation =
+    "За выбранный период нет доходов. Итоги пока рано оценивать: сначала нужна база по поступлениям.";
+} else if (summary.net <= 0) {
+  recommendation =
+    `Период закрывается в минус. Новые переводы в сейфы лучше не усиливать, пока не восстановишь плюс и остаток в «Свободные» (${formatMoney(summary.freeSafeBalance)}).`;
+} else if (summary.flexibleExceededCount > 0) {
+  recommendation =
+    `Часть гибких категорий уже вышла за лимит (${summary.flexibleExceededCount}). Несмотря на плюс периода, усиливать накопления сейчас не стоит: сначала верни контроль над этими тратами.`;
+} else if (summary.flexibleNearLimitCount > 0) {
+  recommendation =
+    `По гибким тратам есть напряжение: ${summary.flexibleNearLimitCount} катег. почти у лимита. Реально доступные деньги сейчас — только «Свободные» (${formatMoney(summary.availableNowBalance)}). Накопления и наличный резерв лучше не трогать без необходимости.`;
+} else if (summary.availableNowBalance <= 0) {
+  recommendation =
+    `Общий результат положительный, но в «Свободные» денег нет. Целевые сейфы трогать не нужно, а резерв 2 уровня (${formatMoney(summary.secondLineReserveBalance)}) лучше оставлять только на крайний случай.`;
+} else if (summary.availableNowBalance < summary.flexibleExpense * 0.5) {
+  recommendation =
+    `Период хороший, но свободный запас уже не очень большой: в «Свободные» осталось ${formatMoney(summary.availableNowBalance)}. Новые переводы в целевые сейфы лучше делать аккуратно.`;
+} else {
+  recommendation =
+    `Ситуация устойчивая. Обязательные расходы занимают ${requiredShare}% дохода, гибкие — ${flexibleShare}%. Доступно сейчас: ${formatMoney(summary.availableNowBalance)} в «Свободные». Резерв 2 уровня — ${formatMoney(summary.secondLineReserveBalance)}, а целевые сейфы (${formatMoney(summary.strictSafeBalance)}) трогать не нужно.`;
+}
 
   insightsRecommendationText.textContent = recommendation;
 
   if (insightsSafeList) {
     insightsSafeList.innerHTML = "";
-
-    const unassignedRow = document.createElement("div");
-    unassignedRow.className = "list-card";
-    unassignedRow.innerHTML = `
-      <div class="list-icon list-icon--neutral">🧩</div>
-      <div class="list-body">
-        <div class="list-title-row">
-          <h3 class="list-title">Не распределено</h3>
-        </div>
-        <p class="list-subtitle">Остаток на счёте сейфов вне внутренних сейфов</p>
-      </div>
-      <div class="list-right">
-        <p class="list-value">${formatMoney(getUnassignedSafeBalance())}</p>
-      </div>
-    `;
-    insightsSafeList.appendChild(unassignedRow);
 
     state.safeBuckets.forEach((bucket) => {
       const row = document.createElement("div");
