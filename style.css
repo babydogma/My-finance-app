@@ -1419,6 +1419,14 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   color: var(--red);
 }
 
+#insightsCanSaveNowValue.is-positive {
+  color: var(--green);
+}
+
+#insightsCanSaveNowValue.is-negative {
+  color: var(--red);
+}
+
 .analytics-chart-card--clean {
   padding: 14px;
   border-radius: 24px;
