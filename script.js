@@ -73,6 +73,11 @@ document.addEventListener("DOMContentLoaded", async () => {
   const insightsFlexibleValue = document.getElementById("insightsFlexibleValue");
   const insightsSavedValue = document.getElementById("insightsSavedValue");
   const insightsInterestValue = document.getElementById("insightsInterestValue");
+  const insightsAvailableNowValue = document.getElementById("insightsAvailableNowValue");
+  const insightsWorkingMinimumValue = document.getElementById("insightsWorkingMinimumValue");
+  const insightsCanSaveNowValue = document.getElementById("insightsCanSaveNowValue");
+  const insightsReserveSecondLineValue = document.getElementById("insightsReserveSecondLineValue");
+  const insightsLimitsStatusText = document.getElementById("insightsLimitsStatusText");
   const insightsRecommendationText = document.getElementById("insightsRecommendationText");
   const insightsSafeList = document.getElementById("insightsSafeList");
 
@@ -370,7 +375,29 @@ function getFlexibleBudgetStats(filteredTransactions) {
   };
 }
 
+function getInsightsWorkingMinimum(requiredExpense, flexibleExpense) {
+  return roundToTwo(
+    Math.max(
+      requiredExpense * 0.5,
+      flexibleExpense * 0.35,
+      5000
+    )
+  );
+}
 
+function getInsightsCanSaveNow(availableNowBalance, workingMinimum, exceededCount, nearLimitCount) {
+  let canSave = Math.max(0, roundToTwo(availableNowBalance - workingMinimum));
+
+  if (exceededCount > 0) {
+    return 0;
+  }
+
+  if (nearLimitCount > 0) {
+    canSave = roundToTwo(canSave * 0.5);
+  }
+
+  return Math.max(0, canSave);
+}
 
 async function setSafeBucketTargetAmount(bucketId, nextAmount) {
   const target = roundToTwo(Number(nextAmount) || 0);
@@ -1775,12 +1802,20 @@ async function deleteSafeBucketFromModal() {
   const budgetStats = getFlexibleBudgetStats(items);
 
   const freeSafeBalance = getFreeSafeBalance();
-  const secondLineReserveBalance = getSecondLineReserveBalance();
+  const availableNowBalance = getAvailableNowBalance();
   const strictSafeBalance = getStrictSafeBalance();
+  const secondLineReserveBalance = getSecondLineReserveBalance();
   const cashReserveBalance = getCashReserveBalance();
   const savingsSafeBalance = getSoftReserveSafeBalance();
-  const availableNowBalance = getAvailableNowBalance();
 
+  const workingMinimum = getInsightsWorkingMinimum(requiredExpense, flexibleExpense);
+  const canSaveNow = getInsightsCanSaveNow(
+    availableNowBalance,
+    workingMinimum,
+    budgetStats.exceededCount,
+    budgetStats.nearLimitCount
+  );
+  const freeSafeGap = Math.max(0, roundToTwo(workingMinimum - availableNowBalance));
   const net = income - expense;
 
   return {
@@ -1794,8 +1829,12 @@ async function deleteSafeBucketFromModal() {
 
     freeSafeBalance,
     availableNowBalance,
-    secondLineReserveBalance,
+    workingMinimum,
+    canSaveNow,
+    freeSafeGap,
+
     strictSafeBalance,
+    secondLineReserveBalance,
     cashReserveBalance,
     savingsSafeBalance,
 
@@ -2442,51 +2481,50 @@ else if (transaction.type === "income") {
   insightsFlexibleValue.textContent = formatMoney(summary.flexibleExpense);
   insightsSavedValue.textContent = formatMoney(summary.savedToSafes);
   insightsInterestValue.textContent = formatMoney(summary.safeInterest);
-
+  insightsAvailableNowValue.textContent = formatMoney(summary.availableNowBalance);
+  insightsWorkingMinimumValue.textContent = formatMoney(summary.workingMinimum);
+  insightsCanSaveNowValue.textContent = formatMoney(summary.canSaveNow);
+  insightsReserveSecondLineValue.textContent = formatMoney(summary.secondLineReserveBalance);
+  
   insightsNetValue.classList.remove("is-positive", "is-negative");
+  insightsCanSaveNowValue?.classList.remove("is-positive", "is-negative");
 
-  if (summary.net > 0) {
-    insightsNetValue.textContent = `+${formatMoney(summary.net)}`;
-    insightsNetValue.classList.add("is-positive");
-  } else if (summary.net < 0) {
-    insightsNetValue.textContent = `−${formatMoney(Math.abs(summary.net))}`;
-    insightsNetValue.classList.add("is-negative");
-  } else {
-    insightsNetValue.textContent = formatMoney(0);
-  }
+  if (summary.canSaveNow > 0) {
+  insightsCanSaveNowValue.textContent = formatMoney(summary.canSaveNow);
+  insightsCanSaveNowValue.classList.add("is-positive");
+} else {
+  insightsCanSaveNowValue.textContent = formatMoney(0);
+  insightsCanSaveNowValue.classList.add("is-negative");
+}
 
-  const requiredShare = summary.income > 0
-  ? Math.round((summary.requiredExpense / summary.income) * 100)
-  : 0;
-
-const flexibleShare = summary.income > 0
-  ? Math.round((summary.flexibleExpense / summary.income) * 100)
-  : 0;
-
+  let limitsStatus = "";
 let recommendation = "";
 
-if (summary.income <= 0) {
+if (summary.flexibleExceededCount > 0) {
+  limitsStatus = `Превышено лимитов: ${summary.flexibleExceededCount}`;
+} else if (summary.flexibleNearLimitCount > 0) {
+  limitsStatus = `Почти у лимита: ${summary.flexibleNearLimitCount}`;
+} else if (summary.flexibleLimitedCount > 0) {
+  limitsStatus = `Лимиты под контролем: ${summary.flexibleLimitedCount}`;
+} else {
+  limitsStatus = "Лимиты не заданы";
+}
+
+if (summary.net <= 0) {
   recommendation =
-    "За выбранный период нет доходов. Итоги пока рано оценивать: сначала нужна база по поступлениям.";
-} else if (summary.net <= 0) {
-  recommendation =
-    `Период закрывается в минус. Новые переводы в сейфы лучше не усиливать, пока не восстановишь плюс и остаток в «Свободные» (${formatMoney(summary.freeSafeBalance)}).`;
+    `Свободные: ${formatMoney(summary.availableNowBalance)}. Рабочий минимум: ${formatMoney(summary.workingMinimum)}. Сейчас нельзя откладывать: сначала нужно закрыть период в плюс.`;
 } else if (summary.flexibleExceededCount > 0) {
   recommendation =
-    `Часть гибких категорий уже вышла за лимит (${summary.flexibleExceededCount}). Несмотря на плюс периода, усиливать накопления сейчас не стоит: сначала верни контроль над этими тратами.`;
-} else if (summary.flexibleNearLimitCount > 0) {
+    `Свободные: ${formatMoney(summary.availableNowBalance)}. Рабочий минимум: ${formatMoney(summary.workingMinimum)}. Можно отложить: 0 ₽, потому что уже есть превышение лимитов.`;
+} else if (summary.availableNowBalance < summary.workingMinimum) {
   recommendation =
-    `По гибким тратам есть напряжение: ${summary.flexibleNearLimitCount} катег. почти у лимита. Реально доступные деньги сейчас — только «Свободные» (${formatMoney(summary.availableNowBalance)}). Накопления и наличный резерв лучше не трогать без необходимости.`;
-} else if (summary.availableNowBalance <= 0) {
-  recommendation =
-    `Общий результат положительный, но в «Свободные» денег нет. Целевые сейфы трогать не нужно, а резерв 2 уровня (${formatMoney(summary.secondLineReserveBalance)}) лучше оставлять только на крайний случай.`;
-} else if (summary.availableNowBalance < summary.flexibleExpense * 0.5) {
-  recommendation =
-    `Период хороший, но свободный запас уже не очень большой: в «Свободные» осталось ${formatMoney(summary.availableNowBalance)}. Новые переводы в целевые сейфы лучше делать аккуратно.`;
+    `Свободные: ${formatMoney(summary.availableNowBalance)}. До безопасного остатка не хватает ${formatMoney(summary.freeSafeGap)}. Новые переводы в сейфы пока рано.`;
 } else {
   recommendation =
-    `Ситуация устойчивая. Обязательные расходы занимают ${requiredShare}% дохода, гибкие — ${flexibleShare}%. Доступно сейчас: ${formatMoney(summary.availableNowBalance)} в «Свободные». Резерв 2 уровня — ${formatMoney(summary.secondLineReserveBalance)}, а целевые сейфы (${formatMoney(summary.strictSafeBalance)}) трогать не нужно.`;
+    `Свободные: ${formatMoney(summary.availableNowBalance)}. Нужно оставить: ${formatMoney(summary.workingMinimum)}. Можно перевести в сейфы: ${formatMoney(summary.canSaveNow)}. Резерв 2 уровня: ${formatMoney(summary.secondLineReserveBalance)}. Целевые сейфы: ${formatMoney(summary.strictSafeBalance)} не трогаются.`;
 }
+
+insightsLimitsStatusText.textContent = limitsStatus;
 
   insightsRecommendationText.textContent = recommendation;
 
