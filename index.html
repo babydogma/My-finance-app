@@ -447,21 +447,29 @@
 
   <!-- BUDGET MODAL -->
   <div class="modal hidden" id="budgetModal">
-    <div class="modal-sheet">
-      <div class="modal-handle"></div>
-      <h3 class="modal-title" id="budgetModalTitle">Лимит категории</h3>
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <h3 class="modal-title" id="budgetModalTitle">Редактирование категории</h3>
 
-      <div class="field">
-        <input class="input" id="budgetAmountInput" type="number" placeholder="Лимит на месяц" />
-      </div>
+    <div class="field">
+      <input class="input" id="budgetCategoryNameInput" type="text" placeholder="Название категории" />
+    </div>
 
-      <div class="modal-actions modal-actions--triple">
-        <button class="btn btn-danger hidden" type="button" id="deleteBudgetBtn">Удалить</button>
-        <button class="btn btn-secondary" type="button" id="closeBudgetModalBtn">Отмена</button>
-        <button class="btn btn-primary" type="button" id="saveBudgetBtn">Сохранить</button>
-      </div>
+    <div class="field">
+      <input class="input" id="budgetCategoryIconInput" type="text" placeholder="Эмодзи, например 🍔" maxlength="4" />
+    </div>
+
+    <div class="field">
+      <input class="input" id="budgetAmountInput" type="number" placeholder="Лимит на месяц" />
+    </div>
+
+    <div class="modal-actions modal-actions--triple">
+      <button class="btn btn-danger hidden" type="button" id="deleteBudgetBtn">Удалить</button>
+      <button class="btn btn-secondary" type="button" id="closeBudgetModalBtn">Отмена</button>
+      <button class="btn btn-primary" type="button" id="saveBudgetBtn">Сохранить</button>
     </div>
   </div>
+</div>
   
   <div class="modal hidden" id="safeBucketsModal">
   <div class="modal-sheet safe-buckets-sheet">
@@ -522,6 +530,25 @@
 
     <div class="safe-bucket-amount-current" id="safeBucketAmountCurrentValue">
       Сейчас: 0 ₽
+    </div>
+
+    <div class="field">
+      <input
+        class="input"
+        id="safeBucketNameInput"
+        type="text"
+        placeholder="Название сейфа"
+      />
+    </div>
+
+    <div class="field">
+      <input
+        class="input"
+        id="safeBucketIconInput"
+        type="text"
+        maxlength="4"
+        placeholder="Эмодзи, например 🏠"
+      />
     </div>
 
     <div class="field">
