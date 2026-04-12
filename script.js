@@ -1331,9 +1331,6 @@ async function addSafeBucket() {
 async function saveSafeBucketAmount() {
   if (!activeSafeBucketAmountId) return;
 
-  const bucket = getSafeBucketById(activeSafeBucketAmountId);
-  if (!bucket) return;
-
   const nextName = safeBucketNameInput.value.trim();
   const nextIcon = safeBucketIconInput.value.trim();
   const normalized = safeBucketAmountInput.value.replace(/\s/g, "").replace(",", ".");
@@ -2098,38 +2095,9 @@ async function deleteSafeBucketFromModal() {
 const typeBtn = card.querySelector("[data-type-id]");
 const deleteBtn = card.querySelector("[data-delete-id]");
 
-      editBtn?.addEventListener("click", async () => {
-        const nextName = prompt("Новое название категории", category.name);
-        if (nextName === null) return;
-
-        const cleanedName = nextName.trim();
-        if (!cleanedName) {
-          alert("Название не может быть пустым");
-          return;
-        }
-
-        const nextIcon = prompt("Новый эмодзи категории", category.icon);
-        if (nextIcon === null) return;
-
-        const cleanedIcon = nextIcon.trim() || "📦";
-
-        const { error } = await supabaseClient
-          .from("categories")
-          .update({
-            name: cleanedName,
-            icon: cleanedIcon,
-          })
-          .eq("id", category.id);
-
-        if (error) {
-          alert("Ошибка обновления категории");
-          console.error(error);
-          return;
-        }
-
-        await loadDataFromSupabase();
-        renderAll();
-      });
+      editBtn?.addEventListener("click", () => {
+  openBudgetModal(category.id);
+});
       
       typeBtn?.addEventListener("click", async () => {
   if (category.locked) return;
@@ -2808,11 +2776,8 @@ return {
     renderAll();
   }
 
-  async function saveBudgetLimit() {
+async function saveBudgetLimit() {
   if (!activeBudgetCategoryId) return;
-
-  const category = getCategoryById(activeBudgetCategoryId);
-  if (!category) return;
 
   const nextName = budgetCategoryNameInput.value.trim();
   const nextIcon = budgetCategoryIconInput.value.trim();
@@ -2842,7 +2807,7 @@ return {
     .eq("id", activeBudgetCategoryId);
 
   if (categoryError) {
-    alert("Ошибка сохранения категории");
+    alert("Ошибка обновления категории");
     console.error(categoryError);
     return;
   }
