@@ -1086,64 +1086,76 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .history-filters {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
+  align-items: center;
 }
 
 .history-filter-group {
   display: flex;
-  gap: 8px;
+  gap: 10px;
   overflow-x: auto;
   padding-bottom: 2px;
   scrollbar-width: none;
-}
-
-.history-filter-group::-webkit-scrollbar {
-  display: none;
 }
 
 .history-filter-group--primary,
 .history-filter-group--secondary,
 .history-filter-group--inputs {
   justify-content: center;
+  width: 100%;
+}
+
+.history-filter-group--secondary {
+  max-width: 360px;
 }
 
 .history-filter-group--inputs {
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 12px;
+  max-width: 360px;
 }
 
 .history-filter-btn {
   flex: 0 0 auto;
-  height: 38px;
-  padding: 0 14px;
-  border: none;
+  height: 42px;
+  padding: 0 18px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.06);
+  background: linear-gradient(180deg, rgba(34, 37, 47, 0.92) 0%, rgba(25, 28, 37, 0.96) 100%);
   color: var(--text-muted);
-  font-size: 13px;
-  font-weight: 810;
-  letter-spacing: -0.02em;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
-  transition: background 0.16s ease, color 0.16s ease;
+  font-size: 14px;
+  font-weight: 830;
+  letter-spacing: -0.025em;
+  box-shadow:
+    0 8px 20px rgba(0, 0, 0, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  transition: background 0.16s ease, color 0.16s ease, transform 0.16s ease;
   white-space: nowrap;
 }
 
+.history-filter-btn:active {
+  transform: scale(0.985);
+}
+
 .history-filter-btn.is-active {
-  background: rgba(111, 156, 255, 0.18);
+  background: linear-gradient(180deg, rgba(111, 156, 255, 0.26) 0%, rgba(91, 143, 255, 0.22) 100%);
   color: #f7f8fb;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.04),
-    0 0 14px rgba(111, 156, 255, 0.08);
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 0 18px rgba(111, 156, 255, 0.12);
 }
 
 .history-filter-btn--month {
-  min-width: 230px;
-  height: 60px;
-  padding: 0 30px;
+  min-width: 260px;
+  height: 64px;
+  padding: 0 34px;
   border-radius: 999px;
-  font-size: 22px;
+  font-size: 24px;
   font-weight: 900;
-  letter-spacing: -0.035em;
+  letter-spacing: -0.04em;
+  box-shadow:
+    0 14px 34px rgba(0, 0, 0, 0.24),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
 .month-filter-wrap {
@@ -1330,15 +1342,17 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 #analyticsRangeToInput:not(.hidden) {
   display: block !important;
   width: 100%;
-  min-height: 48px;
-  padding: 0 16px;
-  border-radius: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  background: linear-gradient(180deg, rgba(42, 46, 61, 0.9) 0%, rgba(28, 31, 43, 0.92) 100%);
+  min-height: 52px;
+  padding: 0 18px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: linear-gradient(180deg, rgba(34, 37, 47, 0.92) 0%, rgba(25, 28, 37, 0.96) 100%);
   color: var(--text);
+  font-size: 17px;
+  font-weight: 760;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.03),
-    0 10px 24px rgba(0, 0, 0, 0.16);
+    0 10px 26px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
 }
 
 #analyticsRangeFromInput:not(.hidden)::-webkit-calendar-picker-indicator,
@@ -1992,4 +2006,13 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   #transactionsList .list-caption {
     font-size: 10px;
   }
+}
+
+#budgetCategoryIconInput,
+#safeBucketIconInput,
+#newCategoryIconInput,
+#newSafeBucketIconInput {
+  text-align: center;
+  font-size: 24px;
+  letter-spacing: 0;
 }
