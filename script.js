@@ -99,10 +99,6 @@ const insightsSummaryToggleBtn = document.getElementById("insightsSummaryToggleB
 const insightsSummaryBody = document.getElementById("insightsSummaryBody");
 const insightsSummaryArrow = document.getElementById("insightsSummaryArrow");
 
-const insightsExplanationToggleBtn = document.getElementById("insightsExplanationToggleBtn");
-const insightsExplanationBody = document.getElementById("insightsExplanationBody");
-const insightsExplanationArrow = document.getElementById("insightsExplanationArrow");
-
 const insightsSafesToggleBtn = document.getElementById("insightsSafesToggleBtn");
 const insightsSafesBody = document.getElementById("insightsSafesBody");
 const insightsSafesArrow = document.getElementById("insightsSafesArrow");
@@ -3329,6 +3325,7 @@ else if (transaction.type === "income") {
 
   setInsightsHeroState(summary);
 
+  if (insightsRecommendationText) {
   if (summary.shortageBeforeSafeSaving > 0) {
     insightsRecommendationText.textContent =
       `Откладывать сейчас рано. После учёта обязательных платежей и остатков лимитов не хватает ${formatMoney(summary.shortageBeforeSafeSaving)}.`;
@@ -3339,6 +3336,7 @@ else if (transaction.type === "income") {
     insightsRecommendationText.textContent =
       `Свободные деньги сейчас полностью заняты обязательствами текущего месяца и остатками лимитов.`;
   }
+}
 
   if (insightsSafeList) {
     insightsSafeList.innerHTML = "";
@@ -3783,10 +3781,6 @@ navInsightsBtn?.addEventListener("click", showInsightsView);
 
 insightsSummaryToggleBtn?.addEventListener("click", () => {
   toggleInsightsCollapse(insightsSummaryBody, insightsSummaryArrow);
-});
-
-insightsExplanationToggleBtn?.addEventListener("click", () => {
-  toggleInsightsCollapse(insightsExplanationBody, insightsExplanationArrow);
 });
 
 insightsSafesToggleBtn?.addEventListener("click", () => {
