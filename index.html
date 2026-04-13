@@ -115,7 +115,8 @@
 
   <!-- ANALYTICS VIEW -->
 <div id="analyticsView" class="hidden">
-  <section class="section section--manager-top">
+    <section class="section section--manager-top screen-shell screen-shell--analytics">
+  <div class="screen-shell__top">
     <div class="analytics-mode-switch-wrap">
       <div class="analytics-mode-switch">
         <button
@@ -135,52 +136,54 @@
         </button>
       </div>
     </div>
+  </div>
 
+  <div class="screen-shell__filters">
     <div class="history-filters">
       <div class="history-filter-group history-filter-group--primary">
-  <div class="month-filter-wrap month-filter-wrap--inline">
-    <button
-      class="history-filter-btn history-filter-btn--month is-active"
-      type="button"
-      data-analytics-period="month"
-      id="analyticsMonthBtn"
-    >
-      Месяц
-    </button>
-  </div>
-</div>
+        <div class="month-filter-wrap month-filter-wrap--inline">
+          <button
+            class="history-filter-btn history-filter-btn--month is-active"
+            type="button"
+            data-analytics-period="month"
+            id="analyticsMonthBtn"
+          >
+            Месяц
+          </button>
+        </div>
+      </div>
 
-<div class="analytics-month-popover hidden" id="analyticsMonthWheelWrap">
-  <div class="analytics-month-popover__panel">
-    <div class="month-wheel" id="analyticsMonthWheelInline">
-      <div class="month-wheel__fade month-wheel__fade--top"></div>
-      <div class="month-wheel__fade month-wheel__fade--bottom"></div>
-      <div class="month-wheel__center-line"></div>
+      <div class="analytics-month-popover hidden" id="analyticsMonthWheelWrap">
+        <div class="analytics-month-popover__panel">
+          <div class="month-wheel" id="analyticsMonthWheelInline">
+            <div class="month-wheel__fade month-wheel__fade--top"></div>
+            <div class="month-wheel__fade month-wheel__fade--bottom"></div>
+            <div class="month-wheel__center-line"></div>
 
-      <div class="month-wheel__column" id="analyticsMonthNamesColumn"></div>
-      <div class="month-wheel__column" id="analyticsMonthYearsColumn"></div>
-    </div>
+            <div class="month-wheel__column" id="analyticsMonthNamesColumn"></div>
+            <div class="month-wheel__column" id="analyticsMonthYearsColumn"></div>
+          </div>
 
-    <div class="analytics-month-popover__actions">
-      <button
-        class="analytics-month-popover__reset"
-        type="button"
-        id="analyticsMonthResetBtn"
-      >
-        Сбросить
-      </button>
+          <div class="analytics-month-popover__actions">
+            <button
+              class="analytics-month-popover__reset"
+              type="button"
+              id="analyticsMonthResetBtn"
+            >
+              Сбросить
+            </button>
 
-      <button
-        class="analytics-month-popover__apply"
-        type="button"
-        id="analyticsMonthApplyBtn"
-        aria-label="Подтвердить выбор месяца"
-      >
-        ✓
-      </button>
-    </div>
-  </div>
-</div>
+            <button
+              class="analytics-month-popover__apply"
+              type="button"
+              id="analyticsMonthApplyBtn"
+              aria-label="Подтвердить выбор месяца"
+            >
+              ✓
+            </button>
+          </div>
+        </div>
+      </div>
 
       <div class="history-filter-group history-filter-group--secondary">
         <button class="history-filter-btn" type="button" data-analytics-period="today">Сегодня</button>
@@ -204,49 +207,21 @@
         <button class="history-filter-btn" type="button" data-analytics-type="transfer">Переводы</button>
       </div>
     </div>
-  </section>
-
-  <section class="section" id="analyticsCategoriesSection">
-    <div class="summary">
-      <div class="summary-card">
-        <p class="summary-label">Доходы за период</p>
-        <p class="summary-value" id="analyticsIncomeValue">0 ₽</p>
-      </div>
-
-      <div class="summary-card">
-        <p class="summary-label">Расходы за период</p>
-        <p class="summary-value" id="analyticsExpenseValue">0 ₽</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="section" id="analyticsTotalsSection">
-    <div class="manager-card analytics-total-card">
-      <p class="summary-label">Итог за период</p>
-      <p class="summary-value" id="analyticsNetValue">0 ₽</p>
-    </div>
-  </section>
-
-  <section class="section" id="analyticsCategoriesBreakdownSection">
-    <div class="manager-card analytics-chart-card analytics-chart-card--clean">
-      <div class="analytics-overview" id="analyticsDonut"></div>
-      <div class="analytics-breakdown" id="analyticsLegend"></div>
-    </div>
-  </section>
-
-  <section class="section hidden" id="analyticsOperationsSection">
-    <div class="list" id="analyticsTransactionsList"></div>
-  </section>
+  </div>
+</section>
 </div>
 
 <!-- INSIGHTS VIEW -->
 <div id="insightsView" class="hidden">
-  <section class="section section--manager-top">
-    <div class="section-head">
-      <h2 class="section-title">Итоги</h2>
-      <div class="section-note" id="insightsPeriodLabel">за период</div>
+  <section class="section section--manager-top screen-shell screen-shell--insights">
+  <div class="screen-shell__top">
+    <div class="section-head screen-shell__head">
+      <h2 class="section-title screen-shell__title">Итоги</h2>
+      <div class="section-note screen-shell__note" id="insightsPeriodLabel">за период</div>
     </div>
+  </div>
 
+  <div class="screen-shell__filters">
     <div class="history-filters">
       <div class="history-filter-group history-filter-group--primary">
         <div class="month-filter-wrap month-filter-wrap--inline">
@@ -305,6 +280,7 @@
         <div class="section-note hidden" id="insightsSelectedPeriodLabel"></div>
       </div>
     </div>
+  </div>
   </section>
 
   <!-- ВЕРХНИЙ БЛОК -->
