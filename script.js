@@ -1378,79 +1378,236 @@ function updateAnalyticsWheelDraftFromScroll() {
       .replaceAll("'", "&#039;");
   }
   
-  const FAQ_CONTENT = {
+  const FAQ_META = {
   required_expense: {
     title: "Обязательные расходы",
     text:
-      "Это все расходы за выбранный период по категориям, которые помечены как обязательные. Например: квартира, коммуналка, налоги, связь.",
-    formula:
-      "Сумма всех expense-операций за период, где категория помечена как обязательная.",
+      "Это все расходы за выбранный период по категориям, которые помечены как обязательные.",
   },
 
   flexible_expense: {
     title: "Гибкие расходы",
     text:
-      "Это все расходы за выбранный период по категориям, которые не помечены как обязательные. Обычно сюда попадают еда, развлечения, маркетплейсы, такси и прочее.",
-    formula:
-      "Сумма всех expense-операций за период, где категория НЕ обязательная.",
+      "Это все расходы за выбранный период по категориям, которые не помечены как обязательные.",
   },
 
   saved_to_safes: {
     title: "Отложено в сейфы",
     text:
       "Это сколько денег ты перевёл в сейфы из обычных счетов за выбранный период. Внутренние перекладывания между самими сейфами сюда не входят.",
-    formula:
-      "Сумма transfer-операций за период, где to_account = 'Сейфы Яндекса' и from_account ≠ 'Сейфы Яндекса'.",
   },
 
   remaining_limits: {
     title: "Остаток лимитов",
     text:
-      "Это сколько ещё можно потратить по гибким категориям в текущем месяце, если ты хочешь остаться в рамках своих лимитов.",
-    formula:
-      "Для каждой гибкой категории: max(0, лимит − уже потрачено в текущем месяце). Потом все остатки складываются.",
+      "Это сколько ещё можно потратить по гибким категориям в текущем месяце, если хочешь остаться в рамках своих лимитов.",
   },
 
   total_balance: {
     title: "Общий баланс",
     text:
-      "Это все деньги во всех твоих счетах и сейфах на текущий момент.",
-    formula:
-      "Сумма балансов всех счетов приложения.",
+      "Это сумма денег по всем счетам приложения на текущий момент.",
   },
 
   protected_money: {
     title: "Резервы и цели",
     text:
-      "Это деньги, которые приложение считает не для обычных трат. Сейчас сюда входят сейфы Налоги, Квартира, Накопления и счёт Наличный резерв.",
-    formula:
-      "Строгие сейфы + резерв 2 уровня.",
+      "Это деньги, которые приложение считает не для обычных трат.",
   },
 
   free_money: {
     title: "Свободные деньги",
     text:
-      "Это деньги, которые остаются после вычета резервов и целей. Именно из них приложение считает, можно ли что-то ещё отложить.",
-    formula:
-      "Общий баланс − резервы и цели.",
+      "Это деньги, которые остаются после вычета резервов и целей.",
   },
 
   can_save_now: {
     title: "Можно отложить сейчас",
     text:
-      "Это сумма, которую можно убрать в накопления без конфликта с непокрытыми обязательными платежами и с оставшимся запасом по лимитам.",
-    formula:
-      "max(0, свободные деньги − непокрытые обязательные − остаток лимитов)",
+      "Это сумма, которую можно убрать в накопления без конфликта с непокрытыми обязательными платежами и остатком лимитов.",
   },
 
   summary_recommendation: {
     title: "Вывод",
     text:
-      "Это короткий итог на основе текущих цифр. Если после всех вычетов остаётся плюс — приложение пишет, сколько можно отложить. Если получается минус — показывает, сколько не хватает.",
-    formula:
-      "Если результат > 0: можно отложить. Если результат < 0: не хватает |результат|.",
+      "Это итоговый результат на основе свободных денег, непокрытых обязательных платежей и остатка лимитов.",
   },
 };
+
+function getRemainingFlexibleBudgetsBreakdownCurrentMonth() {
+  const monthTransactions = getCurrentMonthTransactions();
+  const spentByCategory = new Map();
+
+  monthTransactions.forEach((transaction) => {
+    if (transaction.type !== "expense") return;
+
+    const categoryId = transaction.category_id || UNCATEGORIZED_ID;
+    const current = spentByCategory.get(categoryId) || 0;
+    spentByCategory.set(categoryId, current + (Number(transaction.amount) || 0));
+  });
+
+  const rows = [];
+
+  state.budgetLimits.forEach((limit) => {
+    const categoryId = limit.category_id;
+    const limitAmount = Number(limit.monthly_limit) || 0;
+
+    if (limitAmount <= 0) return;
+    if (isRequiredCategory(categoryId)) return;
+
+    const spent = roundToTwo(spentByCategory.get(categoryId) || 0);
+    const remaining = Math.max(0, roundToTwo(limitAmount - spent));
+
+    rows.push({
+      categoryId,
+      name: getCategoryName(categoryId),
+      limit: roundToTwo(limitAmount),
+      spent,
+      remaining,
+    });
+  });
+
+  return rows
+    .filter((item) => item.remaining > 0)
+    .sort((a, b) => b.remaining - a.remaining);
+}
+
+function getSavedToSafesBreakdown() {
+  const items = getAnalyticsFilteredTransactions().filter((transaction) => {
+    return (
+      transaction.type === "transfer" &&
+      transaction.to_account === getSafeAccountName() &&
+      transaction.from_account !== getSafeAccountName()
+    );
+  });
+
+  return items.map((transaction) => ({
+    title: transaction.title || "Перевод в сейф",
+    amount: roundToTwo(Number(transaction.amount) || 0),
+    date: formatDateShort(transaction.created_at),
+  }));
+}
+
+function getProtectedMoneyBreakdown() {
+  const strictBuckets = getSafeBucketsByNames(["Налоги", "Квартира"]);
+  const softBuckets = getSafeBucketsByNames(["Накопления"]);
+
+  const rows = [];
+
+  strictBuckets.forEach((bucket) => {
+    rows.push({
+      label: bucket.name,
+      amount: roundToTwo(getSafeBucketBalance(bucket.id)),
+    });
+  });
+
+  softBuckets.forEach((bucket) => {
+    rows.push({
+      label: bucket.name,
+      amount: roundToTwo(getSafeBucketBalance(bucket.id)),
+    });
+  });
+
+  rows.push({
+    label: "Наличный резерв",
+    amount: roundToTwo(getCashReserveBalance()),
+  });
+
+  return rows.filter((item) => Math.abs(item.amount) > 0.009);
+}
+
+function buildFaqFormulaText(faqKey) {
+  const summary = getInsightsSummary();
+
+  if (faqKey === "required_expense") {
+    return `${formatMoney(summary.requiredExpense)} = сумма всех обязательных expense-операций за выбранный период`;
+  }
+
+  if (faqKey === "flexible_expense") {
+    return `${formatMoney(summary.flexibleExpense)} = сумма всех гибких expense-операций за выбранный период`;
+  }
+
+  if (faqKey === "saved_to_safes") {
+    const rows = getSavedToSafesBreakdown();
+
+    if (!rows.length) {
+      return `${formatMoney(0)} = за выбранный период не было переводов в сейфы`;
+    }
+
+    const parts = rows.map((item) => `${formatMoney(item.amount)} (${item.date})`);
+    return `${formatMoney(summary.savedToSafes)} = ${parts.join(" + ")}`;
+  }
+
+  if (faqKey === "remaining_limits") {
+    const rows = getRemainingFlexibleBudgetsBreakdownCurrentMonth();
+
+    if (!rows.length) {
+      return `${formatMoney(0)} = по гибким категориям не осталось запаса по лимитам`;
+    }
+
+    const lines = rows.map((item) => {
+      return `${item.name}: ${formatMoney(item.limit)} − ${formatMoney(item.spent)} = ${formatMoney(item.remaining)}`;
+    });
+
+    return `${formatMoney(summary.remainingBudgets)} =\n${lines.join("\n")}`;
+  }
+
+  if (faqKey === "total_balance") {
+    return `${formatMoney(summary.totalBalance)} = сумма балансов всех счетов приложения`;
+  }
+
+  if (faqKey === "protected_money") {
+    const rows = getProtectedMoneyBreakdown();
+
+    if (!rows.length) {
+      return `${formatMoney(0)} = резервы и цели сейчас пустые`;
+    }
+
+    const parts = rows.map((item) => `${formatMoney(item.amount)} (${item.label})`);
+    return `${formatMoney(summary.protectedMoney)} = ${parts.join(" + ")}`;
+  }
+
+  if (faqKey === "free_money") {
+    return `${formatMoney(summary.freeMoney)} = ${formatMoney(summary.totalBalance)} − ${formatMoney(summary.protectedMoney)}`;
+  }
+
+  if (faqKey === "can_save_now") {
+    return `${formatMoney(summary.canSaveNow)} = max(0, ${formatMoney(summary.freeMoney)} − ${formatMoney(summary.pendingMandatoryToDeduct)} − ${formatMoney(summary.remainingBudgets)})`;
+  }
+
+  if (faqKey === "summary_recommendation") {
+    const raw = roundToTwo(
+      summary.freeMoney - summary.pendingMandatoryToDeduct - summary.remainingBudgets
+    );
+
+    if (raw >= 0) {
+      return `${formatMoney(raw)} = ${formatMoney(summary.freeMoney)} − ${formatMoney(summary.pendingMandatoryToDeduct)} − ${formatMoney(summary.remainingBudgets)}`;
+    }
+
+    return `Не хватает ${formatMoney(Math.abs(raw))} = ${formatMoney(summary.pendingMandatoryToDeduct)} + ${formatMoney(summary.remainingBudgets)} − ${formatMoney(summary.freeMoney)}`;
+  }
+
+  return "—";
+}
+
+function openFaqModal(faqKey) {
+  const meta = FAQ_META[faqKey];
+  if (!meta || !faqModal) return;
+
+  faqModalTitle.textContent = meta.title;
+  faqModalText.textContent = meta.text;
+  faqModalFormula.textContent = buildFaqFormulaText(faqKey);
+
+  faqModal.classList.remove("hidden");
+  document.body.style.overflow = "hidden";
+}
+
+function closeFaqModal() {
+  if (!faqModal) return;
+
+  faqModal.classList.add("hidden");
+  document.body.style.overflow = "";
+}
 
 function openFaqModal(faqKey) {
   const item = FAQ_CONTENT[faqKey];
