@@ -272,41 +272,6 @@
   <section class="section">
     <div class="summary">
       <div class="summary-card">
-        <p class="summary-label">Доступно сейчас</p>
-        <p class="summary-value" id="insightsAvailableNowValue">0 ₽</p>
-      </div>
-
-      <div class="summary-card">
-        <p class="summary-label">Безопасный остаток</p>
-        <p class="summary-value" id="insightsWorkingMinimumValue">0 ₽</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="section">
-    <div class="summary">
-      <div class="summary-card">
-        <p class="summary-label">Можно отложить</p>
-        <p class="summary-value" id="insightsCanSaveNowValue">0 ₽</p>
-      </div>
-
-      <div class="summary-card">
-        <p class="summary-label">Резерв 2 уровня</p>
-        <p class="summary-value" id="insightsReserveSecondLineValue">0 ₽</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="section">
-    <div class="manager-card insights-card">
-      <p class="summary-label">Контроль лимитов</p>
-      <p class="insights-recommendation" id="insightsLimitsStatusText">—</p>
-    </div>
-  </section>
-
-  <section class="section">
-    <div class="summary">
-      <div class="summary-card">
         <p class="summary-label">Обязательные расходы</p>
         <p class="summary-value" id="insightsRequiredValue">0 ₽</p>
       </div>
@@ -326,7 +291,7 @@
       </div>
 
       <div class="summary-card">
-        <p class="summary-label">Начислено процентов</p>
+        <p class="summary-label">Проценты по сейфам</p>
         <p class="summary-value" id="insightsInterestValue">0 ₽</p>
       </div>
     </div>
@@ -334,7 +299,65 @@
 
   <section class="section">
     <div class="manager-card insights-card">
-      <p class="summary-label">Рекомендация</p>
+      <div class="section-head">
+        <h2 class="section-title">Обязательства месяца</h2>
+        <button class="manager-back-btn" type="button" id="openMandatoryPaymentsModalBtn">
+          Платежи
+        </button>
+      </div>
+
+      <div class="summary">
+        <div class="summary-card">
+          <p class="summary-label">Неоплаченные обязательные</p>
+          <p class="summary-value" id="insightsPendingMandatoryValue">0 ₽</p>
+        </div>
+
+        <div class="summary-card">
+          <p class="summary-label">Остаток лимитов</p>
+          <p class="summary-value" id="insightsRemainingBudgetsValue">0 ₽</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="summary">
+      <div class="summary-card">
+        <p class="summary-label">Общий баланс</p>
+        <p class="summary-value" id="insightsTotalBalanceValue">0 ₽</p>
+      </div>
+
+      <div class="summary-card">
+        <p class="summary-label">Защищённые деньги</p>
+        <p class="summary-value" id="insightsProtectedMoneyValue">0 ₽</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="summary">
+      <div class="summary-card">
+        <p class="summary-label">Свободные деньги</p>
+        <p class="summary-value" id="insightsFreeMoneyValue">0 ₽</p>
+      </div>
+
+      <div class="summary-card">
+        <p class="summary-label">Можно отложить сейчас</p>
+        <p class="summary-value" id="insightsCanSaveNowValue">0 ₽</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="manager-card insights-card">
+      <p class="summary-label">Сводка обязательств</p>
+      <p class="insights-recommendation" id="insightsLimitsStatusText">—</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="manager-card insights-card">
+      <p class="summary-label">Вывод</p>
       <p class="insights-recommendation" id="insightsRecommendationText">—</p>
     </div>
   </section>
@@ -649,6 +672,43 @@
 </div>
 
 <div class="list" id="analyticsCategoryTransactionsList"></div>
+  </div>
+</div>
+
+  <div class="modal hidden" id="mandatoryPaymentsModal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+
+    <div class="section-head">
+      <h3 class="modal-title" style="margin:0; text-align:left;">Обязательные платежи</h3>
+      <button class="manager-back-btn" type="button" id="closeMandatoryPaymentsModalBtn">
+        Закрыть
+      </button>
+    </div>
+
+    <div class="section-note" style="margin-bottom:12px;">
+      Эти платежи учитываются в расчёте “Можно отложить сейчас”
+    </div>
+
+    <div class="list" id="mandatoryPaymentsList"></div>
+
+    <div class="manager-card" style="margin-top:12px;">
+      <div class="field">
+        <input class="input" id="mandatoryPaymentTitleInput" type="text" placeholder="Например: Квартира" />
+      </div>
+
+      <div class="field">
+        <input class="input" id="mandatoryPaymentAmountInput" type="number" placeholder="Сумма" />
+      </div>
+
+      <div class="field">
+        <input class="input" id="mandatoryPaymentDueDayInput" type="number" min="1" max="31" placeholder="День месяца, например 5" />
+      </div>
+
+      <button class="btn btn-primary manager-add-btn" type="button" id="addMandatoryPaymentBtn">
+        Добавить платёж
+      </button>
+    </div>
   </div>
 </div>
 
