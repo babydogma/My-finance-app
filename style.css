@@ -916,7 +916,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   transition: opacity 0.16s ease, transform 0.16s ease;
 }
 
-  .safe-buckets-sheet {
+.safe-buckets-sheet {
   padding: 18px 16px 18px;
 }
 
@@ -1176,49 +1176,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     inset 0 1px 0 rgba(255, 255, 255, 0.03);
 }
 
-@media (max-width: 420px) {
-  .safe-buckets-title {
-    font-size: 24px;
-  }
-
-  .safe-buckets-total {
-    font-size: 15px;
-  }
-
-  .safe-buckets-close-btn {
-    min-width: 102px;
-    height: 48px;
-    font-size: 16px;
-  }
-
-  .safe-buckets-summary__value {
-    min-width: 108px;
-    font-size: 15px;
-    padding: 9px 12px;
-  }
-
-  .safe-bucket-row__title {
-  font-size: 17px;
-}
-
-.safe-bucket-row__amount {
-  min-width: 118px;
-  font-size: 14px;
-  padding: 9px 12px;
-}
-
-.safe-buckets-rate-row__value {
-  min-width: 92px;
-  font-size: 14px;
-  padding: 9px 12px;
-}
-
-.safe-interest-sheet {
-  width: calc(100% - 20px);
-  padding: 16px;
-  border-radius: 24px;
-}
-}
 /* =========================================================
    13. HISTORY / ANALYTICS FILTERS
    ========================================================= */
@@ -1617,96 +1574,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   color: rgba(255, 255, 255, 0.46);
 }
 
-@media (max-width: 420px) {
-  .history-filters {
-    gap: 10px;
-    padding: 12px;
-    border-radius: 24px;
-    max-width: 100%;
-  }
-
-  .history-filter-group--secondary,
-  .history-filter-group--inputs {
-    gap: 8px;
-  }
-
-  .history-filter-btn {
-    height: 40px;
-    padding: 0 12px;
-    font-size: 12.5px;
-    border-radius: 16px;
-  }
-
-  .history-filter-btn--month {
-    height: 56px;
-    padding: 0 18px;
-    border-radius: 20px;
-    font-size: 18px;
-  }
-
-  .analytics-operation-type-group {
-    gap: 6px;
-  }
-
-  .analytics-operation-type-group .history-filter-btn {
-    padding: 0 8px;
-    font-size: 11.5px;
-    border-radius: 14px;
-  }
-
-  .analytics-month-popover {
-    top: calc(100% + 8px);
-    width: min(360px, calc(100% - 4px));
-  }
-
-  .analytics-month-popover__panel {
-    padding: 12px;
-    border-radius: 24px;
-  }
-
-  .analytics-month-popover__reset {
-    min-width: 118px;
-    height: 52px;
-    font-size: 16px;
-  }
-
-  .analytics-month-popover__apply {
-    width: 66px;
-    height: 66px;
-    font-size: 38px;
-  }
-
-  .month-wheel {
-    height: 214px;
-    padding: 8px 10px;
-  }
-
-  .month-wheel__item {
-    height: 52px;
-    font-size: 17px;
-  }
-
-  .month-wheel__item.is-active {
-    font-size: 24px;
-  }
-
-  .month-wheel__center-line {
-    height: 52px;
-    left: 8px;
-    right: 8px;
-  }
-
-  #analyticsRangeFromInput:not(.hidden),
-  #analyticsRangeToInput:not(.hidden),
-  #insightsRangeFromInput:not(.hidden),
-  #insightsRangeToInput:not(.hidden) {
-    min-height: 44px;
-    padding: 0 14px;
-    border-radius: 16px;
-    font-size: 14px;
-  }
-}
-
 /* =========================================================
    14. ANALYTICS VIEW
    ========================================================= */
@@ -1729,10 +1596,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   justify-content: center;
   width: 100%;
   margin-bottom: 10px;
-}
-
-.analytics-operation-type-group {
-  justify-content: center;
 }
 
 .analytics-mode-switch {
@@ -2300,41 +2163,41 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     height: 42px;
     font-size: 15px;
   }
-  
+
   .balance {
-  padding: 16px 14px 15px;
-  border-radius: 26px;
-}
+    padding: 16px 14px 15px;
+    border-radius: 26px;
+  }
 
-.balance-amount {
-  font-size: clamp(40px, 10vw, 54px);
-}
+  .balance-amount {
+    font-size: clamp(40px, 10vw, 54px);
+  }
 
-#accountsList .list-card {
-  min-height: 72px;
-  padding: 12px 13px;
-}
+  #accountsList .list-card {
+    min-height: 72px;
+    padding: 12px 13px;
+  }
 
-#accountsList .list-value {
-  font-size: 15.5px;
-}
+  #accountsList .list-value {
+    font-size: 15.5px;
+  }
 
-.analytics-panel__total {
-  font-size: 27px;
-}
+  .analytics-panel__total {
+    font-size: 27px;
+  }
 
-.analytics-leader {
-  min-height: 92px;
-  padding: 14px;
-}
+  .analytics-leader {
+    min-height: 92px;
+    padding: 14px;
+  }
 
-.analytics-leader__title {
-  font-size: 17px;
-}
+  .analytics-leader__title {
+    font-size: 17px;
+  }
 
-.analytics-breakdown-row__title {
-  font-size: 15px;
-}
+  .analytics-breakdown-row__title {
+    font-size: 15px;
+  }
 
   #insightsView .section-title {
     font-size: 18px;
@@ -2398,63 +2261,23 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     grid-template-columns: repeat(2, 1fr);
     gap: 8px;
   }
-  
-  .safe-bucket-card__value {
-  min-width: 112px;
-  font-size: 14px;
-  padding: 8px 12px;
-}
 
-.safe-bucket-icon-btn {
-  width: 32px;
-  height: 32px;
-  border-radius: 11px;
-  font-size: 15px;
-}
+  .safe-buckets-rate-row,
+  .safe-buckets-summary,
+  .safe-bucket-row {
+    border-radius: 22px;
+  }
 
-.safe-bucket-amount-sheet {
-  width: calc(100% - 20px);
-  padding: 16px;
-  border-radius: 24px;
-}
+  .safe-bucket-row__icon,
+  .insights-safe-list .list-icon {
+    width: 40px;
+    height: 40px;
+    flex-basis: 40px;
+  }
 
-.safe-bucket-amount-input {
-  height: 52px;
-  font-size: 20px;
-}
-
-#deleteSafeBucketBtn.hidden {
-  display: none !important;
-}
-
-.safe-bucket-amount-actions {
-  align-items: stretch;
-}
-
-.safe-interest-sheet {
-  max-width: 420px;
-  width: calc(100% - 28px);
-  margin: 0 auto;
-  padding: 18px;
-  border-radius: 28px;
-}
-
-.safe-buckets-rate-row,
-.safe-buckets-summary,
-.safe-bucket-row {
-  border-radius: 22px;
-}
-
-.safe-bucket-row__icon,
-.insights-safe-list .list-icon {
-  width: 40px;
-  height: 40px;
-  flex-basis: 40px;
-}
-
-.faq-chip {
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
-}
+  .faq-chip {
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  }
 
   .modal-actions--triple {
     grid-template-columns: 1fr 1fr;
@@ -2472,57 +2295,57 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   }
 
   .analytics-month-popover {
-  top: 156px;
-  width: min(360px, calc(100% - 20px));
-}
+    top: calc(100% + 8px);
+    width: min(360px, calc(100% - 4px));
+  }
 
-.analytics-month-popover__panel {
-  padding: 12px;
-  border-radius: 24px;
-}
+  .analytics-month-popover__panel {
+    padding: 12px;
+    border-radius: 24px;
+  }
 
-.analytics-month-popover__reset {
-  min-width: 118px;
-  height: 52px;
-  font-size: 16px;
-}
+  .analytics-month-popover__reset {
+    min-width: 118px;
+    height: 52px;
+    font-size: 16px;
+  }
 
-.analytics-month-popover__apply {
-  width: 66px;
-  height: 66px;
-  font-size: 38px;
-}
+  .analytics-month-popover__apply {
+    width: 66px;
+    height: 66px;
+    font-size: 38px;
+  }
 
-.month-wheel {
-  height: 214px;
-  padding: 8px 10px;
-}
+  .month-wheel {
+    height: 214px;
+    padding: 8px 10px;
+  }
 
-.month-wheel__item {
-  height: 52px;
-  font-size: 17px;
-}
+  .month-wheel__item {
+    height: 52px;
+    font-size: 17px;
+  }
 
-.month-wheel__item.is-active {
-  font-size: 24px;
-}
+  .month-wheel__item.is-active {
+    font-size: 24px;
+  }
 
-.month-wheel__center-line {
-  height: 52px;
-  left: 8px;
-  right: 8px;
-}
+  .month-wheel__center-line {
+    height: 52px;
+    left: 8px;
+    right: 8px;
+  }
 
   .history-filter-btn {
     height: 34px;
     padding: 0 12px;
     font-size: 12.5px;
   }
-  
-
 
   #analyticsRangeFromInput:not(.hidden),
-  #analyticsRangeToInput:not(.hidden) {
+  #analyticsRangeToInput:not(.hidden),
+  #insightsRangeFromInput:not(.hidden),
+  #insightsRangeToInput:not(.hidden) {
     min-height: 44px;
     padding: 0 14px;
     border-radius: 16px;
@@ -2536,6 +2359,42 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   #transactionsList .list-caption {
     font-size: 10px;
   }
+
+  .safe-buckets-title {
+    font-size: 24px;
+  }
+
+  .safe-buckets-total {
+    font-size: 15px;
+  }
+
+  .safe-buckets-close-btn {
+    min-width: 102px;
+    height: 48px;
+    font-size: 16px;
+  }
+
+  .safe-buckets-summary__value {
+    min-width: 108px;
+    font-size: 15px;
+    padding: 9px 12px;
+  }
+
+  .safe-bucket-row__title {
+    font-size: 17px;
+  }
+
+  .safe-bucket-row__amount {
+    min-width: 118px;
+    font-size: 14px;
+    padding: 9px 12px;
+  }
+
+  .safe-buckets-rate-row__value {
+    min-width: 92px;
+    font-size: 14px;
+    padding: 9px 12px;
+  }
 }
 
 #budgetCategoryIconInput,
@@ -2545,16 +2404,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   text-align: center;
   font-size: 24px;
   letter-spacing: 0;
-}
-
-#insightsCanSaveNowValue.is-positive {
-  color: var(--green);
-  text-shadow: 0 0 18px rgba(74, 216, 140, 0.12);
-}
-
-#insightsCanSaveNowValue.is-negative {
-  color: var(--red);
-  text-shadow: 0 0 18px rgba(255, 114, 104, 0.12);
 }
 
 /* =========================================================
@@ -2596,16 +2445,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 #insightsProtectedMoneyValue,
 #insightsFreeMoneyValue {
   color: #f4f7ff;
-}
-
-#insightsCanSaveNowValue.is-positive {
-  color: var(--green);
-  text-shadow: 0 0 18px rgba(74, 216, 140, 0.12);
-}
-
-#insightsCanSaveNowValue.is-negative {
-  color: var(--red);
-  text-shadow: 0 0 18px rgba(255, 114, 104, 0.12);
 }
 
 #insightsLimitsStatusText,
@@ -2672,47 +2511,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   white-space: nowrap;
 }
 
-@media (max-width: 420px) {
-  #insightsView .summary {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
-  }
-
-  #insightsView .summary-card {
-    min-height: 86px;
-    padding: 10px 11px 9px;
-    border-radius: 18px;
-  }
-
-  #insightsView .summary-label {
-    min-height: 20px;
-    font-size: 11px;
-  }
-
-  #insightsView .summary-value {
-    font-size: 16px;
-  }
-
-  #insightsLimitsStatusText {
-    font-size: 13.5px;
-  }
-
-  #insightsRecommendationText {
-    font-size: 13.5px;
-  }
-
-  #mandatoryPaymentsList .list-card {
-    min-height: 76px;
-    border-radius: 22px;
-  }
-
-  #mandatoryPaymentsList .mini-btn {
-    height: 32px;
-    padding: 0 10px;
-    font-size: 12px;
-  }
-}
-
 /* =========================================================
    18. MANDATORY PAYMENTS — DATE + LINKED SAFE
    ========================================================= */
@@ -2765,21 +2563,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 #mandatoryPaymentsList .category-manager-actions {
   flex: 0 0 auto;
   align-self: center;
-}
-
-@media (max-width: 420px) {
-  #mandatoryPaymentsList .list-card {
-    padding: 10px 12px;
-    gap: 10px;
-  }
-
-  #mandatoryPaymentsList .category-manager-actions {
-    gap: 6px;
-  }
-
-  #mandatoryPaymentsList .mini-btn {
-    min-width: 68px;
-  }
 }
 
 /* =========================================================
@@ -2865,24 +2648,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.03),
     0 8px 18px rgba(0, 0, 0, 0.14);
-}
-
-@media (max-width: 420px) {
-  .faq-chip {
-    width: 20px;
-    height: 20px;
-    min-width: 20px;
-    font-size: 10px;
-  }
-
-  .faq-text {
-    font-size: 15px;
-  }
-
-  .faq-formula {
-    font-size: 13px;
-    padding: 13px 14px;
-  }
 }
 
 /* =========================================================
@@ -3006,33 +2771,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   pointer-events: none;
 }
 
-@media (max-width: 420px) {
-  .insights-card--compact {
-    min-height: 62px;
-    padding: 9px 12px;
-    border-radius: 18px;
-  }
-
-  .insights-card--compact .summary-label {
-    font-size: 11.5px;
-  }
-
-  .insights-card--compact .summary-value {
-    font-size: 17px;
-  }
-
-  .insights-save-card .summary-value {
-    font-size: 27px;
-  }
-
-  #insightsTotalBalanceValue,
-  #insightsProtectedMoneyValue,
-  #insightsFreeMoneyValue,
-  #insightsCanSaveNowValue {
-    font-size: 17px;
-  }
-}
-
 /* =========================================================
    21. MAIN SCREEN + INSIGHTS FINAL POLISH
    ========================================================= */
@@ -3101,18 +2839,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 #insightsView .section:nth-of-type(9),
 #insightsView .section:nth-of-type(10) {
   margin-top: 18px;
-}
-
-@media (max-width: 420px) {
-  #mainView .section-title {
-    font-size: 15px;
-  }
-
-  #insightsView .section:nth-of-type(2),
-  #insightsView .section:nth-of-type(4),
-  #insightsView .section:nth-of-type(7) {
-    margin-top: 22px;
-  }
 }
 
 /* =========================================================
@@ -3321,59 +3047,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   text-shadow: 0 0 14px rgba(111, 156, 255, 0.08);
 }
 
-@media (max-width: 420px) {
-  .insights-mini-grid {
-    gap: 8px;
-  }
-
-  .insights-mini-card {
-    min-height: 64px;
-    padding: 8px 9px;
-    border-radius: 15px;
-  }
-
-  .insights-mini-value {
-    font-size: 15px;
-  }
-
-  .insights-hero-card .summary-value {
-    font-size: 27px;
-  }
-
-  .insights-hero-state {
-    min-height: 26px;
-    padding: 0 9px;
-    font-size: 10.5px;
-  }
-
-  .insights-hero-hint {
-    font-size: 11px;
-  }
-
-  .insights-collapse-toggle {
-    min-height: 64px;
-    padding: 0 14px;
-    font-size: 15px;
-  }
-
-  .insights-collapse-body {
-    padding: 0 14px 14px;
-  }
-
-  .insights-summary-row {
-    min-height: 40px;
-    padding: 0 10px;
-  }
-
-  .insights-summary-row__label {
-    font-size: 10.5px;
-  }
-
-  .insights-summary-row__value {
-    font-size: 12.5px;
-  }
-}
-
 /* =========================================================
    23. INSIGHTS ROW HEIGHT FIX
    ========================================================= */
@@ -3391,16 +3064,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 #insightsSummaryToggleBtn .insights-collapse-arrow,
 #insightsSafesToggleBtn .insights-collapse-arrow {
   font-size: 18px;
-}
-
-@media (max-width: 420px) {
-  #insightsSummaryToggleBtn,
-  #insightsSafesToggleBtn {
-    min-height: 64px;
-    padding-left: 14px;
-    padding-right: 14px;
-    font-size: 15px;
-  }
 }
 
 /* =========================================================
@@ -3555,66 +3218,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   text-shadow: 0 0 14px rgba(111, 156, 255, 0.08);
 }
 
-@media (max-width: 420px) {
-  .insights-top-panel {
-    padding: 12px;
-    border-radius: 22px;
-  }
-
-  .insights-top-hero {
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    margin-bottom: 8px;
-  }
-
-  .insights-top-hero-card {
-    min-height: 96px;
-    padding: 11px 12px 10px;
-    border-radius: 20px;
-  }
-
-  .insights-top-hero-label {
-    margin-bottom: 8px;
-    min-height: 20px;
-    font-size: 11px;
-  }
-
-  .insights-top-hero-value {
-    font-size: 19px;
-  }
-
-  .insights-top-grid {
-    gap: 8px;
-  }
-
-  .insights-top-mini {
-    min-height: 68px;
-    padding: 9px 10px;
-    border-radius: 16px;
-  }
-
-  .insights-top-mini--wide {
-    min-height: 58px;
-  }
-
-  .insights-top-mini-label {
-    font-size: 10px;
-    margin-bottom: 6px;
-  }
-
-  .insights-top-mini--wide .insights-top-mini-label {
-    font-size: 10.5px;
-  }
-
-  .insights-top-mini-value {
-    font-size: 15px;
-  }
-
-  .insights-top-mini--wide .insights-top-mini-value {
-    font-size: 17px;
-  }
-}
-
 /* =========================================================
    25. INSIGHTS EXPENSE PANEL REBUILD
    ========================================================= */
@@ -3738,53 +3341,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   text-shadow: 0 0 14px rgba(111, 156, 255, 0.08);
 }
 
-@media (max-width: 420px) {
-  .insights-expense-panel {
-    padding: 12px;
-    border-radius: 22px;
-  }
-
-  .insights-expense-hero {
-    gap: 8px;
-    margin-bottom: 8px;
-  }
-
-  .insights-expense-hero-card {
-    min-height: 82px;
-    padding: 10px 11px 9px;
-    border-radius: 18px;
-  }
-
-  .insights-expense-label {
-    min-height: 20px;
-    margin-bottom: 7px;
-    font-size: 11px;
-  }
-
-  .insights-expense-value {
-    font-size: 16px;
-  }
-
-  .insights-expense-grid {
-    gap: 8px;
-  }
-
-  .insights-expense-mini {
-    min-height: 62px;
-    padding: 8px 9px;
-    border-radius: 15px;
-  }
-
-  .insights-expense-mini-label {
-    font-size: 10px;
-    margin-bottom: 6px;
-  }
-
-  .insights-expense-mini-value {
-    font-size: 15px;
-  }
-}
-
 /* =========================================================
    26. MONTH POPOVER LAYER FIX
    ========================================================= */
@@ -3811,18 +3367,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 #analyticsMonthWheelWrap.hidden,
 #insightsMonthWheelWrap.hidden {
   display: none !important;
-}
-
-@media (max-width: 420px) {
-  .analytics-month-popover {
-    top: calc(100% + 8px);
-    width: min(360px, calc(100% - 4px));
-    z-index: 999;
-  }
-
-  .analytics-month-popover__panel {
-    z-index: 999;
-  }
 }
 
 /* =========================================================
@@ -3927,6 +3471,355 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 @media (max-width: 420px) {
+  .history-filters {
+    gap: 10px;
+    padding: 12px;
+    border-radius: 24px;
+    max-width: 100%;
+  }
+
+  .history-filter-group--secondary,
+  .history-filter-group--inputs {
+    gap: 8px;
+  }
+
+  .history-filter-btn {
+    height: 40px;
+    padding: 0 12px;
+    font-size: 12.5px;
+    border-radius: 16px;
+  }
+
+  .history-filter-btn--month {
+    height: 56px;
+    padding: 0 18px;
+    border-radius: 20px;
+    font-size: 18px;
+  }
+
+  .analytics-operation-type-group {
+    gap: 6px;
+  }
+
+  .analytics-operation-type-group .history-filter-btn {
+    padding: 0 8px;
+    font-size: 11.5px;
+    border-radius: 14px;
+  }
+
+  .analytics-month-popover {
+    top: calc(100% + 8px);
+    width: min(360px, calc(100% - 4px));
+    z-index: 999;
+  }
+
+  .analytics-month-popover__panel {
+    padding: 12px;
+    border-radius: 24px;
+    z-index: 999;
+  }
+
+  .analytics-month-popover__reset {
+    min-width: 118px;
+    height: 52px;
+    font-size: 16px;
+  }
+
+  .analytics-month-popover__apply {
+    width: 66px;
+    height: 66px;
+    font-size: 38px;
+  }
+
+  .month-wheel {
+    height: 214px;
+    padding: 8px 10px;
+  }
+
+  .month-wheel__item {
+    height: 52px;
+    font-size: 17px;
+  }
+
+  .month-wheel__item.is-active {
+    font-size: 24px;
+  }
+
+  .month-wheel__center-line {
+    height: 52px;
+    left: 8px;
+    right: 8px;
+  }
+
+  #analyticsRangeFromInput:not(.hidden),
+  #analyticsRangeToInput:not(.hidden),
+  #insightsRangeFromInput:not(.hidden),
+  #insightsRangeToInput:not(.hidden) {
+    min-height: 44px;
+    padding: 0 14px;
+    border-radius: 16px;
+    font-size: 14px;
+  }
+
+  #insightsView .summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  #insightsView .summary-card {
+    min-height: 86px;
+    padding: 10px 11px 9px;
+    border-radius: 18px;
+  }
+
+  #insightsView .summary-label {
+    min-height: 20px;
+    font-size: 11px;
+  }
+
+  #insightsView .summary-value {
+    font-size: 16px;
+  }
+
+  #insightsLimitsStatusText {
+    font-size: 13.5px;
+  }
+
+  #insightsRecommendationText {
+    font-size: 13.5px;
+  }
+
+  #mandatoryPaymentsList .list-card {
+    min-height: 76px;
+    border-radius: 22px;
+    padding: 10px 12px;
+    gap: 10px;
+  }
+
+  #mandatoryPaymentsList .category-manager-actions {
+    gap: 6px;
+  }
+
+  #mandatoryPaymentsList .mini-btn {
+    height: 32px;
+    padding: 0 10px;
+    font-size: 12px;
+    min-width: 68px;
+  }
+
+  .faq-chip {
+    width: 20px;
+    height: 20px;
+    min-width: 20px;
+    font-size: 10px;
+  }
+
+  .faq-text {
+    font-size: 15px;
+  }
+
+  .faq-formula {
+    font-size: 13px;
+    padding: 13px 14px;
+  }
+
+  .insights-card--compact {
+    min-height: 62px;
+    padding: 9px 12px;
+    border-radius: 18px;
+  }
+
+  .insights-card--compact .summary-label {
+    font-size: 11.5px;
+  }
+
+  .insights-card--compact .summary-value {
+    font-size: 17px;
+  }
+
+  .insights-save-card .summary-value {
+    font-size: 27px;
+  }
+
+  #insightsTotalBalanceValue,
+  #insightsProtectedMoneyValue,
+  #insightsFreeMoneyValue,
+  #insightsCanSaveNowValue {
+    font-size: 17px;
+  }
+
+  #mainView .section-title {
+    font-size: 15px;
+  }
+
+  #insightsView .section:nth-of-type(2),
+  #insightsView .section:nth-of-type(4),
+  #insightsView .section:nth-of-type(7) {
+    margin-top: 22px;
+  }
+
+  .insights-mini-grid {
+    gap: 8px;
+  }
+
+  .insights-mini-card {
+    min-height: 64px;
+    padding: 8px 9px;
+    border-radius: 15px;
+  }
+
+  .insights-mini-value {
+    font-size: 15px;
+  }
+
+  .insights-hero-card .summary-value {
+    font-size: 27px;
+  }
+
+  .insights-hero-state {
+    min-height: 26px;
+    padding: 0 9px;
+    font-size: 10.5px;
+  }
+
+  .insights-hero-hint {
+    font-size: 11px;
+  }
+
+  .insights-collapse-toggle {
+    min-height: 64px;
+    padding: 0 14px;
+    font-size: 15px;
+  }
+
+  .insights-collapse-body {
+    padding: 0 14px 14px;
+  }
+
+  .insights-summary-row {
+    min-height: 40px;
+    padding: 0 10px;
+  }
+
+  .insights-summary-row__label {
+    font-size: 10.5px;
+  }
+
+  .insights-summary-row__value {
+    font-size: 12.5px;
+  }
+
+  #insightsSummaryToggleBtn,
+  #insightsSafesToggleBtn {
+    min-height: 64px;
+    padding-left: 14px;
+    padding-right: 14px;
+    font-size: 15px;
+  }
+
+  .insights-top-panel {
+    padding: 12px;
+    border-radius: 22px;
+  }
+
+  .insights-top-hero {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .insights-top-hero-card {
+    min-height: 96px;
+    padding: 11px 12px 10px;
+    border-radius: 20px;
+  }
+
+  .insights-top-hero-label {
+    margin-bottom: 8px;
+    min-height: 20px;
+    font-size: 11px;
+  }
+
+  .insights-top-hero-value {
+    font-size: 19px;
+  }
+
+  .insights-top-grid {
+    gap: 8px;
+  }
+
+  .insights-top-mini {
+    min-height: 68px;
+    padding: 9px 10px;
+    border-radius: 16px;
+  }
+
+  .insights-top-mini--wide {
+    min-height: 58px;
+  }
+
+  .insights-top-mini-label {
+    font-size: 10px;
+    margin-bottom: 6px;
+  }
+
+  .insights-top-mini--wide .insights-top-mini-label {
+    font-size: 10.5px;
+  }
+
+  .insights-top-mini-value {
+    font-size: 15px;
+  }
+
+  .insights-top-mini--wide .insights-top-mini-value {
+    font-size: 17px;
+  }
+
+  .insights-expense-panel {
+    padding: 12px;
+    border-radius: 22px;
+  }
+
+  .insights-expense-hero {
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .insights-expense-hero-card {
+    min-height: 82px;
+    padding: 10px 11px 9px;
+    border-radius: 18px;
+  }
+
+  .insights-expense-label {
+    min-height: 20px;
+    margin-bottom: 7px;
+    font-size: 11px;
+  }
+
+  .insights-expense-value {
+    font-size: 16px;
+  }
+
+  .insights-expense-grid {
+    gap: 8px;
+  }
+
+  .insights-expense-mini {
+    min-height: 62px;
+    padding: 8px 9px;
+    border-radius: 15px;
+  }
+
+  .insights-expense-mini-label {
+    font-size: 10px;
+    margin-bottom: 6px;
+  }
+
+  .insights-expense-mini-value {
+    font-size: 15px;
+  }
+
   .screen-shell {
     margin-top: 4px;
     margin-bottom: 6px;
