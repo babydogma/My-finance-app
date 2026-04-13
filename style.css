@@ -3747,3 +3747,24 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     margin-top: 16px;
   }
 }
+
+/* =========================================================
+   30. BALANCE SUBLINE
+   ========================================================= */
+
+.balance-subline {
+  margin: 14px 0 0;
+  color: rgba(255, 255, 255, 0.66);
+  font-size: 14px;
+  font-weight: 780;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  text-align: center;
+}
+
+@media (max-width: 420px) {
+  .balance-subline {
+    margin-top: 12px;
+    font-size: 13px;
+  }
+}
