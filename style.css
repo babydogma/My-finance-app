@@ -948,21 +948,40 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   width: 100%;
   margin-bottom: 12px;
   border: none;
-  padding: 12px 14px;
-  border-radius: 22px;
+  padding: 13px 14px;
+  border-radius: 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 14px;
-  background: linear-gradient(180deg, rgba(42, 46, 58, 0.84) 0%, rgba(33, 36, 46, 0.9) 100%);
+  background:
+    linear-gradient(180deg, rgba(44, 48, 60, 0.9) 0%, rgba(33, 36, 46, 0.95) 100%);
   border: 1px solid rgba(255, 255, 255, 0.05);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.03),
+    0 8px 18px rgba(0, 0, 0, 0.14);
   color: var(--text);
   text-align: left;
+  transition: transform 0.14s ease, box-shadow 0.14s ease;
 }
 
 .safe-buckets-rate-row:active {
   transform: scale(0.993);
+}
+
+.safe-buckets-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 15px 16px;
+  border-radius: 24px;
+  background:
+    linear-gradient(180deg, rgba(44, 48, 60, 0.9) 0%, rgba(33, 36, 46, 0.95) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.03),
+    0 8px 18px rgba(0, 0, 0, 0.14);
 }
 
 .safe-buckets-rate-row__label {
@@ -993,18 +1012,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   border-radius: 999px;
   font-size: 17px;
   font-weight: 850;
-}
-
-.safe-buckets-summary {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-  padding: 14px 16px;
-  border-radius: 24px;
-  background: linear-gradient(180deg, rgba(42, 46, 58, 0.84) 0%, rgba(33, 36, 46, 0.9) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
 }
 
 .safe-buckets-summary--danger {
@@ -1042,39 +1049,40 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .safe-bucket-row {
   width: 100%;
   border: none;
-  padding: 14px 14px;
-  border-radius: 22px;
-  background: linear-gradient(180deg, rgba(49, 53, 68, 0.97) 0%, rgba(39, 43, 57, 0.99) 100%);
+  padding: 15px 14px;
+  border-radius: 24px;
+  background:
+    linear-gradient(180deg, rgba(50, 54, 69, 0.985) 0%, rgba(39, 43, 57, 1) 100%);
   border: 1px solid rgba(255, 255, 255, 0.06);
   box-shadow:
-    0 6px 18px rgba(0, 0, 0, 0.18),
-    0 0 18px rgba(111, 156, 255, 0.05),
+    0 10px 22px rgba(0, 0, 0, 0.2),
+    0 0 18px rgba(111, 156, 255, 0.035),
     inset 0 1px 0 rgba(255, 255, 255, 0.03);
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 14px;
   text-align: left;
-  transition: transform 0.14s ease, border-color 0.14s ease;
+  transition: transform 0.14s ease, border-color 0.14s ease, box-shadow 0.14s ease;
 }
 
 .safe-bucket-row:active {
   transform: scale(0.992);
 }
 
-.safe-bucket-row--system {
+.safe-bucket-row:hover {
+  border-color: rgba(255, 255, 255, 0.085);
   box-shadow:
-    0 6px 18px rgba(0, 0, 0, 0.18),
-    0 0 20px rgba(111, 156, 255, 0.07),
+    0 12px 26px rgba(0, 0, 0, 0.22),
+    0 0 20px rgba(111, 156, 255, 0.05),
     inset 0 1px 0 rgba(255, 255, 255, 0.03);
 }
 
-.safe-bucket-row__left {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  min-width: 0;
-  flex: 1 1 auto;
+.safe-bucket-row--system {
+  box-shadow:
+    0 10px 22px rgba(0, 0, 0, 0.2),
+    0 0 22px rgba(111, 156, 255, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
 }
 
 .safe-bucket-row__left {
@@ -2012,30 +2020,40 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .insights-safe-list {
-  margin-top: 12px;
+  margin-top: 14px;
   gap: 12px;
 }
 
 .insights-safe-list .list-card {
-  min-height: 76px;
-  padding: 12px 14px;
-  border-radius: 22px;
-  background: linear-gradient(180deg, rgba(46, 50, 64, 0.98) 0%, rgba(38, 42, 56, 0.995) 100%);
+  min-height: 78px;
+  padding: 13px 14px;
+  border-radius: 24px;
+  background:
+    linear-gradient(180deg, rgba(49, 53, 68, 0.99) 0%, rgba(38, 42, 56, 1) 100%);
+}
+
+.insights-safe-list .list-icon {
+  width: 44px;
+  height: 44px;
+  flex-basis: 44px;
+  border-radius: 15px;
 }
 
 .insights-safe-list .list-title {
   font-size: 17px;
-  font-weight: 860;
+  font-weight: 880;
 }
 
 .insights-safe-list .list-subtitle {
-  font-size: 12px;
-  font-weight: 720;
+  font-size: 11.5px;
+  font-weight: 740;
+  color: rgba(255, 255, 255, 0.46);
 }
 
 .insights-safe-list .list-value {
   font-size: 17px;
-  font-weight: 880;
+  font-weight: 900;
+  letter-spacing: -0.04em;
 }
 
 /* =========================================================
@@ -2049,6 +2067,58 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 #transactionsList .list-caption {
   display: block;
   text-align: right;
+}
+
+/* =========================================================
+   15.1 MICRO POLISH
+   ========================================================= */
+
+.action-card,
+.list-card--clickable,
+.safe-bucket-row,
+.history-filter-btn,
+.analytics-mode-switch__btn,
+.nav-item,
+.manager-back-btn,
+.btn,
+.mini-btn,
+.faq-chip,
+.safe-buckets-rate-row,
+.analytics-leader--button,
+.analytics-breakdown-row--button {
+  will-change: transform;
+}
+
+.summary-card,
+.manager-card,
+.analytics-total-card,
+.insights-card,
+.safe-buckets-summary,
+.safe-buckets-rate-row,
+.safe-bucket-row,
+.list-card,
+.balance {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+#mainView .section-head,
+#analyticsView .section-head,
+#insightsView .section-head {
+  margin-bottom: 12px;
+}
+
+#mainView .section-title,
+#analyticsView .section-title,
+#insightsView .section-title {
+  text-wrap: balance;
+}
+
+#transactionsList .list-card + .list-card,
+#accountsList .list-card + .list-card,
+#mandatoryPaymentsList .list-card + .list-card,
+.insights-safe-list .list-card + .list-card {
+  margin-top: 0;
 }
 
 /* =========================================================
@@ -2203,6 +2273,23 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   margin: 0 auto;
   padding: 18px;
   border-radius: 28px;
+}
+
+.safe-buckets-rate-row,
+.safe-buckets-summary,
+.safe-bucket-row {
+  border-radius: 22px;
+}
+
+.safe-bucket-row__icon,
+.insights-safe-list .list-icon {
+  width: 40px;
+  height: 40px;
+  flex-basis: 40px;
+}
+
+.faq-chip {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
   .modal-actions--triple {
@@ -2525,7 +2612,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   min-width: 22px;
   border: none;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.08);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.11) 0%, rgba(255, 255, 255, 0.06) 100%);
   color: rgba(255, 255, 255, 0.78);
   font-size: 11px;
   font-weight: 900;
@@ -2533,17 +2621,23 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
-  transition: transform 0.16s ease, background 0.16s ease;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 4px 10px rgba(0, 0, 0, 0.12);
+  transition: transform 0.16s ease, background 0.16s ease, box-shadow 0.16s ease;
   flex: 0 0 auto;
 }
 
 .faq-chip:active {
-  transform: scale(0.96);
+  transform: scale(0.95);
 }
 
 .faq-chip:hover {
-  background: rgba(255, 255, 255, 0.12);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.08) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 6px 14px rgba(0, 0, 0, 0.14);
 }
 
 #faqModal {
@@ -2551,35 +2645,39 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .faq-sheet {
-  padding-bottom: 22px;
+  padding-bottom: 24px;
 }
 
 .faq-content {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
 }
 
 .faq-text {
   margin: 0;
-  color: rgba(255, 255, 255, 0.9);
+  color: rgba(255, 255, 255, 0.92);
   font-size: 16px;
-  font-weight: 760;
-  line-height: 1.4;
+  font-weight: 780;
+  line-height: 1.42;
   letter-spacing: -0.02em;
 }
 
 .faq-formula {
-  padding: 14px 15px;
-  border-radius: 18px;
-  background: linear-gradient(180deg, rgba(43, 46, 57, 0.94) 0%, rgba(35, 38, 47, 0.96) 100%);
+  padding: 15px 16px;
+  border-radius: 20px;
+  background:
+    linear-gradient(180deg, rgba(45, 48, 60, 0.96) 0%, rgba(35, 38, 47, 0.99) 100%);
   border: 1px solid rgba(255, 255, 255, 0.05);
   color: #eef3ff;
   font-size: 14px;
-  font-weight: 800;
-  line-height: 1.35;
+  font-weight: 820;
+  line-height: 1.38;
   letter-spacing: -0.02em;
   white-space: pre-wrap;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.03),
+    0 8px 18px rgba(0, 0, 0, 0.14);
 }
 
 @media (max-width: 420px) {
@@ -2596,7 +2694,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
   .faq-formula {
     font-size: 13px;
-    padding: 12px 13px;
+    padding: 13px 14px;
   }
 }
 
