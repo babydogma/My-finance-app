@@ -91,10 +91,11 @@ const deleteBudgetBtn = document.getElementById("deleteBudgetBtn");
   const openMandatoryPaymentsModalBtn = document.getElementById("openMandatoryPaymentsModalBtn");
   const closeMandatoryPaymentsModalBtn = document.getElementById("closeMandatoryPaymentsModalBtn");
   const mandatoryPaymentsList = document.getElementById("mandatoryPaymentsList");
-  const mandatoryPaymentTitleInput = document.getElementById("mandatoryPaymentTitleInput");
-  const mandatoryPaymentAmountInput = document.getElementById("mandatoryPaymentAmountInput");
-  const mandatoryPaymentDueDayInput = document.getElementById("mandatoryPaymentDueDayInput");
-  const addMandatoryPaymentBtn = document.getElementById("addMandatoryPaymentBtn");
+const mandatoryPaymentTitleInput = document.getElementById("mandatoryPaymentTitleInput");
+const mandatoryPaymentAmountInput = document.getElementById("mandatoryPaymentAmountInput");
+const mandatoryPaymentDueDayInput = document.getElementById("mandatoryPaymentDueDayInput");
+const mandatoryPaymentLinkedSafeSelect = document.getElementById("mandatoryPaymentLinkedSafeSelect");
+const addMandatoryPaymentBtn = document.getElementById("addMandatoryPaymentBtn");
 
   const modalTitle = modal?.querySelector(".modal-title");
 
@@ -590,6 +591,7 @@ function updateTransferSafeFields() {
       title: String(item.title || "").trim(),
       amount: roundToTwo(Number(item.amount) || 0),
       due_day: Math.min(31, Math.max(1, Number(item.due_day) || 1)),
+      linked_safe_bucket_id: item.linked_safe_bucket_id || "",
       enabled: item.enabled !== false,
       last_paid_period: item.last_paid_period || "",
     }));
@@ -637,7 +639,87 @@ function getMandatoryPaymentsStats(monthKey = getCurrentMonthKey()) {
   };
 }
 
+function fillMandatoryPaymentSafeSelect(selectedId = "") {
+  if (!mandatoryPaymentLinkedSafeSelect) return;
+
+  mandatoryPaymentLinkedSafeSelect.innerHTML = `<option value="">Без привязки к сейфу</option>`;
+
+  state.safeBuckets.forEach((bucket) => {
+    const option = document.createElement("option");
+    option.value = bucket.id;
+    option.textContent = `${bucket.icon} ${bucket.name}`;
+
+    if (selectedId && selectedId === bucket.id) {
+      option.selected = true;
+    }
+
+    mandatoryPaymentLinkedSafeSelect.appendChild(option);
+  });
+}
+
+function isProtectedSafeBucket(bucketId) {
+  const bucket = getSafeBucketById(bucketId);
+  if (!bucket) return false;
+
+  const normalized = normalizeMoneyBucketName(bucket.name);
+  return ["налоги", "квартира", "накопления"].includes(normalized);
+}
+
+function getMandatoryPaymentsCoverageStats(monthKey = getCurrentMonthKey()) {
+  const unpaidItems = state.mandatoryPayments.filter((item) => {
+    if (item.enabled === false) return false;
+    return item.last_paid_period !== monthKey;
+  });
+
+  let total = 0;
+  let coveredByLinkedSafes = 0;
+  let coveredByProtectedSafes = 0;
+  let uncoveredAfterLinkedSafes = 0;
+  let chargeToFreeMoney = 0;
+
+  unpaidItems.forEach((item) => {
+    const amount = roundToTwo(Number(item.amount) || 0);
+    total += amount;
+
+    const linkedSafeId = item.linked_safe_bucket_id || "";
+    const linkedSafeBalance = linkedSafeId
+      ? Math.max(0, roundToTwo(getSafeBucketBalance(linkedSafeId)))
+      : 0;
+
+    const coveredByThisSafe = Math.min(amount, linkedSafeBalance);
+    coveredByLinkedSafes += coveredByThisSafe;
+
+    const coveredByProtected = linkedSafeId && isProtectedSafeBucket(linkedSafeId)
+      ? coveredByThisSafe
+      : 0;
+
+    coveredByProtectedSafes += coveredByProtected;
+
+    const uncoveredAfterLinked = Math.max(0, roundToTwo(amount - coveredByThisSafe));
+    uncoveredAfterLinkedSafes += uncoveredAfterLinked;
+
+    const toChargeFromFreeMoney = Math.max(
+      0,
+      roundToTwo(amount - coveredByProtected)
+    );
+
+    chargeToFreeMoney += toChargeFromFreeMoney;
+  });
+
+  return {
+    items: unpaidItems,
+    count: unpaidItems.length,
+    total: roundToTwo(total),
+    coveredByLinkedSafes: roundToTwo(coveredByLinkedSafes),
+    coveredByProtectedSafes: roundToTwo(coveredByProtectedSafes),
+    uncoveredAfterLinkedSafes: roundToTwo(uncoveredAfterLinkedSafes),
+    chargeToFreeMoney: roundToTwo(chargeToFreeMoney),
+  };
+}
+
 function openMandatoryPaymentsModal() {
+  fillMandatoryPaymentSafeSelect();
+  mandatoryPaymentDueDayInput.value = mandatoryPaymentDueDayInput.value || getTodayDateValue();
   renderMandatoryPaymentsModal();
   mandatoryPaymentsModal.classList.remove("hidden");
   document.body.style.overflow = "hidden";
@@ -649,6 +731,9 @@ function closeMandatoryPaymentsModal() {
   mandatoryPaymentTitleInput.value = "";
   mandatoryPaymentAmountInput.value = "";
   mandatoryPaymentDueDayInput.value = "";
+  if (mandatoryPaymentLinkedSafeSelect) {
+    mandatoryPaymentLinkedSafeSelect.value = "";
+  }
 }
 
 function renderMandatoryPaymentsModal() {
@@ -677,6 +762,20 @@ function renderMandatoryPaymentsModal() {
     .forEach((item) => {
       const isPaid = item.last_paid_period === currentMonthKey;
 
+      const linkedSafeName = item.linked_safe_bucket_id
+        ? getSafeBucketName(item.linked_safe_bucket_id)
+        : "";
+
+      const linkedSafeBalance = item.linked_safe_bucket_id
+        ? Math.max(0, roundToTwo(getSafeBucketBalance(item.linked_safe_bucket_id)))
+        : 0;
+
+      const covered = Math.min(Number(item.amount) || 0, linkedSafeBalance);
+
+      const coverageText = item.linked_safe_bucket_id
+        ? `сейф: ${linkedSafeName} • покрыто ${formatMoney(covered)}`
+        : "без привязки к сейфу";
+
       const card = document.createElement("div");
       card.className = "list-card";
       card.innerHTML = `
@@ -689,7 +788,7 @@ function renderMandatoryPaymentsModal() {
             <h3 class="list-title">${escapeHtml(item.title)}</h3>
           </div>
           <p class="list-subtitle">
-            ${formatMoney(item.amount)} • до ${item.due_day} числа • ${isPaid ? "Оплачен" : "Не оплачен"}
+            ${formatMoney(item.amount)} • до ${String(item.due_day).padStart(2, "0")} числа • ${coverageText} • ${isPaid ? "Оплачен" : "Не оплачен"}
           </p>
         </div>
 
@@ -733,10 +832,11 @@ function renderMandatoryPaymentsModal() {
     });
 }
 
-async function addMandatoryPayment() {
+  async function addMandatoryPayment() {
   const title = mandatoryPaymentTitleInput.value.trim();
   const amount = Number(mandatoryPaymentAmountInput.value);
-  const dueDay = Number(mandatoryPaymentDueDayInput.value);
+  const dueDateValue = mandatoryPaymentDueDayInput.value;
+  const linkedSafeBucketId = mandatoryPaymentLinkedSafeSelect?.value || "";
 
   if (!title) {
     alert("Введи название платежа");
@@ -748,16 +848,19 @@ async function addMandatoryPayment() {
     return;
   }
 
-  if (!dueDay || dueDay < 1 || dueDay > 31) {
-    alert("Введи день месяца от 1 до 31");
+  if (!dueDateValue) {
+    alert("Выбери дату платежа");
     return;
   }
+
+  const dueDay = new Date(`${dueDateValue}T00:00:00`).getDate();
 
   state.mandatoryPayments.push({
     id: crypto.randomUUID(),
     title,
     amount: roundToTwo(amount),
     due_day: dueDay,
+    linked_safe_bucket_id: linkedSafeBucketId,
     enabled: true,
     last_paid_period: "",
   });
@@ -768,6 +871,9 @@ async function addMandatoryPayment() {
   mandatoryPaymentTitleInput.value = "";
   mandatoryPaymentAmountInput.value = "";
   mandatoryPaymentDueDayInput.value = "";
+  if (mandatoryPaymentLinkedSafeSelect) {
+    mandatoryPaymentLinkedSafeSelect.value = "";
+  }
 
   renderMandatoryPaymentsModal();
   renderAll();
@@ -2097,16 +2203,17 @@ async function deleteSafeBucketFromModal() {
     }
   });
 
-  const pendingMandatoryStats = getMandatoryPaymentsStats(getCurrentMonthKey());
-  const pendingMandatory = pendingMandatoryStats.total;
+  const mandatoryCoverage = getMandatoryPaymentsCoverageStats(getCurrentMonthKey());
   const remainingBudgets = getRemainingFlexibleBudgetsCurrentMonth();
 
   const totalBalance = roundToTwo(calculateBalance());
   const protectedMoney = getProtectedMoneyTotal();
   const freeMoney = getFreeMoneyTotal();
 
+  const mandatoryToDeduct = mandatoryCoverage.chargeToFreeMoney;
+
   const canSaveNowRaw = roundToTwo(
-    freeMoney - pendingMandatory - remainingBudgets
+    freeMoney - mandatoryToDeduct - remainingBudgets
   );
 
   const canSaveNow = Math.max(0, canSaveNowRaw);
@@ -2127,8 +2234,13 @@ async function deleteSafeBucketFromModal() {
     protectedMoney,
     freeMoney,
 
-    pendingMandatory,
-    pendingMandatoryCount: pendingMandatoryStats.count,
+    pendingMandatoryTotal: mandatoryCoverage.total,
+    pendingMandatoryCoveredByLinkedSafes: mandatoryCoverage.coveredByLinkedSafes,
+    pendingMandatoryCoveredByProtectedSafes: mandatoryCoverage.coveredByProtectedSafes,
+    pendingMandatoryUncoveredAfterLinkedSafes: mandatoryCoverage.uncoveredAfterLinkedSafes,
+    pendingMandatoryToDeduct: mandatoryToDeduct,
+    pendingMandatoryCount: mandatoryCoverage.count,
+
     remainingBudgets,
 
     canSaveNow,
@@ -2749,8 +2861,8 @@ else if (transaction.type === "income") {
   insightsTotalBalanceValue.textContent = formatMoney(summary.totalBalance);
   insightsProtectedMoneyValue.textContent = formatMoney(summary.protectedMoney);
   insightsFreeMoneyValue.textContent = formatMoney(summary.freeMoney);
-  insightsPendingMandatoryValue.textContent = formatMoney(summary.pendingMandatory);
-  insightsRemainingBudgetsValue.textContent = formatMoney(summary.remainingBudgets);
+  insightsPendingMandatoryValue.textContent = formatMoney(summary.pendingMandatoryToDeduct);
+insightsRemainingBudgetsValue.textContent = formatMoney(summary.remainingBudgets);
 
   insightsNetValue.classList.remove("is-positive", "is-negative");
   if (summary.net > 0) {
@@ -2773,19 +2885,21 @@ else if (transaction.type === "income") {
   }
 
   insightsLimitsStatusText.textContent =
-    `Неоплаченные обязательные: ${formatMoney(summary.pendingMandatory)} • ` +
-    `Остаток лимитов: ${formatMoney(summary.remainingBudgets)}`;
+  `Обязательные всего: ${formatMoney(summary.pendingMandatoryTotal)} • ` +
+  `Покрыто сейфами: ${formatMoney(summary.pendingMandatoryCoveredByLinkedSafes)} • ` +
+  `К вычету из свободных: ${formatMoney(summary.pendingMandatoryToDeduct)} • ` +
+  `Остаток лимитов: ${formatMoney(summary.remainingBudgets)}`;
 
   if (summary.shortageBeforeSafeSaving > 0) {
-    insightsRecommendationText.textContent =
-      `Откладывать сейчас рано. До покрытия обязательных платежей и остатков лимитов не хватает ${formatMoney(summary.shortageBeforeSafeSaving)}.`;
-  } else if (summary.canSaveNow > 0) {
-    insightsRecommendationText.textContent =
-      `Сейчас можно отложить ${formatMoney(summary.canSaveNow)} без конфликта с обязательными платежами и лимитами.`;
-  } else {
-    insightsRecommendationText.textContent =
-      `Свободные деньги полностью заняты обязательствами текущего месяца.`;
-  }
+  insightsRecommendationText.textContent =
+    `Откладывать сейчас рано. После учёта обязательных платежей и остатков лимитов не хватает ${formatMoney(summary.shortageBeforeSafeSaving)}.`;
+} else if (summary.canSaveNow > 0) {
+  insightsRecommendationText.textContent =
+    `Сейчас можно отложить ${formatMoney(summary.canSaveNow)}. В обязательных уже учтено покрытие платежей привязанными сейфами.`;
+} else {
+  insightsRecommendationText.textContent =
+    `Свободные деньги полностью заняты обязательствами текущего месяца и остатками лимитов.`;
+}
 
   if (insightsSafeList) {
     insightsSafeList.innerHTML = "";
