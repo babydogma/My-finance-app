@@ -2139,18 +2139,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   text-shadow: 0 0 18px rgba(255, 114, 104, 0.12);
 }
 
-#insightsWorkingMinimumValue {
-  color: #e8edf9;
-}
-
-#insightsAvailableNowValue {
-  color: #f4f7ff;
-}
-
-#insightsReserveSecondLineValue {
-  color: #eef2ff;
-}
-
 /* =========================================================
    17. INSIGHTS REWORK + MANDATORY PAYMENTS
    ========================================================= */
@@ -2281,5 +2269,74 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     height: 32px;
     padding: 0 10px;
     font-size: 12px;
+  }
+}
+
+/* =========================================================
+   18. MANDATORY PAYMENTS — DATE + LINKED SAFE
+   ========================================================= */
+
+#mandatoryPaymentDueDayInput,
+#mandatoryPaymentLinkedSafeSelect {
+  width: 100%;
+}
+
+#mandatoryPaymentDueDayInput {
+  appearance: none;
+  -webkit-appearance: none;
+  color: var(--text);
+}
+
+#mandatoryPaymentDueDayInput::-webkit-date-and-time-value {
+  text-align: left;
+  color: var(--text);
+}
+
+#mandatoryPaymentDueDayInput::-webkit-calendar-picker-indicator {
+  opacity: 0.92;
+  cursor: pointer;
+  filter: invert(1) brightness(0.92);
+}
+
+#mandatoryPaymentLinkedSafeSelect {
+  color: var(--text);
+}
+
+#mandatoryPaymentLinkedSafeSelect option {
+  color: #111;
+}
+
+#mandatoryPaymentsList .list-card {
+  align-items: center;
+}
+
+#mandatoryPaymentsList .list-body {
+  min-width: 0;
+}
+
+#mandatoryPaymentsList .list-subtitle {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: unset;
+  line-height: 1.22;
+}
+
+#mandatoryPaymentsList .category-manager-actions {
+  flex: 0 0 auto;
+  align-self: center;
+}
+
+@media (max-width: 420px) {
+  #mandatoryPaymentsList .list-card {
+    padding: 10px 12px;
+    gap: 10px;
+  }
+
+  #mandatoryPaymentsList .category-manager-actions {
+    gap: 6px;
+  }
+
+  #mandatoryPaymentsList .mini-btn {
+    min-width: 68px;
   }
 }
