@@ -179,11 +179,6 @@ const closeSafeBucketAmountModalBtn = document.getElementById("closeSafeBucketAm
 const cancelSafeBucketAmountBtn = document.getElementById("cancelSafeBucketAmountBtn");
 const saveSafeBucketAmountBtn = document.getElementById("saveSafeBucketAmountBtn");
 const deleteSafeBucketBtn = document.getElementById("deleteSafeBucketBtn");
-
-  const period7Btn = document.getElementById("period7Btn");
-  const period30Btn = document.getElementById("period30Btn");
-  const balanceResultValueEl = document.getElementById("balanceResultValue");
-  const balancePeriodLabelEl = document.getElementById("balancePeriodLabel");
   
   const faqModal = document.getElementById("faqModal");
 const faqModalTitle = document.getElementById("faqModalTitle");
@@ -194,7 +189,6 @@ const faqButtons = document.querySelectorAll("[data-faq-key]");
 
   let currentMode = "expense";
   let editingTransactionId = null;
-  let currentPeriodDays = 7;
 
   let analyticsFilterPeriod = "month";
   let analyticsSelectedMonth = getCurrentMonthValue();
@@ -2491,32 +2485,6 @@ async function deleteSafeBucketFromModal() {
     return state.accounts.reduce((sum, account) => sum + getAccountBalance(account.name), 0);
   }
 
-  function getPeriodTransactions(days) {
-    const now = Date.now();
-    const rangeStart = now - days * 24 * 60 * 60 * 1000;
-
-    return state.transactions.filter((transaction) => {
-      if (!transaction.created_at) return false;
-      const transactionTime = new Date(transaction.created_at).getTime();
-      return transactionTime >= rangeStart;
-    });
-  }
-
-  function calculatePeriodResult(days) {
-    const periodTransactions = getPeriodTransactions(days);
-
-    let income = 0;
-    let expense = 0;
-
-    periodTransactions.forEach((transaction) => {
-      const amount = Number(transaction.amount) || 0;
-      if (transaction.type === "income") income += amount;
-      if (transaction.type === "expense") expense += amount;
-    });
-
-    return income - expense;
-  }
-
   function getAnalyticsFilteredTransactions() {
     return filterTransactionsByPeriod(
       state.transactions,
@@ -2785,30 +2753,6 @@ async function deleteSafeBucketFromModal() {
     const balance = calculateBalance();
     balanceEl.textContent = formatMoney(balance);
     accountsTotalEl.textContent = `Всего: ${formatMoney(balance)}`;
-  }
-
-  function renderBalanceResult() {
-    if (!balanceResultValueEl || !balancePeriodLabelEl) return;
-
-    const result = calculatePeriodResult(currentPeriodDays);
-
-    balanceResultValueEl.classList.remove("is-positive", "is-negative");
-
-    if (result > 0) {
-      balanceResultValueEl.textContent = `+${formatMoney(result)}`;
-      balanceResultValueEl.classList.add("is-positive");
-    } else if (result < 0) {
-      balanceResultValueEl.textContent = `−${formatMoney(Math.abs(result))}`;
-      balanceResultValueEl.classList.add("is-negative");
-    } else {
-      balanceResultValueEl.textContent = formatMoney(0);
-    }
-
-    balancePeriodLabelEl.textContent =
-      currentPeriodDays === 7 ? "за 7 дней" : "за месяц";
-
-    period7Btn?.classList.toggle("is-active", currentPeriodDays === 7);
-    period30Btn?.classList.toggle("is-active", currentPeriodDays === 30);
   }
 
   function renderAccounts() {
@@ -3755,10 +3699,9 @@ async function saveBudgetLimit() {
   ensureUncategorizedCategory();
 }
 
-  function renderAll() {
+function renderAll() {
   ensureUncategorizedCategory();
   renderBalance();
-  renderBalanceResult();
   renderAccounts();
   renderCategoriesManager();
   renderTransactions();
@@ -4105,16 +4048,6 @@ safeInterestRateModal?.addEventListener("click", (event) => {
     return;
   }
 });
-
-  period7Btn?.addEventListener("click", () => {
-    currentPeriodDays = 7;
-    renderBalanceResult();
-  });
-
-  period30Btn?.addEventListener("click", () => {
-    currentPeriodDays = 30;
-    renderBalanceResult();
-  });
 
   await loadDataFromSupabase();
   await applySafeInterestIfNeeded();
