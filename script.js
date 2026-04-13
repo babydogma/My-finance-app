@@ -3256,7 +3256,9 @@ else if (transaction.type === "income") {
   const summary = getInsightsSummary();
   const periodLabel = getInsightsPeriodLabel() || "за период";
 
+  if (insightsPeriodLabel) {
   insightsPeriodLabel.textContent = periodLabel;
+}
 
   insightsIncomeValue.textContent = formatMoney(summary.income);
   insightsExpenseValue.textContent = formatMoney(summary.expense);
