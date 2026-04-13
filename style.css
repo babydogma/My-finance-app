@@ -2996,12 +2996,13 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .insights-collapse-card {
   padding: 0;
   overflow: hidden;
+  min-height: 72px;
 }
 
 .insights-collapse-toggle {
   width: 100%;
-  min-height: 58px;
-  padding: 14px 16px;
+  min-height: 72px;
+  padding: 0 16px;
   border: none;
   background: transparent;
   color: #f5f8ff;
@@ -3010,9 +3011,9 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   justify-content: space-between;
   gap: 12px;
   text-align: left;
-  font-size: 15px;
-  font-weight: 860;
-  letter-spacing: -0.03em;
+  font-size: 17px;
+  font-weight: 900;
+  letter-spacing: -0.04em;
 }
 
 .insights-collapse-toggle > span:first-child {
@@ -3153,5 +3154,34 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
   .insights-summary-row__value {
     font-size: 13px;
+  }
+}
+
+/* =========================================================
+   23. INSIGHTS ROW HEIGHT FIX
+   ========================================================= */
+
+#insightsSummaryToggleBtn,
+#insightsSafesToggleBtn {
+  min-height: 72px;
+  padding-top: 0;
+  padding-bottom: 0;
+  font-size: 17px;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+}
+
+#insightsSummaryToggleBtn .insights-collapse-arrow,
+#insightsSafesToggleBtn .insights-collapse-arrow {
+  font-size: 20px;
+}
+
+@media (max-width: 420px) {
+  #insightsSummaryToggleBtn,
+  #insightsSafesToggleBtn {
+    min-height: 68px;
+    padding-left: 14px;
+    padding-right: 14px;
+    font-size: 16px;
   }
 }
