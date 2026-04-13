@@ -272,12 +272,18 @@
   <section class="section">
     <div class="summary">
       <div class="summary-card">
-        <p class="summary-label">Обязательные расходы</p>
+        <p class="summary-label">
+  Обязательные расходы
+  <button class="faq-chip" type="button" data-faq-key="required_expense" aria-label="Что это?">❔</button>
+</p>
         <p class="summary-value" id="insightsRequiredValue">0 ₽</p>
       </div>
 
       <div class="summary-card">
-        <p class="summary-label">Гибкие расходы</p>
+        <p class="summary-label">
+  Гибкие расходы
+  <button class="faq-chip" type="button" data-faq-key="flexible_expense" aria-label="Что это?">❔</button>
+</p>
         <p class="summary-value" id="insightsFlexibleValue">0 ₽</p>
       </div>
     </div>
@@ -286,7 +292,10 @@
   <section class="section">
     <div class="summary">
       <div class="summary-card">
-        <p class="summary-label">Отложено в сейфы</p>
+        <p class="summary-label">
+  Отложено в сейфы
+  <button class="faq-chip" type="button" data-faq-key="saved_to_safes" aria-label="Что это?">❔</button>
+</p>
         <p class="summary-value" id="insightsSavedValue">0 ₽</p>
       </div>
 
@@ -313,7 +322,10 @@
         </div>
 
         <div class="summary-card">
-          <p class="summary-label">Остаток лимитов</p>
+          <p class="summary-label">
+  Остаток лимитов
+  <button class="faq-chip" type="button" data-faq-key="remaining_limits" aria-label="Что это?">❔</button>
+</p>
           <p class="summary-value" id="insightsRemainingBudgetsValue">0 ₽</p>
         </div>
       </div>
@@ -323,12 +335,18 @@
   <section class="section">
     <div class="summary">
       <div class="summary-card">
-        <p class="summary-label">Общий баланс</p>
+        <p class="summary-label">
+  Общий баланс
+  <button class="faq-chip" type="button" data-faq-key="total_balance" aria-label="Что это?">❔</button>
+</p>
         <p class="summary-value" id="insightsTotalBalanceValue">0 ₽</p>
       </div>
 
       <div class="summary-card">
-        <p class="summary-label">Защищённые деньги</p>
+        <p class="summary-label">
+  Защищенные деньги
+  <button class="faq-chip" type="button" data-faq-key="protected_money" aria-label="Что это?">❔</button>
+</p>
         <p class="summary-value" id="insightsProtectedMoneyValue">0 ₽</p>
       </div>
     </div>
@@ -337,12 +355,18 @@
   <section class="section">
     <div class="summary">
       <div class="summary-card">
-        <p class="summary-label">Свободные деньги</p>
+        <p class="summary-label">
+  Свободные деньги
+  <button class="faq-chip" type="button" data-faq-key="free_money" aria-label="Что это?">❔</button>
+</p>
         <p class="summary-value" id="insightsFreeMoneyValue">0 ₽</p>
       </div>
 
       <div class="summary-card">
-        <p class="summary-label">Можно отложить сейчас</p>
+        <p class="summary-label">
+  Можно отложить
+  <button class="faq-chip" type="button" data-faq-key="can_save_now" aria-label="Что это?">❔</button>
+</p>
         <p class="summary-value" id="insightsCanSaveNowValue">0 ₽</p>
       </div>
     </div>
@@ -357,7 +381,10 @@
 
   <section class="section">
     <div class="manager-card insights-card">
-      <p class="summary-label">Вывод</p>
+      <p class="summary-label">
+  Вывод
+  <button class="faq-chip" type="button" data-faq-key="summary_recommendation" aria-label="Что это?">❔</button>
+</p>
       <p class="insights-recommendation" id="insightsRecommendationText">—</p>
     </div>
   </section>
@@ -714,6 +741,24 @@
 <button class="btn btn-primary manager-add-btn" type="button" id="addMandatoryPaymentBtn">
   Добавить платёж
 </button>
+    </div>
+  </div>
+</div>
+
+<div class="modal hidden" id="faqModal">
+  <div class="modal-sheet faq-sheet">
+    <div class="modal-handle"></div>
+
+    <div class="section-head">
+      <h3 class="modal-title" id="faqModalTitle" style="margin:0; text-align:left;">Пояснение</h3>
+      <button class="manager-back-btn" type="button" id="closeFaqModalBtn">
+        Закрыть
+      </button>
+    </div>
+
+    <div class="faq-content">
+      <p class="faq-text" id="faqModalText">—</p>
+      <div class="faq-formula" id="faqModalFormula"></div>
     </div>
   </div>
 </div>
