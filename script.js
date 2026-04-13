@@ -1609,25 +1609,6 @@ function closeFaqModal() {
   document.body.style.overflow = "";
 }
 
-function openFaqModal(faqKey) {
-  const item = FAQ_CONTENT[faqKey];
-  if (!item || !faqModal) return;
-
-  faqModalTitle.textContent = item.title;
-  faqModalText.textContent = item.text;
-  faqModalFormula.textContent = item.formula;
-
-  faqModal.classList.remove("hidden");
-  document.body.style.overflow = "hidden";
-}
-
-function closeFaqModal() {
-  if (!faqModal) return;
-
-  faqModal.classList.add("hidden");
-  document.body.style.overflow = "";
-}
-
   function getIconToneClass(type, extra = "") {
     if (type === "income") return "list-icon--green";
     if (type === "transfer") return "list-icon--blue";
