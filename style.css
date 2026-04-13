@@ -3824,3 +3824,145 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     z-index: 999;
   }
 }
+
+/* =========================================================
+   28. SCREEN SHELL — UNIFIED PAGE HEADER
+   ========================================================= */
+
+.screen-shell {
+  position: relative;
+  z-index: 120;
+  overflow: visible;
+  margin-top: 6px;
+  margin-bottom: 8px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.screen-shell__top {
+  margin-bottom: 10px;
+}
+
+.screen-shell__head {
+  align-items: flex-end;
+  margin-bottom: 0;
+}
+
+.screen-shell__title {
+  font-size: 28px !important;
+  font-weight: 940 !important;
+  letter-spacing: -0.06em !important;
+  color: #f7f9ff !important;
+}
+
+.screen-shell__note {
+  font-size: 11px !important;
+  font-weight: 820 !important;
+  letter-spacing: -0.015em !important;
+  color: rgba(255, 255, 255, 0.46) !important;
+  text-transform: none !important;
+}
+
+.screen-shell__filters {
+  position: relative;
+  z-index: 120;
+}
+
+.screen-shell .history-filters {
+  margin-top: 0;
+  max-width: 100%;
+  border-radius: 32px;
+  padding: 16px;
+  background:
+    radial-gradient(circle at top center, rgba(111, 156, 255, 0.1), transparent 44%),
+    linear-gradient(180deg, rgba(21, 24, 34, 0.82) 0%, rgba(15, 18, 27, 0.88) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.055);
+  box-shadow:
+    0 20px 42px rgba(0, 0, 0, 0.22),
+    0 0 28px rgba(111, 156, 255, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.screen-shell .history-filter-group--primary {
+  margin-bottom: 2px;
+}
+
+.screen-shell .history-filter-btn--month {
+  height: 68px;
+  border-radius: 24px;
+  font-size: 22px;
+  font-weight: 920;
+  letter-spacing: -0.05em;
+}
+
+.screen-shell .history-filter-group--secondary .history-filter-btn {
+  height: 46px;
+  border-radius: 18px;
+  font-size: 14px;
+  font-weight: 840;
+}
+
+.screen-shell--analytics .screen-shell__top {
+  display: flex;
+  justify-content: center;
+}
+
+.screen-shell--analytics .analytics-mode-switch-wrap {
+  margin-bottom: 0;
+}
+
+.screen-shell--analytics .analytics-mode-switch {
+  margin: 0;
+}
+
+.screen-shell--insights .screen-shell__top {
+  padding: 0 2px;
+}
+
+#analyticsView .screen-shell + .section,
+#insightsView .screen-shell + .section {
+  margin-top: 18px;
+}
+
+@media (max-width: 420px) {
+  .screen-shell {
+    margin-top: 4px;
+    margin-bottom: 6px;
+  }
+
+  .screen-shell__top {
+    margin-bottom: 8px;
+  }
+
+  .screen-shell__title {
+    font-size: 25px !important;
+  }
+
+  .screen-shell__note {
+    font-size: 10.5px !important;
+  }
+
+  .screen-shell .history-filters {
+    border-radius: 26px;
+    padding: 12px;
+  }
+
+  .screen-shell .history-filter-btn--month {
+    height: 58px;
+    border-radius: 20px;
+    font-size: 18px;
+  }
+
+  .screen-shell .history-filter-group--secondary .history-filter-btn {
+    height: 40px;
+    border-radius: 16px;
+    font-size: 12.5px;
+  }
+
+  #analyticsView .screen-shell + .section,
+  #insightsView .screen-shell + .section {
+    margin-top: 16px;
+  }
+}
