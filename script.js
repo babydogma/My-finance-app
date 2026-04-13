@@ -1578,16 +1578,16 @@ function getInsightsFilteredTransactions() {
   },
 
   protected_money: {
-    title: "Резервы и цели",
+    title: "Неприкосаймые",
     text:
       "Это деньги, которые приложение считает не для обычных трат.",
   },
 
   free_money: {
-    title: "Свободные деньги",
-    text:
-      "Это деньги, которые остаются после вычета резервов и целей.",
-  },
+  title: "Свободные деньги",
+  text:
+    "Это совокупность налички и денег из сейфа «Свободные», которые можно тратить без затрагивания резервов и целей.",
+},
 
   can_save_now: {
     title: "Можно отложить сейчас",
@@ -1736,8 +1736,11 @@ function buildFaqFormulaText(faqKey) {
   }
 
   if (faqKey === "free_money") {
-    return `${formatMoney(summary.freeMoney)} = ${formatMoney(summary.totalBalance)} − ${formatMoney(summary.protectedMoney)}`;
-  }
+  const cashBalance = roundToTwo(getAccountBalance("Наличные"));
+  const freeSafeBalance = roundToTwo(getFreeSafeBalance());
+
+  return `${formatMoney(summary.freeMoney)} = ${formatMoney(cashBalance)} + ${formatMoney(freeSafeBalance)}`;
+}
 
   if (faqKey === "can_save_now") {
     return `${formatMoney(summary.canSaveNow)} = max(0, ${formatMoney(summary.freeMoney)} − ${formatMoney(summary.pendingMandatoryToDeduct)} − ${formatMoney(summary.remainingBudgets)})`;
