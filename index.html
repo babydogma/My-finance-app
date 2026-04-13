@@ -308,7 +308,7 @@
 
       <div class="summary">
         <div class="summary-card">
-          <p class="summary-label">Неоплаченные обязательные</p>
+          <p class="summary-label">К вычету из свободных</p>
           <p class="summary-value" id="insightsPendingMandatoryValue">0 ₽</p>
         </div>
 
@@ -702,12 +702,18 @@
       </div>
 
       <div class="field">
-        <input class="input" id="mandatoryPaymentDueDayInput" type="number" min="1" max="31" placeholder="День месяца, например 5" />
-      </div>
+  <input class="input" id="mandatoryPaymentDueDayInput" type="date" />
+</div>
 
-      <button class="btn btn-primary manager-add-btn" type="button" id="addMandatoryPaymentBtn">
-        Добавить платёж
-      </button>
+<div class="field">
+  <select class="select" id="mandatoryPaymentLinkedSafeSelect">
+    <option value="">Без привязки к сейфу</option>
+  </select>
+</div>
+
+<button class="btn btn-primary manager-add-btn" type="button" id="addMandatoryPaymentBtn">
+  Добавить платёж
+</button>
     </div>
   </div>
 </div>
