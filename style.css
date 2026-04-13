@@ -2398,23 +2398,37 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   text-shadow: 0 0 18px rgba(255, 114, 104, 0.12);
 }
 
-  
 /* =========================================================
    17. INSIGHTS REWORK + MANDATORY PAYMENTS
    ========================================================= */
 
+#insightsView .summary {
+  grid-template-columns: repeat(2, minmax(0, 172px));
+  justify-content: center;
+  gap: 10px;
+}
+
 #insightsView .summary-card {
-  min-height: 98px;
+  min-height: 92px;
+  padding: 11px 12px 10px;
+  border-radius: 20px;
 }
 
 #insightsView .summary-label {
-  min-height: 24px;
+  min-height: 22px;
   display: flex;
   align-items: flex-start;
+  margin-bottom: 8px;
+  font-size: 11.5px;
+  font-weight: 770;
+  line-height: 1.04;
 }
 
 #insightsView .summary-value {
   word-break: break-word;
+  font-size: 17px;
+  line-height: 0.98;
+  letter-spacing: -0.045em;
 }
 
 #insightsPendingMandatoryValue,
@@ -2442,16 +2456,16 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 #insightsLimitsStatusText {
-  font-size: 15px;
-  line-height: 1.34;
+  font-size: 14px;
+  line-height: 1.32;
   color: rgba(244, 247, 255, 0.9);
 }
 
 #insightsRecommendationText {
-  font-size: 16px;
-  line-height: 1.4;
+  font-size: 15px;
+  line-height: 1.34;
   color: rgba(255, 255, 255, 0.92);
-  font-weight: 820;
+  font-weight: 810;
 }
 
 #mandatoryPaymentsModal {
@@ -2500,25 +2514,32 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 @media (max-width: 420px) {
+  #insightsView .summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
   #insightsView .summary-card {
-    min-height: 102px;
+    min-height: 86px;
+    padding: 10px 11px 9px;
+    border-radius: 18px;
   }
 
   #insightsView .summary-label {
-    min-height: 28px;
-    font-size: 12px;
+    min-height: 20px;
+    font-size: 11px;
   }
 
   #insightsView .summary-value {
-    font-size: 17px;
+    font-size: 16px;
   }
 
   #insightsLimitsStatusText {
-    font-size: 14px;
+    font-size: 13.5px;
   }
 
   #insightsRecommendationText {
-    font-size: 14px;
+    font-size: 13.5px;
   }
 
   #mandatoryPaymentsList .list-card {
@@ -2710,43 +2731,44 @@ input[type="date"]::-webkit-calendar-picker-indicator {
    ========================================================= */
 
 .insights-card--compact {
-  min-height: 78px;
-  padding: 12px 16px;
+  min-height: 66px;
+  padding: 10px 14px;
+  border-radius: 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 14px;
+  gap: 12px;
 }
 
 .insights-card--compact .summary-label {
   margin: 0;
   min-height: auto;
-  font-size: 13px;
-  font-weight: 800;
-  color: rgba(255, 255, 255, 0.56);
+  font-size: 12px;
+  font-weight: 790;
+  color: rgba(255, 255, 255, 0.58);
 }
 
 .insights-card--compact .summary-value {
   margin: 0;
-  font-size: 22px;
+  font-size: 19px;
   font-weight: 900;
   line-height: 1;
-  letter-spacing: -0.055em;
+  letter-spacing: -0.05em;
   white-space: nowrap;
 }
 
 .insights-save-card {
   position: relative;
   overflow: hidden;
-  padding: 19px 18px 21px;
-  border-radius: 28px;
+  padding: 14px 15px 15px;
+  border-radius: 24px;
   background:
-    radial-gradient(circle at top left, rgba(111, 156, 255, 0.16), transparent 34%),
+    radial-gradient(circle at top left, rgba(111, 156, 255, 0.14), transparent 34%),
     linear-gradient(180deg, rgba(57, 62, 79, 1) 0%, rgba(42, 46, 60, 1) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.085);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow:
-    0 18px 40px rgba(0, 0, 0, 0.3),
-    0 0 32px rgba(111, 156, 255, 0.07),
+    0 14px 30px rgba(0, 0, 0, 0.26),
+    0 0 26px rgba(111, 156, 255, 0.06),
     inset 0 1px 0 rgba(255, 255, 255, 0.045);
 }
 
@@ -2759,14 +2781,14 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .insights-save-card .summary-label {
-  margin-bottom: 14px;
+  margin-bottom: 10px;
   color: rgba(255, 255, 255, 0.7);
 }
 
 .insights-save-card .summary-value {
-  font-size: 36px;
+  font-size: 30px;
   font-weight: 950;
-  letter-spacing: -0.075em;
+  letter-spacing: -0.07em;
 }
 
 #insightsView .section-head + .history-filters {
@@ -2788,20 +2810,20 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 #insightsView .section:nth-of-type(2) .summary-card:last-child,
 #insightsView .section:nth-of-type(3) .summary-card:first-child,
 #insightsView .section:nth-of-type(3) .summary-card:last-child {
-  min-height: 120px;
+  min-height: 92px;
 }
 
 #insightsTotalBalanceValue,
 #insightsProtectedMoneyValue,
 #insightsFreeMoneyValue,
 #insightsCanSaveNowValue {
-  font-size: 25px;
-  font-weight: 940;
+  font-size: 18px;
+  font-weight: 920;
 }
 
 #insightsView .manager-card .section-title {
-  font-size: 15px;
-  font-weight: 880;
+  font-size: 14px;
+  font-weight: 860;
 }
 
 #insightsView .section:nth-of-type(2) .summary-card,
@@ -2817,24 +2839,38 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 #insightsView .section:nth-of-type(5) .summary-card::after {
   content: "";
   position: absolute;
-  left: 16px;
-  right: 16px;
+  left: 14px;
+  right: 14px;
   top: 0;
   height: 1px;
-  background: linear-gradient(90deg, rgba(255,255,255,0.06), rgba(255,255,255,0), rgba(255,255,255,0.06));
+  background: linear-gradient(90deg, rgba(255,255,255,0.05), rgba(255,255,255,0), rgba(255,255,255,0.05));
   pointer-events: none;
 }
 
 @media (max-width: 420px) {
+  .insights-card--compact {
+    min-height: 62px;
+    padding: 9px 12px;
+    border-radius: 18px;
+  }
+
+  .insights-card--compact .summary-label {
+    font-size: 11.5px;
+  }
+
+  .insights-card--compact .summary-value {
+    font-size: 17px;
+  }
+
   .insights-save-card .summary-value {
-    font-size: 30px;
+    font-size: 27px;
   }
 
   #insightsTotalBalanceValue,
   #insightsProtectedMoneyValue,
   #insightsFreeMoneyValue,
   #insightsCanSaveNowValue {
-    font-size: 21px;
+    font-size: 17px;
   }
 }
 
@@ -2925,20 +2961,20 @@ input[type="date"]::-webkit-calendar-picker-indicator {
    ========================================================= */
 
 .insights-plan-card {
-  padding: 14px;
+  padding: 13px;
 }
 
 .insights-mini-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
   margin-top: 8px;
 }
 
 .insights-mini-card {
-  min-height: 74px;
-  padding: 10px 11px;
-  border-radius: 18px;
+  min-height: 68px;
+  padding: 9px 10px;
+  border-radius: 16px;
   background:
     linear-gradient(180deg, rgba(44, 48, 61, 0.94) 0%, rgba(36, 39, 49, 0.98) 100%);
   border: 1px solid rgba(255, 255, 255, 0.045);
@@ -2948,11 +2984,11 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .insights-mini-label {
-  margin: 0 0 8px;
+  margin: 0 0 7px;
   color: rgba(255, 255, 255, 0.48);
-  font-size: 10.5px;
+  font-size: 10px;
   font-weight: 770;
-  line-height: 1.05;
+  line-height: 1.02;
   letter-spacing: -0.02em;
   display: flex;
   align-items: flex-start;
@@ -2963,32 +2999,32 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .insights-mini-value {
   margin: 0;
   color: #f6f9ff;
-  font-size: 17px;
+  font-size: 16px;
   font-weight: 900;
   line-height: 0.98;
-  letter-spacing: -0.045em;
+  letter-spacing: -0.04em;
 }
 
 .insights-hero-card {
-  padding: 14px 15px 15px;
+  padding: 13px 14px 14px;
 }
 
 .insights-hero-top {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 10px;
+  gap: 10px;
+  margin-bottom: 8px;
 }
 
 .insights-hero-state {
   flex: 0 0 auto;
-  min-height: 30px;
-  padding: 0 12px;
+  min-height: 28px;
+  padding: 0 10px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.065);
   color: rgba(255, 255, 255, 0.8);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 820;
   display: inline-flex;
   align-items: center;
@@ -2998,33 +3034,33 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .insights-hero-card .summary-value {
-  font-size: 32px;
+  font-size: 30px;
   font-weight: 950;
   line-height: 0.94;
   letter-spacing: -0.07em;
-  margin-bottom: 6px;
+  margin-bottom: 5px;
 }
 
 .insights-hero-hint {
   margin: 0;
-  color: rgba(255, 255, 255, 0.62);
-  font-size: 12px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 11.5px;
   font-weight: 760;
-  line-height: 1.22;
+  line-height: 1.2;
   letter-spacing: -0.02em;
-  max-width: 320px;
+  max-width: 300px;
 }
 
 .insights-collapse-card {
   padding: 0;
   overflow: hidden;
-  min-height: 72px;
+  min-height: 68px;
 }
 
 .insights-collapse-toggle {
   width: 100%;
-  min-height: 72px;
-  padding: 0 16px;
+  min-height: 68px;
+  padding: 0 15px;
   border: none;
   background: transparent;
   color: #f5f8ff;
@@ -3033,9 +3069,9 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   justify-content: space-between;
   gap: 12px;
   text-align: left;
-  font-size: 17px;
-  font-weight: 900;
-  letter-spacing: -0.04em;
+  font-size: 16px;
+  font-weight: 880;
+  letter-spacing: -0.035em;
 }
 
 .insights-collapse-toggle > span:first-child {
@@ -3055,7 +3091,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .insights-collapse-body {
-  padding: 0 16px 16px;
+  padding: 0 15px 15px;
 }
 
 .insights-collapse-body.hidden {
@@ -3065,13 +3101,13 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .insights-summary-rows {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 7px;
 }
 
 .insights-summary-row {
-  min-height: 46px;
-  padding: 0 12px;
-  border-radius: 16px;
+  min-height: 42px;
+  padding: 0 11px;
+  border-radius: 14px;
   background: rgba(255, 255, 255, 0.045);
   display: flex;
   align-items: center;
@@ -3080,15 +3116,15 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .insights-summary-row__label {
-  color: rgba(255, 255, 255, 0.58);
-  font-size: 12px;
+  color: rgba(255, 255, 255, 0.56);
+  font-size: 11px;
   font-weight: 760;
   letter-spacing: -0.02em;
 }
 
 .insights-summary-row__value {
   color: #f6f9ff;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 860;
   letter-spacing: -0.03em;
   text-align: right;
@@ -3131,34 +3167,34 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     gap: 8px;
   }
 
-.insights-mini-card {
-  min-height: 70px;
-  padding: 9px 10px;
-  border-radius: 16px;
-}
+  .insights-mini-card {
+    min-height: 64px;
+    padding: 8px 9px;
+    border-radius: 15px;
+  }
 
-.insights-mini-value {
-  font-size: 16px;
-}
+  .insights-mini-value {
+    font-size: 15px;
+  }
 
-.insights-hero-card .summary-value {
-  font-size: 28px;
-}
+  .insights-hero-card .summary-value {
+    font-size: 27px;
+  }
 
   .insights-hero-state {
-    min-height: 28px;
-    padding: 0 10px;
-    font-size: 11px;
+    min-height: 26px;
+    padding: 0 9px;
+    font-size: 10.5px;
   }
 
   .insights-hero-hint {
-    font-size: 12px;
+    font-size: 11px;
   }
 
   .insights-collapse-toggle {
-    min-height: 54px;
-    padding: 13px 14px;
-    font-size: 14px;
+    min-height: 64px;
+    padding: 0 14px;
+    font-size: 15px;
   }
 
   .insights-collapse-body {
@@ -3166,16 +3202,16 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   }
 
   .insights-summary-row {
-    min-height: 42px;
-    padding: 0 11px;
+    min-height: 40px;
+    padding: 0 10px;
   }
 
   .insights-summary-row__label {
-    font-size: 11.5px;
+    font-size: 10.5px;
   }
 
   .insights-summary-row__value {
-    font-size: 13px;
+    font-size: 12.5px;
   }
 }
 
@@ -3185,25 +3221,25 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 #insightsSummaryToggleBtn,
 #insightsSafesToggleBtn {
-  min-height: 72px;
+  min-height: 68px;
   padding-top: 0;
   padding-bottom: 0;
-  font-size: 17px;
-  font-weight: 900;
-  letter-spacing: -0.04em;
+  font-size: 16px;
+  font-weight: 880;
+  letter-spacing: -0.035em;
 }
 
 #insightsSummaryToggleBtn .insights-collapse-arrow,
 #insightsSafesToggleBtn .insights-collapse-arrow {
-  font-size: 20px;
+  font-size: 18px;
 }
 
 @media (max-width: 420px) {
   #insightsSummaryToggleBtn,
   #insightsSafesToggleBtn {
-    min-height: 68px;
+    min-height: 64px;
     padding-left: 14px;
     padding-right: 14px;
-    font-size: 16px;
+    font-size: 15px;
   }
 }
