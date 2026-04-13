@@ -61,6 +61,9 @@ const deleteBudgetBtn = document.getElementById("deleteBudgetBtn");
   const analyticsCategoriesBreakdownSection = document.getElementById("analyticsCategoriesBreakdownSection");
   const analyticsOperationsSection = document.getElementById("analyticsOperationsSection");
   const analyticsTransactionsList = document.getElementById("analyticsTransactionsList");
+  const analyticsFiltersModal = document.getElementById("analyticsFiltersModal");
+const openAnalyticsFiltersBtn = document.getElementById("openAnalyticsFiltersBtn");
+const closeAnalyticsFiltersBtn = document.getElementById("closeAnalyticsFiltersBtn");
   
     const insightsPeriodLabel = document.getElementById("insightsPeriodLabel");
   const insightsIncomeValue = document.getElementById("insightsIncomeValue");
@@ -107,6 +110,9 @@ const insightsMonthApplyBtn = document.getElementById("insightsMonthApplyBtn");
 const insightsRangeFromInput = document.getElementById("insightsRangeFromInput");
 const insightsRangeToInput = document.getElementById("insightsRangeToInput");
 const insightsSelectedPeriodLabel = document.getElementById("insightsSelectedPeriodLabel");
+const insightsFiltersModal = document.getElementById("insightsFiltersModal");
+const openInsightsFiltersBtn = document.getElementById("openInsightsFiltersBtn");
+const closeInsightsFiltersBtn = document.getElementById("closeInsightsFiltersBtn");
 
   const mandatoryPaymentsModal = document.getElementById("mandatoryPaymentsModal");
   const openMandatoryPaymentsModalBtn = document.getElementById("openMandatoryPaymentsModalBtn");
@@ -1453,6 +1459,28 @@ function openInsightsMonthWheel() {
 function closeInsightsMonthWheel() {
   isInsightsMonthWheelOpen = false;
   insightsMonthWheelWrap?.classList.add("hidden");
+}
+
+function openAnalyticsFiltersModal() {
+  analyticsFiltersModal?.classList.remove("hidden");
+  document.body.style.overflow = "hidden";
+}
+
+function closeAnalyticsFiltersModal() {
+  analyticsFiltersModal?.classList.add("hidden");
+  closeAnalyticsMonthWheel();
+  document.body.style.overflow = "";
+}
+
+function openInsightsFiltersModal() {
+  insightsFiltersModal?.classList.remove("hidden");
+  document.body.style.overflow = "hidden";
+}
+
+function closeInsightsFiltersModal() {
+  insightsFiltersModal?.classList.add("hidden");
+  closeInsightsMonthWheel();
+  document.body.style.overflow = "";
 }
 
 function applyInsightsMonthWheel() {
@@ -3047,6 +3075,9 @@ else if (transaction.type === "income") {
 
   function renderAnalytics() {
   if (!analyticsView) return;
+  if (analyticsFilterPeriod !== "range" && analyticsFilterPeriod !== "month") {
+  closeAnalyticsFiltersModal();
+}
 
   const breakdown = getAnalyticsCategoryBreakdown();
   
@@ -3218,6 +3249,9 @@ else if (transaction.type === "income") {
   
   function renderInsights() {
   if (!insightsView) return;
+  if (insightsFilterPeriod !== "range" && insightsFilterPeriod !== "month") {
+  closeInsightsFiltersModal();
+}
 
   const summary = getInsightsSummary();
   const periodLabel = getInsightsPeriodLabel() || "за период";
@@ -3708,6 +3742,11 @@ toAccountSelect?.addEventListener("change", updateTransferSafeFields);
   navWalletBtn?.addEventListener("click", showWalletView);
 navAnalyticsBtn?.addEventListener("click", showAnalyticsView);
 navInsightsBtn?.addEventListener("click", showInsightsView);
+openAnalyticsFiltersBtn?.addEventListener("click", openAnalyticsFiltersModal);
+closeAnalyticsFiltersBtn?.addEventListener("click", closeAnalyticsFiltersModal);
+
+openInsightsFiltersBtn?.addEventListener("click", openInsightsFiltersModal);
+closeInsightsFiltersBtn?.addEventListener("click", closeInsightsFiltersModal);
 
 insightsSummaryToggleBtn?.addEventListener("click", () => {
   toggleInsightsCollapse(insightsSummaryBody, insightsSummaryArrow);
@@ -3724,6 +3763,18 @@ addMandatoryPaymentBtn?.addEventListener("click", addMandatoryPayment);
 mandatoryPaymentsModal?.addEventListener("click", (event) => {
   if (event.target === mandatoryPaymentsModal) {
     closeMandatoryPaymentsModal();
+  }
+});
+
+analyticsFiltersModal?.addEventListener("click", (event) => {
+  if (event.target === analyticsFiltersModal) {
+    closeAnalyticsFiltersModal();
+  }
+});
+
+insightsFiltersModal?.addEventListener("click", (event) => {
+  if (event.target === insightsFiltersModal) {
+    closeInsightsFiltersModal();
   }
 });
 
@@ -3790,8 +3841,9 @@ faqModal?.addEventListener("click", (event) => {
   });
 
   analyticsMonthApplyBtn?.addEventListener("click", () => {
-    applyAnalyticsMonthWheel();
-  });
+  applyAnalyticsMonthWheel();
+  closeAnalyticsFiltersModal();
+});
 
   analyticsRangeFromInput?.addEventListener("change", () => {
     if (!analyticsRangeFromInput.value) return;
@@ -3818,6 +3870,7 @@ faqModal?.addEventListener("click", (event) => {
 
     analyticsFilterPeriod = "range";
     closeAnalyticsMonthWheel();
+    closeAnalyticsFiltersModal();
     renderAnalytics();
   });
   
@@ -3870,6 +3923,7 @@ insightsMonthResetBtn?.addEventListener("click", () => {
 
 insightsMonthApplyBtn?.addEventListener("click", () => {
   applyInsightsMonthWheel();
+  closeInsightsFiltersModal();
 });
 
 insightsRangeFromInput?.addEventListener("change", () => {
@@ -3897,6 +3951,7 @@ insightsRangeToInput?.addEventListener("change", () => {
 
   insightsFilterPeriod = "range";
   closeInsightsMonthWheel();
+  closeInsightsFiltersModal();
   renderInsights();
 });
 
@@ -4024,6 +4079,16 @@ safeInterestRateModal?.addEventListener("click", (event) => {
     closeFaqModal();
     return;
   }
+  
+  if (analyticsFiltersModal && !analyticsFiltersModal.classList.contains("hidden")) {
+  closeAnalyticsFiltersModal();
+  return;
+}
+
+if (insightsFiltersModal && !insightsFiltersModal.classList.contains("hidden")) {
+  closeInsightsFiltersModal();
+  return;
+}
 
   if (isInsightsMonthWheelOpen) {
     closeInsightsMonthWheel();
