@@ -143,6 +143,7 @@ const addMandatoryPaymentBtn = document.getElementById("addMandatoryPaymentBtn")
   const toSafeBucketField = document.getElementById("toSafeBucketField");
 
   const balanceEl = document.querySelector(".balance-amount");
+  const balanceFreeMoneyValueEl = document.getElementById("balanceFreeMoneyValue");
   const accountsTotalEl = document.getElementById("accountsTotal");
   const accountsListEl = document.getElementById("accountsList");
   const transactionsListEl = document.getElementById("transactionsList");
@@ -2750,10 +2751,16 @@ async function deleteSafeBucketFromModal() {
 }
 
   function renderBalance() {
-    const balance = calculateBalance();
-    balanceEl.textContent = formatMoney(balance);
-    accountsTotalEl.textContent = `Всего: ${formatMoney(balance)}`;
+  const balance = calculateBalance();
+  const freeMoney = getFreeMoneyTotal();
+
+  balanceEl.textContent = formatMoney(balance);
+  accountsTotalEl.textContent = `Всего: ${formatMoney(balance)}`;
+
+  if (balanceFreeMoneyValueEl) {
+    balanceFreeMoneyValueEl.textContent = `Свободно: ${formatMoney(freeMoney)}`;
   }
+}
 
   function renderAccounts() {
   accountsListEl.innerHTML = "";
