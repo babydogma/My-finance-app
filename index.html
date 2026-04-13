@@ -308,54 +308,52 @@
   </section>
 
   <!-- ВЕРХНИЙ БЛОК -->
-  <section class="section">
-    <div class="section-head">
-      <h2 class="section-title">Текущее состояние</h2>
-      <div class="section-note">что есть сейчас</div>
-    </div>
+<section class="section">
+  <div class="section-head">
+    <h2 class="section-title">Текущее состояние</h2>
+    <div class="section-note">что есть сейчас</div>
+  </div>
 
-    <div class="summary">
-      <div class="summary-card">
-        <p class="summary-label">Доходы</p>
-        <p class="summary-value" id="insightsIncomeValue">0 ₽</p>
-      </div>
-
-      <div class="summary-card">
-        <p class="summary-label">
+  <div class="manager-card insights-card insights-top-panel">
+    <div class="insights-top-hero">
+      <div class="insights-top-hero-card insights-top-hero-card--main">
+        <p class="insights-top-hero-label">
           Общий баланс
           <button class="faq-chip" type="button" data-faq-key="total_balance" aria-label="Что это?">❔</button>
         </p>
-        <p class="summary-value" id="insightsTotalBalanceValue">0 ₽</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="section">
-    <div class="summary">
-      <div class="summary-card">
-        <p class="summary-label">
-          Защищенные деньги
-          <button class="faq-chip" type="button" data-faq-key="protected_money" aria-label="Что это?">❔</button>
-        </p>
-        <p class="summary-value" id="insightsProtectedMoneyValue">0 ₽</p>
+        <p class="insights-top-hero-value" id="insightsTotalBalanceValue">0 ₽</p>
       </div>
 
-      <div class="summary-card">
-        <p class="summary-label">
+      <div class="insights-top-hero-card insights-top-hero-card--accent">
+        <p class="insights-top-hero-label">
           Свободные деньги
           <button class="faq-chip" type="button" data-faq-key="free_money" aria-label="Что это?">❔</button>
         </p>
-        <p class="summary-value" id="insightsFreeMoneyValue">0 ₽</p>
+        <p class="insights-top-hero-value" id="insightsFreeMoneyValue">0 ₽</p>
       </div>
     </div>
-  </section>
 
-  <section class="section">
-    <div class="manager-card insights-card insights-card--compact">
-      <p class="summary-label">Проценты по сейфам</p>
-      <p class="summary-value" id="insightsInterestValue">0 ₽</p>
+    <div class="insights-top-grid">
+      <div class="insights-top-mini">
+        <p class="insights-top-mini-label">Доходы</p>
+        <p class="insights-top-mini-value insights-top-mini-value--green" id="insightsIncomeValue">0 ₽</p>
+      </div>
+
+      <div class="insights-top-mini">
+        <p class="insights-top-mini-label">
+          Защищённые деньги
+          <button class="faq-chip" type="button" data-faq-key="protected_money" aria-label="Что это?">❔</button>
+        </p>
+        <p class="insights-top-mini-value" id="insightsProtectedMoneyValue">0 ₽</p>
+      </div>
+
+      <div class="insights-top-mini insights-top-mini--wide">
+        <p class="insights-top-mini-label">Проценты по сейфам</p>
+        <p class="insights-top-mini-value insights-top-mini-value--blue" id="insightsInterestValue">0 ₽</p>
+      </div>
     </div>
-  </section>
+  </div>
+</section>
 
   <!-- СРЕДНИЙ БЛОК -->
   <section class="section">
