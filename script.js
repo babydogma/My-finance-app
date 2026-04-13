@@ -3420,12 +3420,16 @@ navAnalyticsBtn?.addEventListener("click", showAnalyticsView);
 navInsightsBtn?.addEventListener("click", showInsightsView);
 
   openMandatoryPaymentsModalBtn?.addEventListener("click", openMandatoryPaymentsModal);
-  closeMandatoryPaymentsModalBtn?.addEventListener("click", closeMandatoryPaymentsModal);
-  addMandatoryPaymentBtn?.addEventListener("click", addMandatoryPayment);
+closeMandatoryPaymentsModalBtn?.addEventListener("click", closeMandatoryPaymentsModal);
+addMandatoryPaymentBtn?.addEventListener("click", addMandatoryPayment);
 
-  mandatoryPaymentsModal?.addEventListener("click", (event) => {
-    if (event.target === mandatoryPaymentsModal) closeMandatoryPaymentsModal();
-  faqButtons.forEach((btn) => {
+mandatoryPaymentsModal?.addEventListener("click", (event) => {
+  if (event.target === mandatoryPaymentsModal) {
+    closeMandatoryPaymentsModal();
+  }
+});
+
+faqButtons.forEach((btn) => {
   btn.addEventListener("click", (event) => {
     event.stopPropagation();
     openFaqModal(btn.dataset.faqKey);
@@ -3435,7 +3439,9 @@ navInsightsBtn?.addEventListener("click", showInsightsView);
 closeFaqModalBtn?.addEventListener("click", closeFaqModal);
 
 faqModal?.addEventListener("click", (event) => {
-  if (event.target === faqModal) closeFaqModal();
+  if (event.target === faqModal) {
+    closeFaqModal();
+  }
 });
 
   analyticsPeriodButtons.forEach((btn) => {
