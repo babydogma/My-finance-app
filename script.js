@@ -70,7 +70,6 @@ const deleteBudgetBtn = document.getElementById("deleteBudgetBtn");
     const insightsPeriodLabel = document.getElementById("insightsPeriodLabel");
   const insightsIncomeValue = document.getElementById("insightsIncomeValue");
   const insightsExpenseValue = document.getElementById("insightsExpenseValue");
-  const insightsNetValue = document.getElementById("insightsNetValue");
   const insightsRequiredValue = document.getElementById("insightsRequiredValue");
   const insightsFlexibleValue = document.getElementById("insightsFlexibleValue");
   const insightsSavedValue = document.getElementById("insightsSavedValue");
@@ -1630,7 +1629,7 @@ function getRemainingFlexibleBudgetsBreakdownCurrentMonth() {
 }
 
 function getSavedToSafesBreakdown() {
-  const items = getAnalyticsFilteredTransactions().filter((transaction) => {
+  const items = getInsightsFilteredTransactions().filter((transaction) => {
     return (
       transaction.type === "transfer" &&
       transaction.to_account === getSafeAccountName() &&
@@ -3257,7 +3256,7 @@ else if (transaction.type === "income") {
   insightsProtectedMoneyValue.textContent = formatMoney(summary.protectedMoney);
   insightsFreeMoneyValue.textContent = formatMoney(summary.freeMoney);
   insightsPendingMandatoryValue.textContent = formatMoney(summary.pendingMandatoryToDeduct);
-insightsRemainingBudgetsValue.textContent = formatMoney(summary.remainingBudgets);
+  insightsRemainingBudgetsValue.textContent = formatMoney(summary.remainingBudgets);
 
   insightsCanSaveNowValue.classList.remove("is-positive", "is-negative");
   if (summary.canSaveNow > 0) {
@@ -3269,21 +3268,21 @@ insightsRemainingBudgetsValue.textContent = formatMoney(summary.remainingBudgets
   }
 
   insightsLimitsStatusText.textContent =
-  `Обязательные всего: ${formatMoney(summary.pendingMandatoryTotal)} • ` +
-  `Покрыто сейфами: ${formatMoney(summary.pendingMandatoryCoveredByLinkedSafes)} • ` +
-  `К вычету из свободных: ${formatMoney(summary.pendingMandatoryToDeduct)} • ` +
-  `Остаток лимитов: ${formatMoney(summary.remainingBudgets)}`;
+    `Обязательные всего: ${formatMoney(summary.pendingMandatoryTotal)} • ` +
+    `Покрыто сейфами: ${formatMoney(summary.pendingMandatoryCoveredByLinkedSafes)} • ` +
+    `К вычету из свободных: ${formatMoney(summary.pendingMandatoryToDeduct)} • ` +
+    `Остаток лимитов: ${formatMoney(summary.remainingBudgets)}`;
 
   if (summary.shortageBeforeSafeSaving > 0) {
-  insightsRecommendationText.textContent =
-    `Откладывать сейчас рано. После учёта обязательных платежей и остатков лимитов не хватает ${formatMoney(summary.shortageBeforeSafeSaving)}.`;
-} else if (summary.canSaveNow > 0) {
-  insightsRecommendationText.textContent =
-    `Сейчас можно отложить ${formatMoney(summary.canSaveNow)}. В обязательных уже учтено покрытие платежей привязанными сейфами.`;
-} else {
-  insightsRecommendationText.textContent =
-    `Свободные деньги полностью заняты обязательствами текущего месяца и остатками лимитов.`;
-}
+    insightsRecommendationText.textContent =
+      `Откладывать сейчас рано. После учёта обязательных платежей и остатков лимитов не хватает ${formatMoney(summary.shortageBeforeSafeSaving)}.`;
+  } else if (summary.canSaveNow > 0) {
+    insightsRecommendationText.textContent =
+      `Сейчас можно отложить ${formatMoney(summary.canSaveNow)}. В обязательных уже учтено покрытие платежей привязанными сейфами.`;
+  } else {
+    insightsRecommendationText.textContent =
+      `Свободные деньги полностью заняты обязательствами текущего месяца и остатками лимитов.`;
+  }
 
   if (insightsSafeList) {
     insightsSafeList.innerHTML = "";
@@ -3305,28 +3304,29 @@ insightsRemainingBudgetsValue.textContent = formatMoney(summary.remainingBudgets
       `;
       insightsSafeList.appendChild(row);
     });
-    
-    insightsPeriodButtons.forEach((btn) => {
-  btn.classList.toggle("is-active", btn.dataset.insightsPeriod === insightsFilterPeriod);
-});
+  }
 
-const isInsightsRange = insightsFilterPeriod === "range";
+  insightsPeriodButtons.forEach((btn) => {
+    btn.classList.toggle("is-active", btn.dataset.insightsPeriod === insightsFilterPeriod);
+  });
 
-setNativePickerVisibility(insightsRangeFromInput, isInsightsRange);
-setNativePickerVisibility(insightsRangeToInput, isInsightsRange);
+  const isInsightsRange = insightsFilterPeriod === "range";
 
-if (insightsMonthBtn) {
-  insightsMonthBtn.textContent = formatMonthButtonLabel(insightsSelectedMonth);
-}
+  setNativePickerVisibility(insightsRangeFromInput, isInsightsRange);
+  setNativePickerVisibility(insightsRangeToInput, isInsightsRange);
 
-if (insightsMonthWheelWrap) {
-  insightsMonthWheelWrap.classList.toggle("hidden", !isInsightsMonthWheelOpen);
-}
+  if (insightsMonthBtn) {
+    insightsMonthBtn.textContent = formatMonthButtonLabel(insightsSelectedMonth);
+  }
 
-if (insightsSelectedPeriodLabel) {
-  insightsSelectedPeriodLabel.classList.add("hidden");
-  insightsSelectedPeriodLabel.textContent = "";
-  insightsSelectedPeriodLabel.style.display = "none";
+  if (insightsMonthWheelWrap) {
+    insightsMonthWheelWrap.classList.toggle("hidden", !isInsightsMonthWheelOpen);
+  }
+
+  if (insightsSelectedPeriodLabel) {
+    insightsSelectedPeriodLabel.classList.add("hidden");
+    insightsSelectedPeriodLabel.textContent = "";
+    insightsSelectedPeriodLabel.style.display = "none";
   }
 }
 
@@ -3991,57 +3991,58 @@ safeInterestRateModal?.addEventListener("click", (event) => {
 });
 
   document.addEventListener("keydown", (event) => {
-    if (event.key !== "Escape") return;
+  if (event.key !== "Escape") return;
 
-    if (modal && !modal.classList.contains("hidden")) {
-      closeModal();
-      return;
-    }
+  if (modal && !modal.classList.contains("hidden")) {
+    closeModal();
+    return;
+  }
 
-    if (budgetModal && !budgetModal.classList.contains("hidden")) {
-      closeBudgetModal();
-      return;
-    }
-    
-    if (safeBucketsModal && !safeBucketsModal.classList.contains("hidden")) {
-  closeSafeBucketsModal();
-  return;
-}
+  if (budgetModal && !budgetModal.classList.contains("hidden")) {
+    closeBudgetModal();
+    return;
+  }
 
-    if (safeBucketAmountModal && !safeBucketAmountModal.classList.contains("hidden")) {
-  closeSafeBucketAmountModal();
-  return;
-}
+  if (safeBucketsModal && !safeBucketsModal.classList.contains("hidden")) {
+    closeSafeBucketsModal();
+    return;
+  }
 
-    if (analyticsCategoryModal && !analyticsCategoryModal.classList.contains("hidden")) {
-      closeAnalyticsCategoryModal();
-      return;
-    }
-    
-        if (mandatoryPaymentsModal && !mandatoryPaymentsModal.classList.contains("hidden")) {
-      closeMandatoryPaymentsModal();
-      return;
-    }
-    
-    if (faqModal && !faqModal.classList.contains("hidden")) {
-  closeFaqModal();
-  return;
-}
+  if (safeBucketAmountModal && !safeBucketAmountModal.classList.contains("hidden")) {
+    closeSafeBucketAmountModal();
+    return;
+  }
 
-if (isInsightsMonthWheelOpen) {
-  closeInsightsMonthWheel();
-  return;
-}
+  if (safeInterestRateModal && !safeInterestRateModal.classList.contains("hidden")) {
+    closeSafeInterestRateModal();
+    return;
+  }
 
-    if (isAnalyticsMonthWheelOpen) {
-      closeAnalyticsMonthWheel();
-    }
-    
-    if (safeInterestRateModal && !safeInterestRateModal.classList.contains("hidden")) {
-  closeSafeInterestRateModal();
-  return;
-}
-  });
+  if (analyticsCategoryModal && !analyticsCategoryModal.classList.contains("hidden")) {
+    closeAnalyticsCategoryModal();
+    return;
+  }
+
+  if (mandatoryPaymentsModal && !mandatoryPaymentsModal.classList.contains("hidden")) {
+    closeMandatoryPaymentsModal();
+    return;
+  }
+
+  if (faqModal && !faqModal.classList.contains("hidden")) {
+    closeFaqModal();
+    return;
+  }
+
+  if (isInsightsMonthWheelOpen) {
+    closeInsightsMonthWheel();
+    return;
+  }
+
+  if (isAnalyticsMonthWheelOpen) {
+    closeAnalyticsMonthWheel();
+    return;
+  }
+});
 
   period7Btn?.addEventListener("click", () => {
     currentPeriodDays = 7;
