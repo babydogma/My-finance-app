@@ -102,7 +102,7 @@
   <!-- ANALYTICS VIEW -->
 <div id="analyticsView" class="hidden">
     <section class="section section--manager-top screen-shell screen-shell--analytics">
-  <div class="screen-shell__top">
+  <div class="screen-shell__top screen-shell__top--analytics">
     <div class="analytics-mode-switch-wrap">
       <div class="analytics-mode-switch">
         <button
@@ -122,10 +122,23 @@
         </button>
       </div>
     </div>
-  </div>
 
-  <div class="screen-shell__filters">
-    <div class="history-filters">
+    <button class="screen-filter-btn" type="button" id="openAnalyticsFiltersBtn" aria-label="Открыть фильтры аналитики">
+      ☷
+    </button>
+  </div>
+</section>
+
+<div class="modal hidden" id="analyticsFiltersModal">
+  <div class="modal-sheet filters-sheet">
+    <div class="modal-handle"></div>
+
+    <div class="section-head filters-sheet__head">
+      <h3 class="modal-title filters-sheet__title">Фильтры аналитики</h3>
+      <button class="manager-back-btn" type="button" id="closeAnalyticsFiltersBtn">Закрыть</button>
+    </div>
+
+    <div class="history-filters history-filters--modal">
       <div class="history-filter-group history-filter-group--primary">
         <div class="month-filter-wrap month-filter-wrap--inline">
           <button
@@ -194,7 +207,7 @@
       </div>
     </div>
   </div>
-</section>
+</div>
 
 <section class="section" id="analyticsCategoriesBreakdownSection">
   <div class="manager-card analytics-chart-card analytics-chart-card--clean">
@@ -211,15 +224,25 @@
 <!-- INSIGHTS VIEW -->
 <div id="insightsView" class="hidden">
   <section class="section section--manager-top screen-shell screen-shell--insights">
-  <div class="screen-shell__top">
-    <div class="section-head screen-shell__head">
-      <h2 class="section-title screen-shell__title">Итоги</h2>
-      <div class="section-note screen-shell__note" id="insightsPeriodLabel">за период</div>
-    </div>
-  </div>
+  <div class="screen-shell__top screen-shell__top--insights">
+    <h2 class="section-title screen-shell__title">Итоги</h2>
 
-  <div class="screen-shell__filters">
-    <div class="history-filters">
+    <button class="screen-filter-btn" type="button" id="openInsightsFiltersBtn" aria-label="Открыть фильтры итогов">
+      ☷
+    </button>
+  </div>
+</section>
+
+<div class="modal hidden" id="insightsFiltersModal">
+  <div class="modal-sheet filters-sheet">
+    <div class="modal-handle"></div>
+
+    <div class="section-head filters-sheet__head">
+      <h3 class="modal-title filters-sheet__title">Фильтры итогов</h3>
+      <button class="manager-back-btn" type="button" id="closeInsightsFiltersBtn">Закрыть</button>
+    </div>
+
+    <div class="history-filters history-filters--modal">
       <div class="history-filter-group history-filter-group--primary">
         <div class="month-filter-wrap month-filter-wrap--inline">
           <button
@@ -278,7 +301,7 @@
       </div>
     </div>
   </div>
-  </section>
+</div>
 
   <!-- ВЕРХНИЙ БЛОК -->
 <section class="section">
