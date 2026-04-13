@@ -246,9 +246,74 @@
       <h2 class="section-title">Итоги</h2>
       <div class="section-note" id="insightsPeriodLabel">за период</div>
     </div>
+
+    <div class="history-filters">
+      <div class="history-filter-group history-filter-group--primary">
+        <div class="month-filter-wrap month-filter-wrap--inline">
+          <button
+            class="history-filter-btn history-filter-btn--month is-active"
+            type="button"
+            data-insights-period="month"
+            id="insightsMonthBtn"
+          >
+            Месяц
+          </button>
+        </div>
+      </div>
+
+      <div class="analytics-month-popover hidden" id="insightsMonthWheelWrap">
+        <div class="analytics-month-popover__panel">
+          <div class="month-wheel" id="insightsMonthWheelInline">
+            <div class="month-wheel__fade month-wheel__fade--top"></div>
+            <div class="month-wheel__fade month-wheel__fade--bottom"></div>
+            <div class="month-wheel__center-line"></div>
+
+            <div class="month-wheel__column" id="insightsMonthNamesColumn"></div>
+            <div class="month-wheel__column" id="insightsMonthYearsColumn"></div>
+          </div>
+
+          <div class="analytics-month-popover__actions">
+            <button
+              class="analytics-month-popover__reset"
+              type="button"
+              id="insightsMonthResetBtn"
+            >
+              Сбросить
+            </button>
+
+            <button
+              class="analytics-month-popover__apply"
+              type="button"
+              id="insightsMonthApplyBtn"
+              aria-label="Подтвердить выбор месяца"
+            >
+              ✓
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="history-filter-group history-filter-group--secondary">
+        <button class="history-filter-btn" type="button" data-insights-period="today">Сегодня</button>
+        <button class="history-filter-btn" type="button" data-insights-period="7">7 дней</button>
+        <button class="history-filter-btn" type="button" data-insights-period="range">Период</button>
+      </div>
+
+      <div class="history-filter-group history-filter-group--inputs">
+        <input class="input hidden" type="date" id="insightsRangeFromInput" />
+        <input class="input hidden" type="date" id="insightsRangeToInput" />
+        <div class="section-note hidden" id="insightsSelectedPeriodLabel"></div>
+      </div>
+    </div>
   </section>
 
+  <!-- ВЕРХНИЙ БЛОК -->
   <section class="section">
+    <div class="section-head">
+      <h2 class="section-title">Текущее состояние</h2>
+      <div class="section-note">что есть сейчас</div>
+    </div>
+
     <div class="summary">
       <div class="summary-card">
         <p class="summary-label">Доходы</p>
@@ -256,36 +321,62 @@
       </div>
 
       <div class="summary-card">
+        <p class="summary-label">
+          Общий баланс
+          <button class="faq-chip" type="button" data-faq-key="total_balance" aria-label="Что это?">❔</button>
+        </p>
+        <p class="summary-value" id="insightsTotalBalanceValue">0 ₽</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="summary">
+      <div class="summary-card">
+        <p class="summary-label">
+          Защищенные деньги
+          <button class="faq-chip" type="button" data-faq-key="protected_money" aria-label="Что это?">❔</button>
+        </p>
+        <p class="summary-value" id="insightsProtectedMoneyValue">0 ₽</p>
+      </div>
+
+      <div class="summary-card">
+        <p class="summary-label">
+          Свободные деньги
+          <button class="faq-chip" type="button" data-faq-key="free_money" aria-label="Что это?">❔</button>
+        </p>
+        <p class="summary-value" id="insightsFreeMoneyValue">0 ₽</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="manager-card insights-card insights-card--compact">
+      <p class="summary-label">Проценты по сейфам</p>
+      <p class="summary-value" id="insightsInterestValue">0 ₽</p>
+    </div>
+  </section>
+
+  <!-- СРЕДНИЙ БЛОК -->
+  <section class="section">
+    <div class="section-head">
+      <h2 class="section-title">Расходы</h2>
+      <div class="section-note">за выбранный период</div>
+    </div>
+
+    <div class="summary">
+      <div class="summary-card">
         <p class="summary-label">Расходы</p>
         <p class="summary-value" id="insightsExpenseValue">0 ₽</p>
       </div>
-    </div>
-  </section>
 
-  <section class="section">
-    <div class="manager-card analytics-total-card">
-      <p class="summary-label">Итог за период</p>
-      <p class="summary-value" id="insightsNetValue">0 ₽</p>
-    </div>
-  </section>
-
-  <section class="section">
-    <div class="summary">
       <div class="summary-card">
         <p class="summary-label">
-  Обязательные расходы
-  <button class="faq-chip" type="button" data-faq-key="required_expense" aria-label="Что это?">❔</button>
-</p>
+          Обязательные расходы
+          <button class="faq-chip" type="button" data-faq-key="required_expense" aria-label="Что это?">❔</button>
+        </p>
         <p class="summary-value" id="insightsRequiredValue">0 ₽</p>
       </div>
-
-      <div class="summary-card">
-        <p class="summary-label">
-  Гибкие расходы
-  <button class="faq-chip" type="button" data-faq-key="flexible_expense" aria-label="Что это?">❔</button>
-</p>
-        <p class="summary-value" id="insightsFlexibleValue">0 ₽</p>
-      </div>
     </div>
   </section>
 
@@ -293,20 +384,29 @@
     <div class="summary">
       <div class="summary-card">
         <p class="summary-label">
-  Отложено в сейфы
-  <button class="faq-chip" type="button" data-faq-key="saved_to_safes" aria-label="Что это?">❔</button>
-</p>
-        <p class="summary-value" id="insightsSavedValue">0 ₽</p>
+          Гибкие расходы
+          <button class="faq-chip" type="button" data-faq-key="flexible_expense" aria-label="Что это?">❔</button>
+        </p>
+        <p class="summary-value" id="insightsFlexibleValue">0 ₽</p>
       </div>
 
       <div class="summary-card">
-        <p class="summary-label">Проценты по сейфам</p>
-        <p class="summary-value" id="insightsInterestValue">0 ₽</p>
+        <p class="summary-label">
+          Отложено в сейфы
+          <button class="faq-chip" type="button" data-faq-key="saved_to_safes" aria-label="Что это?">❔</button>
+        </p>
+        <p class="summary-value" id="insightsSavedValue">0 ₽</p>
       </div>
     </div>
   </section>
 
+  <!-- НИЖНИЙ БЛОК -->
   <section class="section">
+    <div class="section-head">
+      <h2 class="section-title">План и решение</h2>
+      <div class="section-note">что можно делать дальше</div>
+    </div>
+
     <div class="manager-card insights-card">
       <div class="section-head">
         <h2 class="section-title">Обязательства месяца</h2>
@@ -323,9 +423,9 @@
 
         <div class="summary-card">
           <p class="summary-label">
-  Остаток лимитов
-  <button class="faq-chip" type="button" data-faq-key="remaining_limits" aria-label="Что это?">❔</button>
-</p>
+            Остаток лимитов
+            <button class="faq-chip" type="button" data-faq-key="remaining_limits" aria-label="Что это?">❔</button>
+          </p>
           <p class="summary-value" id="insightsRemainingBudgetsValue">0 ₽</p>
         </div>
       </div>
@@ -333,48 +433,18 @@
   </section>
 
   <section class="section">
-    <div class="summary">
-      <div class="summary-card">
-        <p class="summary-label">
-  Общий баланс
-  <button class="faq-chip" type="button" data-faq-key="total_balance" aria-label="Что это?">❔</button>
-</p>
-        <p class="summary-value" id="insightsTotalBalanceValue">0 ₽</p>
-      </div>
-
-      <div class="summary-card">
-        <p class="summary-label">
-  Защищенные деньги
-  <button class="faq-chip" type="button" data-faq-key="protected_money" aria-label="Что это?">❔</button>
-</p>
-        <p class="summary-value" id="insightsProtectedMoneyValue">0 ₽</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="section">
-    <div class="summary">
-      <div class="summary-card">
-        <p class="summary-label">
-  Свободные деньги
-  <button class="faq-chip" type="button" data-faq-key="free_money" aria-label="Что это?">❔</button>
-</p>
-        <p class="summary-value" id="insightsFreeMoneyValue">0 ₽</p>
-      </div>
-
-      <div class="summary-card">
-        <p class="summary-label">
-  Можно отложить
-  <button class="faq-chip" type="button" data-faq-key="can_save_now" aria-label="Что это?">❔</button>
-</p>
-        <p class="summary-value" id="insightsCanSaveNowValue">0 ₽</p>
-      </div>
+    <div class="manager-card analytics-total-card insights-save-card">
+      <p class="summary-label">
+        Можно отложить
+        <button class="faq-chip" type="button" data-faq-key="can_save_now" aria-label="Что это?">❔</button>
+      </p>
+      <p class="summary-value" id="insightsCanSaveNowValue">0 ₽</p>
     </div>
   </section>
 
   <section class="section">
     <div class="manager-card insights-card">
-      <p class="summary-label">Сводка обязательств</p>
+      <p class="summary-label">Сводка</p>
       <p class="insights-recommendation" id="insightsLimitsStatusText">—</p>
     </div>
   </section>
@@ -382,9 +452,9 @@
   <section class="section">
     <div class="manager-card insights-card">
       <p class="summary-label">
-  Вывод
-  <button class="faq-chip" type="button" data-faq-key="summary_recommendation" aria-label="Что это?">❔</button>
-</p>
+        Вывод
+        <button class="faq-chip" type="button" data-faq-key="summary_recommendation" aria-label="Что это?">❔</button>
+      </p>
       <p class="insights-recommendation" id="insightsRecommendationText">—</p>
     </div>
   </section>
