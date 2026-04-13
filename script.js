@@ -1368,7 +1368,7 @@ function updateAnalyticsWheelDraftFromScroll() {
     renderAnalyticsMonthWheel();
   }
   
-  function renderInsightsMonthWheel() {
+   function renderInsightsMonthWheel() {
   if (!insightsMonthNamesColumn || !insightsMonthYearsColumn) return;
 
   const monthNames = getRussianMonthNames().map((label, index) => ({
@@ -1424,28 +1424,6 @@ function updateAnalyticsWheelDraftFromScroll() {
     snapWheelToValue(insightsMonthNamesColumn, "data-wheel-month", insightsDraftMonth, "auto");
     snapWheelToValue(insightsMonthYearsColumn, "data-wheel-year", insightsDraftYear, "auto");
   });
-  
-  insightsPeriodButtons.forEach((btn) => {
-  btn.classList.toggle("is-active", btn.dataset.insightsPeriod === insightsFilterPeriod);
-});
-
-const isInsightsRange = insightsFilterPeriod === "range";
-
-setNativePickerVisibility(insightsRangeFromInput, isInsightsRange);
-setNativePickerVisibility(insightsRangeToInput, isInsightsRange);
-
-if (insightsMonthBtn) {
-  insightsMonthBtn.textContent = formatMonthButtonLabel(insightsSelectedMonth);
-}
-
-if (insightsMonthWheelWrap) {
-  insightsMonthWheelWrap.classList.toggle("hidden", !isInsightsMonthWheelOpen);
-}
-
-if (insightsSelectedPeriodLabel) {
-  insightsSelectedPeriodLabel.classList.add("hidden");
-  insightsSelectedPeriodLabel.textContent = "";
-  insightsSelectedPeriodLabel.style.display = "none";
 }
 
 function openInsightsMonthWheel() {
@@ -3095,85 +3073,6 @@ else if (transaction.type === "income") {
     analyticsPeriodButtons.forEach((btn) => {
       btn.classList.toggle("is-active", btn.dataset.analyticsPeriod === analyticsFilterPeriod);
     });
-    
-    insightsPeriodButtons.forEach((btn) => {
-  btn.addEventListener("click", () => {
-    insightsFilterPeriod = btn.dataset.insightsPeriod;
-
-    if (insightsFilterPeriod !== "month") {
-      closeInsightsMonthWheel();
-    }
-
-    if (insightsFilterPeriod === "range") {
-      const today = getTodayDateValue();
-      insightsRangeStart = insightsRangeStart || today;
-      insightsRangeEnd = insightsRangeEnd || today;
-
-      if (insightsRangeFromInput) {
-        insightsRangeFromInput.value = insightsRangeStart;
-      }
-
-      if (insightsRangeToInput) {
-        insightsRangeToInput.value = insightsRangeEnd;
-      }
-
-      setNativePickerVisibility(insightsRangeFromInput, true);
-      setNativePickerVisibility(insightsRangeToInput, true);
-      openNativePicker(insightsRangeFromInput);
-    }
-
-    renderInsights();
-  });
-});
-
-insightsMonthBtn?.addEventListener("click", (event) => {
-  event.stopPropagation();
-  insightsFilterPeriod = "month";
-
-  if (isInsightsMonthWheelOpen) {
-    closeInsightsMonthWheel();
-  } else {
-    openInsightsMonthWheel();
-  }
-
-  renderInsights();
-});
-
-insightsMonthResetBtn?.addEventListener("click", () => {
-  resetInsightsMonthWheel();
-});
-
-insightsMonthApplyBtn?.addEventListener("click", () => {
-  applyInsightsMonthWheel();
-});
-
-insightsRangeFromInput?.addEventListener("change", () => {
-  if (!insightsRangeFromInput.value) return;
-  insightsRangeStart = insightsRangeFromInput.value;
-
-  if (!insightsRangeEnd || insightsRangeEnd < insightsRangeStart) {
-    insightsRangeEnd = insightsRangeStart;
-    if (insightsRangeToInput) insightsRangeToInput.value = insightsRangeEnd;
-  }
-
-  insightsFilterPeriod = "range";
-  closeInsightsMonthWheel();
-  renderInsights();
-});
-
-insightsRangeToInput?.addEventListener("change", () => {
-  if (!insightsRangeToInput.value) return;
-  insightsRangeEnd = insightsRangeToInput.value;
-
-  if (!insightsRangeStart || insightsRangeStart > insightsRangeEnd) {
-    insightsRangeStart = insightsRangeEnd;
-    if (insightsRangeFromInput) insightsRangeFromInput.value = insightsRangeStart;
-  }
-
-  insightsFilterPeriod = "range";
-  closeInsightsMonthWheel();
-  renderInsights();
-});
 
     analyticsTypeButtons.forEach((btn) => {
       btn.classList.toggle("is-active", btn.dataset.analyticsType === analyticsOperationType);
@@ -3360,17 +3259,6 @@ insightsRangeToInput?.addEventListener("change", () => {
   insightsPendingMandatoryValue.textContent = formatMoney(summary.pendingMandatoryToDeduct);
 insightsRemainingBudgetsValue.textContent = formatMoney(summary.remainingBudgets);
 
-  insightsNetValue.classList.remove("is-positive", "is-negative");
-  if (summary.net > 0) {
-    insightsNetValue.textContent = `+${formatMoney(summary.net)}`;
-    insightsNetValue.classList.add("is-positive");
-  } else if (summary.net < 0) {
-    insightsNetValue.textContent = `−${formatMoney(Math.abs(summary.net))}`;
-    insightsNetValue.classList.add("is-negative");
-  } else {
-    insightsNetValue.textContent = formatMoney(0);
-  }
-
   insightsCanSaveNowValue.classList.remove("is-positive", "is-negative");
   if (summary.canSaveNow > 0) {
     insightsCanSaveNowValue.textContent = formatMoney(summary.canSaveNow);
@@ -3417,6 +3305,28 @@ insightsRemainingBudgetsValue.textContent = formatMoney(summary.remainingBudgets
       `;
       insightsSafeList.appendChild(row);
     });
+    
+    insightsPeriodButtons.forEach((btn) => {
+  btn.classList.toggle("is-active", btn.dataset.insightsPeriod === insightsFilterPeriod);
+});
+
+const isInsightsRange = insightsFilterPeriod === "range";
+
+setNativePickerVisibility(insightsRangeFromInput, isInsightsRange);
+setNativePickerVisibility(insightsRangeToInput, isInsightsRange);
+
+if (insightsMonthBtn) {
+  insightsMonthBtn.textContent = formatMonthButtonLabel(insightsSelectedMonth);
+}
+
+if (insightsMonthWheelWrap) {
+  insightsMonthWheelWrap.classList.toggle("hidden", !isInsightsMonthWheelOpen);
+}
+
+if (insightsSelectedPeriodLabel) {
+  insightsSelectedPeriodLabel.classList.add("hidden");
+  insightsSelectedPeriodLabel.textContent = "";
+  insightsSelectedPeriodLabel.style.display = "none";
   }
 }
 
@@ -3918,6 +3828,85 @@ faqModal?.addEventListener("click", (event) => {
     closeAnalyticsMonthWheel();
     renderAnalytics();
   });
+  
+  insightsPeriodButtons.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    insightsFilterPeriod = btn.dataset.insightsPeriod;
+
+    if (insightsFilterPeriod !== "month") {
+      closeInsightsMonthWheel();
+    }
+
+    if (insightsFilterPeriod === "range") {
+      const today = getTodayDateValue();
+      insightsRangeStart = insightsRangeStart || today;
+      insightsRangeEnd = insightsRangeEnd || today;
+
+      if (insightsRangeFromInput) {
+        insightsRangeFromInput.value = insightsRangeStart;
+      }
+
+      if (insightsRangeToInput) {
+        insightsRangeToInput.value = insightsRangeEnd;
+      }
+
+      setNativePickerVisibility(insightsRangeFromInput, true);
+      setNativePickerVisibility(insightsRangeToInput, true);
+      openNativePicker(insightsRangeFromInput);
+    }
+
+    renderInsights();
+  });
+});
+
+insightsMonthBtn?.addEventListener("click", (event) => {
+  event.stopPropagation();
+  insightsFilterPeriod = "month";
+
+  if (isInsightsMonthWheelOpen) {
+    closeInsightsMonthWheel();
+  } else {
+    openInsightsMonthWheel();
+  }
+
+  renderInsights();
+});
+
+insightsMonthResetBtn?.addEventListener("click", () => {
+  resetInsightsMonthWheel();
+});
+
+insightsMonthApplyBtn?.addEventListener("click", () => {
+  applyInsightsMonthWheel();
+});
+
+insightsRangeFromInput?.addEventListener("change", () => {
+  if (!insightsRangeFromInput.value) return;
+  insightsRangeStart = insightsRangeFromInput.value;
+
+  if (!insightsRangeEnd || insightsRangeEnd < insightsRangeStart) {
+    insightsRangeEnd = insightsRangeStart;
+    if (insightsRangeToInput) insightsRangeToInput.value = insightsRangeEnd;
+  }
+
+  insightsFilterPeriod = "range";
+  closeInsightsMonthWheel();
+  renderInsights();
+});
+
+insightsRangeToInput?.addEventListener("change", () => {
+  if (!insightsRangeToInput.value) return;
+  insightsRangeEnd = insightsRangeToInput.value;
+
+  if (!insightsRangeStart || insightsRangeStart > insightsRangeEnd) {
+    insightsRangeStart = insightsRangeEnd;
+    if (insightsRangeFromInput) insightsRangeFromInput.value = insightsRangeStart;
+  }
+
+  insightsFilterPeriod = "range";
+  closeInsightsMonthWheel();
+  renderInsights();
+});
 
   analyticsModeCategoriesBtn?.addEventListener("click", () => {
     analyticsMode = "categories";
@@ -3982,24 +3971,24 @@ safeInterestRateModal?.addEventListener("click", (event) => {
   });
 
   document.addEventListener("click", (event) => {
-    if (!isAnalyticsMonthWheelOpen || !analyticsMonthWheelWrap) return;
-
+  if (isAnalyticsMonthWheelOpen && analyticsMonthWheelWrap) {
     const clickedInsidePopover = analyticsMonthWheelWrap.contains(event.target);
     const clickedMonthBtn = analyticsMonthBtn?.contains(event.target);
 
     if (!clickedInsidePopover && !clickedMonthBtn) {
       closeAnalyticsMonthWheel();
     }
-    
-    if (isInsightsMonthWheelOpen && insightsMonthWheelWrap) {
-  const clickedInsideInsightsPopover = insightsMonthWheelWrap.contains(event.target);
-  const clickedInsightsMonthBtn = insightsMonthBtn?.contains(event.target);
-
-  if (!clickedInsideInsightsPopover && !clickedInsightsMonthBtn) {
-    closeInsightsMonthWheel();
   }
-}
-  });
+
+  if (isInsightsMonthWheelOpen && insightsMonthWheelWrap) {
+    const clickedInsideInsightsPopover = insightsMonthWheelWrap.contains(event.target);
+    const clickedInsightsMonthBtn = insightsMonthBtn?.contains(event.target);
+
+    if (!clickedInsideInsightsPopover && !clickedInsightsMonthBtn) {
+      closeInsightsMonthWheel();
+    }
+  }
+});
 
   document.addEventListener("keydown", (event) => {
     if (event.key !== "Escape") return;
