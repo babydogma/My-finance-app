@@ -400,75 +400,124 @@
     </div>
   </section>
 
-  <!-- НИЖНИЙ БЛОК -->
-  <section class="section">
+    <!-- НИЖНИЙ БЛОК -->
+<section class="section">
+  <div class="section-head">
+    <h2 class="section-title">План и решение</h2>
+    <div class="section-note">что можно делать дальше</div>
+  </div>
+
+  <div class="manager-card insights-card insights-plan-card">
     <div class="section-head">
-      <h2 class="section-title">План и решение</h2>
-      <div class="section-note">что можно делать дальше</div>
+      <h2 class="section-title">Обязательства месяца</h2>
+      <button class="manager-back-btn" type="button" id="openMandatoryPaymentsModalBtn">
+        Платежи
+      </button>
     </div>
 
-    <div class="manager-card insights-card">
-      <div class="section-head">
-        <h2 class="section-title">Обязательства месяца</h2>
-        <button class="manager-back-btn" type="button" id="openMandatoryPaymentsModalBtn">
-          Платежи
-        </button>
+    <div class="insights-mini-grid">
+      <div class="insights-mini-card">
+        <p class="insights-mini-label">Обязательные всего</p>
+        <p class="insights-mini-value" id="insightsMandatoryTotalValue">0 ₽</p>
       </div>
 
-      <div class="summary">
-        <div class="summary-card">
-          <p class="summary-label">К вычету из свободных</p>
-          <p class="summary-value" id="insightsPendingMandatoryValue">0 ₽</p>
-        </div>
+      <div class="insights-mini-card">
+        <p class="insights-mini-label">Покрыто сейфами</p>
+        <p class="insights-mini-value" id="insightsMandatoryCoveredValue">0 ₽</p>
+      </div>
 
-        <div class="summary-card">
-          <p class="summary-label">
-            Остаток лимитов
-            <button class="faq-chip" type="button" data-faq-key="remaining_limits" aria-label="Что это?">❔</button>
-          </p>
-          <p class="summary-value" id="insightsRemainingBudgetsValue">0 ₽</p>
-        </div>
+      <div class="insights-mini-card">
+        <p class="insights-mini-label">К вычету из свободных</p>
+        <p class="insights-mini-value" id="insightsPendingMandatoryValue">0 ₽</p>
+      </div>
+
+      <div class="insights-mini-card">
+        <p class="insights-mini-label">
+          Остаток лимитов
+          <button class="faq-chip" type="button" data-faq-key="remaining_limits" aria-label="Что это?">❔</button>
+        </p>
+        <p class="insights-mini-value" id="insightsRemainingBudgetsValue">0 ₽</p>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <section class="section">
-    <div class="manager-card analytics-total-card insights-save-card">
+<section class="section">
+  <div class="manager-card analytics-total-card insights-save-card insights-hero-card">
+    <div class="insights-hero-top">
       <p class="summary-label">
         Можно отложить
         <button class="faq-chip" type="button" data-faq-key="can_save_now" aria-label="Что это?">❔</button>
       </p>
-      <p class="summary-value" id="insightsCanSaveNowValue">0 ₽</p>
+      <div class="insights-hero-state" id="insightsCanSaveNowStatus">—</div>
     </div>
-  </section>
 
-  <section class="section">
-    <div class="manager-card insights-card">
-      <p class="summary-label">Сводка</p>
-      <p class="insights-recommendation" id="insightsLimitsStatusText">—</p>
+    <p class="summary-value" id="insightsCanSaveNowValue">0 ₽</p>
+    <p class="insights-hero-hint" id="insightsCanSaveNowHint">—</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="manager-card insights-card insights-collapse-card">
+    <button class="insights-collapse-toggle" type="button" id="insightsSummaryToggleBtn">
+      <span>Сводка</span>
+      <span class="insights-collapse-arrow" id="insightsSummaryArrow">⌄</span>
+    </button>
+
+    <div class="insights-collapse-body hidden" id="insightsSummaryBody">
+      <div class="insights-summary-rows">
+        <div class="insights-summary-row">
+          <span class="insights-summary-row__label">Обязательные всего</span>
+          <span class="insights-summary-row__value" id="insightsSummaryMandatoryTotal">0 ₽</span>
+        </div>
+
+        <div class="insights-summary-row">
+          <span class="insights-summary-row__label">Покрыто сейфами</span>
+          <span class="insights-summary-row__value" id="insightsSummaryCoveredBySafes">0 ₽</span>
+        </div>
+
+        <div class="insights-summary-row">
+          <span class="insights-summary-row__label">К вычету из свободных</span>
+          <span class="insights-summary-row__value" id="insightsSummaryToDeduct">0 ₽</span>
+        </div>
+
+        <div class="insights-summary-row">
+          <span class="insights-summary-row__label">Остаток лимитов</span>
+          <span class="insights-summary-row__value" id="insightsSummaryRemainingLimits">0 ₽</span>
+        </div>
+      </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <section class="section">
-    <div class="manager-card insights-card">
-      <p class="summary-label">
+<section class="section">
+  <div class="manager-card insights-card insights-collapse-card">
+    <button class="insights-collapse-toggle" type="button" id="insightsExplanationToggleBtn">
+      <span>
         Вывод
         <button class="faq-chip" type="button" data-faq-key="summary_recommendation" aria-label="Что это?">❔</button>
-      </p>
+      </span>
+      <span class="insights-collapse-arrow" id="insightsExplanationArrow">⌄</span>
+    </button>
+
+    <div class="insights-collapse-body" id="insightsExplanationBody">
       <p class="insights-recommendation" id="insightsRecommendationText">—</p>
     </div>
-  </section>
+  </div>
+</section>
 
-  <section class="section">
-    <div class="manager-card insights-card">
-      <div class="section-head">
-        <h2 class="section-title">Сейфы</h2>
-        <div class="section-note">текущее состояние</div>
-      </div>
+<section class="section">
+  <div class="manager-card insights-card insights-collapse-card">
+    <button class="insights-collapse-toggle" type="button" id="insightsSafesToggleBtn">
+      <span>Сейфы</span>
+      <span class="insights-collapse-arrow is-open" id="insightsSafesArrow">⌄</span>
+    </button>
 
+    <div class="insights-collapse-body is-open" id="insightsSafesBody">
       <div class="list insights-safe-list" id="insightsSafeList"></div>
     </div>
-  </section>
+  </div>
+</section>
 </div>
 
 <!-- BOTTOM NAV -->
