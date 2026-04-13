@@ -189,30 +189,52 @@ button {
    ========================================================= */
 
 .balance {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
-  margin-top: 2px;
+  margin-top: 4px;
+  padding: 18px 18px 16px;
+  border-radius: 30px;
+  background:
+    radial-gradient(circle at top center, rgba(111, 156, 255, 0.13), transparent 34%),
+    linear-gradient(180deg, rgba(28, 32, 43, 0.98) 0%, rgba(18, 21, 30, 1) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow:
+    0 18px 40px rgba(0, 0, 0, 0.28),
+    0 0 26px rgba(111, 156, 255, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  overflow: hidden;
+}
+
+.balance::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.02) 0%, rgba(255, 255, 255, 0) 42%);
+  pointer-events: none;
 }
 
 .balance-label {
-  margin: 0 0 8px;
-  font-size: 15px;
-  font-weight: 800;
+  margin: 0 0 10px;
+  font-size: 14px;
+  font-weight: 820;
   letter-spacing: -0.02em;
   text-align: center;
+  color: rgba(255, 255, 255, 0.6);
 }
 
 .balance-amount {
   margin: 0;
   width: 100%;
   text-align: center;
-  font-size: clamp(40px, 8vw, 58px);
-  line-height: 0.95;
-  font-weight: 900;
-  letter-spacing: -0.055em;
+  font-size: clamp(44px, 8vw, 62px);
+  line-height: 0.92;
+  font-weight: 940;
+  letter-spacing: -0.065em;
+  color: #f8faff;
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.02);
 }
 
@@ -220,20 +242,20 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 10px;
   flex-wrap: wrap;
   width: 100%;
-  margin-top: 10px;
+  margin-top: 14px;
 }
 
 .balance-meta--single {
-  gap: 8px;
-  margin-top: 10px;
+  gap: 10px;
+  margin-top: 14px;
 }
 
 .balance-result {
   font-size: 15px;
-  font-weight: 820;
+  font-weight: 840;
   letter-spacing: -0.02em;
   color: var(--text-muted);
 }
@@ -249,14 +271,14 @@ button {
 }
 
 .balance-period-toggle {
-  padding: 7px 12px;
-  background: rgba(255, 255, 255, 0.055);
-  color: var(--text-muted);
+  padding: 8px 13px;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.68);
   border-radius: var(--radius-pill);
-  font-size: 13px;
-  font-weight: 820;
+  font-size: 12.5px;
+  font-weight: 840;
   line-height: 1;
-  border: 1px solid rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.04);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
 }
 
@@ -462,6 +484,58 @@ button {
   line-height: 1.15;
   white-space: nowrap;
   letter-spacing: -0.01em;
+}
+
+/* =========================================================
+   7.1 ACCOUNTS + TRANSACTIONS POLISH
+   ========================================================= */
+
+#accountsList .list-card,
+#transactionsList .list-card {
+  border-radius: 24px;
+}
+
+#accountsList .list-card {
+  min-height: 78px;
+  padding: 13px 15px;
+  background:
+    linear-gradient(180deg, rgba(53, 57, 72, 0.99) 0%, rgba(40, 44, 58, 1) 100%);
+}
+
+#accountsList .list-title {
+  font-size: 16px;
+  font-weight: 860;
+}
+
+#accountsList .list-subtitle {
+  font-size: 11.5px;
+  font-weight: 650;
+  color: rgba(255, 255, 255, 0.48);
+}
+
+#accountsList .list-value {
+  font-size: 17px;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+}
+
+#transactionsList .list-card {
+  min-height: 74px;
+  padding: 12px 14px;
+}
+
+#transactionsList .list-title {
+  font-size: 15px;
+  font-weight: 840;
+}
+
+#transactionsList .list-subtitle {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+#transactionsList .list-value {
+  font-size: 15.5px;
+  font-weight: 880;
 }
 
 /* =========================================================
@@ -1469,14 +1543,16 @@ input[type="date"]::-webkit-calendar-picker-indicator {
    ========================================================= */
 
 .analytics-total-card {
-  padding: 16px 16px 18px;
-  border-radius: 24px;
-  background: linear-gradient(180deg, rgba(52, 56, 71, 0.99) 0%, rgba(42, 46, 60, 0.995) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  padding: 18px 18px 20px;
+  border-radius: 26px;
+  background:
+    radial-gradient(circle at top left, rgba(111, 156, 255, 0.1), transparent 32%),
+    linear-gradient(180deg, rgba(55, 60, 77, 0.995) 0%, rgba(42, 46, 60, 1) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.075);
   box-shadow:
-    0 12px 30px rgba(0, 0, 0, 0.24),
-    0 0 24px rgba(111, 156, 255, 0.04),
-    inset 0 1px 0 rgba(255, 255, 255, 0.035);
+    0 16px 34px rgba(0, 0, 0, 0.26),
+    0 0 24px rgba(111, 156, 255, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
 .analytics-mode-switch-wrap {
@@ -1565,41 +1641,42 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .analytics-panel {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
 }
 
 .analytics-panel__headline {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
 }
 
 .analytics-panel__eyebrow {
   font-size: 12px;
-  font-weight: 760;
-  color: rgba(255, 255, 255, 0.46);
+  font-weight: 780;
+  color: rgba(255, 255, 255, 0.42);
   line-height: 1.12;
+  letter-spacing: -0.02em;
 }
 
 .analytics-panel__total {
-  margin-top: 6px;
-  font-size: 28px;
-  font-weight: 880;
-  line-height: 0.96;
-  letter-spacing: -0.05em;
-  color: var(--text);
+  margin-top: 8px;
+  font-size: 31px;
+  font-weight: 920;
+  line-height: 0.94;
+  letter-spacing: -0.06em;
+  color: #f7f9ff;
 }
 
 .analytics-panel__period {
   flex: 0 0 auto;
-  min-height: 34px;
+  min-height: 35px;
   padding: 0 14px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.06);
-  color: rgba(255, 255, 255, 0.74);
-  font-size: 12.5px;
-  font-weight: 780;
+  background: rgba(255, 255, 255, 0.065);
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 12px;
+  font-weight: 800;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1613,15 +1690,16 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   align-items: center;
   justify-content: space-between;
   gap: 14px;
-  min-height: 94px;
-  padding: 14px 16px;
-  border-radius: 20px;
+  min-height: 100px;
+  padding: 16px 16px;
+  border-radius: 22px;
   background:
-    linear-gradient(180deg, rgba(18, 22, 34, 0.94) 0%, rgba(14, 18, 28, 0.99) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.045);
+    radial-gradient(circle at top left, rgba(224, 178, 72, 0.1), transparent 34%),
+    linear-gradient(180deg, rgba(19, 23, 35, 0.96) 0%, rgba(14, 18, 28, 1) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.05);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.03),
-    0 8px 22px rgba(0, 0, 0, 0.18);
+    0 10px 24px rgba(0, 0, 0, 0.22);
 }
 
 .analytics-leader--button {
@@ -1629,10 +1707,11 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   border: none;
   text-align: left;
   cursor: pointer;
+  transition: transform 0.16s ease, border-color 0.16s ease;
 }
 
 .analytics-leader--button:active {
-  transform: scale(0.995);
+  transform: scale(0.994);
 }
 
 .analytics-leader--empty {
@@ -1653,35 +1732,36 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .analytics-leader__label {
-  font-size: 12px;
-  font-weight: 800;
-  color: rgba(255, 255, 255, 0.56);
+  font-size: 11.5px;
+  font-weight: 820;
+  color: rgba(255, 255, 255, 0.52);
   line-height: 1.1;
-}
-
-.analytics-leader__title {
-  margin-top: 4px;
-  font-size: 17px;
-  font-weight: 860;
-  line-height: 1.08;
-  color: #f4e1a1;
   letter-spacing: -0.02em;
 }
 
+.analytics-leader__title {
+  margin-top: 5px;
+  font-size: 18px;
+  font-weight: 900;
+  line-height: 1.08;
+  color: #f4e1a1;
+  letter-spacing: -0.03em;
+}
+
 .analytics-leader__meta {
-  margin-top: 4px;
-  font-size: 12.5px;
-  font-weight: 690;
-  color: rgba(255, 255, 255, 0.52);
-  line-height: 1.12;
+  margin-top: 5px;
+  font-size: 12px;
+  font-weight: 720;
+  color: rgba(255, 255, 255, 0.5);
+  line-height: 1.15;
 }
 
 .analytics-leader__value {
   flex: 0 0 auto;
   text-align: right;
   font-size: 14px;
-  font-weight: 830;
-  line-height: 1.12;
+  font-weight: 860;
+  line-height: 1.14;
   letter-spacing: -0.02em;
   color: #f4e1a1;
   white-space: nowrap;
@@ -1700,8 +1780,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .analytics-breakdown-list {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  padding-top: 6px;
+  gap: 4px;
+  padding-top: 10px;
   border-top: 1px solid rgba(255, 255, 255, 0.06);
 }
 
@@ -1715,8 +1795,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   align-items: center;
   justify-content: space-between;
   gap: 14px;
-  min-height: 56px;
-  padding: 6px 0;
+  min-height: 60px;
+  padding: 8px 0;
 }
 
 .analytics-breakdown-row--button {
@@ -1727,6 +1807,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   padding-right: 0;
   text-align: left;
   cursor: pointer;
+  transition: transform 0.16s ease, opacity 0.16s ease;
 }
 
 .analytics-breakdown-row--button:active {
@@ -1768,8 +1849,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 .analytics-breakdown-row__title {
   font-size: 16px;
-  font-weight: 820;
-  color: var(--text);
+  font-weight: 850;
+  color: #f4f7ff;
   line-height: 1.12;
   letter-spacing: -0.025em;
   white-space: nowrap;
@@ -1779,17 +1860,17 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 .analytics-breakdown-row__subtitle {
   margin-top: 4px;
-  font-size: 12px;
-  font-weight: 660;
-  color: rgba(255, 255, 255, 0.48);
+  font-size: 11.5px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.46);
   line-height: 1.12;
 }
 
 .analytics-breakdown-row__value {
   flex: 0 0 auto;
   font-size: 13.5px;
-  font-weight: 820;
-  color: var(--text);
+  font-weight: 850;
+  color: #eef3ff;
   line-height: 1.12;
   letter-spacing: -0.02em;
   white-space: nowrap;
@@ -1985,6 +2066,41 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     height: 42px;
     font-size: 15px;
   }
+  
+  .balance {
+  padding: 16px 14px 15px;
+  border-radius: 26px;
+}
+
+.balance-amount {
+  font-size: clamp(40px, 10vw, 54px);
+}
+
+#accountsList .list-card {
+  min-height: 72px;
+  padding: 12px 13px;
+}
+
+#accountsList .list-value {
+  font-size: 15.5px;
+}
+
+.analytics-panel__total {
+  font-size: 27px;
+}
+
+.analytics-leader {
+  min-height: 92px;
+  padding: 14px;
+}
+
+.analytics-leader__title {
+  font-size: 17px;
+}
+
+.analytics-breakdown-row__title {
+  font-size: 15px;
+}
 
   #insightsView .section-title {
     font-size: 18px;
@@ -2151,6 +2267,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     padding: 0 12px;
     font-size: 12.5px;
   }
+  
+
 
   #analyticsRangeFromInput:not(.hidden),
   #analyticsRangeToInput:not(.hidden) {
