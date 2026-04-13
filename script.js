@@ -76,15 +76,36 @@ const deleteBudgetBtn = document.getElementById("deleteBudgetBtn");
   const insightsInterestValue = document.getElementById("insightsInterestValue");
 
   const insightsPendingMandatoryValue = document.getElementById("insightsPendingMandatoryValue");
-  const insightsRemainingBudgetsValue = document.getElementById("insightsRemainingBudgetsValue");
-  const insightsTotalBalanceValue = document.getElementById("insightsTotalBalanceValue");
-  const insightsProtectedMoneyValue = document.getElementById("insightsProtectedMoneyValue");
-  const insightsFreeMoneyValue = document.getElementById("insightsFreeMoneyValue");
-  const insightsCanSaveNowValue = document.getElementById("insightsCanSaveNowValue");
+const insightsRemainingBudgetsValue = document.getElementById("insightsRemainingBudgetsValue");
+const insightsTotalBalanceValue = document.getElementById("insightsTotalBalanceValue");
+const insightsProtectedMoneyValue = document.getElementById("insightsProtectedMoneyValue");
+const insightsFreeMoneyValue = document.getElementById("insightsFreeMoneyValue");
+const insightsCanSaveNowValue = document.getElementById("insightsCanSaveNowValue");
 
-  const insightsLimitsStatusText = document.getElementById("insightsLimitsStatusText");
-  const insightsRecommendationText = document.getElementById("insightsRecommendationText");
-  const insightsSafeList = document.getElementById("insightsSafeList");
+const insightsMandatoryTotalValue = document.getElementById("insightsMandatoryTotalValue");
+const insightsMandatoryCoveredValue = document.getElementById("insightsMandatoryCoveredValue");
+const insightsCanSaveNowStatus = document.getElementById("insightsCanSaveNowStatus");
+const insightsCanSaveNowHint = document.getElementById("insightsCanSaveNowHint");
+
+const insightsSummaryMandatoryTotal = document.getElementById("insightsSummaryMandatoryTotal");
+const insightsSummaryCoveredBySafes = document.getElementById("insightsSummaryCoveredBySafes");
+const insightsSummaryToDeduct = document.getElementById("insightsSummaryToDeduct");
+const insightsSummaryRemainingLimits = document.getElementById("insightsSummaryRemainingLimits");
+
+const insightsRecommendationText = document.getElementById("insightsRecommendationText");
+const insightsSafeList = document.getElementById("insightsSafeList");
+
+const insightsSummaryToggleBtn = document.getElementById("insightsSummaryToggleBtn");
+const insightsSummaryBody = document.getElementById("insightsSummaryBody");
+const insightsSummaryArrow = document.getElementById("insightsSummaryArrow");
+
+const insightsExplanationToggleBtn = document.getElementById("insightsExplanationToggleBtn");
+const insightsExplanationBody = document.getElementById("insightsExplanationBody");
+const insightsExplanationArrow = document.getElementById("insightsExplanationArrow");
+
+const insightsSafesToggleBtn = document.getElementById("insightsSafesToggleBtn");
+const insightsSafesBody = document.getElementById("insightsSafesBody");
+const insightsSafesArrow = document.getElementById("insightsSafesArrow");
   const insightsPeriodButtons = document.querySelectorAll("[data-insights-period]");
 const insightsMonthBtn = document.getElementById("insightsMonthBtn");
 const insightsMonthWheelWrap = document.getElementById("insightsMonthWheelWrap");
@@ -1765,6 +1786,37 @@ function closeFaqModal() {
   document.body.style.overflow = "";
 }
 
+function toggleInsightsCollapse(bodyEl, arrowEl) {
+  if (!bodyEl || !arrowEl) return;
+
+  const willOpen = bodyEl.classList.contains("hidden");
+  bodyEl.classList.toggle("hidden", !willOpen);
+  bodyEl.classList.toggle("is-open", willOpen);
+  arrowEl.classList.toggle("is-open", willOpen);
+}
+
+function setInsightsHeroState(summary) {
+  if (!insightsCanSaveNowStatus || !insightsCanSaveNowHint) return;
+
+  if (summary.shortageBeforeSafeSaving > 0) {
+    insightsCanSaveNowStatus.textContent = "Сейчас рано";
+    insightsCanSaveNowHint.textContent =
+      `Не хватает ${formatMoney(summary.shortageBeforeSafeSaving)} после учёта обязательных и лимитов.`;
+    return;
+  }
+
+  if (summary.canSaveNow > 0) {
+    insightsCanSaveNowStatus.textContent = "Можно спокойно отложить";
+    insightsCanSaveNowHint.textContent =
+      "Сумма уже рассчитана с учётом обязательных платежей и лимитов.";
+    return;
+  }
+
+  insightsCanSaveNowStatus.textContent = "Запаса нет";
+  insightsCanSaveNowHint.textContent =
+    "Свободные деньги сейчас полностью заняты обязательствами и лимитами.";
+}
+
   function getIconToneClass(type, extra = "") {
     if (type === "income") return "list-icon--green";
     if (type === "transfer") return "list-icon--blue";
@@ -3255,8 +3307,16 @@ else if (transaction.type === "income") {
   insightsTotalBalanceValue.textContent = formatMoney(summary.totalBalance);
   insightsProtectedMoneyValue.textContent = formatMoney(summary.protectedMoney);
   insightsFreeMoneyValue.textContent = formatMoney(summary.freeMoney);
+
+  insightsMandatoryTotalValue.textContent = formatMoney(summary.pendingMandatoryTotal);
+  insightsMandatoryCoveredValue.textContent = formatMoney(summary.pendingMandatoryCoveredByLinkedSafes);
   insightsPendingMandatoryValue.textContent = formatMoney(summary.pendingMandatoryToDeduct);
   insightsRemainingBudgetsValue.textContent = formatMoney(summary.remainingBudgets);
+
+  insightsSummaryMandatoryTotal.textContent = formatMoney(summary.pendingMandatoryTotal);
+  insightsSummaryCoveredBySafes.textContent = formatMoney(summary.pendingMandatoryCoveredByLinkedSafes);
+  insightsSummaryToDeduct.textContent = formatMoney(summary.pendingMandatoryToDeduct);
+  insightsSummaryRemainingLimits.textContent = formatMoney(summary.remainingBudgets);
 
   insightsCanSaveNowValue.classList.remove("is-positive", "is-negative");
   if (summary.canSaveNow > 0) {
@@ -3267,11 +3327,7 @@ else if (transaction.type === "income") {
     insightsCanSaveNowValue.classList.add("is-negative");
   }
 
-  insightsLimitsStatusText.textContent =
-    `Обязательные всего: ${formatMoney(summary.pendingMandatoryTotal)} • ` +
-    `Покрыто сейфами: ${formatMoney(summary.pendingMandatoryCoveredByLinkedSafes)} • ` +
-    `К вычету из свободных: ${formatMoney(summary.pendingMandatoryToDeduct)} • ` +
-    `Остаток лимитов: ${formatMoney(summary.remainingBudgets)}`;
+  setInsightsHeroState(summary);
 
   if (summary.shortageBeforeSafeSaving > 0) {
     insightsRecommendationText.textContent =
@@ -3281,7 +3337,7 @@ else if (transaction.type === "income") {
       `Сейчас можно отложить ${formatMoney(summary.canSaveNow)}. В обязательных уже учтено покрытие платежей привязанными сейфами.`;
   } else {
     insightsRecommendationText.textContent =
-      `Свободные деньги полностью заняты обязательствами текущего месяца и остатками лимитов.`;
+      `Свободные деньги сейчас полностью заняты обязательствами текущего месяца и остатками лимитов.`;
   }
 
   if (insightsSafeList) {
@@ -3724,6 +3780,18 @@ toAccountSelect?.addEventListener("change", updateTransferSafeFields);
   navWalletBtn?.addEventListener("click", showWalletView);
 navAnalyticsBtn?.addEventListener("click", showAnalyticsView);
 navInsightsBtn?.addEventListener("click", showInsightsView);
+
+insightsSummaryToggleBtn?.addEventListener("click", () => {
+  toggleInsightsCollapse(insightsSummaryBody, insightsSummaryArrow);
+});
+
+insightsExplanationToggleBtn?.addEventListener("click", () => {
+  toggleInsightsCollapse(insightsExplanationBody, insightsExplanationArrow);
+});
+
+insightsSafesToggleBtn?.addEventListener("click", () => {
+  toggleInsightsCollapse(insightsSafesBody, insightsSafesArrow);
+});
 
   openMandatoryPaymentsModalBtn?.addEventListener("click", openMandatoryPaymentsModal);
 closeMandatoryPaymentsModalBtn?.addEventListener("click", closeMandatoryPaymentsModal);
