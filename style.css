@@ -2432,3 +2432,35 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     padding: 12px 13px;
   }
 }
+
+/* =========================================================
+   20. INSIGHTS FILTERS + NEW LAYOUT
+   ========================================================= */
+
+.insights-card--compact {
+  padding-top: 16px;
+  padding-bottom: 16px;
+}
+
+.insights-save-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.insights-save-card .summary-value {
+  font-size: 30px;
+}
+
+#insightsView .section-head + .history-filters {
+  margin-top: 14px;
+}
+
+#insightsMonthWheelWrap {
+  margin-top: 10px;
+}
+
+@media (max-width: 420px) {
+  .insights-save-card .summary-value {
+    font-size: 26px;
+  }
+}
