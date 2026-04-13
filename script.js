@@ -158,6 +158,13 @@ const deleteSafeBucketBtn = document.getElementById("deleteSafeBucketBtn");
   const period30Btn = document.getElementById("period30Btn");
   const balanceResultValueEl = document.getElementById("balanceResultValue");
   const balancePeriodLabelEl = document.getElementById("balancePeriodLabel");
+  
+  const faqModal = document.getElementById("faqModal");
+const faqModalTitle = document.getElementById("faqModalTitle");
+const faqModalText = document.getElementById("faqModalText");
+const faqModalFormula = document.getElementById("faqModalFormula");
+const closeFaqModalBtn = document.getElementById("closeFaqModalBtn");
+const faqButtons = document.querySelectorAll("[data-faq-key]");
 
   let currentMode = "expense";
   let editingTransactionId = null;
@@ -1370,6 +1377,99 @@ function updateAnalyticsWheelDraftFromScroll() {
       .replaceAll('"', "&quot;")
       .replaceAll("'", "&#039;");
   }
+  
+  const FAQ_CONTENT = {
+  required_expense: {
+    title: "Обязательные расходы",
+    text:
+      "Это все расходы за выбранный период по категориям, которые помечены как обязательные. Например: квартира, коммуналка, налоги, связь.",
+    formula:
+      "Сумма всех expense-операций за период, где категория помечена как обязательная.",
+  },
+
+  flexible_expense: {
+    title: "Гибкие расходы",
+    text:
+      "Это все расходы за выбранный период по категориям, которые не помечены как обязательные. Обычно сюда попадают еда, развлечения, маркетплейсы, такси и прочее.",
+    formula:
+      "Сумма всех expense-операций за период, где категория НЕ обязательная.",
+  },
+
+  saved_to_safes: {
+    title: "Отложено в сейфы",
+    text:
+      "Это сколько денег ты перевёл в сейфы из обычных счетов за выбранный период. Внутренние перекладывания между самими сейфами сюда не входят.",
+    formula:
+      "Сумма transfer-операций за период, где to_account = 'Сейфы Яндекса' и from_account ≠ 'Сейфы Яндекса'.",
+  },
+
+  remaining_limits: {
+    title: "Остаток лимитов",
+    text:
+      "Это сколько ещё можно потратить по гибким категориям в текущем месяце, если ты хочешь остаться в рамках своих лимитов.",
+    formula:
+      "Для каждой гибкой категории: max(0, лимит − уже потрачено в текущем месяце). Потом все остатки складываются.",
+  },
+
+  total_balance: {
+    title: "Общий баланс",
+    text:
+      "Это все деньги во всех твоих счетах и сейфах на текущий момент.",
+    formula:
+      "Сумма балансов всех счетов приложения.",
+  },
+
+  protected_money: {
+    title: "Резервы и цели",
+    text:
+      "Это деньги, которые приложение считает не для обычных трат. Сейчас сюда входят сейфы Налоги, Квартира, Накопления и счёт Наличный резерв.",
+    formula:
+      "Строгие сейфы + резерв 2 уровня.",
+  },
+
+  free_money: {
+    title: "Свободные деньги",
+    text:
+      "Это деньги, которые остаются после вычета резервов и целей. Именно из них приложение считает, можно ли что-то ещё отложить.",
+    formula:
+      "Общий баланс − резервы и цели.",
+  },
+
+  can_save_now: {
+    title: "Можно отложить сейчас",
+    text:
+      "Это сумма, которую можно убрать в накопления без конфликта с непокрытыми обязательными платежами и с оставшимся запасом по лимитам.",
+    formula:
+      "max(0, свободные деньги − непокрытые обязательные − остаток лимитов)",
+  },
+
+  summary_recommendation: {
+    title: "Вывод",
+    text:
+      "Это короткий итог на основе текущих цифр. Если после всех вычетов остаётся плюс — приложение пишет, сколько можно отложить. Если получается минус — показывает, сколько не хватает.",
+    formula:
+      "Если результат > 0: можно отложить. Если результат < 0: не хватает |результат|.",
+  },
+};
+
+function openFaqModal(faqKey) {
+  const item = FAQ_CONTENT[faqKey];
+  if (!item || !faqModal) return;
+
+  faqModalTitle.textContent = item.title;
+  faqModalText.textContent = item.text;
+  faqModalFormula.textContent = item.formula;
+
+  faqModal.classList.remove("hidden");
+  document.body.style.overflow = "hidden";
+}
+
+function closeFaqModal() {
+  if (!faqModal) return;
+
+  faqModal.classList.add("hidden");
+  document.body.style.overflow = "";
+}
 
   function getIconToneClass(type, extra = "") {
     if (type === "income") return "list-icon--green";
@@ -3325,7 +3425,18 @@ navInsightsBtn?.addEventListener("click", showInsightsView);
 
   mandatoryPaymentsModal?.addEventListener("click", (event) => {
     if (event.target === mandatoryPaymentsModal) closeMandatoryPaymentsModal();
+  faqButtons.forEach((btn) => {
+  btn.addEventListener("click", (event) => {
+    event.stopPropagation();
+    openFaqModal(btn.dataset.faqKey);
   });
+});
+
+closeFaqModalBtn?.addEventListener("click", closeFaqModal);
+
+faqModal?.addEventListener("click", (event) => {
+  if (event.target === faqModal) closeFaqModal();
+});
 
   analyticsPeriodButtons.forEach((btn) => {
     btn.addEventListener("click", () => {
@@ -3511,6 +3622,11 @@ safeInterestRateModal?.addEventListener("click", (event) => {
       closeMandatoryPaymentsModal();
       return;
     }
+    
+    if (faqModal && !faqModal.classList.contains("hidden")) {
+  closeFaqModal();
+  return;
+}
 
     if (isAnalyticsMonthWheelOpen) {
       closeAnalyticsMonthWheel();
