@@ -85,17 +85,8 @@ const insightsMandatoryCoveredValue = document.getElementById("insightsMandatory
 const insightsCanSaveNowStatus = document.getElementById("insightsCanSaveNowStatus");
 const insightsCanSaveNowHint = document.getElementById("insightsCanSaveNowHint");
 
-const insightsSummaryMandatoryTotal = document.getElementById("insightsSummaryMandatoryTotal");
-const insightsSummaryCoveredBySafes = document.getElementById("insightsSummaryCoveredBySafes");
-const insightsSummaryToDeduct = document.getElementById("insightsSummaryToDeduct");
-const insightsSummaryRemainingLimits = document.getElementById("insightsSummaryRemainingLimits");
-
 const insightsRecommendationText = document.getElementById("insightsRecommendationText");
 const insightsSafeList = document.getElementById("insightsSafeList");
-
-const insightsSummaryToggleBtn = document.getElementById("insightsSummaryToggleBtn");
-const insightsSummaryBody = document.getElementById("insightsSummaryBody");
-const insightsSummaryArrow = document.getElementById("insightsSummaryArrow");
 
 const insightsSafesToggleBtn = document.getElementById("insightsSafesToggleBtn");
 const insightsSafesBody = document.getElementById("insightsSafesBody");
@@ -3276,11 +3267,6 @@ else if (transaction.type === "income") {
   insightsPendingMandatoryValue.textContent = formatMoney(summary.pendingMandatoryToDeduct);
   insightsRemainingBudgetsValue.textContent = formatMoney(summary.remainingBudgets);
 
-  insightsSummaryMandatoryTotal.textContent = formatMoney(summary.pendingMandatoryTotal);
-  insightsSummaryCoveredBySafes.textContent = formatMoney(summary.pendingMandatoryCoveredByLinkedSafes);
-  insightsSummaryToDeduct.textContent = formatMoney(summary.pendingMandatoryToDeduct);
-  insightsSummaryRemainingLimits.textContent = formatMoney(summary.remainingBudgets);
-
   insightsCanSaveNowValue.classList.remove("is-positive", "is-negative");
   if (summary.canSaveNow > 0) {
     insightsCanSaveNowValue.textContent = formatMoney(summary.canSaveNow);
@@ -3749,24 +3735,6 @@ closeAnalyticsFiltersBtn?.addEventListener("click", closeAnalyticsFiltersModal);
 
 openInsightsFiltersBtn?.addEventListener("click", openInsightsFiltersModal);
 closeInsightsFiltersBtn?.addEventListener("click", closeInsightsFiltersModal);
-
-insightsSummaryToggleBtn?.addEventListener("click", () => {
-  toggleInsightsCollapse(insightsSummaryBody, insightsSummaryArrow);
-});
-
-insightsSafesToggleBtn?.addEventListener("click", () => {
-  toggleInsightsCollapse(insightsSafesBody, insightsSafesArrow);
-});
-
-  openMandatoryPaymentsModalBtn?.addEventListener("click", openMandatoryPaymentsModal);
-closeMandatoryPaymentsModalBtn?.addEventListener("click", closeMandatoryPaymentsModal);
-addMandatoryPaymentBtn?.addEventListener("click", addMandatoryPayment);
-
-mandatoryPaymentsModal?.addEventListener("click", (event) => {
-  if (event.target === mandatoryPaymentsModal) {
-    closeMandatoryPaymentsModal();
-  }
-});
 
 analyticsFiltersModal?.addEventListener("click", (event) => {
   if (event.target === analyticsFiltersModal) {
