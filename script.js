@@ -67,7 +67,7 @@ const deleteBudgetBtn = document.getElementById("deleteBudgetBtn");
   const analyticsOperationsSection = document.getElementById("analyticsOperationsSection");
   const analyticsTransactionsList = document.getElementById("analyticsTransactionsList");
   
-  const insightsPeriodLabel = document.getElementById("insightsPeriodLabel");
+    const insightsPeriodLabel = document.getElementById("insightsPeriodLabel");
   const insightsIncomeValue = document.getElementById("insightsIncomeValue");
   const insightsExpenseValue = document.getElementById("insightsExpenseValue");
   const insightsNetValue = document.getElementById("insightsNetValue");
@@ -75,13 +75,26 @@ const deleteBudgetBtn = document.getElementById("deleteBudgetBtn");
   const insightsFlexibleValue = document.getElementById("insightsFlexibleValue");
   const insightsSavedValue = document.getElementById("insightsSavedValue");
   const insightsInterestValue = document.getElementById("insightsInterestValue");
-  const insightsAvailableNowValue = document.getElementById("insightsAvailableNowValue");
-  const insightsWorkingMinimumValue = document.getElementById("insightsWorkingMinimumValue");
+
+  const insightsPendingMandatoryValue = document.getElementById("insightsPendingMandatoryValue");
+  const insightsRemainingBudgetsValue = document.getElementById("insightsRemainingBudgetsValue");
+  const insightsTotalBalanceValue = document.getElementById("insightsTotalBalanceValue");
+  const insightsProtectedMoneyValue = document.getElementById("insightsProtectedMoneyValue");
+  const insightsFreeMoneyValue = document.getElementById("insightsFreeMoneyValue");
   const insightsCanSaveNowValue = document.getElementById("insightsCanSaveNowValue");
-  const insightsReserveSecondLineValue = document.getElementById("insightsReserveSecondLineValue");
+
   const insightsLimitsStatusText = document.getElementById("insightsLimitsStatusText");
   const insightsRecommendationText = document.getElementById("insightsRecommendationText");
   const insightsSafeList = document.getElementById("insightsSafeList");
+
+  const mandatoryPaymentsModal = document.getElementById("mandatoryPaymentsModal");
+  const openMandatoryPaymentsModalBtn = document.getElementById("openMandatoryPaymentsModalBtn");
+  const closeMandatoryPaymentsModalBtn = document.getElementById("closeMandatoryPaymentsModalBtn");
+  const mandatoryPaymentsList = document.getElementById("mandatoryPaymentsList");
+  const mandatoryPaymentTitleInput = document.getElementById("mandatoryPaymentTitleInput");
+  const mandatoryPaymentAmountInput = document.getElementById("mandatoryPaymentAmountInput");
+  const mandatoryPaymentDueDayInput = document.getElementById("mandatoryPaymentDueDayInput");
+  const addMandatoryPaymentBtn = document.getElementById("addMandatoryPaymentBtn");
 
   const modalTitle = modal?.querySelector(".modal-title");
 
@@ -177,6 +190,7 @@ let activeSafeBucketAmountId = null;
   budgetLimits: [],
   safeBuckets: [],
   appMeta: [],
+  mandatoryPayments: [],
 };
 
   function getCategoryById(categoryId) {
@@ -379,6 +393,56 @@ function getFlexibleBudgetStats(filteredTransactions) {
   };
 }
 
+function getCurrentMonthTransactions() {
+  return filterTransactionsByPeriod(
+    state.transactions,
+    "month",
+    getCurrentMonthValue(),
+    "",
+    ""
+  );
+}
+
+function getRemainingFlexibleBudgetsCurrentMonth() {
+  const monthTransactions = getCurrentMonthTransactions();
+  const spentByCategory = new Map();
+
+  monthTransactions.forEach((transaction) => {
+    if (transaction.type !== "expense") return;
+
+    const categoryId = transaction.category_id || UNCATEGORIZED_ID;
+    const current = spentByCategory.get(categoryId) || 0;
+    spentByCategory.set(categoryId, current + (Number(transaction.amount) || 0));
+  });
+
+  let total = 0;
+
+  state.budgetLimits.forEach((limit) => {
+    const categoryId = limit.category_id;
+    const limitAmount = Number(limit.monthly_limit) || 0;
+
+    if (limitAmount <= 0) return;
+    if (isRequiredCategory(categoryId)) return;
+
+    const spent = spentByCategory.get(categoryId) || 0;
+    const remaining = Math.max(0, roundToTwo(limitAmount - spent));
+
+    total += remaining;
+  });
+
+  return roundToTwo(total);
+}
+
+function getProtectedMoneyTotal() {
+  return roundToTwo(getStrictSafeBalance() + getSecondLineReserveBalance());
+}
+
+function getFreeMoneyTotal() {
+  const totalBalance = roundToTwo(calculateBalance());
+  const protectedMoney = getProtectedMoneyTotal();
+  return roundToTwo(Math.max(0, totalBalance - protectedMoney));
+}
+
 function getInsightsWorkingMinimum(requiredExpense, flexibleExpense) {
   return roundToTwo(
     Math.max(
@@ -512,6 +576,202 @@ function updateTransferSafeFields() {
     const item = state.appMeta.find((entry) => entry.key === key);
     return item ? item.value : "";
   }
+  
+  function parseMandatoryPaymentsFromMeta() {
+  const raw = getAppMetaValue("mandatory_payments");
+  if (!raw) return [];
+
+  try {
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+
+    return parsed.map((item) => ({
+      id: item.id || crypto.randomUUID(),
+      title: String(item.title || "").trim(),
+      amount: roundToTwo(Number(item.amount) || 0),
+      due_day: Math.min(31, Math.max(1, Number(item.due_day) || 1)),
+      enabled: item.enabled !== false,
+      last_paid_period: item.last_paid_period || "",
+    }));
+  } catch (error) {
+    console.error("Ошибка mandatory_payments", error);
+    return [];
+  }
+}
+
+async function saveMandatoryPaymentsToMeta() {
+  const { error } = await supabaseClient
+    .from("app_meta")
+    .upsert({
+      key: "mandatory_payments",
+      value: JSON.stringify(state.mandatoryPayments),
+    });
+
+  if (error) {
+    alert("Ошибка сохранения обязательных платежей");
+    console.error(error);
+    return false;
+  }
+
+  return true;
+}
+
+function getCurrentMonthKey() {
+  return getCurrentMonthValue();
+}
+
+function getMandatoryPaymentsStats(monthKey = getCurrentMonthKey()) {
+  const unpaidItems = state.mandatoryPayments.filter((item) => {
+    if (item.enabled === false) return false;
+    return item.last_paid_period !== monthKey;
+  });
+
+  const total = unpaidItems.reduce((sum, item) => {
+    return sum + (Number(item.amount) || 0);
+  }, 0);
+
+  return {
+    items: unpaidItems,
+    count: unpaidItems.length,
+    total: roundToTwo(total),
+  };
+}
+
+function openMandatoryPaymentsModal() {
+  renderMandatoryPaymentsModal();
+  mandatoryPaymentsModal.classList.remove("hidden");
+  document.body.style.overflow = "hidden";
+}
+
+function closeMandatoryPaymentsModal() {
+  mandatoryPaymentsModal.classList.add("hidden");
+  document.body.style.overflow = "";
+  mandatoryPaymentTitleInput.value = "";
+  mandatoryPaymentAmountInput.value = "";
+  mandatoryPaymentDueDayInput.value = "";
+}
+
+function renderMandatoryPaymentsModal() {
+  if (!mandatoryPaymentsList) return;
+
+  mandatoryPaymentsList.innerHTML = "";
+
+  if (!state.mandatoryPayments.length) {
+    const empty = document.createElement("div");
+    empty.className = "list-card";
+    empty.innerHTML = `
+      <div class="list-body">
+        <h3 class="list-title">Платежей пока нет</h3>
+        <p class="list-subtitle">Добавь обязательные платежи ниже</p>
+      </div>
+    `;
+    mandatoryPaymentsList.appendChild(empty);
+    return;
+  }
+
+  const currentMonthKey = getCurrentMonthKey();
+
+  state.mandatoryPayments
+    .slice()
+    .sort((a, b) => a.due_day - b.due_day)
+    .forEach((item) => {
+      const isPaid = item.last_paid_period === currentMonthKey;
+
+      const card = document.createElement("div");
+      card.className = "list-card";
+      card.innerHTML = `
+        <div class="list-icon ${isPaid ? "list-icon--green" : "list-icon--red"}">
+          ${isPaid ? "✓" : "!"}
+        </div>
+
+        <div class="list-body">
+          <div class="list-title-row">
+            <h3 class="list-title">${escapeHtml(item.title)}</h3>
+          </div>
+          <p class="list-subtitle">
+            ${formatMoney(item.amount)} • до ${item.due_day} числа • ${isPaid ? "Оплачен" : "Не оплачен"}
+          </p>
+        </div>
+
+        <div class="category-manager-actions">
+          <button class="mini-btn mini-btn-type" type="button" data-toggle-mandatory-id="${item.id}">
+            ${isPaid ? "Снять" : "Оплат."}
+          </button>
+          <button class="mini-btn mini-btn-delete" type="button" data-delete-mandatory-id="${item.id}">
+            Удал.
+          </button>
+        </div>
+      `;
+
+      card.querySelector("[data-toggle-mandatory-id]")?.addEventListener("click", async () => {
+        const target = state.mandatoryPayments.find((entry) => entry.id === item.id);
+        if (!target) return;
+
+        target.last_paid_period = isPaid ? "" : currentMonthKey;
+
+        const ok = await saveMandatoryPaymentsToMeta();
+        if (!ok) return;
+
+        renderMandatoryPaymentsModal();
+        renderAll();
+      });
+
+      card.querySelector("[data-delete-mandatory-id]")?.addEventListener("click", async () => {
+        const ok = confirm(`Удалить обязательный платёж "${item.title}"?`);
+        if (!ok) return;
+
+        state.mandatoryPayments = state.mandatoryPayments.filter((entry) => entry.id !== item.id);
+
+        const saved = await saveMandatoryPaymentsToMeta();
+        if (!saved) return;
+
+        renderMandatoryPaymentsModal();
+        renderAll();
+      });
+
+      mandatoryPaymentsList.appendChild(card);
+    });
+}
+
+async function addMandatoryPayment() {
+  const title = mandatoryPaymentTitleInput.value.trim();
+  const amount = Number(mandatoryPaymentAmountInput.value);
+  const dueDay = Number(mandatoryPaymentDueDayInput.value);
+
+  if (!title) {
+    alert("Введи название платежа");
+    return;
+  }
+
+  if (!amount || amount <= 0) {
+    alert("Введи корректную сумму");
+    return;
+  }
+
+  if (!dueDay || dueDay < 1 || dueDay > 31) {
+    alert("Введи день месяца от 1 до 31");
+    return;
+  }
+
+  state.mandatoryPayments.push({
+    id: crypto.randomUUID(),
+    title,
+    amount: roundToTwo(amount),
+    due_day: dueDay,
+    enabled: true,
+    last_paid_period: "",
+  });
+
+  const ok = await saveMandatoryPaymentsToMeta();
+  if (!ok) return;
+
+  mandatoryPaymentTitleInput.value = "";
+  mandatoryPaymentAmountInput.value = "";
+  mandatoryPaymentDueDayInput.value = "";
+
+  renderMandatoryPaymentsModal();
+  renderAll();
+}
 
   function getDateOnlyString(date) {
     const year = date.getFullYear();
@@ -1794,7 +2054,7 @@ async function deleteSafeBucketFromModal() {
   }
   
   function getInsightsSummary() {
-  const items = getAnalyticsFilteredTransactions();
+  const periodTransactions = getAnalyticsFilteredTransactions();
 
   let income = 0;
   let expense = 0;
@@ -1803,7 +2063,7 @@ async function deleteSafeBucketFromModal() {
   let savedToSafes = 0;
   let safeInterest = 0;
 
-  items.forEach((transaction) => {
+  periodTransactions.forEach((transaction) => {
     const amount = Number(transaction.amount) || 0;
 
     if (transaction.type === "income") {
@@ -1837,48 +2097,42 @@ async function deleteSafeBucketFromModal() {
     }
   });
 
-  const budgetStats = getFlexibleBudgetStats(items);
+  const pendingMandatoryStats = getMandatoryPaymentsStats(getCurrentMonthKey());
+  const pendingMandatory = pendingMandatoryStats.total;
+  const remainingBudgets = getRemainingFlexibleBudgetsCurrentMonth();
 
-  const freeSafeBalance = getFreeSafeBalance();
-  const availableNowBalance = getAvailableNowBalance();
-  const strictSafeBalance = getStrictSafeBalance();
-  const secondLineReserveBalance = getSecondLineReserveBalance();
-  const cashReserveBalance = getCashReserveBalance();
-  const savingsSafeBalance = getSoftReserveSafeBalance();
+  const totalBalance = roundToTwo(calculateBalance());
+  const protectedMoney = getProtectedMoneyTotal();
+  const freeMoney = getFreeMoneyTotal();
 
-  const workingMinimum = getInsightsWorkingMinimum(requiredExpense, flexibleExpense);
-  const canSaveNow = getInsightsCanSaveNow(
-    availableNowBalance,
-    workingMinimum,
-    budgetStats.exceededCount,
-    budgetStats.nearLimitCount
+  const canSaveNowRaw = roundToTwo(
+    freeMoney - pendingMandatory - remainingBudgets
   );
-  const freeSafeGap = Math.max(0, roundToTwo(workingMinimum - availableNowBalance));
-  const net = income - expense;
+
+  const canSaveNow = Math.max(0, canSaveNowRaw);
+  const shortageBeforeSafeSaving = Math.max(0, roundToTwo(-canSaveNowRaw));
 
   return {
-    income,
-    expense,
-    net,
-    requiredExpense,
-    flexibleExpense,
-    savedToSafes,
-    safeInterest,
+    income: roundToTwo(income),
+    expense: roundToTwo(expense),
+    net: roundToTwo(income - expense),
 
-    freeSafeBalance,
-    availableNowBalance,
-    workingMinimum,
+    requiredExpense: roundToTwo(requiredExpense),
+    flexibleExpense: roundToTwo(flexibleExpense),
+
+    savedToSafes: roundToTwo(savedToSafes),
+    safeInterest: roundToTwo(safeInterest),
+
+    totalBalance,
+    protectedMoney,
+    freeMoney,
+
+    pendingMandatory,
+    pendingMandatoryCount: pendingMandatoryStats.count,
+    remainingBudgets,
+
     canSaveNow,
-    freeSafeGap,
-
-    strictSafeBalance,
-    secondLineReserveBalance,
-    cashReserveBalance,
-    savingsSafeBalance,
-
-    flexibleLimitedCount: budgetStats.limitedCount,
-    flexibleExceededCount: budgetStats.exceededCount,
-    flexibleNearLimitCount: budgetStats.nearLimitCount,
+    shortageBeforeSafeSaving,
   };
 }
 
@@ -2484,58 +2738,54 @@ else if (transaction.type === "income") {
   const periodLabel = getAnalyticsPeriodLabel() || "за период";
 
   insightsPeriodLabel.textContent = periodLabel;
+
   insightsIncomeValue.textContent = formatMoney(summary.income);
   insightsExpenseValue.textContent = formatMoney(summary.expense);
   insightsRequiredValue.textContent = formatMoney(summary.requiredExpense);
   insightsFlexibleValue.textContent = formatMoney(summary.flexibleExpense);
   insightsSavedValue.textContent = formatMoney(summary.savedToSafes);
   insightsInterestValue.textContent = formatMoney(summary.safeInterest);
-  insightsAvailableNowValue.textContent = formatMoney(summary.availableNowBalance);
-  insightsWorkingMinimumValue.textContent = formatMoney(summary.workingMinimum);
-  insightsCanSaveNowValue.textContent = formatMoney(summary.canSaveNow);
-  insightsReserveSecondLineValue.textContent = formatMoney(summary.secondLineReserveBalance);
-  
+
+  insightsTotalBalanceValue.textContent = formatMoney(summary.totalBalance);
+  insightsProtectedMoneyValue.textContent = formatMoney(summary.protectedMoney);
+  insightsFreeMoneyValue.textContent = formatMoney(summary.freeMoney);
+  insightsPendingMandatoryValue.textContent = formatMoney(summary.pendingMandatory);
+  insightsRemainingBudgetsValue.textContent = formatMoney(summary.remainingBudgets);
+
   insightsNetValue.classList.remove("is-positive", "is-negative");
-  insightsCanSaveNowValue?.classList.remove("is-positive", "is-negative");
+  if (summary.net > 0) {
+    insightsNetValue.textContent = `+${formatMoney(summary.net)}`;
+    insightsNetValue.classList.add("is-positive");
+  } else if (summary.net < 0) {
+    insightsNetValue.textContent = `−${formatMoney(Math.abs(summary.net))}`;
+    insightsNetValue.classList.add("is-negative");
+  } else {
+    insightsNetValue.textContent = formatMoney(0);
+  }
 
+  insightsCanSaveNowValue.classList.remove("is-positive", "is-negative");
   if (summary.canSaveNow > 0) {
-  insightsCanSaveNowValue.textContent = formatMoney(summary.canSaveNow);
-  insightsCanSaveNowValue.classList.add("is-positive");
-} else {
-  insightsCanSaveNowValue.textContent = formatMoney(0);
-  insightsCanSaveNowValue.classList.add("is-negative");
-}
+    insightsCanSaveNowValue.textContent = formatMoney(summary.canSaveNow);
+    insightsCanSaveNowValue.classList.add("is-positive");
+  } else {
+    insightsCanSaveNowValue.textContent = formatMoney(0);
+    insightsCanSaveNowValue.classList.add("is-negative");
+  }
 
-  let limitsStatus = "";
-let recommendation = "";
+  insightsLimitsStatusText.textContent =
+    `Неоплаченные обязательные: ${formatMoney(summary.pendingMandatory)} • ` +
+    `Остаток лимитов: ${formatMoney(summary.remainingBudgets)}`;
 
-if (summary.flexibleExceededCount > 0) {
-  limitsStatus = `Превышено лимитов: ${summary.flexibleExceededCount}`;
-} else if (summary.flexibleNearLimitCount > 0) {
-  limitsStatus = `Почти у лимита: ${summary.flexibleNearLimitCount}`;
-} else if (summary.flexibleLimitedCount > 0) {
-  limitsStatus = `Лимиты под контролем: ${summary.flexibleLimitedCount}`;
-} else {
-  limitsStatus = "Лимиты не заданы";
-}
-
-if (summary.net <= 0) {
-  recommendation =
-    `Свободные: ${formatMoney(summary.availableNowBalance)}. Рабочий минимум: ${formatMoney(summary.workingMinimum)}. Сейчас нельзя откладывать: сначала нужно закрыть период в плюс.`;
-} else if (summary.flexibleExceededCount > 0) {
-  recommendation =
-    `Свободные: ${formatMoney(summary.availableNowBalance)}. Рабочий минимум: ${formatMoney(summary.workingMinimum)}. Можно отложить: 0 ₽, потому что уже есть превышение лимитов.`;
-} else if (summary.availableNowBalance < summary.workingMinimum) {
-  recommendation =
-    `Свободные: ${formatMoney(summary.availableNowBalance)}. До безопасного остатка не хватает ${formatMoney(summary.freeSafeGap)}. Новые переводы в сейфы пока рано.`;
-} else {
-  recommendation =
-    `Свободные: ${formatMoney(summary.availableNowBalance)}. Нужно оставить: ${formatMoney(summary.workingMinimum)}. Можно перевести в сейфы: ${formatMoney(summary.canSaveNow)}. Резерв 2 уровня: ${formatMoney(summary.secondLineReserveBalance)}. Целевые сейфы: ${formatMoney(summary.strictSafeBalance)} не трогаются.`;
-}
-
-insightsLimitsStatusText.textContent = limitsStatus;
-
-  insightsRecommendationText.textContent = recommendation;
+  if (summary.shortageBeforeSafeSaving > 0) {
+    insightsRecommendationText.textContent =
+      `Откладывать сейчас рано. До покрытия обязательных платежей и остатков лимитов не хватает ${formatMoney(summary.shortageBeforeSafeSaving)}.`;
+  } else if (summary.canSaveNow > 0) {
+    insightsRecommendationText.textContent =
+      `Сейчас можно отложить ${formatMoney(summary.canSaveNow)} без конфликта с обязательными платежами и лимитами.`;
+  } else {
+    insightsRecommendationText.textContent =
+      `Свободные деньги полностью заняты обязательствами текущего месяца.`;
+  }
 
   if (insightsSafeList) {
     insightsSafeList.innerHTML = "";
@@ -2920,12 +3170,13 @@ async function saveBudgetLimit() {
     return;
   }
 
-  state.accounts = accounts || [];
+    state.accounts = accounts || [];
   state.categories = categories || [];
   state.transactions = transactions || [];
   state.budgetLimits = budgetLimits || [];
   state.safeBuckets = safeBuckets || [];
   state.appMeta = appMeta || [];
+  state.mandatoryPayments = parseMandatoryPaymentsFromMeta();
 
   ensureUncategorizedCategory();
 }
@@ -2953,6 +3204,14 @@ toAccountSelect?.addEventListener("change", updateTransferSafeFields);
   navWalletBtn?.addEventListener("click", showWalletView);
 navAnalyticsBtn?.addEventListener("click", showAnalyticsView);
 navInsightsBtn?.addEventListener("click", showInsightsView);
+
+  openMandatoryPaymentsModalBtn?.addEventListener("click", openMandatoryPaymentsModal);
+  closeMandatoryPaymentsModalBtn?.addEventListener("click", closeMandatoryPaymentsModal);
+  addMandatoryPaymentBtn?.addEventListener("click", addMandatoryPayment);
+
+  mandatoryPaymentsModal?.addEventListener("click", (event) => {
+    if (event.target === mandatoryPaymentsModal) closeMandatoryPaymentsModal();
+  });
 
   analyticsPeriodButtons.forEach((btn) => {
     btn.addEventListener("click", () => {
@@ -3131,6 +3390,11 @@ safeInterestRateModal?.addEventListener("click", (event) => {
 
     if (analyticsCategoryModal && !analyticsCategoryModal.classList.contains("hidden")) {
       closeAnalyticsCategoryModal();
+      return;
+    }
+    
+        if (mandatoryPaymentsModal && !mandatoryPaymentsModal.classList.contains("hidden")) {
+      closeMandatoryPaymentsModal();
       return;
     }
 
