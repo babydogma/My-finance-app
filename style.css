@@ -1482,34 +1482,36 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .analytics-mode-switch-wrap {
   display: flex;
   justify-content: center;
-  width: 100%;
-  margin-bottom: 10px;
+  width: auto;
+  margin-bottom: 0;
+  flex: 1 1 auto;
 }
 
 .analytics-mode-switch {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 8px;
-  margin: 4px auto 10px;
+  gap: 5px;
+  padding: 5px;
+  margin: 0;
   border-radius: 999px;
   background:
-    linear-gradient(180deg, rgba(35, 38, 47, 0.96) 0%, rgba(28, 31, 40, 0.98) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.055);
+    linear-gradient(180deg, rgba(35, 38, 47, 0.9) 0%, rgba(28, 31, 40, 0.94) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.05);
   box-shadow:
-    0 14px 30px rgba(0, 0, 0, 0.26),
+    0 8px 18px rgba(0, 0, 0, 0.16),
     inset 0 1px 0 rgba(255, 255, 255, 0.03);
 }
 
 .analytics-mode-switch__btn {
-  min-width: 150px;
-  height: 48px;
+  min-width: 116px;
+  height: 38px;
+  padding: 0 14px;
   border: none;
   border-radius: 999px;
   background: transparent;
-  color: rgba(255, 255, 255, 0.54);
-  font-size: 17px;
+  color: rgba(255, 255, 255, 0.58);
+  font-size: 14px;
   font-weight: 850;
   letter-spacing: -0.025em;
   transition: background 0.16s ease, color 0.16s ease, transform 0.16s ease;
@@ -2047,10 +2049,11 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   }
 
   .analytics-mode-switch__btn {
-    min-width: 126px;
-    height: 42px;
-    font-size: 15px;
-  }
+  min-width: 104px;
+  height: 36px;
+  padding: 0 12px;
+  font-size: 13.5px;
+}
 
   .balance {
     padding: 16px 14px 15px;
@@ -3236,7 +3239,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 #analyticsView .section--manager-top,
 #insightsView .section--manager-top {
   position: relative;
-  z-index: 120;
+  z-index: 20;
   overflow: visible;
 }
 
@@ -3263,7 +3266,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 .screen-shell {
   position: relative;
-  z-index: 120;
+  z-index: 20;
   overflow: visible;
   margin-top: 6px;
   margin-bottom: 8px;
@@ -3778,7 +3781,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 10px;
 }
 
 .screen-shell__top--insights .screen-shell__title,
@@ -3875,4 +3878,15 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     border-radius: 22px;
     padding: 10px;
   }
+}
+
+#analyticsFiltersModal,
+#insightsFiltersModal {
+  z-index: 220;
+}
+
+#analyticsFiltersModal .modal-sheet,
+#insightsFiltersModal .modal-sheet {
+  position: relative;
+  z-index: 221;
 }
