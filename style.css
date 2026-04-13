@@ -75,36 +75,45 @@ button {
   width: 100%;
   max-width: 480px;
   margin: 0 auto;
-  padding: 14px 16px 118px;
+  padding: 16px 16px 122px;
 }
 
 .section {
-  margin-top: 20px;
+  margin-top: 24px;
 }
 
 .section--manager-top {
-  margin-top: 12px;
+  margin-top: 10px;
 }
 
 .section-head {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 10px;
+  gap: 12px;
+  margin-bottom: 12px;
 }
 
 .section-title {
   margin: 0;
-  font-size: 14px;
-  font-weight: 790;
-  letter-spacing: -0.02em;
+  font-size: 15px;
+  font-weight: 860;
+  letter-spacing: -0.03em;
+  color: #f4f7ff;
 }
 
 .section-note {
-  color: var(--text-muted);
-  font-size: 12px;
-  font-weight: 720;
+  color: rgba(255, 255, 255, 0.48);
+  font-size: 11.5px;
+  font-weight: 760;
+  letter-spacing: -0.02em;
+}
+
+#mainView .section + .section,
+#analyticsView .section + .section,
+#insightsView .section + .section,
+#categoriesManagerView .section + .section {
+  margin-top: 22px;
 }
 
 /* =========================================================
@@ -258,57 +267,64 @@ button {
 .actions {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 7px;
-  margin-top: 16px;
+  gap: 9px;
+  margin-top: 18px;
 }
 
 .action-card {
-  min-height: 76px;
-  padding: 8px 6px;
-  border-radius: 18px;
-  border: 1px solid var(--border);
-  background: linear-gradient(180deg, rgba(39, 42, 52, 0.9) 0%, rgba(31, 34, 43, 0.94) 100%);
+  min-height: 82px;
+  padding: 10px 8px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.055);
+  background:
+    linear-gradient(180deg, rgba(43, 47, 59, 0.96) 0%, rgba(32, 35, 45, 0.98) 100%);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 9px;
   text-align: center;
-  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.2);
-  transition: transform 0.16s ease, border-color 0.16s ease;
+  box-shadow:
+    0 12px 28px rgba(0, 0, 0, 0.24),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  transition: transform 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
 }
 
 .action-card:active {
-  transform: translateY(1px) scale(0.992);
+  transform: translateY(1px) scale(0.988);
 }
 
 .action-card:hover {
-  border-color: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.09);
+  box-shadow:
+    0 14px 30px rgba(0, 0, 0, 0.28),
+    0 0 20px rgba(111, 156, 255, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.045);
 }
 
 .action-icon {
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
+  width: 34px;
+  height: 34px;
+  border-radius: 12px;
   background:
-    radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.16), transparent 45%),
-    var(--accent);
+    radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.15), transparent 45%),
+    linear-gradient(180deg, rgba(120, 166, 255, 0.98) 0%, rgba(92, 144, 255, 0.96) 100%);
   color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 15px;
+  font-size: 16px;
   box-shadow:
     0 0 0 1px rgba(255, 255, 255, 0.04),
-    0 6px 18px rgba(111, 156, 255, 0.18);
+    0 10px 22px rgba(111, 156, 255, 0.2);
 }
 
 .action-label {
-  color: var(--accent);
+  color: #edf3ff;
   font-size: 12px;
-  font-weight: 820;
-  line-height: 1;
-  letter-spacing: -0.02em;
+  font-weight: 840;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
 }
 
 /* =========================================================
@@ -318,24 +334,34 @@ button {
 .list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
 .list-card {
-  min-height: 62px;
-  padding: 8px 15px;
-  border-radius: 999px;
-  gap: 12px;
+  min-height: 74px;
+  padding: 12px 15px;
+  border-radius: 22px;
+  gap: 13px;
   display: flex;
   align-items: center;
-  background: linear-gradient(180deg, rgba(49, 53, 68, 0.97) 0%, rgba(39, 43, 57, 0.99) 100%);
+  background:
+    linear-gradient(180deg, rgba(50, 54, 69, 0.985) 0%, rgba(39, 43, 57, 0.995) 100%);
   border: 1px solid rgba(255, 255, 255, 0.06);
   box-shadow:
-    0 6px 18px rgba(0, 0, 0, 0.18),
-    0 0 18px rgba(111, 156, 255, 0.05),
+    0 10px 24px rgba(0, 0, 0, 0.22),
+    0 0 18px rgba(111, 156, 255, 0.035),
     inset 0 1px 0 rgba(255, 255, 255, 0.03);
   position: relative;
   overflow: hidden;
+  transition: transform 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
+}
+
+.list-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.018) 0%, rgba(255, 255, 255, 0) 40%);
+  pointer-events: none;
 }
 
 .list-card--clickable {
@@ -343,14 +369,22 @@ button {
 }
 
 .list-card--clickable:active {
-  transform: scale(0.996);
+  transform: scale(0.994);
+}
+
+.list-card--clickable:hover {
+  border-color: rgba(255, 255, 255, 0.085);
+  box-shadow:
+    0 14px 30px rgba(0, 0, 0, 0.24),
+    0 0 22px rgba(111, 156, 255, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.034);
 }
 
 .list-icon {
-  width: 38px;
-  height: 38px;
-  flex: 0 0 38px;
-  border-radius: 50%;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  border-radius: 14px;
   background: rgba(98, 104, 126, 0.34);
   display: flex;
   align-items: center;
@@ -368,26 +402,27 @@ button {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 2px;
+  margin-bottom: 4px;
 }
 
 .list-title {
   margin: 0;
   font-size: 15.5px;
-  font-weight: 790;
-  line-height: 1.05;
+  font-weight: 840;
+  line-height: 1.08;
   letter-spacing: -0.03em;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  color: #f5f7fd;
 }
 
 .list-subtitle {
   margin: 0;
-  color: rgba(255, 255, 255, 0.46);
+  color: rgba(255, 255, 255, 0.5);
   font-size: 11.5px;
-  font-weight: 560;
-  line-height: 1.1;
+  font-weight: 640;
+  line-height: 1.18;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -402,10 +437,11 @@ button {
 
 .list-value {
   margin: 0;
-  font-size: 15.5px;
-  font-weight: 770;
+  font-size: 16px;
+  font-weight: 860;
   line-height: 1;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.035em;
+  color: #f3f6ff;
 }
 
 .list-value--green {
@@ -419,10 +455,10 @@ button {
 }
 
 .list-caption {
-  margin-top: 4px;
-  color: rgba(255, 255, 255, 0.42);
+  margin-top: 5px;
+  color: rgba(255, 255, 255, 0.4);
   font-size: 10.5px;
-  font-weight: 620;
+  font-weight: 680;
   line-height: 1.15;
   white-space: nowrap;
   letter-spacing: -0.01em;
@@ -435,37 +471,49 @@ button {
 .summary {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
+  gap: 10px;
 }
 
 .summary-card {
-  min-height: 104px;
-  padding: 14px 15px;
+  min-height: 114px;
+  padding: 16px 16px 15px;
   border-radius: 24px;
-  background: linear-gradient(180deg, rgba(47, 51, 66, 0.98) 0%, rgba(38, 42, 56, 0.995) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.065);
+  background:
+    linear-gradient(180deg, rgba(51, 55, 70, 0.99) 0%, rgba(39, 43, 57, 0.998) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.068);
   box-shadow:
-    0 12px 32px rgba(0, 0, 0, 0.24),
-    0 0 24px rgba(111, 156, 255, 0.045),
+    0 14px 34px rgba(0, 0, 0, 0.25),
+    0 0 22px rgba(111, 156, 255, 0.035),
     inset 0 1px 0 rgba(255, 255, 255, 0.035);
+  position: relative;
+  overflow: hidden;
+}
+
+.summary-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.018) 0%, rgba(255, 255, 255, 0) 38%);
+  pointer-events: none;
 }
 
 .summary-label {
-  margin: 0 0 10px;
-  color: rgba(255, 255, 255, 0.62);
-  font-size: 13px;
-  font-weight: 780;
-  line-height: 1.08;
+  margin: 0 0 12px;
+  color: rgba(255, 255, 255, 0.56);
+  font-size: 12.5px;
+  font-weight: 800;
+  line-height: 1.12;
   letter-spacing: -0.02em;
 }
 
 .summary-value {
   margin: 0;
-  font-size: 19px;
-  font-weight: 900;
-  line-height: 0.96;
-  letter-spacing: -0.055em;
-  color: var(--text);
+  font-size: 22px;
+  font-weight: 920;
+  line-height: 0.94;
+  letter-spacing: -0.06em;
+  color: #f7f9ff;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.015);
 }
 
 /* =========================================================
@@ -473,24 +521,26 @@ button {
    ========================================================= */
 
 .manager-card {
-  padding: 12px;
-  border-radius: 20px;
-  background: linear-gradient(180deg, rgba(49, 53, 68, 0.97) 0%, rgba(39, 43, 57, 0.99) 100%);
-  border: 1px solid var(--border);
+  padding: 14px;
+  border-radius: 22px;
+  background:
+    linear-gradient(180deg, rgba(50, 54, 69, 0.985) 0%, rgba(39, 43, 57, 0.995) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.065);
   box-shadow:
-    0 8px 24px rgba(0, 0, 0, 0.22),
-    0 0 18px rgba(111, 156, 255, 0.04),
+    0 12px 30px rgba(0, 0, 0, 0.24),
+    0 0 20px rgba(111, 156, 255, 0.03),
     inset 0 1px 0 rgba(255, 255, 255, 0.03);
 }
 
 .manager-back-btn {
   border: none;
-  background: rgba(255, 255, 255, 0.06);
-  color: var(--text);
+  background: rgba(255, 255, 255, 0.065);
+  color: #eef3ff;
   border-radius: 999px;
-  padding: 8px 12px;
+  padding: 9px 13px;
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 820;
+  letter-spacing: -0.02em;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
@@ -504,31 +554,18 @@ button {
 
 .category-manager-actions {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   margin-left: auto;
 }
 
 .mini-btn {
-  height: 38px;
-  padding: 0 14px;
+  height: 36px;
+  padding: 0 13px;
   border: none;
-  border-radius: 14px;
-  font-size: 14px;
-  font-weight: 800;
-}
-
-.mini-btn-edit {
-  background: rgba(111, 156, 255, 0.16);
-  color: var(--accent);
-}
-
-.mini-btn-delete {
-  background: rgba(255, 114, 104, 0.16);
-  color: var(--red);
-}
-
-.mini-btn-delete:disabled {
-  opacity: 0.45;
+  border-radius: 13px;
+  font-size: 13px;
+  font-weight: 820;
+  letter-spacing: -0.02em;
 }
 
 /* =========================================================
@@ -1417,22 +1454,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     inset 0 1px 0 rgba(255, 255, 255, 0.035);
 }
 
-#insightsNetValue {
-  font-size: 22px;
-  font-weight: 920;
-  letter-spacing: -0.06em;
-}
-
-#insightsNetValue.is-positive {
-  color: var(--green);
-  text-shadow: 0 0 18px rgba(74, 216, 140, 0.12);
-}
-
-#insightsNetValue.is-negative {
-  color: var(--red);
-  text-shadow: 0 0 18px rgba(255, 114, 104, 0.12);
-}
-
 .analytics-mode-switch-wrap {
   display: flex;
   justify-content: center;
@@ -1950,10 +1971,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   font-size: 16px;
 }
 
-#insightsNetValue {
-  font-size: 20px;
-}
-
   .header-switch__item {
     min-width: 96px;
     height: 42px;
@@ -2438,29 +2455,92 @@ input[type="date"]::-webkit-calendar-picker-indicator {
    ========================================================= */
 
 .insights-card--compact {
-  padding-top: 16px;
-  padding-bottom: 16px;
+  padding-top: 18px;
+  padding-bottom: 18px;
 }
 
 .insights-save-card {
   position: relative;
   overflow: hidden;
+  padding: 18px 18px 20px;
+  border-radius: 26px;
+  background:
+    radial-gradient(circle at top left, rgba(111, 156, 255, 0.12), transparent 34%),
+    linear-gradient(180deg, rgba(55, 60, 77, 0.995) 0%, rgba(42, 46, 60, 1) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 16px 36px rgba(0, 0, 0, 0.28),
+    0 0 30px rgba(111, 156, 255, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.insights-save-card .summary-label {
+  margin-bottom: 14px;
+  color: rgba(255, 255, 255, 0.68);
 }
 
 .insights-save-card .summary-value {
-  font-size: 30px;
+  font-size: 34px;
+  font-weight: 940;
+  letter-spacing: -0.07em;
 }
 
 #insightsView .section-head + .history-filters {
-  margin-top: 14px;
+  margin-top: 16px;
 }
 
 #insightsMonthWheelWrap {
   margin-top: 10px;
 }
 
+#insightsView .summary-card,
+#insightsView .insights-card,
+#insightsView .analytics-total-card {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+#insightsView .section:nth-of-type(2) .summary-card:first-child,
+#insightsView .section:nth-of-type(2) .summary-card:last-child,
+#insightsView .section:nth-of-type(3) .summary-card:first-child,
+#insightsView .section:nth-of-type(3) .summary-card:last-child {
+  min-height: 118px;
+}
+
+#insightsTotalBalanceValue,
+#insightsProtectedMoneyValue,
+#insightsFreeMoneyValue,
+#insightsCanSaveNowValue {
+  font-size: 24px;
+  font-weight: 930;
+}
+
+#insightsView .manager-card .section-title {
+  font-size: 15px;
+  font-weight: 860;
+}
+
+#insightsLimitsStatusText {
+  font-size: 15px;
+  line-height: 1.34;
+  color: rgba(244, 247, 255, 0.92);
+}
+
+#insightsRecommendationText {
+  font-size: 16px;
+  line-height: 1.38;
+  color: rgba(255, 255, 255, 0.9);
+}
+
 @media (max-width: 420px) {
   .insights-save-card .summary-value {
-    font-size: 26px;
+    font-size: 29px;
+  }
+
+  #insightsTotalBalanceValue,
+  #insightsProtectedMoneyValue,
+  #insightsFreeMoneyValue,
+  #insightsCanSaveNowValue {
+    font-size: 21px;
   }
 }
