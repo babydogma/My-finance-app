@@ -42,9 +42,6 @@ const deleteBudgetBtn = document.getElementById("deleteBudgetBtn");
   const addCategoryBtn = document.getElementById("addCategoryBtn");
 
   const analyticsPeriodButtons = document.querySelectorAll("[data-analytics-period]");
-  const analyticsIncomeValue = document.getElementById("analyticsIncomeValue");
-  const analyticsExpenseValue = document.getElementById("analyticsExpenseValue");
-  const analyticsNetValue = document.getElementById("analyticsNetValue");
   const analyticsDonut = document.getElementById("analyticsDonut");
   const analyticsLegend = document.getElementById("analyticsLegend");
   const analyticsMonthBtn = document.getElementById("analyticsMonthBtn");
@@ -61,8 +58,6 @@ const deleteBudgetBtn = document.getElementById("deleteBudgetBtn");
   const analyticsModeOperationsBtn = document.getElementById("analyticsModeOperationsBtn");
   const analyticsOperationTypeFilters = document.getElementById("analyticsOperationTypeFilters");
   const analyticsTypeButtons = document.querySelectorAll("[data-analytics-type]");
-  const analyticsCategoriesSection = document.getElementById("analyticsCategoriesSection");
-  const analyticsTotalsSection = document.getElementById("analyticsTotalsSection");
   const analyticsCategoriesBreakdownSection = document.getElementById("analyticsCategoriesBreakdownSection");
   const analyticsOperationsSection = document.getElementById("analyticsOperationsSection");
   const analyticsTransactionsList = document.getElementById("analyticsTransactionsList");
@@ -3051,26 +3046,10 @@ else if (transaction.type === "income") {
   }
 
   function renderAnalytics() {
-    if (!analyticsView) return;
+  if (!analyticsView) return;
 
-    const summary = getAnalyticsSummary();
-    const breakdown = getAnalyticsCategoryBreakdown();
-
-    analyticsIncomeValue.textContent = formatMoney(summary.income);
-    analyticsExpenseValue.textContent = formatMoney(summary.expense);
-
-    analyticsNetValue.classList.remove("is-positive", "is-negative");
-
-    if (summary.net > 0) {
-      analyticsNetValue.textContent = `+${formatMoney(summary.net)}`;
-      analyticsNetValue.classList.add("is-positive");
-    } else if (summary.net < 0) {
-      analyticsNetValue.textContent = `−${formatMoney(Math.abs(summary.net))}`;
-      analyticsNetValue.classList.add("is-negative");
-    } else {
-      analyticsNetValue.textContent = formatMoney(0);
-    }
-
+  const breakdown = getAnalyticsCategoryBreakdown();
+  
     analyticsPeriodButtons.forEach((btn) => {
       btn.classList.toggle("is-active", btn.dataset.analyticsPeriod === analyticsFilterPeriod);
     });
@@ -3082,8 +3061,6 @@ else if (transaction.type === "income") {
     analyticsModeCategoriesBtn?.classList.toggle("is-active", analyticsMode === "categories");
     analyticsModeOperationsBtn?.classList.toggle("is-active", analyticsMode === "operations");
 
-    analyticsCategoriesSection?.classList.toggle("hidden", analyticsMode !== "categories");
-    analyticsTotalsSection?.classList.toggle("hidden", analyticsMode !== "categories");
     analyticsCategoriesBreakdownSection?.classList.toggle("hidden", analyticsMode !== "categories");
 
     analyticsOperationsSection?.classList.toggle("hidden", analyticsMode !== "operations");
