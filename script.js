@@ -86,6 +86,16 @@ const deleteBudgetBtn = document.getElementById("deleteBudgetBtn");
   const insightsLimitsStatusText = document.getElementById("insightsLimitsStatusText");
   const insightsRecommendationText = document.getElementById("insightsRecommendationText");
   const insightsSafeList = document.getElementById("insightsSafeList");
+  const insightsPeriodButtons = document.querySelectorAll("[data-insights-period]");
+const insightsMonthBtn = document.getElementById("insightsMonthBtn");
+const insightsMonthWheelWrap = document.getElementById("insightsMonthWheelWrap");
+const insightsMonthNamesColumn = document.getElementById("insightsMonthNamesColumn");
+const insightsMonthYearsColumn = document.getElementById("insightsMonthYearsColumn");
+const insightsMonthResetBtn = document.getElementById("insightsMonthResetBtn");
+const insightsMonthApplyBtn = document.getElementById("insightsMonthApplyBtn");
+const insightsRangeFromInput = document.getElementById("insightsRangeFromInput");
+const insightsRangeToInput = document.getElementById("insightsRangeToInput");
+const insightsSelectedPeriodLabel = document.getElementById("insightsSelectedPeriodLabel");
 
   const mandatoryPaymentsModal = document.getElementById("mandatoryPaymentsModal");
   const openMandatoryPaymentsModalBtn = document.getElementById("openMandatoryPaymentsModalBtn");
@@ -174,6 +184,15 @@ const faqButtons = document.querySelectorAll("[data-faq-key]");
   let analyticsSelectedMonth = getCurrentMonthValue();
   let analyticsRangeStart = "";
   let analyticsRangeEnd = "";
+  
+  let insightsFilterPeriod = "month";
+let insightsSelectedMonth = getCurrentMonthValue();
+let insightsRangeStart = "";
+let insightsRangeEnd = "";
+
+let insightsDraftMonth = "";
+let insightsDraftYear = "";
+let isInsightsMonthWheelOpen = false;
 
   let analyticsDraftMonth = "";
 let analyticsDraftYear = "";
@@ -1348,6 +1367,125 @@ function updateAnalyticsWheelDraftFromScroll() {
     setAnalyticsDraftMonthFromValue(getCurrentMonthValue());
     renderAnalyticsMonthWheel();
   }
+  
+  function renderInsightsMonthWheel() {
+  if (!insightsMonthNamesColumn || !insightsMonthYearsColumn) return;
+
+  const monthNames = getRussianMonthNames().map((label, index) => ({
+    value: String(index + 1).padStart(2, "0"),
+    label,
+  }));
+
+  const years = getAnalyticsWheelYears().map((year) => ({
+    value: year,
+    label: year,
+  }));
+
+  insightsMonthNamesColumn.innerHTML = buildWheelColumnItems(
+    monthNames,
+    insightsDraftMonth,
+    "data-wheel-month"
+  );
+
+  insightsMonthYearsColumn.innerHTML = buildWheelColumnItems(
+    years,
+    insightsDraftYear,
+    "data-wheel-year"
+  );
+
+  insightsMonthNamesColumn.querySelectorAll("[data-wheel-month]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      insightsDraftMonth = btn.dataset.wheelMonth;
+      setWheelActiveState(insightsMonthNamesColumn, "data-wheel-month", insightsDraftMonth);
+      snapWheelToValue(insightsMonthNamesColumn, "data-wheel-month", insightsDraftMonth, "smooth");
+    });
+  });
+
+  insightsMonthYearsColumn.querySelectorAll("[data-wheel-year]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      insightsDraftYear = btn.dataset.wheelYear;
+      setWheelActiveState(insightsMonthYearsColumn, "data-wheel-year", insightsDraftYear);
+      snapWheelToValue(insightsMonthYearsColumn, "data-wheel-year", insightsDraftYear, "smooth");
+    });
+  });
+
+  bindWheelScroll(insightsMonthNamesColumn, "data-wheel-month", (value) => {
+    insightsDraftMonth = value;
+  });
+
+  bindWheelScroll(insightsMonthYearsColumn, "data-wheel-year", (value) => {
+    insightsDraftYear = value;
+  });
+
+  requestAnimationFrame(() => {
+    setWheelActiveState(insightsMonthNamesColumn, "data-wheel-month", insightsDraftMonth);
+    setWheelActiveState(insightsMonthYearsColumn, "data-wheel-year", insightsDraftYear);
+
+    snapWheelToValue(insightsMonthNamesColumn, "data-wheel-month", insightsDraftMonth, "auto");
+    snapWheelToValue(insightsMonthYearsColumn, "data-wheel-year", insightsDraftYear, "auto");
+  });
+  
+  insightsPeriodButtons.forEach((btn) => {
+  btn.classList.toggle("is-active", btn.dataset.insightsPeriod === insightsFilterPeriod);
+});
+
+const isInsightsRange = insightsFilterPeriod === "range";
+
+setNativePickerVisibility(insightsRangeFromInput, isInsightsRange);
+setNativePickerVisibility(insightsRangeToInput, isInsightsRange);
+
+if (insightsMonthBtn) {
+  insightsMonthBtn.textContent = formatMonthButtonLabel(insightsSelectedMonth);
+}
+
+if (insightsMonthWheelWrap) {
+  insightsMonthWheelWrap.classList.toggle("hidden", !isInsightsMonthWheelOpen);
+}
+
+if (insightsSelectedPeriodLabel) {
+  insightsSelectedPeriodLabel.classList.add("hidden");
+  insightsSelectedPeriodLabel.textContent = "";
+  insightsSelectedPeriodLabel.style.display = "none";
+}
+
+function openInsightsMonthWheel() {
+  setInsightsDraftMonthFromValue(insightsSelectedMonth);
+  isInsightsMonthWheelOpen = true;
+  insightsMonthWheelWrap?.classList.remove("hidden");
+
+  if (!insightsMonthNamesColumn?.children.length || !insightsMonthYearsColumn?.children.length) {
+    renderInsightsMonthWheel();
+  } else {
+    setWheelActiveState(insightsMonthNamesColumn, "data-wheel-month", insightsDraftMonth);
+    setWheelActiveState(insightsMonthYearsColumn, "data-wheel-year", insightsDraftYear);
+
+    requestAnimationFrame(() => {
+      snapWheelToValue(insightsMonthNamesColumn, "data-wheel-month", insightsDraftMonth, "auto");
+      snapWheelToValue(insightsMonthYearsColumn, "data-wheel-year", insightsDraftYear, "auto");
+    });
+  }
+}
+
+function closeInsightsMonthWheel() {
+  isInsightsMonthWheelOpen = false;
+  insightsMonthWheelWrap?.classList.add("hidden");
+}
+
+function applyInsightsMonthWheel() {
+  if (!insightsDraftYear || !insightsDraftMonth) {
+    setInsightsDraftMonthFromValue(insightsSelectedMonth || getCurrentMonthValue());
+  }
+
+  insightsSelectedMonth = getInsightsDraftMonthValue();
+  insightsFilterPeriod = "month";
+  closeInsightsMonthWheel();
+  renderInsights();
+}
+
+function resetInsightsMonthWheel() {
+  setInsightsDraftMonthFromValue(getCurrentMonthValue());
+  renderInsightsMonthWheel();
+}
 
   function getAnalyticsPeriodLabel() {
     if (analyticsFilterPeriod === "month") {
@@ -1368,6 +1506,47 @@ function updateAnalyticsWheelDraftFromScroll() {
 
     return "";
   }
+  
+  function setInsightsDraftMonthFromValue(monthValue) {
+  const safeValue = monthValue || getCurrentMonthValue();
+  const [year, month] = safeValue.split("-");
+  insightsDraftYear = year;
+  insightsDraftMonth = month;
+}
+
+function getInsightsDraftMonthValue() {
+  return `${insightsDraftYear}-${insightsDraftMonth}`;
+}
+
+function getInsightsPeriodLabel() {
+  if (insightsFilterPeriod === "month") {
+    return formatMonthLabel(insightsSelectedMonth);
+  }
+
+  if (insightsFilterPeriod === "today") {
+    return "сегодня";
+  }
+
+  if (insightsFilterPeriod === "7") {
+    return "за 7 дней";
+  }
+
+  if (insightsFilterPeriod === "range") {
+    return formatDateRangeLabel(insightsRangeStart, insightsRangeEnd);
+  }
+
+  return "";
+}
+
+function getInsightsFilteredTransactions() {
+  return filterTransactionsByPeriod(
+    state.transactions,
+    insightsFilterPeriod,
+    insightsSelectedMonth,
+    insightsRangeStart,
+    insightsRangeEnd
+  );
+}
 
   function escapeHtml(str) {
     return String(str)
@@ -2398,7 +2577,7 @@ async function deleteSafeBucketFromModal() {
   }
   
   function getInsightsSummary() {
-  const periodTransactions = getAnalyticsFilteredTransactions();
+  const periodTransactions = getInsightsFilteredTransactions();
 
   let income = 0;
   let expense = 0;
@@ -2916,6 +3095,85 @@ else if (transaction.type === "income") {
     analyticsPeriodButtons.forEach((btn) => {
       btn.classList.toggle("is-active", btn.dataset.analyticsPeriod === analyticsFilterPeriod);
     });
+    
+    insightsPeriodButtons.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    insightsFilterPeriod = btn.dataset.insightsPeriod;
+
+    if (insightsFilterPeriod !== "month") {
+      closeInsightsMonthWheel();
+    }
+
+    if (insightsFilterPeriod === "range") {
+      const today = getTodayDateValue();
+      insightsRangeStart = insightsRangeStart || today;
+      insightsRangeEnd = insightsRangeEnd || today;
+
+      if (insightsRangeFromInput) {
+        insightsRangeFromInput.value = insightsRangeStart;
+      }
+
+      if (insightsRangeToInput) {
+        insightsRangeToInput.value = insightsRangeEnd;
+      }
+
+      setNativePickerVisibility(insightsRangeFromInput, true);
+      setNativePickerVisibility(insightsRangeToInput, true);
+      openNativePicker(insightsRangeFromInput);
+    }
+
+    renderInsights();
+  });
+});
+
+insightsMonthBtn?.addEventListener("click", (event) => {
+  event.stopPropagation();
+  insightsFilterPeriod = "month";
+
+  if (isInsightsMonthWheelOpen) {
+    closeInsightsMonthWheel();
+  } else {
+    openInsightsMonthWheel();
+  }
+
+  renderInsights();
+});
+
+insightsMonthResetBtn?.addEventListener("click", () => {
+  resetInsightsMonthWheel();
+});
+
+insightsMonthApplyBtn?.addEventListener("click", () => {
+  applyInsightsMonthWheel();
+});
+
+insightsRangeFromInput?.addEventListener("change", () => {
+  if (!insightsRangeFromInput.value) return;
+  insightsRangeStart = insightsRangeFromInput.value;
+
+  if (!insightsRangeEnd || insightsRangeEnd < insightsRangeStart) {
+    insightsRangeEnd = insightsRangeStart;
+    if (insightsRangeToInput) insightsRangeToInput.value = insightsRangeEnd;
+  }
+
+  insightsFilterPeriod = "range";
+  closeInsightsMonthWheel();
+  renderInsights();
+});
+
+insightsRangeToInput?.addEventListener("change", () => {
+  if (!insightsRangeToInput.value) return;
+  insightsRangeEnd = insightsRangeToInput.value;
+
+  if (!insightsRangeStart || insightsRangeStart > insightsRangeEnd) {
+    insightsRangeStart = insightsRangeEnd;
+    if (insightsRangeFromInput) insightsRangeFromInput.value = insightsRangeStart;
+  }
+
+  insightsFilterPeriod = "range";
+  closeInsightsMonthWheel();
+  renderInsights();
+});
 
     analyticsTypeButtons.forEach((btn) => {
       btn.classList.toggle("is-active", btn.dataset.analyticsType === analyticsOperationType);
@@ -3085,7 +3343,7 @@ else if (transaction.type === "income") {
   if (!insightsView) return;
 
   const summary = getInsightsSummary();
-  const periodLabel = getAnalyticsPeriodLabel() || "за период";
+  const periodLabel = getInsightsPeriodLabel() || "за период";
 
   insightsPeriodLabel.textContent = periodLabel;
 
@@ -3732,6 +3990,15 @@ safeInterestRateModal?.addEventListener("click", (event) => {
     if (!clickedInsidePopover && !clickedMonthBtn) {
       closeAnalyticsMonthWheel();
     }
+    
+    if (isInsightsMonthWheelOpen && insightsMonthWheelWrap) {
+  const clickedInsideInsightsPopover = insightsMonthWheelWrap.contains(event.target);
+  const clickedInsightsMonthBtn = insightsMonthBtn?.contains(event.target);
+
+  if (!clickedInsideInsightsPopover && !clickedInsightsMonthBtn) {
+    closeInsightsMonthWheel();
+  }
+}
   });
 
   document.addEventListener("keydown", (event) => {
@@ -3769,6 +4036,11 @@ safeInterestRateModal?.addEventListener("click", (event) => {
     
     if (faqModal && !faqModal.classList.contains("hidden")) {
   closeFaqModal();
+  return;
+}
+
+if (isInsightsMonthWheelOpen) {
+  closeInsightsMonthWheel();
   return;
 }
 
