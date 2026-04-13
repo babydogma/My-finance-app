@@ -3768,3 +3768,111 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     font-size: 13px;
   }
 }
+
+/* =========================================================
+   31. COMPACT SCREEN FILTERS
+   ========================================================= */
+
+.screen-shell__top--analytics,
+.screen-shell__top--insights {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.screen-shell__top--insights .screen-shell__title,
+.screen-shell__top--analytics .screen-shell__title {
+  margin: 0;
+}
+
+.screen-filter-btn {
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  border: none;
+  border-radius: 50%;
+  background:
+    linear-gradient(180deg, rgba(41, 45, 58, 0.96) 0%, rgba(31, 35, 46, 0.99) 100%);
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 18px;
+  font-weight: 900;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    0 10px 22px rgba(0, 0, 0, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  transition:
+    transform 0.16s ease,
+    box-shadow 0.16s ease,
+    background 0.16s ease;
+}
+
+.screen-filter-btn:active {
+  transform: scale(0.96);
+}
+
+.screen-filter-btn:hover {
+  box-shadow:
+    0 12px 24px rgba(0, 0, 0, 0.2),
+    0 0 16px rgba(111, 156, 255, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.filters-sheet {
+  padding-bottom: 24px;
+}
+
+.filters-sheet__head {
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.filters-sheet__title {
+  margin: 0 !important;
+  text-align: left !important;
+  font-size: 24px;
+}
+
+.history-filters--modal {
+  margin-top: 0;
+  max-width: 100%;
+  border-radius: 26px;
+  padding: 12px;
+}
+
+.screen-shell__filters {
+  display: none !important;
+}
+
+/* убираем правые поясняющие подписи в аналитике и итогах */
+#analyticsView .section-head .section-note,
+#insightsView .section-head .section-note {
+  display: none !important;
+}
+
+/* кроме полезных мест */
+#insightsView #accountsTotal,
+#analyticsView #accountsTotal {
+  display: block !important;
+}
+
+@media (max-width: 420px) {
+  .screen-filter-btn {
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    font-size: 16px;
+  }
+
+  .filters-sheet__title {
+    font-size: 22px;
+  }
+
+  .history-filters--modal {
+    border-radius: 22px;
+    padding: 10px;
+  }
+}
