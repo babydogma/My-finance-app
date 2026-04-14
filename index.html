@@ -67,33 +67,59 @@
 
     <!-- CATEGORIES MANAGER VIEW -->
     <div id="categoriesManagerView" class="hidden">
-      <section class="section section--manager-top">
-        <div class="section-head">
-          <button class="manager-back-btn" type="button" id="closeCategoriesManagerBtn">← Назад</button>
-          <h2 class="section-title">Категории расходов</h2>
-          <div class="section-note">Управление</div>
+  <section class="section section--manager-top categories-shell">
+    <div class="categories-shell__head">
+      <button class="manager-back-btn categories-shell__back" type="button" id="closeCategoriesManagerBtn">
+        ← Назад
+      </button>
+
+      <div class="categories-shell__title-wrap">
+        <h2 class="categories-shell__title">Категории</h2>
+        <div class="categories-shell__subtitle">управление расходами</div>
+      </div>
+    </div>
+
+    <div class="manager-card categories-create-card">
+      <div class="categories-create-card__head">
+        <h3 class="categories-create-card__title">Новая категория</h3>
+        <div class="categories-create-card__note">добавь название и эмодзи</div>
+      </div>
+
+      <div class="categories-create-grid">
+        <div class="field categories-create-grid__name">
+          <input
+            class="input"
+            id="newCategoryNameInput"
+            type="text"
+            placeholder="Например: Продукты"
+          />
         </div>
 
-        <div class="manager-card">
-          <div class="field">
-            <input class="input" id="newCategoryNameInput" type="text" placeholder="Название категории" />
-          </div>
-
-          <div class="field">
-            <input class="input" id="newCategoryIconInput" type="text" placeholder="Эмодзи, например 🍔" maxlength="4" />
-          </div>
-
-          <button class="btn btn-primary manager-add-btn" type="button" id="addCategoryBtn">
-            Добавить категорию
-          </button>
+        <div class="field categories-create-grid__emoji">
+          <input
+            class="input"
+            id="newCategoryIconInput"
+            type="text"
+            placeholder="🍔"
+            maxlength="4"
+          />
         </div>
-      </section>
+      </div>
 
-      <section class="section">
-        <div class="section-head">
-          <h2 class="section-title">Список категорий</h2>
-          <div class="section-note">Можно менять</div>
-        </div>
+      <button class="btn btn-primary manager-add-btn categories-create-btn" type="button" id="addCategoryBtn">
+        Добавить категорию
+      </button>
+    </div>
+  </section>
+
+  <section class="section categories-list-section">
+    <div class="section-head categories-list-head">
+      <h2 class="section-title categories-list-title">Список категорий</h2>
+    </div>
+
+    <div class="list categories-manager-list" id="categoriesManagerList"></div>
+  </section>
+</div>
 
         <div class="list" id="categoriesManagerList"></div>
       </section>
