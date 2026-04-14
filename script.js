@@ -3952,6 +3952,9 @@ insightsRangeToInput?.addEventListener("change", () => {
   saveBudgetBtn?.addEventListener("click", saveBudgetLimit);
   deleteBudgetBtn?.addEventListener("click", deleteBudgetLimit);
   closeSafeBucketsModalBtn?.addEventListener("click", closeSafeBucketsModal);
+  openMandatoryPaymentsModalBtn?.addEventListener("click", openMandatoryPaymentsModal);
+closeMandatoryPaymentsModalBtn?.addEventListener("click", closeMandatoryPaymentsModal);
+addMandatoryPaymentBtn?.addEventListener("click", addMandatoryPayment);
 addSafeBucketBtn?.addEventListener("click", addSafeBucket);
 closeSafeBucketAmountModalBtn?.addEventListener("click", closeSafeBucketAmountModal);
 cancelSafeBucketAmountBtn?.addEventListener("click", closeSafeBucketAmountModal);
@@ -3972,6 +3975,9 @@ safeInterestRateModal?.addEventListener("click", (event) => {
   budgetModal?.addEventListener("click", (event) => {
     if (event.target === budgetModal) closeBudgetModal();
   });
+  mandatoryPaymentsModal?.addEventListener("click", (event) => {
+  if (event.target === mandatoryPaymentsModal) closeMandatoryPaymentsModal();
+});
   
   safeBucketsModal?.addEventListener("click", (event) => {
   if (event.target === safeBucketsModal) closeSafeBucketsModal();
