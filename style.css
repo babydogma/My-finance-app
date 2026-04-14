@@ -3944,11 +3944,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .categories-shell__subtitle {
-  margin-top: 6px;
-  color: rgba(255, 255, 255, 0.44);
-  font-size: 12px;
-  font-weight: 760;
-  letter-spacing: -0.02em;
+  display: none;
 }
 
 .categories-create-card {
@@ -3977,11 +3973,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .categories-create-card__note {
-  margin-top: 5px;
-  color: rgba(255, 255, 255, 0.48);
-  font-size: 12px;
-  font-weight: 740;
-  letter-spacing: -0.02em;
+  display: none;
 }
 
 .categories-create-grid {
@@ -4065,46 +4057,43 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 #categoriesManagerList .list-subtitle {
-  margin-top: 5px;
-  font-size: 12px;
-  font-weight: 760;
-  line-height: 1.12;
-  color: rgba(255, 255, 255, 0.46);
+  display: none;
 }
 
 #categoriesManagerList .category-manager-actions {
   flex: 0 0 auto;
-  display: grid;
-  grid-template-columns: repeat(2, auto);
-  gap: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
   align-items: center;
-  justify-content: end;
+  justify-content: flex-end;
   margin-left: auto;
+  max-width: 168px;
 }
 
 #categoriesManagerList .mini-btn {
-  min-width: 76px;
-  height: 36px;
-  padding: 0 12px;
-  border-radius: 14px;
-  font-size: 13px;
-  font-weight: 860;
+  min-width: 58px;
+  height: 30px;
+  padding: 0 10px;
+  border-radius: 11px;
+  font-size: 11.5px;
+  font-weight: 850;
   letter-spacing: -0.02em;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.04),
-    0 6px 14px rgba(0, 0, 0, 0.12);
+    0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 #categoriesManagerList .mini-btn:not(.mini-btn-type) {
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.92) 0%, rgba(240, 243, 249, 0.98) 100%);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(238, 242, 248, 0.96) 100%);
   color: #5c8ff7;
 }
 
 #categoriesManagerList .mini-btn-type {
-  min-width: 96px;
+  min-width: 78px;
   background:
-    linear-gradient(180deg, rgba(255, 114, 104, 0.18) 0%, rgba(255, 114, 104, 0.12) 100%);
+    linear-gradient(180deg, rgba(255, 114, 104, 0.16) 0%, rgba(255, 114, 104, 0.1) 100%);
   color: #ffaaa3;
 }
 
@@ -4184,23 +4173,23 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   }
 
   #categoriesManagerList .list-subtitle {
-    font-size: 11.5px;
-  }
+  display: none;
+}
 
-  #categoriesManagerList .category-manager-actions {
-    grid-template-columns: repeat(2, auto);
-    gap: 6px;
-  }
+#categoriesManagerList .category-manager-actions {
+  gap: 5px;
+  max-width: 150px;
+}
 
-  #categoriesManagerList .mini-btn {
-    min-width: 68px;
-    height: 34px;
-    padding: 0 10px;
-    font-size: 12px;
-    border-radius: 13px;
-  }
+#categoriesManagerList .mini-btn {
+  min-width: 54px;
+  height: 28px;
+  padding: 0 9px;
+  font-size: 11px;
+  border-radius: 10px;
+}
 
-  #categoriesManagerList .mini-btn-type {
-    min-width: 86px;
-  }
+#categoriesManagerList .mini-btn-type {
+  min-width: 72px;
+}
 }
