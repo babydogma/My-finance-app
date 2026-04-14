@@ -3890,3 +3890,317 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   position: relative;
   z-index: 221;
 }
+
+/* =========================================================
+   32. CATEGORIES MANAGER REDESIGN
+   ========================================================= */
+
+#categoriesManagerView {
+  padding-bottom: 10px;
+}
+
+#categoriesManagerView .section {
+  margin-top: 18px;
+}
+
+#categoriesManagerView .section + .section {
+  margin-top: 18px;
+}
+
+.categories-shell {
+  margin-top: 4px;
+}
+
+.categories-shell__head {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.categories-shell__back {
+  min-width: 108px;
+  height: 46px;
+  padding: 0 18px;
+  font-size: 15px;
+  font-weight: 860;
+  box-shadow:
+    0 10px 24px rgba(0, 0, 0, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.categories-shell__title-wrap {
+  min-width: 0;
+}
+
+.categories-shell__title {
+  margin: 0;
+  color: #f7f9ff;
+  font-size: 29px;
+  font-weight: 950;
+  line-height: 0.96;
+  letter-spacing: -0.065em;
+}
+
+.categories-shell__subtitle {
+  margin-top: 6px;
+  color: rgba(255, 255, 255, 0.44);
+  font-size: 12px;
+  font-weight: 760;
+  letter-spacing: -0.02em;
+}
+
+.categories-create-card {
+  padding: 14px;
+  border-radius: 26px;
+  background:
+    radial-gradient(circle at top left, rgba(111, 156, 255, 0.11), transparent 34%),
+    linear-gradient(180deg, rgba(52, 56, 71, 0.99) 0%, rgba(40, 44, 58, 1) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  box-shadow:
+    0 14px 32px rgba(0, 0, 0, 0.24),
+    0 0 22px rgba(111, 156, 255, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.categories-create-card__head {
+  margin-bottom: 12px;
+}
+
+.categories-create-card__title {
+  margin: 0;
+  color: #f7f9ff;
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+}
+
+.categories-create-card__note {
+  margin-top: 5px;
+  color: rgba(255, 255, 255, 0.48);
+  font-size: 12px;
+  font-weight: 740;
+  letter-spacing: -0.02em;
+}
+
+.categories-create-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 98px;
+  gap: 10px;
+  align-items: start;
+}
+
+.categories-create-grid .field {
+  margin-bottom: 0;
+}
+
+.categories-create-grid__emoji .input {
+  text-align: center;
+  font-size: 28px;
+  letter-spacing: 0;
+  padding-left: 12px;
+  padding-right: 12px;
+}
+
+.categories-create-btn {
+  margin-top: 12px;
+  height: 54px;
+  border-radius: 18px;
+  font-size: 16px;
+  font-weight: 880;
+}
+
+.categories-list-section {
+  margin-top: 18px;
+}
+
+.categories-list-head {
+  margin-bottom: 12px;
+}
+
+.categories-list-title {
+  font-size: 17px;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+}
+
+.categories-manager-list {
+  gap: 10px;
+}
+
+#categoriesManagerList .list-card {
+  min-height: 88px;
+  padding: 12px 13px;
+  align-items: center;
+  border-radius: 24px;
+  background:
+    linear-gradient(180deg, rgba(52, 56, 71, 0.99) 0%, rgba(40, 44, 58, 1) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow:
+    0 12px 28px rgba(0, 0, 0, 0.22),
+    0 0 18px rgba(111, 156, 255, 0.03),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+#categoriesManagerList .list-icon {
+  width: 46px;
+  height: 46px;
+  flex: 0 0 46px;
+  border-radius: 16px;
+  font-size: 22px;
+  background: rgba(104, 110, 132, 0.36);
+}
+
+#categoriesManagerList .list-body {
+  min-width: 0;
+  padding-right: 6px;
+}
+
+#categoriesManagerList .list-title {
+  font-size: 19px;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.045em;
+}
+
+#categoriesManagerList .list-subtitle {
+  margin-top: 5px;
+  font-size: 12px;
+  font-weight: 760;
+  line-height: 1.12;
+  color: rgba(255, 255, 255, 0.46);
+}
+
+#categoriesManagerList .category-manager-actions {
+  flex: 0 0 auto;
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  gap: 8px;
+  align-items: center;
+  justify-content: end;
+  margin-left: auto;
+}
+
+#categoriesManagerList .mini-btn {
+  min-width: 76px;
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 14px;
+  font-size: 13px;
+  font-weight: 860;
+  letter-spacing: -0.02em;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 6px 14px rgba(0, 0, 0, 0.12);
+}
+
+#categoriesManagerList .mini-btn:not(.mini-btn-type) {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92) 0%, rgba(240, 243, 249, 0.98) 100%);
+  color: #5c8ff7;
+}
+
+#categoriesManagerList .mini-btn-type {
+  min-width: 96px;
+  background:
+    linear-gradient(180deg, rgba(255, 114, 104, 0.18) 0%, rgba(255, 114, 104, 0.12) 100%);
+  color: #ffaaa3;
+}
+
+#categoriesManagerList .mini-btn:disabled {
+  opacity: 0.45;
+  filter: grayscale(0.12);
+  box-shadow: none;
+}
+
+#categoriesManagerList .list-card .category-required-flag,
+#categoriesManagerList .list-card .analytics-required-flag {
+  display: none !important;
+}
+
+@media (max-width: 420px) {
+  .categories-shell__head {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .categories-shell__back {
+    width: fit-content;
+    min-width: 102px;
+    height: 42px;
+    padding: 0 16px;
+    font-size: 14px;
+  }
+
+  .categories-shell__title {
+    font-size: 26px;
+  }
+
+  .categories-shell__subtitle {
+    font-size: 11.5px;
+  }
+
+  .categories-create-card {
+    padding: 12px;
+    border-radius: 22px;
+  }
+
+  .categories-create-card__title {
+    font-size: 17px;
+  }
+
+  .categories-create-grid {
+    grid-template-columns: minmax(0, 1fr) 84px;
+    gap: 8px;
+  }
+
+  .categories-create-grid__emoji .input {
+    font-size: 24px;
+  }
+
+  .categories-create-btn {
+    height: 50px;
+    font-size: 15px;
+  }
+
+  #categoriesManagerList .list-card {
+    min-height: 84px;
+    padding: 11px 12px;
+    gap: 10px;
+    border-radius: 22px;
+  }
+
+  #categoriesManagerList .list-icon {
+    width: 42px;
+    height: 42px;
+    flex-basis: 42px;
+    font-size: 20px;
+  }
+
+  #categoriesManagerList .list-title {
+    font-size: 17px;
+  }
+
+  #categoriesManagerList .list-subtitle {
+    font-size: 11.5px;
+  }
+
+  #categoriesManagerList .category-manager-actions {
+    grid-template-columns: repeat(2, auto);
+    gap: 6px;
+  }
+
+  #categoriesManagerList .mini-btn {
+    min-width: 68px;
+    height: 34px;
+    padding: 0 10px;
+    font-size: 12px;
+    border-radius: 13px;
+  }
+
+  #categoriesManagerList .mini-btn-type {
+    min-width: 86px;
+  }
+}
