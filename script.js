@@ -23,9 +23,11 @@ const accountIconInput = document.getElementById("accountIconInput");
 const accountRoleSelect = document.getElementById("accountRoleSelect");
 const accountPrimarySpendInput = document.getElementById("accountPrimarySpendInput");
 const accountPrimaryNote = document.getElementById("accountPrimaryNote");
+const openCreateAccountModalBtn = document.getElementById("openCreateAccountModalBtn");
 const closeAccountModalBtn = document.getElementById("closeAccountModalBtn");
 const cancelAccountModalBtn = document.getElementById("cancelAccountModalBtn");
 const saveAccountModalBtn = document.getElementById("saveAccountModalBtn");
+const deleteAccountModalBtn = document.getElementById("deleteAccountModalBtn");
 
   const analyticsCategoryModal = document.getElementById("analyticsCategoryModal");
   const analyticsCategoryModalTitle = document.getElementById("analyticsCategoryModalTitle");
@@ -897,13 +899,33 @@ function renderMandatoryPaymentsModal() {
         </div>
 
         <div class="category-manager-actions">
-          <button class="mini-btn mini-btn-type" type="button" data-toggle-mandatory-id="${item.id}">
-            ${isPaid ? "Снять" : "Оплат."}
-          </button>
-          <button class="mini-btn mini-btn-delete" type="button" data-delete-mandatory-id="${item.id}">
-            Удал.
-          </button>
-        </div>
+  <button
+    class="icon-action-btn icon-action-btn--toggle ${isPaid ? "is-active" : ""}"
+    type="button"
+    data-toggle-mandatory-id="${item.id}"
+    aria-label="${isPaid ? "Снять оплату" : "Отметить как оплаченный"}"
+    title="${isPaid ? "Снять оплату" : "Отметить как оплаченный"}"
+  >
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M5 12.5 9.2 16.5 19 7.5" />
+    </svg>
+  </button>
+
+  <button
+    class="icon-action-btn icon-action-btn--danger"
+    type="button"
+    data-delete-mandatory-id="${item.id}"
+    aria-label="Удалить платёж"
+    title="Удалить платёж"
+  >
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M5 7h14" />
+      <path d="M9 7V5h6v2" />
+      <path d="M8 7l1 12h6l1-12" />
+      <path d="M10 11v5M14 11v5" />
+    </svg>
+  </button>
+</div>
       `;
 
       card.querySelector("[data-toggle-mandatory-id]")?.addEventListener("click", async () => {
@@ -2082,6 +2104,24 @@ function syncAccountPrimaryControls() {
   }
 }
 
+function openCreateAccountModal() {
+  if (!accountModal) return;
+
+  activeAccountId = null;
+
+  accountModalTitle.textContent = "Новый счёт";
+  accountNameInput.value = "";
+  accountIconInput.value = "💳";
+  accountRoleSelect.value = "spend";
+  accountPrimarySpendInput.checked = false;
+
+  deleteAccountModalBtn?.classList.add("hidden");
+  syncAccountPrimaryControls();
+
+  accountModal.classList.remove("hidden");
+  document.body.style.overflow = "hidden";
+}
+
 function openAccountModal(accountId) {
   const account = state.accounts.find((item) => item.id === accountId);
   if (!account || !accountModal) return;
@@ -2094,6 +2134,7 @@ function openAccountModal(accountId) {
   accountRoleSelect.value = account.account_kind || "spend";
   accountPrimarySpendInput.checked = Boolean(account.is_primary_spend);
 
+  deleteAccountModalBtn?.classList.remove("hidden");
   syncAccountPrimaryControls();
 
   accountModal.classList.remove("hidden");
@@ -2111,11 +2152,10 @@ function closeAccountModal() {
   accountIconInput.value = "";
   accountRoleSelect.value = "spend";
   accountPrimarySpendInput.checked = false;
+  deleteAccountModalBtn?.classList.add("hidden");
 }
 
 async function saveAccountModal() {
-  if (!activeAccountId) return;
-
   const nextName = accountNameInput.value.trim();
   const nextIcon = accountIconInput.value.trim();
   const nextRole = accountRoleSelect.value;
@@ -2130,6 +2170,16 @@ async function saveAccountModal() {
     return;
   }
 
+  const duplicateName = state.accounts.find((account) => {
+    if (activeAccountId && account.id === activeAccountId) return false;
+    return String(account.name || "").trim().toLowerCase() === nextName.toLowerCase();
+  });
+
+  if (duplicateName) {
+    alert("Счёт с таким названием уже существует");
+    return;
+  }
+
   const flags = getAccountRoleFlags(nextRole);
   const isPrimary = canAccountBePrimary(nextRole) && accountPrimarySpendInput.checked;
 
@@ -2137,7 +2187,7 @@ async function saveAccountModal() {
     const { error: resetPrimaryError } = await supabaseClient
       .from("accounts")
       .update({ is_primary_spend: false })
-      .neq("id", activeAccountId);
+      .neq("id", activeAccountId || "");
 
     if (resetPrimaryError) {
       alert("Ошибка сброса основного счёта");
@@ -2146,21 +2196,89 @@ async function saveAccountModal() {
     }
   }
 
+  if (activeAccountId) {
+    const { error } = await supabaseClient
+      .from("accounts")
+      .update({
+        name: nextName,
+        icon: nextIcon,
+        account_kind: nextRole,
+        include_in_free_money: flags.include_in_free_money,
+        is_protected: flags.is_protected,
+        is_primary_spend: isPrimary,
+        subtitle: "",
+      })
+      .eq("id", activeAccountId);
+
+    if (error) {
+      alert("Ошибка сохранения счёта");
+      console.error(error);
+      return;
+    }
+  } else {
+    const nextSortOrder =
+      (state.accounts.reduce((max, account) => Math.max(max, Number(account.sort_order) || 0), 0) || 0) + 1;
+
+    const { error } = await supabaseClient
+      .from("accounts")
+      .insert({
+        id: crypto.randomUUID(),
+        name: nextName,
+        icon: nextIcon,
+        account_kind: nextRole,
+        include_in_free_money: flags.include_in_free_money,
+        is_protected: flags.is_protected,
+        is_primary_spend: isPrimary,
+        subtitle: "",
+        sort_order: nextSortOrder,
+      });
+
+    if (error) {
+      alert("Ошибка создания счёта");
+      console.error(error);
+      return;
+    }
+  }
+
+  await loadDataFromSupabase();
+  renderAll();
+  closeAccountModal();
+}
+
+async function deleteAccountModalAction() {
+  if (!activeAccountId) return;
+
+  const account = state.accounts.find((item) => item.id === activeAccountId);
+  if (!account) return;
+
+  if (account.account_kind === "vault_pool") {
+    alert("Накопительный счёт удалять нельзя");
+    return;
+  }
+
+  const hasTransactions = state.transactions.some((transaction) => {
+    return (
+      transaction.account === account.name ||
+      transaction.from_account === account.name ||
+      transaction.to_account === account.name
+    );
+  });
+
+  if (hasTransactions) {
+    alert("Нельзя удалить счёт, который уже используется в операциях");
+    return;
+  }
+
+  const ok = confirm(`Удалить счёт "${account.name}"?`);
+  if (!ok) return;
+
   const { error } = await supabaseClient
     .from("accounts")
-    .update({
-      name: nextName,
-      icon: nextIcon,
-      account_kind: nextRole,
-      include_in_free_money: flags.include_in_free_money,
-      is_protected: flags.is_protected,
-      is_primary_spend: isPrimary,
-      subtitle: "",
-    })
+    .delete()
     .eq("id", activeAccountId);
 
   if (error) {
-    alert("Ошибка сохранения счёта");
+    alert("Ошибка удаления счёта");
     console.error(error);
     return;
   }
@@ -3097,9 +3215,18 @@ function getAccountRoleFlags(role) {
       </div>
       <div class="list-right">
         <p class="list-value">${formatMoney(currentBalance)}</p>
-        <button class="accounts-edit-btn" type="button" data-edit-account-id="${account.id}">
-          Изм.
-        </button>
+       <button
+  class="icon-action-btn"
+  type="button"
+  data-edit-account-id="${account.id}"
+  aria-label="Редактировать счёт"
+  title="Редактировать счёт"
+>
+  <svg viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M4 20h4l10-10-4-4L4 16v4Z" />
+    <path d="M13 7l4 4" />
+  </svg>
+</button>
       </div>
     `;
 
@@ -3149,16 +3276,50 @@ function getAccountRoleFlags(role) {
   </div>
 
   <div class="category-manager-actions">
-    <button class="mini-btn mini-btn-edit" type="button" data-edit-id="${category.id}" ${lockedAttr}>
-      Изм.
-    </button>
-    <button class="mini-btn mini-btn-type" type="button" data-type-id="${category.id}" ${lockedAttr}>
-      ${category.is_required ? "Гибкая" : "Обязат."}
-    </button>
-    <button class="mini-btn mini-btn-delete" type="button" data-delete-id="${category.id}" ${lockedAttr}>
-      Удал.
-    </button>
-  </div>
+  <button
+    class="icon-action-btn"
+    type="button"
+    data-edit-id="${category.id}"
+    ${lockedAttr}
+    aria-label="Редактировать категорию"
+    title="Редактировать категорию"
+  >
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M4 20h4l10-10-4-4L4 16v4Z" />
+      <path d="M13 7l4 4" />
+    </svg>
+  </button>
+
+  <button
+    class="icon-action-btn icon-action-btn--toggle ${category.is_required ? "is-active" : ""}"
+    type="button"
+    data-type-id="${category.id}"
+    ${lockedAttr}
+    aria-label="Переключить тип категории"
+    title="Переключить тип категории"
+  >
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M8 7h8a4 4 0 1 1 0 8H8a4 4 0 1 1 0-8Z" />
+      <circle cx="16" cy="11" r="2.5" />
+    </svg>
+  </button>
+
+  <button
+    class="icon-action-btn icon-action-btn--danger"
+    type="button"
+    data-delete-id="${category.id}"
+    ${lockedAttr}
+    aria-label="Удалить категорию"
+    title="Удалить категорию"
+  >
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M5 7h14" />
+      <path d="M9 7V5h6v2" />
+      <path d="M8 7l1 12h6l1-12" />
+      <path d="M10 11v5M14 11v5" />
+    </svg>
+  </button>
+</div>
 `;
 
       const editBtn = card.querySelector("[data-edit-id]");
@@ -4027,9 +4188,11 @@ closeInsightsFiltersBtn?.addEventListener("click", closeInsightsFiltersModal);
 
 accountRoleSelect?.addEventListener("change", syncAccountPrimaryControls);
 
+openCreateAccountModalBtn?.addEventListener("click", openCreateAccountModal);
 closeAccountModalBtn?.addEventListener("click", closeAccountModal);
 cancelAccountModalBtn?.addEventListener("click", closeAccountModal);
 saveAccountModalBtn?.addEventListener("click", saveAccountModal);
+deleteAccountModalBtn?.addEventListener("click", deleteAccountModalAction);
 
 accountModal?.addEventListener("click", (event) => {
   if (event.target === accountModal) {
