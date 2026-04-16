@@ -268,6 +268,68 @@ function getAccountsByKind(kind) {
   return state.accounts.filter((account) => account.account_kind === kind);
 }
 
+function getAccountById(accountId) {
+  return state.accounts.find((account) => account.id === accountId) || null;
+}
+
+function getAccountNameById(accountId) {
+  return getAccountById(accountId)?.name || "";
+}
+
+function getAccountIconById(accountId) {
+  return getAccountById(accountId)?.icon || "💳";
+}
+
+function getVaultAccount() {
+  return state.accounts.find((account) => account.account_kind === "vault_pool") || null;
+}
+
+function getVaultAccountId() {
+  return getVaultAccount()?.id || "";
+}
+
+function getVaultAccountName() {
+  return getVaultAccount()?.name || "";
+}
+
+function isVaultAccountId(accountId) {
+  return Boolean(accountId && accountId === getVaultAccountId());
+}
+
+function getPrimarySpendAccount() {
+  return (
+    state.accounts.find(
+      (account) =>
+        account.is_primary_spend === true &&
+        account.account_kind !== "vault_pool"
+    ) || null
+  );
+}
+
+function getPrimarySpendAccountId() {
+  return getPrimarySpendAccount()?.id || "";
+}
+
+function getPrimarySpendAccountName() {
+  return getPrimarySpendAccount()?.name || "";
+}
+
+function getCashAccount() {
+  return state.accounts.find((account) => account.account_kind === "cash") || null;
+}
+
+function getCashAccountId() {
+  return getCashAccount()?.id || "";
+}
+
+function getSafeAccountName() {
+  return getVaultAccountName();
+}
+
+function getSafeAccountId() {
+  return getVaultAccountId();
+}
+
 function getPrimarySpendAccount() {
   return (
     state.accounts.find(
@@ -366,8 +428,9 @@ function getSafeBucketBalance(bucketId) {
 
     if (transaction.type === "transfer") {
       if (
-        transaction.to_account === getSafeAccountName() &&
-        transaction.to_safe_bucket_id === bucketId
+        transaction.to_account_id === getSafeAccountId()
+transaction.from_account_id === getSafeAccountId()
+transaction.account_id === getSafeAccountId()
       ) {
         balance += amount;
       }
@@ -639,8 +702,8 @@ function fillSafeBucketSelect(selectEl, placeholder, selectedId = "") {
 }
 
 function updateTransferSafeFields() {
-  const fromIsSafes = isVaultAccountName(fromAccountSelect?.value);
-const toIsSafes = isVaultAccountName(toAccountSelect?.value);
+  const fromIsSafes = isVaultAccountId(fromAccountSelect?.value);
+const toIsSafes = isVaultAccountId(toAccountSelect?.value);
 
   fromSafeBucketField?.classList.toggle("hidden", !fromIsSafes);
   toSafeBucketField?.classList.toggle("hidden", !toIsSafes);
@@ -1987,6 +2050,7 @@ function setInsightsHeroState(summary) {
   const {
     includeVault = true,
     includeProtected = true,
+    excludeId = "",
   } = options;
 
   selectEl.innerHTML = `<option value="">${placeholder}</option>`;
@@ -1994,12 +2058,13 @@ function setInsightsHeroState(summary) {
   state.accounts.forEach((account) => {
     if (!includeVault && account.account_kind === "vault_pool") return;
     if (!includeProtected && account.is_protected) return;
+    if (excludeId && account.id === excludeId) return;
 
     const option = document.createElement("option");
-    option.value = account.name;
+    option.value = account.id;
     option.textContent = `${account.icon} ${account.name}`;
 
-    if (selectedValue && selectedValue === account.name) {
+    if (selectedValue && selectedValue === account.id) {
       option.selected = true;
     }
 
@@ -2693,10 +2758,10 @@ async function deleteSafeBucketFromModal() {
       fillExpenseCategorySelect();
       fillAccountSelect(accountSelect, "Выбери счёт");
 
-const defaultExpenseAccountName =
-  getPrimarySpendAccountName() || getSpendableAccounts()[0]?.name || "";
+const defaultExpenseAccountId =
+  getPrimarySpendAccountId() || getSpendableAccounts()[0]?.id || "";
 
-accountSelect.value = defaultExpenseAccountName;
+accountSelect.value = defaultExpenseAccountId;
     } else if (mode === "income") {
       modalTitle.textContent = "Добавить доход";
       saveBtn.textContent = "Сохранить доход";
@@ -2708,10 +2773,10 @@ accountSelect.value = defaultExpenseAccountName;
 
       fillAccountSelect(accountSelect, "Выбери счёт");
 
-const defaultIncomeAccountName =
-  getPrimarySpendAccountName() || getSpendableAccounts()[0]?.name || "";
+const defaultIncomeAccountId =
+  getPrimarySpendAccountId() || getSpendableAccounts()[0]?.id || "";
 
-accountSelect.value = defaultIncomeAccountName;
+accountSelect.value = defaultIncomeAccountId;
    } else if (mode === "transfer") {
   modalTitle.textContent = "Сделать перевод";
   saveBtn.textContent = "Сохранить перевод";
@@ -2724,16 +2789,19 @@ accountSelect.value = defaultIncomeAccountName;
   fillAccountSelect(fromAccountSelect, "С какого счёта");
 fillAccountSelect(toAccountSelect, "На какой счёт");
 
-const defaultFromAccount =
-  getPrimarySpendAccountName() || getSpendableAccounts()[0]?.name || "";
+const defaultFromAccountId =
+  getPrimarySpendAccountId() || getSpendableAccounts()[0]?.id || "";
 
-const cashFallback =
-  getCashAccountName() ||
-  getSpendableAccounts().find((account) => account.name !== defaultFromAccount)?.name ||
+const cashFallbackId =
+  getCashAccountId() ||
+  getSpendableAccounts().find((account) => account.id !== defaultFromAccountId)?.id ||
   "";
 
-fromAccountSelect.value = defaultFromAccount;
-toAccountSelect.value = cashFallback;
+fromAccountSelect.value = defaultFromAccountId;
+fillAccountSelect(toAccountSelect, "На какой счёт", cashFallbackId, {
+  excludeId: defaultFromAccountId,
+});
+toAccountSelect.value = cashFallbackId;
 
   fromSafeBucketField.classList.add("hidden");
   toSafeBucketField.classList.add("hidden");
@@ -2772,8 +2840,8 @@ toAccountSelect.value = cashFallback;
       dateInput.value = transaction.created_at
         ? String(transaction.created_at).slice(0, 10)
         : getTodayDateValue();
-      fillAccountSelect(accountSelect, "Выбери счёт", transaction.account);
-      accountSelect.value = transaction.account;
+      fillAccountSelect(accountSelect, "Выбери счёт", transaction.account_id);
+accountSelect.value = transaction.account_id || "";
       commentInput.value = transaction.title === "Новая трата" ? "" : transaction.title;
     } else if (transaction.type === "income") {
       modalTitle.textContent = "Редактировать доход";
@@ -2788,8 +2856,8 @@ toAccountSelect.value = cashFallback;
       dateInput.value = transaction.created_at
         ? String(transaction.created_at).slice(0, 10)
         : getTodayDateValue();
-      fillAccountSelect(accountSelect, "Выбери счёт", transaction.account);
-      accountSelect.value = transaction.account;
+      fillAccountSelect(accountSelect, "Выбери счёт", transaction.account_id);
+accountSelect.value = transaction.account_id || "";
       commentInput.value = transaction.title === "Новый доход" ? "" : transaction.title;
       
     } else if (transaction.type === "transfer") {
@@ -2805,11 +2873,13 @@ toAccountSelect.value = cashFallback;
   dateInput.value = transaction.created_at
     ? String(transaction.created_at).slice(0, 10)
     : getTodayDateValue();
-  fillAccountSelect(fromAccountSelect, "С какого счёта", transaction.from_account);
-fillAccountSelect(toAccountSelect, "На какой счёт", transaction.to_account);
+  fillAccountSelect(fromAccountSelect, "С какого счёта", transaction.from_account_id);
+fillAccountSelect(toAccountSelect, "На какой счёт", transaction.to_account_id, {
+  excludeId: transaction.from_account_id,
+});
 
-fromAccountSelect.value = transaction.from_account;
-toAccountSelect.value = transaction.to_account;
+fromAccountSelect.value = transaction.from_account_id || "";
+toAccountSelect.value = transaction.to_account_id || "";
   commentInput.value = transaction.title === "Перевод" ? "" : transaction.title;
 
   fillSafeBucketSelect(
@@ -2843,26 +2913,63 @@ toAccountSelect.value = transaction.to_account;
     editingTransactionId = null;
   }
 
-  function getAccountBalance(accountName) {
-    let balance = 0;
+  function getAccountBalance(accountNameOrId) {
+  const account =
+    getAccountById(accountNameOrId) ||
+    state.accounts.find((item) => item.name === accountNameOrId) ||
+    null;
 
-    state.transactions.forEach((transaction) => {
-      const amount = Number(transaction.amount) || 0;
+  if (!account) return 0;
 
-      if (transaction.type === "transfer") {
-        if (transaction.from_account === accountName) balance -= amount;
-        if (transaction.to_account === accountName) balance += amount;
-        return;
+  const accountId = account.id;
+  const accountName = account.name;
+
+  return roundToTwo(
+    state.transactions.reduce((sum, transaction) => {
+      const amount = roundToTwo(Number(transaction.amount) || 0);
+
+      if (transaction.type === "income") {
+        const matchesById = transaction.account_id && transaction.account_id === accountId;
+        const matchesLegacy = !transaction.account_id && transaction.account === accountName;
+
+        if (matchesById || matchesLegacy) {
+          return sum + amount;
+        }
       }
 
-      if (transaction.account !== accountName) return;
+      if (transaction.type === "expense") {
+        const matchesById = transaction.account_id && transaction.account_id === accountId;
+        const matchesLegacy = !transaction.account_id && transaction.account === accountName;
 
-      if (transaction.type === "income") balance += amount;
-      if (transaction.type === "expense") balance -= amount;
-    });
+        if (matchesById || matchesLegacy) {
+          return sum - amount;
+        }
+      }
 
-    return balance;
-  }
+      if (transaction.type === "transfer") {
+        const fromMatchesById =
+          transaction.from_account_id && transaction.from_account_id === accountId;
+        const fromMatchesLegacy =
+          !transaction.from_account_id && transaction.from_account === accountName;
+
+        const toMatchesById =
+          transaction.to_account_id && transaction.to_account_id === accountId;
+        const toMatchesLegacy =
+          !transaction.to_account_id && transaction.to_account === accountName;
+
+        if (fromMatchesById || fromMatchesLegacy) {
+          sum -= amount;
+        }
+
+        if (toMatchesById || toMatchesLegacy) {
+          sum += amount;
+        }
+      }
+
+      return sum;
+    }, 0)
+  );
+}
   
   function getAccountRoleLabel(account) {
   if (account.account_kind === "vault_pool") return "Накопительный счёт";
@@ -3008,11 +3115,12 @@ function getAccountRoleFlags(role) {
       income += amount;
 
       if (
-        transaction.account === getSafeAccountName() &&
-        transaction.title === "Проценты по сейфу"
-      ) {
-        safeInterest += amount;
-      }
+  (transaction.account_id === getSafeAccountId() ||
+    (!transaction.account_id && transaction.account === getSafeAccountName())) &&
+  transaction.title === "Проценты по накоплению"
+) {
+  safeInterest += amount;
+}
     }
 
     if (transaction.type === "expense") {
@@ -3419,27 +3527,39 @@ const deleteBtn = card.querySelector("[data-delete-id]");
   let valueClass = "list-value";
 
   if (transaction.type === "transfer") {
-    const fromLabel = isVaultAccountName(transaction.from_account)
-      ? `${transaction.from_account} • ${getSafeBucketName(transaction.from_safe_bucket_id)}`
-      : transaction.from_account;
+    const fromAccountName =
+      getAccountNameById(transaction.from_account_id) || transaction.from_account || "";
 
-    const toLabel = isVaultAccountName(transaction.to_account)
-      ? `${transaction.to_account} • ${getSafeBucketName(transaction.to_safe_bucket_id)}`
-      : transaction.to_account;
+    const toAccountName =
+      getAccountNameById(transaction.to_account_id) || transaction.to_account || "";
+
+    const fromLabel = isVaultAccountId(transaction.from_account_id)
+      ? `${fromAccountName} • ${getSafeBucketName(transaction.from_safe_bucket_id)}`
+      : fromAccountName;
+
+    const toLabel = isVaultAccountId(transaction.to_account_id)
+      ? `${toAccountName} • ${getSafeBucketName(transaction.to_safe_bucket_id)}`
+      : toAccountName;
 
     subtitle = `${escapeHtml(fromLabel)} → ${escapeHtml(toLabel)}`;
     signedAmount = formatMoney(transaction.amount);
   } else if (transaction.type === "income") {
+    const incomeAccountName =
+      getAccountNameById(transaction.account_id) || transaction.account || "";
+
     const incomeBucketLabel =
-      transaction.account === getSafeAccountName() && transaction.to_safe_bucket_id
+      isVaultAccountId(transaction.account_id) && transaction.to_safe_bucket_id
         ? ` • ${getSafeBucketName(transaction.to_safe_bucket_id)}`
         : "";
 
-    subtitle = `${escapeHtml(transaction.account)}${escapeHtml(incomeBucketLabel)} • доход`;
+    subtitle = `${escapeHtml(incomeAccountName)}${escapeHtml(incomeBucketLabel)} • доход`;
     signedAmount = `+${formatMoney(transaction.amount)}`;
     valueClass = "list-value list-value--green";
   } else {
-    subtitle = `${escapeHtml(getCategoryName(transaction.category_id || UNCATEGORIZED_ID))} • ${escapeHtml(transaction.account)}`;
+    const expenseAccountName =
+      getAccountNameById(transaction.account_id) || transaction.account || "";
+
+    subtitle = `${escapeHtml(getCategoryName(transaction.category_id || UNCATEGORIZED_ID))} • ${escapeHtml(expenseAccountName)}`;
     signedAmount = `−${formatMoney(transaction.amount)}`;
     valueClass = "list-value list-value--red";
   }
@@ -3790,6 +3910,7 @@ const deleteBtn = card.querySelector("[data-delete-id]");
   function buildTransactionFromForm() {
     const amount = Number(amountInput.value.trim());
     const comment = commentInput.value.trim();
+    
 
     if (!amount || amount <= 0) {
       alert("Введи сумму");
@@ -3808,12 +3929,16 @@ const deleteBtn = card.querySelector("[data-delete-id]");
     const createdAt = `${selectedDate}T${preservedTime}`;
 
     if (currentMode === "transfer") {
-  const fromAccount = fromAccountSelect.value;
-  const toAccount = toAccountSelect.value;
+  const fromAccountId = fromAccountSelect.value;
+const toAccountId = toAccountSelect.value;
+
+const fromAccount = getAccountNameById(fromAccountId);
+const toAccount = getAccountNameById(toAccountId);
   const fromSafeBucketId =
-  isVaultAccountName(fromAccount) ? fromSafeBucketSelect.value : null;
+  isVaultAccountId(fromAccountId) ? fromSafeBucketSelect.value : null;
 const toSafeBucketId =
-  isVaultAccountName(toAccount) ? toSafeBucketSelect.value : null;
+  isVaultAccountId(toAccountId) ? toSafeBucketSelect.value : null;
+  const freeSafeBucket = isVaultAccountId(accountId) ? getDefaultSpendingSafeBucket() : null;
 
   if (!fromAccount) {
     alert("Выбери счёт списания");
@@ -3825,9 +3950,9 @@ const toSafeBucketId =
     return null;
   }
 
-  if (fromAccount === toAccount) {
+  if (fromAccountId === toAccountId) {
   const sameBuckets =
-    !isVaultAccountName(fromAccount) ||
+    !isVaultAccountId(fromAccountId) ||
     (fromSafeBucketId && toSafeBucketId && fromSafeBucketId === toSafeBucketId);
 
   if (sameBuckets) {
@@ -3836,33 +3961,33 @@ const toSafeBucketId =
   }
 }
 
-  if (isVaultAccountName(fromAccount) && !fromSafeBucketId) {
+  if (isVaultAccountId(fromAccountId) && !fromSafeBucketId) {
     alert("Выбери сейф списания");
     return null;
   }
 
-  if (isVaultAccountName(toAccount) && !toSafeBucketId) {
+  if (isVaultAccountId(toAccountId) && !toSafeBucketId) {
     alert("Выбери сейф зачисления");
     return null;
   }
 
   return {
-    id: editingTransactionId || crypto.randomUUID(),
-    type: "transfer",
-    title: comment || "Перевод",
-    account: null,
-    category_id: null,
-    from_account: fromAccount,
-    to_account: toAccount,
-    from_safe_bucket_id: fromSafeBucketId,
-    to_safe_bucket_id: toSafeBucketId,
-    amount,
-    time_label: getCurrentTime(),
-    created_at: createdAt,
-  };
+  id: editingTransactionId || crypto.randomUUID(),
+  type: "transfer",
+  title: comment || "Перевод",
+  amount,
+  from_account_id: fromAccountId,
+  to_account_id: toAccountId,
+  from_account: fromAccount,
+  to_account: toAccount,
+  from_safe_bucket_id: fromSafeBucketId,
+  to_safe_bucket_id: toSafeBucketId,
+  created_at: isoDate,
+};
 }
 
-    const account = accountSelect.value;
+    const accountId = accountSelect.value;
+const account = getAccountNameById(accountId);
 
     if (!account) {
       alert("Выбери счёт");
@@ -3871,17 +3996,17 @@ const toSafeBucketId =
 
     if (currentMode === "income") {
       return {
-        id: editingTransactionId || crypto.randomUUID(),
-        type: "income",
-        title: comment || "Новый доход",
-        account,
-        category_id: null,
-        from_account: null,
-        to_account: null,
-        amount,
-        time_label: getCurrentTime(),
-        created_at: createdAt,
-      };
+        return {
+  id: editingTransactionId || crypto.randomUUID(),
+  type: mode,
+  title,
+  amount,
+  account_id: accountId,
+  account,
+  category_id,
+  to_safe_bucket_id: ...,
+  created_at: isoDate,
+};
     }
 
     const categoryId = categorySelect.value;
@@ -3899,18 +4024,16 @@ if (account === getSafeAccountName() && !freeSafeBucket) {
 }
 
 return {
+  return {
   id: editingTransactionId || crypto.randomUUID(),
-  type: "expense",
-  title: comment || "Новая трата",
-  account,
-  category_id: categoryId,
-  from_account: null,
-  to_account: null,
-  from_safe_bucket_id: freeSafeBucket?.id || null,
-  to_safe_bucket_id: null,
+  type: mode,
+  title,
   amount,
-  time_label: getCurrentTime(),
-  created_at: createdAt,
+  account_id: accountId,
+  account,
+  category_id,
+  to_safe_bucket_id: ...,
+  created_at: isoDate,
 };
   }
 
