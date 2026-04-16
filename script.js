@@ -1,4 +1,7 @@
 document.addEventListener("DOMContentLoaded", async () => {
+  /* =========================================================
+     01. DOM REFERENCES
+     ========================================================= */
   const modal = document.getElementById("transactionModal");
   const openExpenseModalBtn = document.getElementById("openExpenseModal");
   const openIncomeModalBtn = document.getElementById("openIncomeModal");
@@ -193,6 +196,9 @@ const faqModalFormula = document.getElementById("faqModalFormula");
 const closeFaqModalBtn = document.getElementById("closeFaqModalBtn");
 const faqButtons = document.querySelectorAll("[data-faq-key]");
 
+  /* =========================================================
+     02. UI STATE
+     ========================================================= */
   let currentMode = "expense";
   let editingTransactionId = null;
 
@@ -227,6 +233,9 @@ let activeAccountId = null;
 
   const UNCATEGORIZED_ID = "uncategorized";
 
+  /* =========================================================
+     03. APP STATE
+     ========================================================= */
   const state = {
   transactions: [],
   accounts: [],
@@ -237,18 +246,21 @@ let activeAccountId = null;
   mandatoryPayments: [],
 };
 
+  /* =========================================================
+     04. HELPERS: CATEGORIES / ACCOUNTS / BUCKETS
+     ========================================================= */
   function getCategoryById(categoryId) {
     return state.categories.find((item) => item.id === categoryId);
   }
 
   function getCategoryName(categoryId) {
     const category = getCategoryById(categoryId);
-    return category ? category.name : "Без категории";
+    return category ? category.name : "ÐÐµÐ· ÐºÐ°ÑÐµÐ³Ð¾ÑÐ¸Ð¸";
   }
 
   function getCategoryIcon(categoryId) {
     const category = getCategoryById(categoryId);
-    return category ? category.icon : "📦";
+    return category ? category.icon : "ð¦";
   }
   
   function isRequiredCategory(categoryId) {
@@ -257,7 +269,7 @@ let activeAccountId = null;
 }
 
 function getCategoryTypeLabel(categoryId) {
-  return isRequiredCategory(categoryId) ? "Обязательная" : "Гибкая";
+  return isRequiredCategory(categoryId) ? "ÐÐ±ÑÐ·Ð°ÑÐµÐ»ÑÐ½Ð°Ñ" : "ÐÐ¸Ð±ÐºÐ°Ñ";
 }
 
 function getSafeBucketById(bucketId) {
@@ -277,7 +289,7 @@ function getAccountNameById(accountId) {
 }
 
 function getAccountIconById(accountId) {
-  return getAccountById(accountId)?.icon || "💳";
+  return getAccountById(accountId)?.icon || "ð³";
 }
 
 function getVaultAccount() {
@@ -362,11 +374,7 @@ function getSafeBucketName(bucketId) {
 
 function getSafeBucketIcon(bucketId) {
   const bucket = getSafeBucketById(bucketId);
-  return bucket ? bucket.icon : "🗂️";
-}
-
-function getSafeAccountName() {
-  return getVaultAccountName();
+  return bucket ? bucket.icon : "ðï¸";
 }
 
 function getSafeInterestAnnualRate() {
@@ -620,7 +628,7 @@ async function setSafeBucketTargetAmount(bucketId, nextAmount) {
   const target = roundToTwo(Number(nextAmount) || 0);
 
   if (target < 0) {
-    alert("Сумма сейфа не может быть меньше нуля");
+    alert("Ð¡ÑÐ¼Ð¼Ð° Ð½Ð°ÐºÐ¾Ð¿Ð»ÐµÐ½Ð¸Ñ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑ Ð±ÑÑÑ Ð¼ÐµÐ½ÑÑÐµ Ð½ÑÐ»Ñ");
     return false;
   }
 
@@ -634,9 +642,12 @@ async function setSafeBucketTargetAmount(bucketId, nextAmount) {
   const adjustmentTransaction = {
     id: crypto.randomUUID(),
     type: "transfer",
-    title: "Корректировка сейфа",
+    title: "ÐÐ¾ÑÑÐµÐºÑÐ¸ÑÐ¾Ð²ÐºÐ° Ð½Ð°ÐºÐ¾Ð¿Ð»ÐµÐ½Ð¸Ñ",
+    account_id: null,
     account: null,
     category_id: null,
+    from_account_id: getSafeAccountId(),
+    to_account_id: getSafeAccountId(),
     from_account: getSafeAccountName(),
     to_account: getSafeAccountName(),
     from_safe_bucket_id: diff < 0 ? bucketId : null,
@@ -651,7 +662,7 @@ async function setSafeBucketTargetAmount(bucketId, nextAmount) {
     .insert(adjustmentTransaction);
 
   if (error) {
-    alert("Ошибка корректировки суммы сейфа");
+    alert("ÐÑÐ¸Ð±ÐºÐ° ÐºÐ¾ÑÑÐµÐºÑÐ¸ÑÐ¾Ð²ÐºÐ¸ ÑÑÐ¼Ð¼Ñ Ð½Ð°ÐºÐ¾Ð¿Ð»ÐµÐ½Ð¸Ñ");
     console.error(error);
     return false;
   }
@@ -693,14 +704,17 @@ const toIsSafes = isVaultAccountId(toAccountSelect?.value);
   }
 
   if (fromIsSafes) {
-    fillSafeBucketSelect(fromSafeBucketSelect, "Из какого сейфа", fromSafeBucketSelect?.value || "");
+    fillSafeBucketSelect(fromSafeBucketSelect, "ÐÐ· ÐºÐ°ÐºÐ¾Ð³Ð¾ Ð½Ð°ÐºÐ¾Ð¿Ð»ÐµÐ½Ð¸Ñ", fromSafeBucketSelect?.value || "");
   }
 
   if (toIsSafes) {
-    fillSafeBucketSelect(toSafeBucketSelect, "В какой сейф", toSafeBucketSelect?.value || "");
+    fillSafeBucketSelect(toSafeBucketSelect, "Ð ÐºÐ°ÐºÐ¾Ðµ Ð½Ð°ÐºÐ¾Ð¿Ð»ÐµÐ½Ð¸Ðµ", toSafeBucketSelect?.value || "");
   }
 }
 
+  /* =========================================================
+     05. HELPERS: BUDGETS / META / MANDATORY PAYMENTS
+     ========================================================= */
   function getBudgetLimitByCategoryId(categoryId) {
     return state.budgetLimits.find((item) => item.category_id === categoryId);
   }
@@ -708,7 +722,7 @@ const toIsSafes = isVaultAccountId(toAccountSelect?.value);
   function getBudgetLimitLabel(categoryId) {
     const record = getBudgetLimitByCategoryId(categoryId);
     const amount = record ? Number(record.monthly_limit) || 0 : 0;
-    return amount > 0 ? formatMoney(amount) : "—";
+    return amount > 0 ? formatMoney(amount) : "â";
   }
 
   function getAnalyticsSpentLimitLabel(spent, categoryId) {
@@ -744,7 +758,7 @@ const toIsSafes = isVaultAccountId(toAccountSelect?.value);
       last_paid_period: item.last_paid_period || "",
     }));
   } catch (error) {
-    console.error("Ошибка mandatory_payments", error);
+    console.error("ÐÑÐ¸Ð±ÐºÐ° mandatory_payments", error);
     return [];
   }
 }
@@ -758,7 +772,7 @@ async function saveMandatoryPaymentsToMeta() {
     });
 
   if (error) {
-    alert("Ошибка сохранения обязательных платежей");
+    alert("ÐÑÐ¸Ð±ÐºÐ° ÑÐ¾ÑÑÐ°Ð½ÐµÐ½Ð¸Ñ Ð¾Ð±ÑÐ·Ð°ÑÐµÐ»ÑÐ½ÑÑ Ð¿Ð»Ð°ÑÐµÐ¶ÐµÐ¹");
     console.error(error);
     return false;
   }
@@ -790,7 +804,7 @@ function getMandatoryPaymentsStats(monthKey = getCurrentMonthKey()) {
 function fillMandatoryPaymentSafeSelect(selectedId = "") {
   if (!mandatoryPaymentLinkedSafeSelect) return;
 
-  mandatoryPaymentLinkedSafeSelect.innerHTML = `<option value="">Без привязки к сейфу</option>`;
+  mandatoryPaymentLinkedSafeSelect.innerHTML = `<option value="">ÐÐµÐ· Ð¿ÑÐ¸Ð²ÑÐ·ÐºÐ¸ Ðº Ð½Ð°ÐºÐ¾Ð¿Ð»ÐµÐ½Ð¸Ñ</option>`;
 
   state.safeBuckets.forEach((bucket) => {
     const option = document.createElement("option");
@@ -891,8 +905,8 @@ function renderMandatoryPaymentsModal() {
     empty.className = "list-card";
     empty.innerHTML = `
       <div class="list-body">
-        <h3 class="list-title">Платежей пока нет</h3>
-        <p class="list-subtitle">Добавь обязательные платежи ниже</p>
+        <h3 class="list-title">ÐÐ»Ð°ÑÐµÐ¶ÐµÐ¹ Ð¿Ð¾ÐºÐ° Ð½ÐµÑ</h3>
+        <p class="list-subtitle">ÐÐ¾Ð±Ð°Ð²Ñ Ð¾Ð±ÑÐ·Ð°ÑÐµÐ»ÑÐ½ÑÐµ Ð¿Ð»Ð°ÑÐµÐ¶Ð¸ Ð½Ð¸Ð¶Ðµ</p>
       </div>
     `;
     mandatoryPaymentsList.appendChild(empty);
@@ -918,14 +932,14 @@ function renderMandatoryPaymentsModal() {
       const covered = Math.min(Number(item.amount) || 0, linkedSafeBalance);
 
       const coverageText = item.linked_safe_bucket_id
-        ? `сейф: ${linkedSafeName} • покрыто ${formatMoney(covered)}`
-        : "без привязки к сейфу";
+        ? `Ð½Ð°ÐºÐ¾Ð¿Ð»ÐµÐ½Ð¸Ðµ: ${linkedSafeName} â¢ Ð¿Ð¾ÐºÑÑÑÐ¾ ${formatMoney(covered)}`
+        : "Ð±ÐµÐ· Ð¿ÑÐ¸Ð²ÑÐ·ÐºÐ¸ Ðº Ð½Ð°ÐºÐ¾Ð¿Ð»ÐµÐ½Ð¸Ñ";
 
       const card = document.createElement("div");
       card.className = "list-card";
       card.innerHTML = `
         <div class="list-icon ${isPaid ? "list-icon--green" : "list-icon--red"}">
-          ${isPaid ? "✓" : "!"}
+          ${isPaid ? "â" : "!"}
         </div>
 
         <div class="list-body">
@@ -933,7 +947,7 @@ function renderMandatoryPaymentsModal() {
             <h3 class="list-title">${escapeHtml(item.title)}</h3>
           </div>
           <p class="list-subtitle">
-            ${formatMoney(item.amount)} • до ${String(item.due_day).padStart(2, "0")} числа • ${coverageText} • ${isPaid ? "Оплачен" : "Не оплачен"}
+            ${formatMoney(item.amount)} â¢ Ð´Ð¾ ${String(item.due_day).padStart(2, "0")} ÑÐ¸ÑÐ»Ð° â¢ ${coverageText} â¢ ${isPaid ? "ÐÐ¿Ð»Ð°ÑÐµÐ½" : "ÐÐµ Ð¾Ð¿Ð»Ð°ÑÐµÐ½"}
           </p>
         </div>
 
@@ -942,8 +956,8 @@ function renderMandatoryPaymentsModal() {
     class="icon-action-btn icon-action-btn--toggle ${isPaid ? "is-active" : ""}"
     type="button"
     data-toggle-mandatory-id="${item.id}"
-    aria-label="${isPaid ? "Снять оплату" : "Отметить как оплаченный"}"
-    title="${isPaid ? "Снять оплату" : "Отметить как оплаченный"}"
+    aria-label="${isPaid ? "Ð¡Ð½ÑÑÑ Ð¾Ð¿Ð»Ð°ÑÑ" : "ÐÑÐ¼ÐµÑÐ¸ÑÑ ÐºÐ°Ðº Ð¾Ð¿Ð»Ð°ÑÐµÐ½Ð½ÑÐ¹"}"
+    title="${isPaid ? "Ð¡Ð½ÑÑÑ Ð¾Ð¿Ð»Ð°ÑÑ" : "ÐÑÐ¼ÐµÑÐ¸ÑÑ ÐºÐ°Ðº Ð¾Ð¿Ð»Ð°ÑÐµÐ½Ð½ÑÐ¹"}"
   >
     <svg viewBox="0 0 24 24" aria-hidden="true">
       <path d="M5 12.5 9.2 16.5 19 7.5" />
@@ -954,8 +968,8 @@ function renderMandatoryPaymentsModal() {
     class="icon-action-btn icon-action-btn--danger"
     type="button"
     data-delete-mandatory-id="${item.id}"
-    aria-label="Удалить платёж"
-    title="Удалить платёж"
+    aria-label="Ð£Ð´Ð°Ð»Ð¸ÑÑ Ð¿Ð»Ð°ÑÑÐ¶"
+    title="Ð£Ð´Ð°Ð»Ð¸ÑÑ Ð¿Ð»Ð°ÑÑÐ¶"
   >
     <svg viewBox="0 0 24 24" aria-hidden="true">
       <path d="M5 7h14" />
@@ -981,7 +995,7 @@ function renderMandatoryPaymentsModal() {
       });
 
       card.querySelector("[data-delete-mandatory-id]")?.addEventListener("click", async () => {
-        const ok = confirm(`Удалить обязательный платёж "${item.title}"?`);
+        const ok = confirm(`Ð£Ð´Ð°Ð»Ð¸ÑÑ Ð¾Ð±ÑÐ·Ð°ÑÐµÐ»ÑÐ½ÑÐ¹ Ð¿Ð»Ð°ÑÑÐ¶ "${item.title}"?`);
         if (!ok) return;
 
         state.mandatoryPayments = state.mandatoryPayments.filter((entry) => entry.id !== item.id);
@@ -1004,17 +1018,17 @@ function renderMandatoryPaymentsModal() {
   const linkedSafeBucketId = mandatoryPaymentLinkedSafeSelect?.value || "";
 
   if (!title) {
-    alert("Введи название платежа");
+    alert("ÐÐ²ÐµÐ´Ð¸ Ð½Ð°Ð·Ð²Ð°Ð½Ð¸Ðµ Ð¿Ð»Ð°ÑÐµÐ¶Ð°");
     return;
   }
 
   if (!amount || amount <= 0) {
-    alert("Введи корректную сумму");
+    alert("ÐÐ²ÐµÐ´Ð¸ ÐºÐ¾ÑÑÐµÐºÑÐ½ÑÑ ÑÑÐ¼Ð¼Ñ");
     return;
   }
 
   if (!dueDateValue) {
-    alert("Выбери дату платежа");
+    alert("ÐÑÐ±ÐµÑÐ¸ Ð´Ð°ÑÑ Ð¿Ð»Ð°ÑÐµÐ¶Ð°");
     return;
   }
 
@@ -1044,6 +1058,9 @@ function renderMandatoryPaymentsModal() {
   renderAll();
 }
 
+  /* =========================================================
+     06. HELPERS: DATE / FORMAT / FILTERS
+     ========================================================= */
   function getDateOnlyString(date) {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -1076,7 +1093,7 @@ function renderMandatoryPaymentsModal() {
 
   function formatDateRangeLabel(fromValue, toValue) {
     if (!fromValue || !toValue) return "";
-    return `${formatDateShort(fromValue)} — ${formatDateShort(toValue)}`;
+    return `${formatDateShort(fromValue)} â ${formatDateShort(toValue)}`;
   }
 
   function getStartOfTodayTime() {
@@ -1175,7 +1192,7 @@ function renderMandatoryPaymentsModal() {
   }
 
   function formatMoney(value) {
-    return `${new Intl.NumberFormat("ru-RU").format(Number(value) || 0)} ₽`;
+    return `${new Intl.NumberFormat("ru-RU").format(Number(value) || 0)} â½`;
   }
 
   function formatDateShort(dateValue) {
@@ -1212,10 +1229,10 @@ function renderMandatoryPaymentsModal() {
   }
 
   function formatMonthButtonLabel(monthValue) {
-    if (!monthValue) return "Месяц";
+    if (!monthValue) return "ÐÐµÑÑÑ";
 
     const [year, month] = monthValue.split("-").map(Number);
-    if (!year || !month) return "Месяц";
+    if (!year || !month) return "ÐÐµÑÑÑ";
 
     const date = new Date(year, month - 1, 1);
     const monthLabel = date.toLocaleDateString("ru-RU", { month: "long" });
@@ -1225,18 +1242,18 @@ function renderMandatoryPaymentsModal() {
 
   function getRussianMonthNames() {
     return [
-      "Январь",
-      "Февраль",
-      "Март",
-      "Апрель",
-      "Май",
-      "Июнь",
-      "Июль",
-      "Август",
-      "Сентябрь",
-      "Октябрь",
-      "Ноябрь",
-      "Декабрь",
+      "Ð¯Ð½Ð²Ð°ÑÑ",
+      "Ð¤ÐµÐ²ÑÐ°Ð»Ñ",
+      "ÐÐ°ÑÑ",
+      "ÐÐ¿ÑÐµÐ»Ñ",
+      "ÐÐ°Ð¹",
+      "ÐÑÐ½Ñ",
+      "ÐÑÐ»Ñ",
+      "ÐÐ²Ð³ÑÑÑ",
+      "Ð¡ÐµÐ½ÑÑÐ±ÑÑ",
+      "ÐÐºÑÑÐ±ÑÑ",
+      "ÐÐ¾ÑÐ±ÑÑ",
+      "ÐÐµÐºÐ°Ð±ÑÑ",
     ];
   }
 
@@ -1632,11 +1649,11 @@ function resetInsightsMonthWheel() {
     }
 
     if (analyticsFilterPeriod === "today") {
-      return "сегодня";
+      return "ÑÐµÐ³Ð¾Ð´Ð½Ñ";
     }
 
     if (analyticsFilterPeriod === "7") {
-      return "за 7 дней";
+      return "Ð·Ð° 7 Ð´Ð½ÐµÐ¹";
     }
 
     if (analyticsFilterPeriod === "range") {
@@ -1663,11 +1680,11 @@ function getInsightsPeriodLabel() {
   }
 
   if (insightsFilterPeriod === "today") {
-    return "сегодня";
+    return "ÑÐµÐ³Ð¾Ð´Ð½Ñ";
   }
 
   if (insightsFilterPeriod === "7") {
-    return "за 7 дней";
+    return "Ð·Ð° 7 Ð´Ð½ÐµÐ¹";
   }
 
   if (insightsFilterPeriod === "range") {
@@ -1698,57 +1715,57 @@ function getInsightsFilteredTransactions() {
   
   const FAQ_META = {
   required_expense: {
-    title: "Обязательные расходы",
+    title: "ÐÐ±ÑÐ·Ð°ÑÐµÐ»ÑÐ½ÑÐµ ÑÐ°ÑÑÐ¾Ð´Ñ",
     text:
-      "Это все расходы за выбранный период по категориям, которые помечены как обязательные.",
+      "Ð­ÑÐ¾ Ð²ÑÐµ ÑÐ°ÑÑÐ¾Ð´Ñ Ð·Ð° Ð²ÑÐ±ÑÐ°Ð½Ð½ÑÐ¹ Ð¿ÐµÑÐ¸Ð¾Ð´ Ð¿Ð¾ ÐºÐ°ÑÐµÐ³Ð¾ÑÐ¸ÑÐ¼, ÐºÐ¾ÑÐ¾ÑÑÐµ Ð¿Ð¾Ð¼ÐµÑÐµÐ½Ñ ÐºÐ°Ðº Ð¾Ð±ÑÐ·Ð°ÑÐµÐ»ÑÐ½ÑÐµ.",
   },
 
   flexible_expense: {
-    title: "Гибкие расходы",
+    title: "ÐÐ¸Ð±ÐºÐ¸Ðµ ÑÐ°ÑÑÐ¾Ð´Ñ",
     text:
-      "Это все расходы за выбранный период по категориям, которые не помечены как обязательные.",
+      "Ð­ÑÐ¾ Ð²ÑÐµ ÑÐ°ÑÑÐ¾Ð´Ñ Ð·Ð° Ð²ÑÐ±ÑÐ°Ð½Ð½ÑÐ¹ Ð¿ÐµÑÐ¸Ð¾Ð´ Ð¿Ð¾ ÐºÐ°ÑÐµÐ³Ð¾ÑÐ¸ÑÐ¼, ÐºÐ¾ÑÐ¾ÑÑÐµ Ð½Ðµ Ð¿Ð¾Ð¼ÐµÑÐµÐ½Ñ ÐºÐ°Ðº Ð¾Ð±ÑÐ·Ð°ÑÐµÐ»ÑÐ½ÑÐµ.",
   },
 
 saved_to_safes: {
-  title: "Отложено в накопления",
+  title: "ÐÑÐ»Ð¾Ð¶ÐµÐ½Ð¾ Ð² Ð½Ð°ÐºÐ¾Ð¿Ð»ÐµÐ½Ð¸Ñ",
   text:
-    "Это сколько денег ты перевёл в накопления из обычных счетов за выбранный период. Внутренние перекладывания между самими накоплениями сюда не входят.",
+    "Ð­ÑÐ¾ ÑÐºÐ¾Ð»ÑÐºÐ¾ Ð´ÐµÐ½ÐµÐ³ ÑÑ Ð¿ÐµÑÐµÐ²ÑÐ» Ð² Ð½Ð°ÐºÐ¾Ð¿Ð»ÐµÐ½Ð¸Ñ Ð¸Ð· Ð¾Ð±ÑÑÐ½ÑÑ ÑÑÐµÑÐ¾Ð² Ð·Ð° Ð²ÑÐ±ÑÐ°Ð½Ð½ÑÐ¹ Ð¿ÐµÑÐ¸Ð¾Ð´. ÐÐ½ÑÑÑÐµÐ½Ð½Ð¸Ðµ Ð¿ÐµÑÐµÐºÐ»Ð°Ð´ÑÐ²Ð°Ð½Ð¸Ñ Ð¼ÐµÐ¶Ð´Ñ ÑÐ°Ð¼Ð¸Ð¼Ð¸ Ð½Ð°ÐºÐ¾Ð¿Ð»ÐµÐ½Ð¸ÑÐ¼Ð¸ ÑÑÐ´Ð° Ð½Ðµ Ð²ÑÐ¾Ð´ÑÑ.",
 },
 
   remaining_limits: {
-    title: "Остаток лимитов",
+    title: "ÐÑÑÐ°ÑÐ¾Ðº Ð»Ð¸Ð¼Ð¸ÑÐ¾Ð²",
     text:
-      "Это сколько ещё можно потратить по гибким категориям в текущем месяце, если хочешь остаться в рамках своих лимитов.",
+      "Ð­ÑÐ¾ ÑÐºÐ¾Ð»ÑÐºÐ¾ ÐµÑÑ Ð¼Ð¾Ð¶Ð½Ð¾ Ð¿Ð¾ÑÑÐ°ÑÐ¸ÑÑ Ð¿Ð¾ Ð³Ð¸Ð±ÐºÐ¸Ð¼ ÐºÐ°ÑÐµÐ³Ð¾ÑÐ¸ÑÐ¼ Ð² ÑÐµÐºÑÑÐµÐ¼ Ð¼ÐµÑÑÑÐµ, ÐµÑÐ»Ð¸ ÑÐ¾ÑÐµÑÑ Ð¾ÑÑÐ°ÑÑÑÑ Ð² ÑÐ°Ð¼ÐºÐ°Ñ ÑÐ²Ð¾Ð¸Ñ Ð»Ð¸Ð¼Ð¸ÑÐ¾Ð².",
   },
 
   total_balance: {
-    title: "Общий баланс",
+    title: "ÐÐ±ÑÐ¸Ð¹ Ð±Ð°Ð»Ð°Ð½Ñ",
     text:
-      "Это сумма денег по всем счетам приложения на текущий момент.",
+      "Ð­ÑÐ¾ ÑÑÐ¼Ð¼Ð° Ð´ÐµÐ½ÐµÐ³ Ð¿Ð¾ Ð²ÑÐµÐ¼ ÑÑÐµÑÐ°Ð¼ Ð¿ÑÐ¸Ð»Ð¾Ð¶ÐµÐ½Ð¸Ñ Ð½Ð° ÑÐµÐºÑÑÐ¸Ð¹ Ð¼Ð¾Ð¼ÐµÐ½Ñ.",
   },
 
   protected_money: {
-    title: "Неприкосаймые",
+    title: "ÐÐµÐ¿ÑÐ¸ÐºÐ¾ÑÐ°Ð¹Ð¼ÑÐµ",
     text:
-      "Это деньги, которые приложение считает не для обычных трат.",
+      "Ð­ÑÐ¾ Ð´ÐµÐ½ÑÐ³Ð¸, ÐºÐ¾ÑÐ¾ÑÑÐµ Ð¿ÑÐ¸Ð»Ð¾Ð¶ÐµÐ½Ð¸Ðµ ÑÑÐ¸ÑÐ°ÐµÑ Ð½Ðµ Ð´Ð»Ñ Ð¾Ð±ÑÑÐ½ÑÑ ÑÑÐ°Ñ.",
   },
 
   free_money: {
-  title: "Свободные деньги",
+  title: "Ð¡Ð²Ð¾Ð±Ð¾Ð´Ð½ÑÐµ Ð´ÐµÐ½ÑÐ³Ð¸",
   text:
-  "Это деньги из счетов и накоплений, которые помечены как доступные для обычных трат.",
+  "Ð­ÑÐ¾ Ð´ÐµÐ½ÑÐ³Ð¸ Ð¸Ð· ÑÑÐµÑÐ¾Ð² Ð¸ Ð½Ð°ÐºÐ¾Ð¿Ð»ÐµÐ½Ð¸Ð¹, ÐºÐ¾ÑÐ¾ÑÑÐµ Ð¿Ð¾Ð¼ÐµÑÐµÐ½Ñ ÐºÐ°Ðº Ð´Ð¾ÑÑÑÐ¿Ð½ÑÐµ Ð´Ð»Ñ Ð¾Ð±ÑÑÐ½ÑÑ ÑÑÐ°Ñ.",
 },
 
   can_save_now: {
-    title: "Можно отложить сейчас",
+    title: "ÐÐ¾Ð¶Ð½Ð¾ Ð¾ÑÐ»Ð¾Ð¶Ð¸ÑÑ ÑÐµÐ¹ÑÐ°Ñ",
     text:
-      "Это сумма, которую можно убрать в накопления без конфликта с непокрытыми обязательными платежами и остатком лимитов.",
+      "Ð­ÑÐ¾ ÑÑÐ¼Ð¼Ð°, ÐºÐ¾ÑÐ¾ÑÑÑ Ð¼Ð¾Ð¶Ð½Ð¾ ÑÐ±ÑÐ°ÑÑ Ð² Ð½Ð°ÐºÐ¾Ð¿Ð»ÐµÐ½Ð¸Ñ Ð±ÐµÐ· ÐºÐ¾Ð½ÑÐ»Ð¸ÐºÑÐ° Ñ Ð½ÐµÐ¿Ð¾ÐºÑÑÑÑÐ¼Ð¸ Ð¾Ð±ÑÐ·Ð°ÑÐµÐ»ÑÐ½ÑÐ¼Ð¸ Ð¿Ð»Ð°ÑÐµÐ¶Ð°Ð¼Ð¸ Ð¸ Ð¾ÑÑÐ°ÑÐºÐ¾Ð¼ Ð»Ð¸Ð¼Ð¸ÑÐ¾Ð².",
   },
 
   summary_recommendation: {
-    title: "Вывод",
+    title: "ÐÑÐ²Ð¾Ð´",
     text:
-      "Это итоговый результат на основе свободных денег, непокрытых обязательных платежей и остатка лимитов.",
+      "Ð­ÑÐ¾ Ð¸ÑÐ¾Ð³Ð¾Ð²ÑÐ¹ ÑÐµÐ·ÑÐ»ÑÑÐ°Ñ Ð½Ð° Ð¾ÑÐ½Ð¾Ð²Ðµ ÑÐ²Ð¾Ð±Ð¾Ð´Ð½ÑÑ Ð´ÐµÐ½ÐµÐ³, Ð½ÐµÐ¿Ð¾ÐºÑÑÑÑÑ Ð¾Ð±ÑÐ·Ð°ÑÐµÐ»ÑÐ½ÑÑ Ð¿Ð»Ð°ÑÐµÐ¶ÐµÐ¹ Ð¸ Ð¾ÑÑÐ°ÑÐºÐ° Ð»Ð¸Ð¼Ð¸ÑÐ¾Ð².",
   },
 };
 
@@ -1794,13 +1811,19 @@ function getSavedToSafesBreakdown() {
   const items = getInsightsFilteredTransactions().filter((transaction) => {
     return (
       transaction.type === "transfer" &&
-      transaction.to_account === getSafeAccountName() &&
-      transaction.from_account !== getSafeAccountName()
+      (
+        transaction.to_account_id === getSafeAccountId() ||
+        (!transaction.to_account_id && transaction.to_account === getSafeAccountName())
+      ) &&
+      !(
+        transaction.from_account_id === getSafeAccountId() ||
+        (!transaction.from_account_id && transaction.from_account === getSafeAccountName())
+      )
     );
   });
 
   return items.map((transaction) => ({
-    title: transaction.title || "Перевод в накопления",
+    title: transaction.title || "ÐÐµÑÐµÐ²Ð¾Ð´ Ð² Ð½Ð°ÐºÐ¾Ð¿Ð»ÐµÐ½Ð¸Ñ",
     amount: roundToTwo(Number(transaction.amount) || 0),
     date: formatDateShort(transaction.created_at),
   }));
@@ -1830,18 +1853,18 @@ function buildFaqFormulaText(faqKey) {
   const summary = getInsightsSummary();
 
   if (faqKey === "required_expense") {
-    return `${formatMoney(summary.requiredExpense)} = сумма всех обязательных expense-операций за выбранный период`;
+    return `${formatMoney(summary.requiredExpense)} = ÑÑÐ¼Ð¼Ð° Ð²ÑÐµÑ Ð¾Ð±ÑÐ·Ð°ÑÐµÐ»ÑÐ½ÑÑ expense-Ð¾Ð¿ÐµÑÐ°ÑÐ¸Ð¹ Ð·Ð° Ð²ÑÐ±ÑÐ°Ð½Ð½ÑÐ¹ Ð¿ÐµÑÐ¸Ð¾Ð´`;
   }
 
   if (faqKey === "flexible_expense") {
-    return `${formatMoney(summary.flexibleExpense)} = сумма всех гибких expense-операций за выбранный период`;
+    return `${formatMoney(summary.flexibleExpense)} = ÑÑÐ¼Ð¼Ð° Ð²ÑÐµÑ Ð³Ð¸Ð±ÐºÐ¸Ñ expense-Ð¾Ð¿ÐµÑÐ°ÑÐ¸Ð¹ Ð·Ð° Ð²ÑÐ±ÑÐ°Ð½Ð½ÑÐ¹ Ð¿ÐµÑÐ¸Ð¾Ð´`;
   }
 
   if (faqKey === "saved_to_safes") {
     const rows = getSavedToSafesBreakdown();
 
     if (!rows.length) {
-      return `${formatMoney(0)} = за выбранный период не было переводов в накопления`;
+      return `${formatMoney(0)} = Ð·Ð° Ð²ÑÐ±ÑÐ°Ð½Ð½ÑÐ¹ Ð¿ÐµÑÐ¸Ð¾Ð´ Ð½Ðµ Ð±ÑÐ»Ð¾ Ð¿ÐµÑÐµÐ²Ð¾Ð´Ð¾Ð² Ð² Ð½Ð°ÐºÐ¾Ð¿Ð»ÐµÐ½Ð¸Ñ`;
     }
 
     const parts = rows.map((item) => `${formatMoney(item.amount)} (${item.date})`);
@@ -1852,25 +1875,25 @@ function buildFaqFormulaText(faqKey) {
     const rows = getRemainingFlexibleBudgetsBreakdownCurrentMonth();
 
     if (!rows.length) {
-      return `${formatMoney(0)} = по гибким категориям не осталось запаса по лимитам`;
+      return `${formatMoney(0)} = Ð¿Ð¾ Ð³Ð¸Ð±ÐºÐ¸Ð¼ ÐºÐ°ÑÐµÐ³Ð¾ÑÐ¸ÑÐ¼ Ð½Ðµ Ð¾ÑÑÐ°Ð»Ð¾ÑÑ Ð·Ð°Ð¿Ð°ÑÐ° Ð¿Ð¾ Ð»Ð¸Ð¼Ð¸ÑÐ°Ð¼`;
     }
 
     const lines = rows.map((item) => {
-      return `${item.name}: ${formatMoney(item.limit)} − ${formatMoney(item.spent)} = ${formatMoney(item.remaining)}`;
+      return `${item.name}: ${formatMoney(item.limit)} â ${formatMoney(item.spent)} = ${formatMoney(item.remaining)}`;
     });
 
     return `${formatMoney(summary.remainingBudgets)} =\n${lines.join("\n")}`;
   }
 
   if (faqKey === "total_balance") {
-    return `${formatMoney(summary.totalBalance)} = сумма балансов всех счетов приложения`;
+    return `${formatMoney(summary.totalBalance)} = ÑÑÐ¼Ð¼Ð° Ð±Ð°Ð»Ð°Ð½ÑÐ¾Ð² Ð²ÑÐµÑ ÑÑÐµÑÐ¾Ð² Ð¿ÑÐ¸Ð»Ð¾Ð¶ÐµÐ½Ð¸Ñ`;
   }
 
   if (faqKey === "protected_money") {
     const rows = getProtectedMoneyBreakdown();
 
     if (!rows.length) {
-      return `${formatMoney(0)} = резервы и цели сейчас пустые`;
+      return `${formatMoney(0)} = ÑÐµÐ·ÐµÑÐ²Ñ Ð¸ ÑÐµÐ»Ð¸ ÑÐµÐ¹ÑÐ°Ñ Ð¿ÑÑÑÑÐµ`;
     }
 
     const parts = rows.map((item) => `${formatMoney(item.amount)} (${item.label})`);
@@ -1897,7 +1920,7 @@ function buildFaqFormulaText(faqKey) {
     });
 
   if (!rows.length) {
-    return `${formatMoney(0)} = сейчас нет источников, помеченных как свободные деньги`;
+    return `${formatMoney(0)} = ÑÐµÐ¹ÑÐ°Ñ Ð½ÐµÑ Ð¸ÑÑÐ¾ÑÐ½Ð¸ÐºÐ¾Ð², Ð¿Ð¾Ð¼ÐµÑÐµÐ½Ð½ÑÑ ÐºÐ°Ðº ÑÐ²Ð¾Ð±Ð¾Ð´Ð½ÑÐµ Ð´ÐµÐ½ÑÐ³Ð¸`;
   }
 
   const parts = rows.map((item) => `${formatMoney(item.amount)} (${item.label})`);
@@ -1905,7 +1928,7 @@ function buildFaqFormulaText(faqKey) {
 }
 
   if (faqKey === "can_save_now") {
-    return `${formatMoney(summary.canSaveNow)} = max(0, ${formatMoney(summary.freeMoney)} − ${formatMoney(summary.pendingMandatoryToDeduct)} − ${formatMoney(summary.remainingBudgets)})`;
+    return `${formatMoney(summary.canSaveNow)} = max(0, ${formatMoney(summary.freeMoney)} â ${formatMoney(summary.pendingMandatoryToDeduct)} â ${formatMoney(summary.remainingBudgets)})`;
   }
 
   if (faqKey === "summary_recommendation") {
@@ -1914,13 +1937,13 @@ function buildFaqFormulaText(faqKey) {
     );
 
     if (raw >= 0) {
-      return `${formatMoney(raw)} = ${formatMoney(summary.freeMoney)} − ${formatMoney(summary.pendingMandatoryToDeduct)} − ${formatMoney(summary.remainingBudgets)}`;
+      return `${formatMoney(raw)} = ${formatMoney(summary.freeMoney)} â ${formatMoney(summary.pendingMandatoryToDeduct)} â ${formatMoney(summary.remainingBudgets)}`;
     }
 
-    return `Не хватает ${formatMoney(Math.abs(raw))} = ${formatMoney(summary.pendingMandatoryToDeduct)} + ${formatMoney(summary.remainingBudgets)} − ${formatMoney(summary.freeMoney)}`;
+    return `ÐÐµ ÑÐ²Ð°ÑÐ°ÐµÑ ${formatMoney(Math.abs(raw))} = ${formatMoney(summary.pendingMandatoryToDeduct)} + ${formatMoney(summary.remainingBudgets)} â ${formatMoney(summary.freeMoney)}`;
   }
 
-  return "—";
+  return "â";
 }
 
 function openFaqModal(faqKey) {
@@ -1955,22 +1978,22 @@ function setInsightsHeroState(summary) {
   if (!insightsCanSaveNowStatus || !insightsCanSaveNowHint) return;
 
   if (summary.shortageBeforeSafeSaving > 0) {
-    insightsCanSaveNowStatus.textContent = "Сейчас рано";
+    insightsCanSaveNowStatus.textContent = "Ð¡ÐµÐ¹ÑÐ°Ñ ÑÐ°Ð½Ð¾";
     insightsCanSaveNowHint.textContent =
-      `Не хватает ${formatMoney(summary.shortageBeforeSafeSaving)} после учёта обязательных и лимитов.`;
+      `ÐÐµ ÑÐ²Ð°ÑÐ°ÐµÑ ${formatMoney(summary.shortageBeforeSafeSaving)} Ð¿Ð¾ÑÐ»Ðµ ÑÑÑÑÐ° Ð¾Ð±ÑÐ·Ð°ÑÐµÐ»ÑÐ½ÑÑ Ð¸ Ð»Ð¸Ð¼Ð¸ÑÐ¾Ð².`;
     return;
   }
 
   if (summary.canSaveNow > 0) {
-    insightsCanSaveNowStatus.textContent = "Можно спокойно отложить";
+    insightsCanSaveNowStatus.textContent = "ÐÐ¾Ð¶Ð½Ð¾ ÑÐ¿Ð¾ÐºÐ¾Ð¹Ð½Ð¾ Ð¾ÑÐ»Ð¾Ð¶Ð¸ÑÑ";
     insightsCanSaveNowHint.textContent =
-      "Сумма уже рассчитана с учётом обязательных платежей и лимитов.";
+      "Ð¡ÑÐ¼Ð¼Ð° ÑÐ¶Ðµ ÑÐ°ÑÑÑÐ¸ÑÐ°Ð½Ð° Ñ ÑÑÑÑÐ¾Ð¼ Ð¾Ð±ÑÐ·Ð°ÑÐµÐ»ÑÐ½ÑÑ Ð¿Ð»Ð°ÑÐµÐ¶ÐµÐ¹ Ð¸ Ð»Ð¸Ð¼Ð¸ÑÐ¾Ð².";
     return;
   }
 
-  insightsCanSaveNowStatus.textContent = "Запаса нет";
+  insightsCanSaveNowStatus.textContent = "ÐÐ°Ð¿Ð°ÑÐ° Ð½ÐµÑ";
   insightsCanSaveNowHint.textContent =
-    "Свободные деньги сейчас полностью заняты обязательствами и лимитами.";
+    "Ð¡Ð²Ð¾Ð±Ð¾Ð´Ð½ÑÐµ Ð´ÐµÐ½ÑÐ³Ð¸ ÑÐµÐ¹ÑÐ°Ñ Ð¿Ð¾Ð»Ð½Ð¾ÑÑÑÑ Ð·Ð°Ð½ÑÑÑ Ð¾Ð±ÑÐ·Ð°ÑÐµÐ»ÑÑÑÐ²Ð°Ð¼Ð¸ Ð¸ Ð»Ð¸Ð¼Ð¸ÑÐ°Ð¼Ð¸.";
 }
 
   function getIconToneClass(type, extra = "") {
@@ -1995,8 +2018,8 @@ function setInsightsHeroState(summary) {
     if (!exists) {
       state.categories.unshift({
   id: UNCATEGORIZED_ID,
-  name: "Без категории",
-  icon: "📦",
+  name: "ÐÐµÐ· ÐºÐ°ÑÐµÐ³Ð¾ÑÐ¸Ð¸",
+  icon: "ð¦",
   locked: true,
   is_required: false,
   sort_order: 1,
@@ -2005,7 +2028,7 @@ function setInsightsHeroState(summary) {
   }
 
   function fillExpenseCategorySelect(selectedId = "") {
-    categorySelect.innerHTML = `<option value="">Выбери категорию</option>`;
+    categorySelect.innerHTML = `<option value="">ÐÑÐ±ÐµÑÐ¸ ÐºÐ°ÑÐµÐ³Ð¾ÑÐ¸Ñ</option>`;
 
     state.categories.forEach((category) => {
       const option = document.createElement("option");
@@ -2099,6 +2122,9 @@ function setInsightsHeroState(summary) {
   renderInsights();
 }
 
+  /* =========================================================
+     07. MODALS: BUDGET / ACCOUNTS / ÐÐÐÐÐÐÐÐÐÐ¯
+     ========================================================= */
   function openBudgetModal(categoryId) {
   const category = getCategoryById(categoryId);
   if (!category) return;
@@ -2107,7 +2133,7 @@ function setInsightsHeroState(summary) {
 
   const existing = getBudgetLimitByCategoryId(categoryId);
 
-  budgetModalTitle.textContent = `Редактирование: ${category.icon} ${category.name}`;
+  budgetModalTitle.textContent = `Ð ÐµÐ´Ð°ÐºÑÐ¸ÑÐ¾Ð²Ð°Ð½Ð¸Ðµ: ${category.icon} ${category.name}`;
   budgetCategoryNameInput.value = category.name || "";
   budgetCategoryIconInput.value = category.icon || "";
   budgetAmountInput.value = existing ? Number(existing.monthly_limit) : "";
@@ -2139,9 +2165,16 @@ function syncAccountPrimaryControls() {
   }
 
   if (accountPrimaryNote) {
-    accountPrimaryNote.textContent = canBePrimary
-      ? "Этот счёт будет подставляться по умолчанию в расходах и доходах."
-      : "Для этой роли основной счёт недоступен.";
+    if (role === "vault_pool") {
+      accountPrimaryNote.textContent =
+        "ÐÐ°ÐºÐ¾Ð¿Ð¸ÑÐµÐ»ÑÐ½ÑÐ¹ ÑÑÑÑ Ð½ÐµÐ»ÑÐ·Ñ Ð´ÐµÐ»Ð°ÑÑ Ð¾ÑÐ½Ð¾Ð²Ð½ÑÐ¼. ÐÐ½ Ð¸ÑÐ¿Ð¾Ð»ÑÐ·ÑÐµÑÑÑ ÐºÐ°Ðº ÐºÐ¾Ð½ÑÐµÐ¹Ð½ÐµÑ Ð´Ð»Ñ Ð½Ð°ÐºÐ¾Ð¿Ð»ÐµÐ½Ð¸Ð¹.";
+    } else if (role === "reserve") {
+      accountPrimaryNote.textContent =
+        "Ð ÐµÐ·ÐµÑÐ²Ð½ÑÐ¹ ÑÑÑÑ Ð½ÐµÐ»ÑÐ·Ñ Ð´ÐµÐ»Ð°ÑÑ Ð¾ÑÐ½Ð¾Ð²Ð½ÑÐ¼ Ð´Ð»Ñ ÐµÐ¶ÐµÐ´Ð½ÐµÐ²Ð½ÑÑ ÑÐ¿Ð¸ÑÐ°Ð½Ð¸Ð¹.";
+    } else {
+      accountPrimaryNote.textContent =
+        "Ð­ÑÐ¾Ñ ÑÑÑÑ Ð±ÑÐ´ÐµÑ Ð¿Ð¾Ð´ÑÑÐ°Ð²Ð»ÑÑÑÑÑ Ð¿Ð¾ ÑÐ¼Ð¾Ð»ÑÐ°Ð½Ð¸Ñ Ð² ÑÐ°ÑÑÐ¾Ð´Ð°Ñ Ð¸ Ð´Ð¾ÑÐ¾Ð´Ð°Ñ.";
+    }
   }
 }
 
@@ -2150,9 +2183,9 @@ function openCreateAccountModal() {
 
   activeAccountId = null;
 
-  accountModalTitle.textContent = "Новый счёт";
+  accountModalTitle.textContent = "ÐÐ¾Ð²ÑÐ¹ ÑÑÑÑ";
   accountNameInput.value = "";
-  accountIconInput.value = "💳";
+  accountIconInput.value = "ð³";
   accountRoleSelect.value = "spend";
   accountPrimarySpendInput.checked = false;
 
@@ -2169,7 +2202,7 @@ function openAccountModal(accountId) {
 
   activeAccountId = accountId;
 
-  accountModalTitle.textContent = `Счёт: ${account.icon} ${account.name}`;
+  accountModalTitle.textContent = `Ð¡ÑÑÑ: ${account.icon} ${account.name}`;
   accountNameInput.value = account.name || "";
   accountIconInput.value = account.icon || "";
   accountRoleSelect.value = account.account_kind || "spend";
@@ -2202,12 +2235,12 @@ async function saveAccountModal() {
   const nextRole = accountRoleSelect.value;
 
   if (!nextName) {
-    alert("Введи название счёта");
+    alert("ÐÐ²ÐµÐ´Ð¸ Ð½Ð°Ð·Ð²Ð°Ð½Ð¸Ðµ ÑÑÑÑÐ°");
     return;
   }
 
   if (!nextIcon) {
-    alert("Введи эмодзи счёта");
+    alert("ÐÐ²ÐµÐ´Ð¸ ÑÐ¼Ð¾Ð´Ð·Ð¸ ÑÑÑÑÐ°");
     return;
   }
 
@@ -2217,12 +2250,23 @@ async function saveAccountModal() {
   });
 
   if (duplicateName) {
-    alert("Счёт с таким названием уже существует");
+    alert("Ð¡ÑÑÑ Ñ ÑÐ°ÐºÐ¸Ð¼ Ð½Ð°Ð·Ð²Ð°Ð½Ð¸ÐµÐ¼ ÑÐ¶Ðµ ÑÑÑÐµÑÑÐ²ÑÐµÑ");
     return;
   }
 
   const flags = getAccountRoleFlags(nextRole);
   const isPrimary = canAccountBePrimary(nextRole) && accountPrimarySpendInput.checked;
+
+  const currentVaultAccount = getVaultAccount();
+  if (nextRole === "vault_pool") {
+    const anotherVaultExists =
+      currentVaultAccount && currentVaultAccount.id !== activeAccountId;
+
+    if (anotherVaultExists) {
+      alert("ÐÐ°ÐºÐ¾Ð¿Ð¸ÑÐµÐ»ÑÐ½ÑÐ¹ ÑÑÑÑ ÑÐ¶Ðµ ÑÑÑÐµÑÑÐ²ÑÐµÑ. Ð Ð¿ÑÐ¸Ð»Ð¾Ð¶ÐµÐ½Ð¸Ð¸ Ð´Ð¾Ð»Ð¶ÐµÐ½ Ð±ÑÑÑ ÑÐ¾Ð»ÑÐºÐ¾ Ð¾Ð´Ð¸Ð½ ÑÐ°ÐºÐ¾Ð¹ ÑÑÑÑ.");
+      return;
+    }
+  }
 
   if (isPrimary) {
     const { error: resetPrimaryError } = await supabaseClient
@@ -2231,7 +2275,7 @@ async function saveAccountModal() {
       .neq("id", activeAccountId || "");
 
     if (resetPrimaryError) {
-      alert("Ошибка сброса основного счёта");
+      alert("ÐÑÐ¸Ð±ÐºÐ° ÑÐ±ÑÐ¾ÑÐ° Ð¾ÑÐ½Ð¾Ð²Ð½Ð¾Ð³Ð¾ ÑÑÑÑÐ°");
       console.error(resetPrimaryError);
       return;
     }
@@ -2252,7 +2296,7 @@ async function saveAccountModal() {
       .eq("id", activeAccountId);
 
     if (error) {
-      alert("Ошибка сохранения счёта");
+      alert("ÐÑÐ¸Ð±ÐºÐ° ÑÐ¾ÑÑÐ°Ð½ÐµÐ½Ð¸Ñ ÑÑÑÑÐ°");
       console.error(error);
       return;
     }
@@ -2275,7 +2319,7 @@ async function saveAccountModal() {
       });
 
     if (error) {
-      alert("Ошибка создания счёта");
+      alert("ÐÑÐ¸Ð±ÐºÐ° ÑÐ¾Ð·Ð´Ð°Ð½Ð¸Ñ ÑÑÑÑÐ°");
       console.error(error);
       return;
     }
@@ -2293,7 +2337,7 @@ async function deleteAccountModalAction() {
   if (!account) return;
 
   if (account.account_kind === "vault_pool") {
-    alert("Накопительный счёт удалять нельзя");
+    alert("ÐÐ°ÐºÐ¾Ð¿Ð¸ÑÐµÐ»ÑÐ½ÑÐ¹ ÑÑÑÑ ÑÐ´Ð°Ð»ÑÑÑ Ð½ÐµÐ»ÑÐ·Ñ");
     return;
   }
 
@@ -2306,11 +2350,11 @@ async function deleteAccountModalAction() {
   });
 
   if (hasTransactions) {
-    alert("Нельзя удалить счёт, который уже используется в операциях");
+    alert("ÐÐµÐ»ÑÐ·Ñ ÑÐ´Ð°Ð»Ð¸ÑÑ ÑÑÑÑ, ÐºÐ¾ÑÐ¾ÑÑÐ¹ ÑÐ¶Ðµ Ð¸ÑÐ¿Ð¾Ð»ÑÐ·ÑÐµÑÑÑ Ð² Ð¾Ð¿ÐµÑÐ°ÑÐ¸ÑÑ");
     return;
   }
 
-  const ok = confirm(`Удалить счёт "${account.name}"?`);
+  const ok = confirm(`Ð£Ð´Ð°Ð»Ð¸ÑÑ ÑÑÑÑ "${account.name}"?`);
   if (!ok) return;
 
   const { error } = await supabaseClient
@@ -2319,7 +2363,7 @@ async function deleteAccountModalAction() {
     .eq("id", activeAccountId);
 
   if (error) {
-    alert("Ошибка удаления счёта");
+    alert("ÐÑÐ¸Ð±ÐºÐ° ÑÐ´Ð°Ð»ÐµÐ½Ð¸Ñ ÑÑÑÑÐ°");
     console.error(error);
     return;
   }
@@ -2332,7 +2376,7 @@ async function deleteAccountModalAction() {
 function openSafeBucketsModal() {
   if (!safeBucketsModal) return;
 
-  safeBucketsModalTitle.textContent = getSafeAccountName() || "Накопления";
+  safeBucketsModalTitle.textContent = getSafeAccountName() || "ÐÐ°ÐºÐ¾Ð¿Ð»ÐµÐ½Ð¸Ñ";
   renderSafeBucketsModal();
 
   safeBucketsModal.classList.remove("hidden");
@@ -2357,7 +2401,7 @@ function openSafeBucketAmountModal(bucketId) {
   const balance = getSafeBucketBalance(bucketId);
 
   safeBucketAmountModalTitle.textContent = `${bucket.icon} ${bucket.name}`;
-  safeBucketAmountCurrentValue.textContent = `Сейчас: ${formatMoney(balance)}`;
+  safeBucketAmountCurrentValue.textContent = `Ð¡ÐµÐ¹ÑÐ°Ñ: ${formatMoney(balance)}`;
   safeBucketNameInput.value = bucket.name || "";
   safeBucketIconInput.value = bucket.icon || "";
   safeBucketAmountInput.value = String(balance).replace(".", ",");
@@ -2388,7 +2432,7 @@ function closeSafeBucketAmountModal() {
 function openSafeInterestRateModal() {
   const annualRate = getSafeInterestAnnualRate();
 
-  safeInterestRateCurrentValue.textContent = `Сейчас: ${formatPercentLabel(annualRate)}`;
+  safeInterestRateCurrentValue.textContent = `Ð¡ÐµÐ¹ÑÐ°Ñ: ${formatPercentLabel(annualRate)}`;
   safeInterestRateInput.value = String(roundToTwo(annualRate * 100)).replace(".", ",");
 
   safeInterestRateModal.classList.remove("hidden");
@@ -2406,7 +2450,7 @@ async function saveSafeInterestRate() {
   const percentValue = Number(normalized);
 
   if (Number.isNaN(percentValue) || percentValue < 0) {
-    alert("Введи корректный процент");
+    alert("ÐÐ²ÐµÐ´Ð¸ ÐºÐ¾ÑÑÐµÐºÑÐ½ÑÐ¹ Ð¿ÑÐ¾ÑÐµÐ½Ñ");
     return;
   }
 
@@ -2420,7 +2464,7 @@ async function saveSafeInterestRate() {
     });
 
   if (error) {
-    alert("Ошибка сохранения годового процента");
+    alert("ÐÑÐ¸Ð±ÐºÐ° ÑÐ¾ÑÑÐ°Ð½ÐµÐ½Ð¸Ñ Ð³Ð¾Ð´Ð¾Ð²Ð¾Ð³Ð¾ Ð¿ÑÐ¾ÑÐµÐ½ÑÐ°");
     console.error(error);
     return;
   }
@@ -2436,7 +2480,7 @@ function renderSafeBucketsModal() {
   const totalSafeBalance = getAccountBalance(getSafeAccountName());
   const unassignedBalance = getUnassignedSafeBalance();
 
-  safeBucketsModalTotalLabel.textContent = `Общий баланс: ${formatMoney(totalSafeBalance)}`;
+  safeBucketsModalTotalLabel.textContent = `ÐÐ±ÑÐ¸Ð¹ Ð±Ð°Ð»Ð°Ð½Ñ: ${formatMoney(totalSafeBalance)}`;
   if (safeBucketsRateValue) {
   safeBucketsRateValue.textContent = formatPercentLabel(getSafeInterestAnnualRate());
 }
@@ -2454,8 +2498,8 @@ function renderSafeBucketsModal() {
     const empty = document.createElement("div");
     empty.className = "safe-bucket-empty";
     empty.innerHTML = `
-      <div class="safe-bucket-empty__title">Сейфов пока нет</div>
-      <div class="safe-bucket-empty__text">Добавь первый внутренний сейф ниже</div>
+      <div class="safe-bucket-empty__title">ÐÐ°ÐºÐ¾Ð¿Ð»ÐµÐ½Ð¸Ð¹ Ð¿Ð¾ÐºÐ° Ð½ÐµÑ</div>
+      <div class="safe-bucket-empty__text">ÐÐ¾Ð±Ð°Ð²Ñ Ð¿ÐµÑÐ²Ð¾Ðµ Ð½Ð°ÐºÐ¾Ð¿Ð»ÐµÐ½Ð¸Ðµ Ð½Ð¸Ð¶Ðµ</div>
     `;
     safeBucketsList.appendChild(empty);
     return;
@@ -2477,7 +2521,7 @@ function renderSafeBucketsModal() {
         <div class="safe-bucket-row__text">
           <div class="safe-bucket-row__title">${escapeHtml(bucket.name)}</div>
           <div class="safe-bucket-row__meta">
-            ${isLocked ? "Системный сейф" : "Внутренний сейф"}
+            ${isLocked ? "Ð¡Ð¸ÑÑÐµÐ¼Ð½Ð¾Ðµ Ð½Ð°ÐºÐ¾Ð¿Ð»ÐµÐ½Ð¸Ðµ" : "ÐÐ°ÐºÐ¾Ð¿Ð»ÐµÐ½Ð¸Ðµ"}
           </div>
         </div>
       </div>
@@ -2495,10 +2539,10 @@ function renderSafeBucketsModal() {
 
 async function addSafeBucket() {
   const name = newSafeBucketNameInput.value.trim();
-  const icon = newSafeBucketIconInput.value.trim() || "🗂️";
+  const icon = newSafeBucketIconInput.value.trim() || "ðï¸";
 
   if (!name) {
-    alert("Введите название сейфа");
+    alert("ÐÐ²ÐµÐ´Ð¸ÑÐµ Ð½Ð°Ð·Ð²Ð°Ð½Ð¸Ðµ Ð½Ð°ÐºÐ¾Ð¿Ð»ÐµÐ½Ð¸Ñ");
     return;
   }
 
@@ -2514,7 +2558,7 @@ async function addSafeBucket() {
     .insert(newSafeBucket);
 
   if (error) {
-    alert("Ошибка добавления сейфа");
+    alert("ÐÑÐ¸Ð±ÐºÐ° Ð´Ð¾Ð±Ð°Ð²Ð»ÐµÐ½Ð¸Ñ Ð½Ð°ÐºÐ¾Ð¿Ð»ÐµÐ½Ð¸Ñ");
     console.error(error);
     return;
   }
@@ -2536,17 +2580,17 @@ async function saveSafeBucketAmount() {
   const nextAmount = Number(normalized);
 
   if (!nextName) {
-    alert("Введи название сейфа");
+    alert("ÐÐ²ÐµÐ´Ð¸ Ð½Ð°Ð·Ð²Ð°Ð½Ð¸Ðµ Ð½Ð°ÐºÐ¾Ð¿Ð»ÐµÐ½Ð¸Ñ");
     return;
   }
 
   if (!nextIcon) {
-    alert("Введи эмодзи сейфа");
+    alert("ÐÐ²ÐµÐ´Ð¸ ÑÐ¼Ð¾Ð´Ð·Ð¸ Ð½Ð°ÐºÐ¾Ð¿Ð»ÐµÐ½Ð¸Ñ");
     return;
   }
 
   if (Number.isNaN(nextAmount) || nextAmount < 0) {
-    alert("Введи корректную сумму");
+    alert("ÐÐ²ÐµÐ´Ð¸ ÐºÐ¾ÑÑÐµÐºÑÐ½ÑÑ ÑÑÐ¼Ð¼Ñ");
     return;
   }
 
@@ -2559,7 +2603,7 @@ async function saveSafeBucketAmount() {
     .eq("id", activeSafeBucketAmountId);
 
   if (updateBucketError) {
-    alert("Ошибка сохранения сейфа");
+    alert("ÐÑÐ¸Ð±ÐºÐ° ÑÐ¾ÑÑÐ°Ð½ÐµÐ½Ð¸Ñ Ð½Ð°ÐºÐ¾Ð¿Ð»ÐµÐ½Ð¸Ñ");
     console.error(updateBucketError);
     return;
   }
@@ -2581,11 +2625,11 @@ async function deleteSafeBucketFromModal() {
 
   const balanceBeforeDelete = getSafeBucketBalance(bucket.id);
   if (Math.abs(balanceBeforeDelete) > 0.009) {
-    alert("Нельзя удалить сейф, пока в нём есть деньги");
+    alert("ÐÐµÐ»ÑÐ·Ñ ÑÐ´Ð°Ð»Ð¸ÑÑ Ð½Ð°ÐºÐ¾Ð¿Ð»ÐµÐ½Ð¸Ðµ, Ð¿Ð¾ÐºÐ° Ð² Ð½ÑÐ¼ ÐµÑÑÑ Ð´ÐµÐ½ÑÐ³Ð¸");
     return;
   }
 
-  const ok = confirm(`Удалить сейф "${bucket.name}"?`);
+  const ok = confirm(`Ð£Ð´Ð°Ð»Ð¸ÑÑ Ð½Ð°ÐºÐ¾Ð¿Ð»ÐµÐ½Ð¸Ðµ "${bucket.name}"?`);
   if (!ok) return;
 
   const { error } = await supabaseClient
@@ -2594,7 +2638,7 @@ async function deleteSafeBucketFromModal() {
     .eq("id", bucket.id);
 
   if (error) {
-    alert("Ошибка удаления сейфа");
+    alert("ÐÑÐ¸Ð±ÐºÐ° ÑÐ´Ð°Ð»ÐµÐ½Ð¸Ñ Ð½Ð°ÐºÐ¾Ð¿Ð»ÐµÐ½Ð¸Ñ");
     console.error(error);
     return;
   }
@@ -2610,10 +2654,10 @@ async function deleteSafeBucketFromModal() {
 
     const isTransferCategory = categoryId === "transfers";
     const title = isTransferCategory
-      ? "💸 Переводы"
+      ? "ð¸ ÐÐµÑÐµÐ²Ð¾Ð´Ñ"
       : `${getCategoryIcon(categoryId)} ${getCategoryName(categoryId)}`;
 
-    const periodLabel = getAnalyticsPeriodLabel() || "Период";
+    const periodLabel = getAnalyticsPeriodLabel() || "ÐÐµÑÐ¸Ð¾Ð´";
     const transactions = getAnalyticsTransactionsByCategory(categoryId);
 
     analyticsCategoryModalTitle.textContent = title;
@@ -2622,7 +2666,7 @@ async function deleteSafeBucketFromModal() {
 
     if (analyticsCategoryBudgetBtn) {
       if (isTransferCategory) {
-        analyticsCategoryBudgetBtn.textContent = "—";
+        analyticsCategoryBudgetBtn.textContent = "â";
         analyticsCategoryBudgetBtn.onclick = null;
         analyticsCategoryBudgetBtn.disabled = true;
       } else {
@@ -2634,7 +2678,7 @@ async function deleteSafeBucketFromModal() {
     
     if (analyticsCategoryTypeBtn) {
   if (isTransferCategory) {
-    analyticsCategoryTypeBtn.textContent = "Гибкая";
+    analyticsCategoryTypeBtn.textContent = "ÐÐ¸Ð±ÐºÐ°Ñ";
     analyticsCategoryTypeBtn.disabled = true;
     analyticsCategoryTypeBtn.onclick = null;
     analyticsCategoryTypeBtn.classList.remove("analytics-category-type-btn--required");
@@ -2642,7 +2686,7 @@ async function deleteSafeBucketFromModal() {
   } else {
     const required = isRequiredCategory(categoryId);
 
-    analyticsCategoryTypeBtn.textContent = required ? "Обязательная" : "Гибкая";
+    analyticsCategoryTypeBtn.textContent = required ? "ÐÐ±ÑÐ·Ð°ÑÐµÐ»ÑÐ½Ð°Ñ" : "ÐÐ¸Ð±ÐºÐ°Ñ";
     analyticsCategoryTypeBtn.disabled = false;
     analyticsCategoryTypeBtn.classList.toggle("analytics-category-type-btn--required", required);
     analyticsCategoryTypeBtn.classList.toggle("analytics-category-type-btn--flex", !required);
@@ -2654,7 +2698,7 @@ async function deleteSafeBucketFromModal() {
         .eq("id", categoryId);
 
       if (error) {
-        alert("Ошибка обновления типа категории");
+        alert("ÐÑÐ¸Ð±ÐºÐ° Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ñ ÑÐ¸Ð¿Ð° ÐºÐ°ÑÐµÐ³Ð¾ÑÐ¸Ð¸");
         console.error(error);
         return;
       }
@@ -2671,8 +2715,8 @@ async function deleteSafeBucketFromModal() {
       empty.className = "list-card";
       empty.innerHTML = `
         <div class="list-body">
-          <h3 class="list-title">Операций нет</h3>
-          <p class="list-subtitle">За выбранный период ничего не найдено</p>
+          <h3 class="list-title">ÐÐ¿ÐµÑÐ°ÑÐ¸Ð¹ Ð½ÐµÑ</h3>
+          <p class="list-subtitle">ÐÐ° Ð²ÑÐ±ÑÐ°Ð½Ð½ÑÐ¹ Ð¿ÐµÑÐ¸Ð¾Ð´ Ð½Ð¸ÑÐµÐ³Ð¾ Ð½Ðµ Ð½Ð°Ð¹Ð´ÐµÐ½Ð¾</p>
         </div>
       `;
       analyticsCategoryTransactionsList.appendChild(empty);
@@ -2696,18 +2740,18 @@ async function deleteSafeBucketFromModal() {
   amountInput.value = "";
   dateInput.value = getTodayDateValue();
   commentInput.value = "";
-  categorySelect.innerHTML = `<option value="">Выбери категорию</option>`;
+  categorySelect.innerHTML = `<option value="">ÐÑÐ±ÐµÑÐ¸ ÐºÐ°ÑÐµÐ³Ð¾ÑÐ¸Ñ</option>`;
   accountSelect.selectedIndex = 0;
   fromAccountSelect.selectedIndex = 0;
   toAccountSelect.selectedIndex = 0;
 
   if (fromSafeBucketSelect) {
-    fromSafeBucketSelect.innerHTML = `<option value="">Из какого сейфа</option>`;
+    fromSafeBucketSelect.innerHTML = `<option value="">ÐÐ· ÐºÐ°ÐºÐ¾Ð³Ð¾ Ð½Ð°ÐºÐ¾Ð¿Ð»ÐµÐ½Ð¸Ñ</option>`;
     fromSafeBucketSelect.value = "";
   }
 
   if (toSafeBucketSelect) {
-    toSafeBucketSelect.innerHTML = `<option value="">В какой сейф</option>`;
+    toSafeBucketSelect.innerHTML = `<option value="">Ð ÐºÐ°ÐºÐ¾Ðµ Ð½Ð°ÐºÐ¾Ð¿Ð»ÐµÐ½Ð¸Ðµ</option>`;
     toSafeBucketSelect.value = "";
   }
 
@@ -2723,8 +2767,8 @@ async function deleteSafeBucketFromModal() {
     resetForm();
 
     if (mode === "expense") {
-      modalTitle.textContent = "Добавить расход";
-      saveBtn.textContent = "Сохранить расход";
+      modalTitle.textContent = "ÐÐ¾Ð±Ð°Ð²Ð¸ÑÑ ÑÐ°ÑÑÐ¾Ð´";
+      saveBtn.textContent = "Ð¡Ð¾ÑÑÐ°Ð½Ð¸ÑÑ ÑÐ°ÑÑÐ¾Ð´";
 
       categoryField.classList.remove("hidden");
       accountField.classList.remove("hidden");
@@ -2732,38 +2776,38 @@ async function deleteSafeBucketFromModal() {
       toAccountField.classList.add("hidden");
 
       fillExpenseCategorySelect();
-      fillAccountSelect(accountSelect, "Выбери счёт");
+      fillAccountSelect(accountSelect, "ÐÑÐ±ÐµÑÐ¸ ÑÑÑÑ");
 
 const defaultExpenseAccountId =
   getPrimarySpendAccountId() || getSpendableAccounts()[0]?.id || "";
 
 accountSelect.value = defaultExpenseAccountId;
     } else if (mode === "income") {
-      modalTitle.textContent = "Добавить доход";
-      saveBtn.textContent = "Сохранить доход";
+      modalTitle.textContent = "ÐÐ¾Ð±Ð°Ð²Ð¸ÑÑ Ð´Ð¾ÑÐ¾Ð´";
+      saveBtn.textContent = "Ð¡Ð¾ÑÑÐ°Ð½Ð¸ÑÑ Ð´Ð¾ÑÐ¾Ð´";
 
       categoryField.classList.add("hidden");
       accountField.classList.remove("hidden");
       fromAccountField.classList.add("hidden");
       toAccountField.classList.add("hidden");
 
-      fillAccountSelect(accountSelect, "Выбери счёт");
+      fillAccountSelect(accountSelect, "ÐÑÐ±ÐµÑÐ¸ ÑÑÑÑ");
 
 const defaultIncomeAccountId =
   getPrimarySpendAccountId() || getSpendableAccounts()[0]?.id || "";
 
 accountSelect.value = defaultIncomeAccountId;
    } else if (mode === "transfer") {
-  modalTitle.textContent = "Сделать перевод";
-  saveBtn.textContent = "Сохранить перевод";
+  modalTitle.textContent = "Ð¡Ð´ÐµÐ»Ð°ÑÑ Ð¿ÐµÑÐµÐ²Ð¾Ð´";
+  saveBtn.textContent = "Ð¡Ð¾ÑÑÐ°Ð½Ð¸ÑÑ Ð¿ÐµÑÐµÐ²Ð¾Ð´";
 
   categoryField.classList.add("hidden");
   accountField.classList.add("hidden");
   fromAccountField.classList.remove("hidden");
   toAccountField.classList.remove("hidden");
 
-  fillAccountSelect(fromAccountSelect, "С какого счёта");
-fillAccountSelect(toAccountSelect, "На какой счёт");
+  fillAccountSelect(fromAccountSelect, "Ð¡ ÐºÐ°ÐºÐ¾Ð³Ð¾ ÑÑÑÑÐ°");
+fillAccountSelect(toAccountSelect, "ÐÐ° ÐºÐ°ÐºÐ¾Ð¹ ÑÑÑÑ");
 
 const defaultFromAccountId =
   getPrimarySpendAccountId() || getSpendableAccounts()[0]?.id || "";
@@ -2774,7 +2818,7 @@ const cashFallbackId =
   "";
 
 fromAccountSelect.value = defaultFromAccountId;
-fillAccountSelect(toAccountSelect, "На какой счёт", cashFallbackId, {
+fillAccountSelect(toAccountSelect, "ÐÐ° ÐºÐ°ÐºÐ¾Ð¹ ÑÑÑÑ", cashFallbackId, {
   excludeId: defaultFromAccountId,
 });
 toAccountSelect.value = cashFallbackId;
@@ -2782,8 +2826,8 @@ toAccountSelect.value = cashFallbackId;
   fromSafeBucketField.classList.add("hidden");
   toSafeBucketField.classList.add("hidden");
 
-  fillSafeBucketSelect(fromSafeBucketSelect, "Из какого сейфа");
-  fillSafeBucketSelect(toSafeBucketSelect, "В какой сейф");
+  fillSafeBucketSelect(fromSafeBucketSelect, "ÐÐ· ÐºÐ°ÐºÐ¾Ð³Ð¾ Ð½Ð°ÐºÐ¾Ð¿Ð»ÐµÐ½Ð¸Ñ");
+  fillSafeBucketSelect(toSafeBucketSelect, "Ð ÐºÐ°ÐºÐ¾Ðµ Ð½Ð°ÐºÐ¾Ð¿Ð»ÐµÐ½Ð¸Ðµ");
   updateTransferSafeFields();
 }
 
@@ -2802,8 +2846,8 @@ toAccountSelect.value = cashFallbackId;
     resetForm();
 
     if (transaction.type === "expense") {
-      modalTitle.textContent = "Редактировать расход";
-      saveBtn.textContent = "Сохранить";
+      modalTitle.textContent = "Ð ÐµÐ´Ð°ÐºÑÐ¸ÑÐ¾Ð²Ð°ÑÑ ÑÐ°ÑÑÐ¾Ð´";
+      saveBtn.textContent = "Ð¡Ð¾ÑÑÐ°Ð½Ð¸ÑÑ";
 
       categoryField.classList.remove("hidden");
       accountField.classList.remove("hidden");
@@ -2816,12 +2860,12 @@ toAccountSelect.value = cashFallbackId;
       dateInput.value = transaction.created_at
         ? String(transaction.created_at).slice(0, 10)
         : getTodayDateValue();
-      fillAccountSelect(accountSelect, "Выбери счёт", transaction.account_id);
+      fillAccountSelect(accountSelect, "ÐÑÐ±ÐµÑÐ¸ ÑÑÑÑ", transaction.account_id);
 accountSelect.value = transaction.account_id || "";
-      commentInput.value = transaction.title === "Новая трата" ? "" : transaction.title;
+      commentInput.value = transaction.title === "ÐÐ¾Ð²Ð°Ñ ÑÑÐ°ÑÐ°" ? "" : transaction.title;
     } else if (transaction.type === "income") {
-      modalTitle.textContent = "Редактировать доход";
-      saveBtn.textContent = "Сохранить";
+      modalTitle.textContent = "Ð ÐµÐ´Ð°ÐºÑÐ¸ÑÐ¾Ð²Ð°ÑÑ Ð´Ð¾ÑÐ¾Ð´";
+      saveBtn.textContent = "Ð¡Ð¾ÑÑÐ°Ð½Ð¸ÑÑ";
 
       categoryField.classList.add("hidden");
       accountField.classList.remove("hidden");
@@ -2832,13 +2876,13 @@ accountSelect.value = transaction.account_id || "";
       dateInput.value = transaction.created_at
         ? String(transaction.created_at).slice(0, 10)
         : getTodayDateValue();
-      fillAccountSelect(accountSelect, "Выбери счёт", transaction.account_id);
+      fillAccountSelect(accountSelect, "ÐÑÐ±ÐµÑÐ¸ ÑÑÑÑ", transaction.account_id);
 accountSelect.value = transaction.account_id || "";
-      commentInput.value = transaction.title === "Новый доход" ? "" : transaction.title;
+      commentInput.value = transaction.title === "ÐÐ¾Ð²ÑÐ¹ Ð´Ð¾ÑÐ¾Ð´" ? "" : transaction.title;
       
     } else if (transaction.type === "transfer") {
-  modalTitle.textContent = "Редактировать перевод";
-  saveBtn.textContent = "Сохранить";
+  modalTitle.textContent = "Ð ÐµÐ´Ð°ÐºÑÐ¸ÑÐ¾Ð²Ð°ÑÑ Ð¿ÐµÑÐµÐ²Ð¾Ð´";
+  saveBtn.textContent = "Ð¡Ð¾ÑÑÐ°Ð½Ð¸ÑÑ";
 
   categoryField.classList.add("hidden");
   accountField.classList.add("hidden");
@@ -2849,23 +2893,23 @@ accountSelect.value = transaction.account_id || "";
   dateInput.value = transaction.created_at
     ? String(transaction.created_at).slice(0, 10)
     : getTodayDateValue();
-  fillAccountSelect(fromAccountSelect, "С какого счёта", transaction.from_account_id);
-fillAccountSelect(toAccountSelect, "На какой счёт", transaction.to_account_id, {
+  fillAccountSelect(fromAccountSelect, "Ð¡ ÐºÐ°ÐºÐ¾Ð³Ð¾ ÑÑÑÑÐ°", transaction.from_account_id);
+fillAccountSelect(toAccountSelect, "ÐÐ° ÐºÐ°ÐºÐ¾Ð¹ ÑÑÑÑ", transaction.to_account_id, {
   excludeId: transaction.from_account_id,
 });
 
 fromAccountSelect.value = transaction.from_account_id || "";
 toAccountSelect.value = transaction.to_account_id || "";
-  commentInput.value = transaction.title === "Перевод" ? "" : transaction.title;
+  commentInput.value = transaction.title === "ÐÐµÑÐµÐ²Ð¾Ð´" ? "" : transaction.title;
 
   fillSafeBucketSelect(
     fromSafeBucketSelect,
-    "Из какого сейфа",
+    "ÐÐ· ÐºÐ°ÐºÐ¾Ð³Ð¾ Ð½Ð°ÐºÐ¾Ð¿Ð»ÐµÐ½Ð¸Ñ",
     transaction.from_safe_bucket_id || ""
   );
   fillSafeBucketSelect(
     toSafeBucketSelect,
-    "В какой сейф",
+    "Ð ÐºÐ°ÐºÐ¾Ðµ Ð½Ð°ÐºÐ¾Ð¿Ð»ÐµÐ½Ð¸Ðµ",
     transaction.to_safe_bucket_id || ""
   );
   updateTransferSafeFields();
@@ -2948,10 +2992,10 @@ toAccountSelect.value = transaction.to_account_id || "";
 }
   
   function getAccountRoleLabel(account) {
-  if (account.account_kind === "vault_pool") return "Накопительный счёт";
-  if (account.account_kind === "reserve") return "Резерв";
-  if (account.account_kind === "cash") return "Наличные";
-  return account.is_primary_spend ? "Основной счёт" : "Обычный счёт";
+  if (account.account_kind === "vault_pool") return "ÐÐ°ÐºÐ¾Ð¿Ð»ÐµÐ½Ð¸Ñ";
+  if (account.account_kind === "reserve") return "Ð ÐµÐ·ÐµÑÐ²";
+  if (account.account_kind === "cash") return "ÐÐ°Ð»Ð¸ÑÐ½ÑÐµ";
+  return account.is_primary_spend ? "ÐÑÐ½Ð¾Ð²Ð½Ð¾Ð¹ ÑÑÑÑ" : "ÐÐ±ÑÑÐ½ÑÐ¹ ÑÑÑÑ";
 }
 
 function canAccountBePrimary(role) {
@@ -3093,7 +3137,7 @@ function getAccountRoleFlags(role) {
       if (
   (transaction.account_id === getSafeAccountId() ||
     (!transaction.account_id && transaction.account === getSafeAccountName())) &&
-  transaction.title === "Проценты по накоплению"
+  transaction.title === "ÐÑÐ¾ÑÐµÐ½ÑÑ Ð¿Ð¾ Ð½Ð°ÐºÐ¾Ð¿Ð»ÐµÐ½Ð¸Ñ"
 ) {
   safeInterest += amount;
 }
@@ -3222,9 +3266,12 @@ function getAccountRoleFlags(role) {
       const interestTransaction = {
         id: crypto.randomUUID(),
         type: "income",
-        title: "Проценты по накоплению",
+        title: "ÐÑÐ¾ÑÐµÐ½ÑÑ Ð¿Ð¾ Ð½Ð°ÐºÐ¾Ð¿Ð»ÐµÐ½Ð¸Ñ",
+        account_id: getSafeAccountId(),
         account: getSafeAccountName(),
         category_id: null,
+        from_account_id: null,
+        to_account_id: null,
         from_account: null,
         to_account: null,
         from_safe_bucket_id: null,
@@ -3240,7 +3287,7 @@ function getAccountRoleFlags(role) {
 
       if (insertError) {
         console.error(insertError);
-        alert("Ошибка начисления процентов по сейфам");
+        alert("ÐÑÐ¸Ð±ÐºÐ° Ð½Ð°ÑÐ¸ÑÐ»ÐµÐ½Ð¸Ñ Ð¿ÑÐ¾ÑÐµÐ½ÑÐ¾Ð² Ð¿Ð¾ Ð½Ð°ÐºÐ¾Ð¿Ð»ÐµÐ½Ð¸ÑÐ¼");
         return;
       }
 
@@ -3257,19 +3304,22 @@ function getAccountRoleFlags(role) {
 
   if (metaError) {
     console.error(metaError);
-    alert("Ошибка сохранения даты начисления процентов");
+    alert("ÐÑÐ¸Ð±ÐºÐ° ÑÐ¾ÑÑÐ°Ð½ÐµÐ½Ð¸Ñ Ð´Ð°ÑÑ Ð½Ð°ÑÐ¸ÑÐ»ÐµÐ½Ð¸Ñ Ð¿ÑÐ¾ÑÐµÐ½ÑÐ¾Ð²");
   }
 }
 
+  /* =========================================================
+     08. RENDER: MAIN / ANALYTICS / INSIGHTS
+     ========================================================= */
   function renderBalance() {
   const balance = calculateBalance();
   const freeMoney = getFreeMoneyTotal();
 
   balanceEl.textContent = formatMoney(balance);
-  accountsTotalEl.textContent = `Всего: ${formatMoney(balance)}`;
+  accountsTotalEl.textContent = `ÐÑÐµÐ³Ð¾: ${formatMoney(balance)}`;
 
   if (balanceFreeMoneyValueEl) {
-    balanceFreeMoneyValueEl.textContent = `Свободно: ${formatMoney(freeMoney)}`;
+    balanceFreeMoneyValueEl.textContent = `Ð¡Ð²Ð¾Ð±Ð¾Ð´Ð½Ð¾: ${formatMoney(freeMoney)}`;
   }
 }
 
@@ -3309,8 +3359,8 @@ function getAccountRoleFlags(role) {
   class="icon-action-btn"
   type="button"
   data-edit-account-id="${account.id}"
-  aria-label="Редактировать счёт"
-  title="Редактировать счёт"
+  aria-label="Ð ÐµÐ´Ð°ÐºÑÐ¸ÑÐ¾Ð²Ð°ÑÑ ÑÑÑÑ"
+  title="Ð ÐµÐ´Ð°ÐºÑÐ¸ÑÐ¾Ð²Ð°ÑÑ ÑÑÑÑ"
 >
   <svg viewBox="0 0 24 24" aria-hidden="true">
     <path d="M4 20h4l10-10-4-4L4 16v4Z" />
@@ -3341,7 +3391,7 @@ function getAccountRoleFlags(role) {
       card.className = "list-card";
 
       const lockedAttr = category.locked ? "disabled" : "";
-      const lockedSubtitle = category.locked ? "Системная категория" : "Можно редактировать";
+      const lockedSubtitle = category.locked ? "Ð¡Ð¸ÑÑÐµÐ¼Ð½Ð°Ñ ÐºÐ°ÑÐµÐ³Ð¾ÑÐ¸Ñ" : "ÐÐ¾Ð¶Ð½Ð¾ ÑÐµÐ´Ð°ÐºÑÐ¸ÑÐ¾Ð²Ð°ÑÑ";
 
       const managerTone =
         category.id === "food"
@@ -3360,9 +3410,9 @@ function getAccountRoleFlags(role) {
   <div class="list-body">
     <div class="list-title-row">
       <h3 class="list-title">${escapeHtml(category.name)}</h3>
-      ${category.is_required ? '<span class="category-required-flag">🚩</span>' : ""}
+      ${category.is_required ? '<span class="category-required-flag">ð©</span>' : ""}
     </div>
-    <p class="list-subtitle">${lockedSubtitle} • ${category.is_required ? "Обязательная" : "Гибкая"}</p>
+    <p class="list-subtitle">${lockedSubtitle} â¢ ${category.is_required ? "ÐÐ±ÑÐ·Ð°ÑÐµÐ»ÑÐ½Ð°Ñ" : "ÐÐ¸Ð±ÐºÐ°Ñ"}</p>
   </div>
 
   <div class="category-manager-actions">
@@ -3371,8 +3421,8 @@ function getAccountRoleFlags(role) {
     type="button"
     data-edit-id="${category.id}"
     ${lockedAttr}
-    aria-label="Редактировать категорию"
-    title="Редактировать категорию"
+    aria-label="Ð ÐµÐ´Ð°ÐºÑÐ¸ÑÐ¾Ð²Ð°ÑÑ ÐºÐ°ÑÐµÐ³Ð¾ÑÐ¸Ñ"
+    title="Ð ÐµÐ´Ð°ÐºÑÐ¸ÑÐ¾Ð²Ð°ÑÑ ÐºÐ°ÑÐµÐ³Ð¾ÑÐ¸Ñ"
   >
     <svg viewBox="0 0 24 24" aria-hidden="true">
       <path d="M4 20h4l10-10-4-4L4 16v4Z" />
@@ -3385,8 +3435,8 @@ function getAccountRoleFlags(role) {
     type="button"
     data-type-id="${category.id}"
     ${lockedAttr}
-    aria-label="Переключить тип категории"
-    title="Переключить тип категории"
+    aria-label="ÐÐµÑÐµÐºÐ»ÑÑÐ¸ÑÑ ÑÐ¸Ð¿ ÐºÐ°ÑÐµÐ³Ð¾ÑÐ¸Ð¸"
+    title="ÐÐµÑÐµÐºÐ»ÑÑÐ¸ÑÑ ÑÐ¸Ð¿ ÐºÐ°ÑÐµÐ³Ð¾ÑÐ¸Ð¸"
   >
     <svg viewBox="0 0 24 24" aria-hidden="true">
       <path d="M8 7h8a4 4 0 1 1 0 8H8a4 4 0 1 1 0-8Z" />
@@ -3399,8 +3449,8 @@ function getAccountRoleFlags(role) {
     type="button"
     data-delete-id="${category.id}"
     ${lockedAttr}
-    aria-label="Удалить категорию"
-    title="Удалить категорию"
+    aria-label="Ð£Ð´Ð°Ð»Ð¸ÑÑ ÐºÐ°ÑÐµÐ³Ð¾ÑÐ¸Ñ"
+    title="Ð£Ð´Ð°Ð»Ð¸ÑÑ ÐºÐ°ÑÐµÐ³Ð¾ÑÐ¸Ñ"
   >
     <svg viewBox="0 0 24 24" aria-hidden="true">
       <path d="M5 7h14" />
@@ -3429,7 +3479,7 @@ const deleteBtn = card.querySelector("[data-delete-id]");
     .eq("id", category.id);
 
   if (error) {
-    alert("Ошибка обновления типа категории");
+    alert("ÐÑÐ¸Ð±ÐºÐ° Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ñ ÑÐ¸Ð¿Ð° ÐºÐ°ÑÐµÐ³Ð¾ÑÐ¸Ð¸");
     console.error(error);
     return;
   }
@@ -3442,7 +3492,7 @@ const deleteBtn = card.querySelector("[data-delete-id]");
         if (category.locked) return;
 
         const ok = confirm(
-          `Удалить категорию "${category.name}"? Все старые расходы перейдут в "Без категории". Лимит бюджета тоже удалится.`
+          `Ð£Ð´Ð°Ð»Ð¸ÑÑ ÐºÐ°ÑÐµÐ³Ð¾ÑÐ¸Ñ "${category.name}"? ÐÑÐµ ÑÑÐ°ÑÑÐµ ÑÐ°ÑÑÐ¾Ð´Ñ Ð¿ÐµÑÐµÐ¹Ð´ÑÑ Ð² "ÐÐµÐ· ÐºÐ°ÑÐµÐ³Ð¾ÑÐ¸Ð¸". ÐÐ¸Ð¼Ð¸Ñ Ð±ÑÐ´Ð¶ÐµÑÐ° ÑÐ¾Ð¶Ðµ ÑÐ´Ð°Ð»Ð¸ÑÑÑ.`
         );
         if (!ok) return;
 
@@ -3453,7 +3503,7 @@ const deleteBtn = card.querySelector("[data-delete-id]");
           .eq("category_id", category.id);
 
         if (txError) {
-          alert("Ошибка переноса старых расходов");
+          alert("ÐÑÐ¸Ð±ÐºÐ° Ð¿ÐµÑÐµÐ½Ð¾ÑÐ° ÑÑÐ°ÑÑÑ ÑÐ°ÑÑÐ¾Ð´Ð¾Ð²");
           console.error(txError);
           return;
         }
@@ -3464,7 +3514,7 @@ const deleteBtn = card.querySelector("[data-delete-id]");
           .eq("category_id", category.id);
 
         if (budgetDeleteError) {
-          alert("Ошибка удаления лимита бюджета");
+          alert("ÐÑÐ¸Ð±ÐºÐ° ÑÐ´Ð°Ð»ÐµÐ½Ð¸Ñ Ð»Ð¸Ð¼Ð¸ÑÐ° Ð±ÑÐ´Ð¶ÐµÑÐ°");
           console.error(budgetDeleteError);
           return;
         }
@@ -3475,7 +3525,7 @@ const deleteBtn = card.querySelector("[data-delete-id]");
           .eq("id", category.id);
 
         if (deleteError) {
-          alert("Ошибка удаления категории");
+          alert("ÐÑÐ¸Ð±ÐºÐ° ÑÐ´Ð°Ð»ÐµÐ½Ð¸Ñ ÐºÐ°ÑÐµÐ³Ð¾ÑÐ¸Ð¸");
           console.error(deleteError);
           return;
         }
@@ -3494,9 +3544,9 @@ const deleteBtn = card.querySelector("[data-delete-id]");
 
   const icon =
     transaction.type === "income"
-      ? "💰"
+      ? "ð°"
       : transaction.type === "transfer"
-      ? "↗"
+      ? "â"
       : getCategoryIcon(transaction.category_id || UNCATEGORIZED_ID);
 
   const toneKey =
@@ -3516,14 +3566,14 @@ const deleteBtn = card.querySelector("[data-delete-id]");
       getAccountNameById(transaction.to_account_id) || transaction.to_account || "";
 
     const fromLabel = isVaultAccountId(transaction.from_account_id)
-      ? `${fromAccountName} • ${getSafeBucketName(transaction.from_safe_bucket_id)}`
+      ? `${fromAccountName} â¢ ${getSafeBucketName(transaction.from_safe_bucket_id)}`
       : fromAccountName;
 
     const toLabel = isVaultAccountId(transaction.to_account_id)
-      ? `${toAccountName} • ${getSafeBucketName(transaction.to_safe_bucket_id)}`
+      ? `${toAccountName} â¢ ${getSafeBucketName(transaction.to_safe_bucket_id)}`
       : toAccountName;
 
-    subtitle = `${escapeHtml(fromLabel)} → ${escapeHtml(toLabel)}`;
+    subtitle = `${escapeHtml(fromLabel)} â ${escapeHtml(toLabel)}`;
     signedAmount = formatMoney(transaction.amount);
   } else if (transaction.type === "income") {
     const incomeAccountName =
@@ -3531,24 +3581,24 @@ const deleteBtn = card.querySelector("[data-delete-id]");
 
     const incomeBucketLabel =
       isVaultAccountId(transaction.account_id) && transaction.to_safe_bucket_id
-        ? ` • ${getSafeBucketName(transaction.to_safe_bucket_id)}`
+        ? ` â¢ ${getSafeBucketName(transaction.to_safe_bucket_id)}`
         : "";
 
-    subtitle = `${escapeHtml(incomeAccountName)}${escapeHtml(incomeBucketLabel)} • доход`;
+    subtitle = `${escapeHtml(incomeAccountName)}${escapeHtml(incomeBucketLabel)} â¢ Ð´Ð¾ÑÐ¾Ð´`;
     signedAmount = `+${formatMoney(transaction.amount)}`;
     valueClass = "list-value list-value--green";
   } else {
     const expenseAccountName =
       getAccountNameById(transaction.account_id) || transaction.account || "";
 
-    subtitle = `${escapeHtml(getCategoryName(transaction.category_id || UNCATEGORIZED_ID))} • ${escapeHtml(expenseAccountName)}`;
-    signedAmount = `−${formatMoney(transaction.amount)}`;
+    subtitle = `${escapeHtml(getCategoryName(transaction.category_id || UNCATEGORIZED_ID))} â¢ ${escapeHtml(expenseAccountName)}`;
+    signedAmount = `â${formatMoney(transaction.amount)}`;
     valueClass = "list-value list-value--red";
   }
 
   const shortDate = formatDateShort(transaction.created_at);
   const timeLabel = transaction.time_label || "";
-  const caption = `${shortDate}${shortDate && timeLabel ? " • " : ""}${timeLabel}`;
+  const caption = `${shortDate}${shortDate && timeLabel ? " â¢ " : ""}${timeLabel}`;
 
   card.innerHTML = `
     <div class="list-icon ${iconToneClass}">${icon}</div>
@@ -3578,8 +3628,8 @@ const deleteBtn = card.querySelector("[data-delete-id]");
       empty.className = "list-card";
       empty.innerHTML = `
         <div class="list-body">
-          <h3 class="list-title">Операций пока нет</h3>
-          <p class="list-subtitle">Добавь первую операцию через кнопки сверху</p>
+          <h3 class="list-title">ÐÐ¿ÐµÑÐ°ÑÐ¸Ð¹ Ð¿Ð¾ÐºÐ° Ð½ÐµÑ</h3>
+          <p class="list-subtitle">ÐÐ¾Ð±Ð°Ð²Ñ Ð¿ÐµÑÐ²ÑÑ Ð¾Ð¿ÐµÑÐ°ÑÐ¸Ñ ÑÐµÑÐµÐ· ÐºÐ½Ð¾Ð¿ÐºÐ¸ ÑÐ²ÐµÑÑÑ</p>
         </div>
       `;
       transactionsListEl.appendChild(empty);
@@ -3603,8 +3653,8 @@ const deleteBtn = card.querySelector("[data-delete-id]");
       empty.className = "list-card";
       empty.innerHTML = `
         <div class="list-body">
-          <h3 class="list-title">Ничего не найдено</h3>
-          <p class="list-subtitle">За выбранный период нет операций</p>
+          <h3 class="list-title">ÐÐ¸ÑÐµÐ³Ð¾ Ð½Ðµ Ð½Ð°Ð¹Ð´ÐµÐ½Ð¾</h3>
+          <p class="list-subtitle">ÐÐ° Ð²ÑÐ±ÑÐ°Ð½Ð½ÑÐ¹ Ð¿ÐµÑÐ¸Ð¾Ð´ Ð½ÐµÑ Ð¾Ð¿ÐµÑÐ°ÑÐ¸Ð¹</p>
         </div>
       `;
       analyticsTransactionsList.appendChild(empty);
@@ -3661,13 +3711,13 @@ const deleteBtn = card.querySelector("[data-delete-id]");
 
     renderAnalyticsOperations();
 
-    const periodLabel = getAnalyticsPeriodLabel() || "Период";
+    const periodLabel = getAnalyticsPeriodLabel() || "ÐÐµÑÐ¸Ð¾Ð´";
     const totalExpense = breakdown.reduce((sum, item) => sum + item.amount, 0);
 
     if (!breakdown.length) {
       analyticsDonut.innerHTML = `
         <div class="analytics-panel">
-          <div class="analytics-panel__eyebrow">Расходы по категориям</div>
+          <div class="analytics-panel__eyebrow">Ð Ð°ÑÑÐ¾Ð´Ñ Ð¿Ð¾ ÐºÐ°ÑÐµÐ³Ð¾ÑÐ¸ÑÐ¼</div>
 
           <div class="analytics-panel__headline">
             <div class="analytics-panel__total">${formatMoney(0)}</div>
@@ -3679,20 +3729,20 @@ const deleteBtn = card.querySelector("[data-delete-id]");
               <div class="analytics-breakdown-row__rank analytics-breakdown-row__rank--leader">#1</div>
 
               <div class="analytics-leader__content">
-                <div class="analytics-leader__label">Лидер</div>
-                <div class="analytics-leader__title">Нет данных</div>
-                <div class="analytics-leader__meta">За выбранный период нет расходов</div>
+                <div class="analytics-leader__label">ÐÐ¸Ð´ÐµÑ</div>
+                <div class="analytics-leader__title">ÐÐµÑ Ð´Ð°Ð½Ð½ÑÑ</div>
+                <div class="analytics-leader__meta">ÐÐ° Ð²ÑÐ±ÑÐ°Ð½Ð½ÑÐ¹ Ð¿ÐµÑÐ¸Ð¾Ð´ Ð½ÐµÑ ÑÐ°ÑÑÐ¾Ð´Ð¾Ð²</div>
               </div>
             </div>
 
-            <div class="analytics-leader__value">—</div>
+            <div class="analytics-leader__value">â</div>
           </div>
         </div>
       `;
 
       analyticsLegend.innerHTML = `
         <div class="analytics-breakdown-list analytics-breakdown-list--empty">
-          <div class="analytics-empty">Нет данных по расходам за выбранный период</div>
+          <div class="analytics-empty">ÐÐµÑ Ð´Ð°Ð½Ð½ÑÑ Ð¿Ð¾ ÑÐ°ÑÑÐ¾Ð´Ð°Ð¼ Ð·Ð° Ð²ÑÐ±ÑÐ°Ð½Ð½ÑÐ¹ Ð¿ÐµÑÐ¸Ð¾Ð´</div>
         </div>
       `;
       return;
@@ -3704,7 +3754,7 @@ const deleteBtn = card.querySelector("[data-delete-id]");
 
     analyticsDonut.innerHTML = `
       <div class="analytics-panel">
-        <div class="analytics-panel__eyebrow">Расходы по категориям</div>
+        <div class="analytics-panel__eyebrow">Ð Ð°ÑÑÐ¾Ð´Ñ Ð¿Ð¾ ÐºÐ°ÑÐµÐ³Ð¾ÑÐ¸ÑÐ¼</div>
 
         <div class="analytics-panel__headline">
           <div class="analytics-panel__total">${formatMoney(totalExpense)}</div>
@@ -3720,12 +3770,12 @@ const deleteBtn = card.querySelector("[data-delete-id]");
             <div class="analytics-breakdown-row__rank analytics-breakdown-row__rank--leader">#1</div>
 
             <div class="analytics-leader__content">
-              <div class="analytics-leader__label">Лидер</div>
+              <div class="analytics-leader__label">ÐÐ¸Ð´ÐµÑ</div>
               <div class="analytics-leader__title">
-  ${topItem.is_required ? '<span class="analytics-required-flag">🚩</span>' : ""}
+  ${topItem.is_required ? '<span class="analytics-required-flag">ð©</span>' : ""}
   ${escapeHtml(topItem.icon)} ${escapeHtml(topItem.name)}
 </div>
-              <div class="analytics-leader__meta">${topPercent}% от расходов</div>
+              <div class="analytics-leader__meta">${topPercent}% Ð¾Ñ ÑÐ°ÑÑÐ¾Ð´Ð¾Ð²</div>
             </div>
           </div>
 
@@ -3753,10 +3803,10 @@ const deleteBtn = card.querySelector("[data-delete-id]");
               <div class="analytics-breakdown-row__rank">#${index + 2}</div>
               <div class="analytics-breakdown-row__body">
                 <div class="analytics-breakdown-row__title">
-  ${item.is_required ? '<span class="analytics-required-flag">🚩</span>' : ""}
+  ${item.is_required ? '<span class="analytics-required-flag">ð©</span>' : ""}
   ${escapeHtml(item.icon)} ${escapeHtml(item.name)}
 </div>
-                <div class="analytics-breakdown-row__subtitle">${percent}% от расходов</div>
+                <div class="analytics-breakdown-row__subtitle">${percent}% Ð¾Ñ ÑÐ°ÑÑÐ¾Ð´Ð¾Ð²</div>
               </div>
             </div>
             <div class="analytics-breakdown-row__value ${exceeded ? "analytics-limit-value--danger" : ""}">
@@ -3797,7 +3847,7 @@ const deleteBtn = card.querySelector("[data-delete-id]");
 }
 
   const summary = getInsightsSummary();
-  const periodLabel = getInsightsPeriodLabel() || "за период";
+  const periodLabel = getInsightsPeriodLabel() || "Ð·Ð° Ð¿ÐµÑÐ¸Ð¾Ð´";
 
   if (insightsPeriodLabel) {
   insightsPeriodLabel.textContent = periodLabel;
@@ -3833,13 +3883,13 @@ const deleteBtn = card.querySelector("[data-delete-id]");
   if (insightsRecommendationText) {
   if (summary.shortageBeforeSafeSaving > 0) {
     insightsRecommendationText.textContent =
-      `Откладывать сейчас рано. После учёта обязательных платежей и остатков лимитов не хватает ${formatMoney(summary.shortageBeforeSafeSaving)}.`;
+      `ÐÑÐºÐ»Ð°Ð´ÑÐ²Ð°ÑÑ ÑÐµÐ¹ÑÐ°Ñ ÑÐ°Ð½Ð¾. ÐÐ¾ÑÐ»Ðµ ÑÑÑÑÐ° Ð¾Ð±ÑÐ·Ð°ÑÐµÐ»ÑÐ½ÑÑ Ð¿Ð»Ð°ÑÐµÐ¶ÐµÐ¹ Ð¸ Ð¾ÑÑÐ°ÑÐºÐ¾Ð² Ð»Ð¸Ð¼Ð¸ÑÐ¾Ð² Ð½Ðµ ÑÐ²Ð°ÑÐ°ÐµÑ ${formatMoney(summary.shortageBeforeSafeSaving)}.`;
   } else if (summary.canSaveNow > 0) {
     insightsRecommendationText.textContent =
-      `Сейчас можно отложить ${formatMoney(summary.canSaveNow)}. В обязательных уже учтено покрытие платежей привязанными накоплениями.`;
+      `Ð¡ÐµÐ¹ÑÐ°Ñ Ð¼Ð¾Ð¶Ð½Ð¾ Ð¾ÑÐ»Ð¾Ð¶Ð¸ÑÑ ${formatMoney(summary.canSaveNow)}. Ð Ð¾Ð±ÑÐ·Ð°ÑÐµÐ»ÑÐ½ÑÑ ÑÐ¶Ðµ ÑÑÑÐµÐ½Ð¾ Ð¿Ð¾ÐºÑÑÑÐ¸Ðµ Ð¿Ð»Ð°ÑÐµÐ¶ÐµÐ¹ Ð¿ÑÐ¸Ð²ÑÐ·Ð°Ð½Ð½ÑÐ¼Ð¸ Ð½Ð°ÐºÐ¾Ð¿Ð»ÐµÐ½Ð¸ÑÐ¼Ð¸.`;
   } else {
     insightsRecommendationText.textContent =
-      `Свободные деньги сейчас полностью заняты обязательствами текущего месяца и остатками лимитов.`;
+      `Ð¡Ð²Ð¾Ð±Ð¾Ð´Ð½ÑÐµ Ð´ÐµÐ½ÑÐ³Ð¸ ÑÐµÐ¹ÑÐ°Ñ Ð¿Ð¾Ð»Ð½Ð¾ÑÑÑÑ Ð·Ð°Ð½ÑÑÑ Ð¾Ð±ÑÐ·Ð°ÑÐµÐ»ÑÑÑÐ²Ð°Ð¼Ð¸ ÑÐµÐºÑÑÐµÐ³Ð¾ Ð¼ÐµÑÑÑÐ° Ð¸ Ð¾ÑÑÐ°ÑÐºÐ°Ð¼Ð¸ Ð»Ð¸Ð¼Ð¸ÑÐ¾Ð².`;
   }
 }
 
@@ -3855,7 +3905,7 @@ const deleteBtn = card.querySelector("[data-delete-id]");
           <div class="list-title-row">
             <h3 class="list-title">${escapeHtml(bucket.name)}</h3>
           </div>
-          <p class="list-subtitle">${bucket.is_locked ? "Системное накопление" : "Накопление"}</p>
+          <p class="list-subtitle">${bucket.is_locked ? "Ð¡Ð¸ÑÑÐµÐ¼Ð½Ð¾Ðµ Ð½Ð°ÐºÐ¾Ð¿Ð»ÐµÐ½Ð¸Ðµ" : "ÐÐ°ÐºÐ¾Ð¿Ð»ÐµÐ½Ð¸Ðµ"}</p>
         </div>
         <div class="list-right">
           <p class="list-value">${formatMoney(getSafeBucketBalance(bucket.id))}</p>
@@ -3889,12 +3939,15 @@ const deleteBtn = card.querySelector("[data-delete-id]");
   }
 }
 
+  /* =========================================================
+     09. TRANSACTIONS CRUD
+     ========================================================= */
   function buildTransactionFromForm() {
   const amount = Number(amountInput.value.trim());
   const comment = commentInput.value.trim();
 
   if (!amount || amount <= 0) {
-    alert("Введи сумму");
+    alert("ÐÐ²ÐµÐ´Ð¸ ÑÑÐ¼Ð¼Ñ");
     return null;
   }
 
@@ -3922,12 +3975,12 @@ const deleteBtn = card.querySelector("[data-delete-id]");
       isVaultAccountId(toAccountId) ? toSafeBucketSelect.value : null;
 
     if (!fromAccountId) {
-      alert("Выбери счёт списания");
+      alert("ÐÑÐ±ÐµÑÐ¸ ÑÑÑÑ ÑÐ¿Ð¸ÑÐ°Ð½Ð¸Ñ");
       return null;
     }
 
     if (!toAccountId) {
-      alert("Выбери счёт зачисления");
+      alert("ÐÑÐ±ÐµÑÐ¸ ÑÑÑÑ Ð·Ð°ÑÐ¸ÑÐ»ÐµÐ½Ð¸Ñ");
       return null;
     }
 
@@ -3937,25 +3990,25 @@ const deleteBtn = card.querySelector("[data-delete-id]");
         (fromSafeBucketId && toSafeBucketId && fromSafeBucketId === toSafeBucketId);
 
       if (sameBuckets) {
-        alert("Счета должны быть разными");
+        alert("Ð¡ÑÐµÑÐ° Ð´Ð¾Ð»Ð¶Ð½Ñ Ð±ÑÑÑ ÑÐ°Ð·Ð½ÑÐ¼Ð¸");
         return null;
       }
     }
 
     if (isVaultAccountId(fromAccountId) && !fromSafeBucketId) {
-      alert("Выбери накопление списания");
+      alert("ÐÑÐ±ÐµÑÐ¸ Ð½Ð°ÐºÐ¾Ð¿Ð»ÐµÐ½Ð¸Ðµ ÑÐ¿Ð¸ÑÐ°Ð½Ð¸Ñ");
       return null;
     }
 
     if (isVaultAccountId(toAccountId) && !toSafeBucketId) {
-      alert("Выбери накопление зачисления");
+      alert("ÐÑÐ±ÐµÑÐ¸ Ð½Ð°ÐºÐ¾Ð¿Ð»ÐµÐ½Ð¸Ðµ Ð·Ð°ÑÐ¸ÑÐ»ÐµÐ½Ð¸Ñ");
       return null;
     }
 
     return {
       id: editingTransactionId || crypto.randomUUID(),
       type: "transfer",
-      title: comment || "Перевод",
+      title: comment || "ÐÐµÑÐµÐ²Ð¾Ð´",
       amount,
       from_account_id: fromAccountId,
       to_account_id: toAccountId,
@@ -3975,7 +4028,7 @@ const deleteBtn = card.querySelector("[data-delete-id]");
   const account = getAccountNameById(accountId);
 
   if (!accountId) {
-    alert("Выбери счёт");
+    alert("ÐÑÐ±ÐµÑÐ¸ ÑÑÑÑ");
     return null;
   }
 
@@ -3983,7 +4036,7 @@ const deleteBtn = card.querySelector("[data-delete-id]");
     return {
       id: editingTransactionId || crypto.randomUUID(),
       type: "income",
-      title: comment || "Новый доход",
+      title: comment || "ÐÐ¾Ð²ÑÐ¹ Ð´Ð¾ÑÐ¾Ð´",
       amount,
       account_id: accountId,
       account,
@@ -4004,21 +4057,21 @@ const deleteBtn = card.querySelector("[data-delete-id]");
   const categoryId = categorySelect.value;
 
   if (!categoryId) {
-    alert("Выбери категорию");
+    alert("ÐÑÐ±ÐµÑÐ¸ ÐºÐ°ÑÐµÐ³Ð¾ÑÐ¸Ñ");
     return null;
   }
 
   const freeSafeBucket = isVaultAccountId(accountId) ? getFreeSafeBucket() : null;
 
   if (isVaultAccountId(accountId) && !freeSafeBucket) {
-    alert("Не найдено накопление, помеченное как свободные деньги.");
+    alert("ÐÐµ Ð½Ð°Ð¹Ð´ÐµÐ½Ð¾ Ð½Ð°ÐºÐ¾Ð¿Ð»ÐµÐ½Ð¸Ðµ, Ð¿Ð¾Ð¼ÐµÑÐµÐ½Ð½Ð¾Ðµ ÐºÐ°Ðº ÑÐ²Ð¾Ð±Ð¾Ð´Ð½ÑÐµ Ð´ÐµÐ½ÑÐ³Ð¸.");
     return null;
   }
 
   return {
     id: editingTransactionId || crypto.randomUUID(),
     type: "expense",
-    title: comment || "Новая трата",
+    title: comment || "ÐÐ¾Ð²Ð°Ñ ÑÑÐ°ÑÐ°",
     amount,
     account_id: accountId,
     account,
@@ -4045,7 +4098,7 @@ const deleteBtn = card.querySelector("[data-delete-id]");
         .eq("id", editingTransactionId);
 
       if (error) {
-        alert("Ошибка обновления операции");
+        alert("ÐÑÐ¸Ð±ÐºÐ° Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ñ Ð¾Ð¿ÐµÑÐ°ÑÐ¸Ð¸");
         console.error(error);
         return;
       }
@@ -4055,7 +4108,7 @@ const deleteBtn = card.querySelector("[data-delete-id]");
         .insert(transaction);
 
       if (error) {
-        alert("Ошибка сохранения операции");
+        alert("ÐÑÐ¸Ð±ÐºÐ° ÑÐ¾ÑÑÐ°Ð½ÐµÐ½Ð¸Ñ Ð¾Ð¿ÐµÑÐ°ÑÐ¸Ð¸");
         console.error(error);
         return;
       }
@@ -4069,7 +4122,7 @@ const deleteBtn = card.querySelector("[data-delete-id]");
   async function deleteTransaction() {
     if (!editingTransactionId) return;
 
-    const ok = confirm("Удалить эту операцию?");
+    const ok = confirm("Ð£Ð´Ð°Ð»Ð¸ÑÑ ÑÑÑ Ð¾Ð¿ÐµÑÐ°ÑÐ¸Ñ?");
     if (!ok) return;
 
     const { error } = await supabaseClient
@@ -4078,7 +4131,7 @@ const deleteBtn = card.querySelector("[data-delete-id]");
       .eq("id", editingTransactionId);
 
     if (error) {
-      alert("Ошибка удаления операции");
+      alert("ÐÑÐ¸Ð±ÐºÐ° ÑÐ´Ð°Ð»ÐµÐ½Ð¸Ñ Ð¾Ð¿ÐµÑÐ°ÑÐ¸Ð¸");
       console.error(error);
       return;
     }
@@ -4088,12 +4141,15 @@ const deleteBtn = card.querySelector("[data-delete-id]");
     closeModal();
   }
 
+  /* =========================================================
+     10. CATEGORIES / BUDGETS CRUD
+     ========================================================= */
   async function addCategory() {
     const name = newCategoryNameInput.value.trim();
-    const icon = newCategoryIconInput.value.trim() || "📦";
+    const icon = newCategoryIconInput.value.trim() || "ð¦";
 
     if (!name) {
-      alert("Введите название категории");
+      alert("ÐÐ²ÐµÐ´Ð¸ÑÐµ Ð½Ð°Ð·Ð²Ð°Ð½Ð¸Ðµ ÐºÐ°ÑÐµÐ³Ð¾ÑÐ¸Ð¸");
       return;
     }
 
@@ -4111,7 +4167,7 @@ const deleteBtn = card.querySelector("[data-delete-id]");
       .insert(newCategory);
 
     if (error) {
-      alert("Ошибка добавления категории");
+      alert("ÐÑÐ¸Ð±ÐºÐ° Ð´Ð¾Ð±Ð°Ð²Ð»ÐµÐ½Ð¸Ñ ÐºÐ°ÑÐµÐ³Ð¾ÑÐ¸Ð¸");
       console.error(error);
       return;
     }
@@ -4131,17 +4187,17 @@ async function saveBudgetLimit() {
   const amount = Number(budgetAmountInput.value.trim());
 
   if (!nextName) {
-    alert("Введи название категории");
+    alert("ÐÐ²ÐµÐ´Ð¸ Ð½Ð°Ð·Ð²Ð°Ð½Ð¸Ðµ ÐºÐ°ÑÐµÐ³Ð¾ÑÐ¸Ð¸");
     return;
   }
 
   if (!nextIcon) {
-    alert("Введи эмодзи категории");
+    alert("ÐÐ²ÐµÐ´Ð¸ ÑÐ¼Ð¾Ð´Ð·Ð¸ ÐºÐ°ÑÐµÐ³Ð¾ÑÐ¸Ð¸");
     return;
   }
 
   if (Number.isNaN(amount) || amount < 0) {
-    alert("Введи корректный лимит");
+    alert("ÐÐ²ÐµÐ´Ð¸ ÐºÐ¾ÑÑÐµÐºÑÐ½ÑÐ¹ Ð»Ð¸Ð¼Ð¸Ñ");
     return;
   }
 
@@ -4154,7 +4210,7 @@ async function saveBudgetLimit() {
     .eq("id", activeBudgetCategoryId);
 
   if (categoryError) {
-    alert("Ошибка обновления категории");
+    alert("ÐÑÐ¸Ð±ÐºÐ° Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ñ ÐºÐ°ÑÐµÐ³Ð¾ÑÐ¸Ð¸");
     console.error(categoryError);
     return;
   }
@@ -4168,7 +4224,7 @@ async function saveBudgetLimit() {
       .eq("category_id", activeBudgetCategoryId);
 
     if (error) {
-      alert("Ошибка обновления лимита");
+      alert("ÐÑÐ¸Ð±ÐºÐ° Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ñ Ð»Ð¸Ð¼Ð¸ÑÐ°");
       console.error(error);
       return;
     }
@@ -4181,7 +4237,7 @@ async function saveBudgetLimit() {
       });
 
     if (error) {
-      alert("Ошибка сохранения лимита");
+      alert("ÐÑÐ¸Ð±ÐºÐ° ÑÐ¾ÑÑÐ°Ð½ÐµÐ½Ð¸Ñ Ð»Ð¸Ð¼Ð¸ÑÐ°");
       console.error(error);
       return;
     }
@@ -4195,7 +4251,7 @@ async function saveBudgetLimit() {
   async function deleteBudgetLimit() {
     if (!activeBudgetCategoryId) return;
 
-    const ok = confirm("Удалить лимит для этой категории?");
+    const ok = confirm("Ð£Ð´Ð°Ð»Ð¸ÑÑ Ð»Ð¸Ð¼Ð¸Ñ Ð´Ð»Ñ ÑÑÐ¾Ð¹ ÐºÐ°ÑÐµÐ³Ð¾ÑÐ¸Ð¸?");
     if (!ok) return;
 
     const { error } = await supabaseClient
@@ -4204,7 +4260,7 @@ async function saveBudgetLimit() {
       .eq("category_id", activeBudgetCategoryId);
 
     if (error) {
-      alert("Ошибка удаления лимита");
+      alert("ÐÑÐ¸Ð±ÐºÐ° ÑÐ´Ð°Ð»ÐµÐ½Ð¸Ñ Ð»Ð¸Ð¼Ð¸ÑÐ°");
       console.error(error);
       return;
     }
@@ -4214,6 +4270,9 @@ async function saveBudgetLimit() {
     closeBudgetModal();
   }
 
+  /* =========================================================
+     11. SUPABASE LOAD + BOOTSTRAP
+     ========================================================= */
   async function loadDataFromSupabase() {
   const [
     { data: accounts, error: accountsError },
@@ -4233,37 +4292,37 @@ async function saveBudgetLimit() {
 
   if (accountsError) {
     console.error(accountsError);
-    alert("Ошибка загрузки счетов из Supabase");
+    alert("ÐÑÐ¸Ð±ÐºÐ° Ð·Ð°Ð³ÑÑÐ·ÐºÐ¸ ÑÑÐµÑÐ¾Ð² Ð¸Ð· Supabase");
     return;
   }
 
   if (categoriesError) {
     console.error(categoriesError);
-    alert("Ошибка загрузки категорий из Supabase");
+    alert("ÐÑÐ¸Ð±ÐºÐ° Ð·Ð°Ð³ÑÑÐ·ÐºÐ¸ ÐºÐ°ÑÐµÐ³Ð¾ÑÐ¸Ð¹ Ð¸Ð· Supabase");
     return;
   }
 
   if (transactionsError) {
     console.error(transactionsError);
-    alert("Ошибка загрузки операций из Supabase");
+    alert("ÐÑÐ¸Ð±ÐºÐ° Ð·Ð°Ð³ÑÑÐ·ÐºÐ¸ Ð¾Ð¿ÐµÑÐ°ÑÐ¸Ð¹ Ð¸Ð· Supabase");
     return;
   }
 
   if (budgetLimitsError) {
     console.error(budgetLimitsError);
-    alert("Ошибка загрузки лимитов бюджета из Supabase");
+    alert("ÐÑÐ¸Ð±ÐºÐ° Ð·Ð°Ð³ÑÑÐ·ÐºÐ¸ Ð»Ð¸Ð¼Ð¸ÑÐ¾Ð² Ð±ÑÐ´Ð¶ÐµÑÐ° Ð¸Ð· Supabase");
     return;
   }
 
   if (safeBucketsError) {
     console.error(safeBucketsError);
-    alert("Ошибка загрузки сейфов из Supabase");
+    alert("ÐÑÐ¸Ð±ÐºÐ° Ð·Ð°Ð³ÑÑÐ·ÐºÐ¸ ÑÐµÐ¹ÑÐ¾Ð² Ð¸Ð· Supabase");
     return;
   }
 
   if (appMetaError) {
     console.error(appMetaError);
-    alert("Ошибка загрузки служебных данных приложения");
+    alert("ÐÑÐ¸Ð±ÐºÐ° Ð·Ð°Ð³ÑÑÐ·ÐºÐ¸ ÑÐ»ÑÐ¶ÐµÐ±Ð½ÑÑ Ð´Ð°Ð½Ð½ÑÑ Ð¿ÑÐ¸Ð»Ð¾Ð¶ÐµÐ½Ð¸Ñ");
     return;
   }
 
@@ -4288,6 +4347,9 @@ function renderAll() {
   renderInsights();
 }
 
+  /* =========================================================
+     12. EVENTS / LISTENERS
+     ========================================================= */
   openExpenseModalBtn?.addEventListener("click", () => openModal("expense"));
   openIncomeModalBtn?.addEventListener("click", () => openModal("income"));
   openTransferModalBtn?.addEventListener("click", () => openModal("transfer"));
