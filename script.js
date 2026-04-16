@@ -330,41 +330,6 @@ function getSafeAccountId() {
   return getVaultAccountId();
 }
 
-function getPrimarySpendAccount() {
-  return (
-    state.accounts.find(
-      (account) =>
-        account.is_primary_spend === true &&
-        account.account_kind !== "vault_pool"
-    ) || null
-  );
-}
-
-function getPrimarySpendAccountName() {
-  return getPrimarySpendAccount()?.name || "";
-}
-
-function getVaultAccount() {
-  return state.accounts.find((account) => account.account_kind === "vault_pool") || null;
-}
-
-function getVaultAccountName() {
-  return getVaultAccount()?.name || "";
-}
-
-function isVaultAccountName(name) {
-  const vaultName = getVaultAccountName();
-  return Boolean(vaultName && name === vaultName);
-}
-
-function getCashAccount() {
-  return state.accounts.find((account) => account.account_kind === "cash") || null;
-}
-
-function getCashAccountName() {
-  return getCashAccount()?.name || "";
-}
-
 function getProtectedAccounts() {
   return state.accounts.filter((account) => account.is_protected === true);
 }
@@ -422,37 +387,48 @@ function formatPercentLabel(rateDecimal) {
 function getSafeBucketBalance(bucketId) {
   let balance = 0;
   const freeBucketId = getFreeSafeBucket()?.id || null;
+  const safeAccountId = getSafeAccountId();
+  const safeAccountName = getSafeAccountName();
 
   state.transactions.forEach((transaction) => {
     const amount = Number(transaction.amount) || 0;
 
     if (transaction.type === "transfer") {
-      if (
-        transaction.to_account_id === getSafeAccountId()
-transaction.from_account_id === getSafeAccountId()
-transaction.account_id === getSafeAccountId()
-      ) {
+      const goesToSafe =
+        (transaction.to_account_id && transaction.to_account_id === safeAccountId) ||
+        (!transaction.to_account_id && transaction.to_account === safeAccountName);
+
+      const goesFromSafe =
+        (transaction.from_account_id && transaction.from_account_id === safeAccountId) ||
+        (!transaction.from_account_id && transaction.from_account === safeAccountName);
+
+      if (goesToSafe && transaction.to_safe_bucket_id === bucketId) {
         balance += amount;
       }
 
-      if (
-        transaction.from_account === getSafeAccountName() &&
-        transaction.from_safe_bucket_id === bucketId
-      ) {
+      if (goesFromSafe && transaction.from_safe_bucket_id === bucketId) {
         balance -= amount;
       }
     }
 
-    if (transaction.type === "income" && transaction.account === getSafeAccountName()) {
-      if (transaction.to_safe_bucket_id === bucketId) {
+    if (transaction.type === "income") {
+      const incomeToSafe =
+        (transaction.account_id && transaction.account_id === safeAccountId) ||
+        (!transaction.account_id && transaction.account === safeAccountName);
+
+      if (incomeToSafe && transaction.to_safe_bucket_id === bucketId) {
         balance += amount;
       }
     }
 
-    if (transaction.type === "expense" && transaction.account === getSafeAccountName()) {
+    if (transaction.type === "expense") {
+      const expenseFromSafe =
+        (transaction.account_id && transaction.account_id === safeAccountId) ||
+        (!transaction.account_id && transaction.account === safeAccountName);
+
       const expenseBucketId = transaction.from_safe_bucket_id || freeBucketId;
 
-      if (expenseBucketId === bucketId) {
+      if (expenseFromSafe && expenseBucketId === bucketId) {
         balance -= amount;
       }
     }
@@ -3240,7 +3216,7 @@ function getAccountRoleFlags(role) {
       const interestTransaction = {
         id: crypto.randomUUID(),
         type: "income",
-        title: "Проценты по сейфу",
+        title: "Проценты по накоплению",
         account: getSafeAccountName(),
         category_id: null,
         from_account: null,
@@ -3908,134 +3884,149 @@ const deleteBtn = card.querySelector("[data-delete-id]");
 }
 
   function buildTransactionFromForm() {
-    const amount = Number(amountInput.value.trim());
-    const comment = commentInput.value.trim();
-    
+  const amount = Number(amountInput.value.trim());
+  const comment = commentInput.value.trim();
 
-    if (!amount || amount <= 0) {
-      alert("Введи сумму");
+  if (!amount || amount <= 0) {
+    alert("Введи сумму");
+    return null;
+  }
+
+  const selectedDate = dateInput.value || getTodayDateValue();
+  const existingTransaction = editingTransactionId
+    ? state.transactions.find((item) => item.id === editingTransactionId)
+    : null;
+
+  const preservedTime = existingTransaction?.created_at
+    ? String(existingTransaction.created_at).slice(11, 19) || new Date().toTimeString().slice(0, 8)
+    : new Date().toTimeString().slice(0, 8);
+
+  const createdAt = `${selectedDate}T${preservedTime}`;
+
+  if (currentMode === "transfer") {
+    const fromAccountId = fromAccountSelect.value;
+    const toAccountId = toAccountSelect.value;
+
+    const fromAccount = getAccountNameById(fromAccountId);
+    const toAccount = getAccountNameById(toAccountId);
+
+    const fromSafeBucketId =
+      isVaultAccountId(fromAccountId) ? fromSafeBucketSelect.value : null;
+    const toSafeBucketId =
+      isVaultAccountId(toAccountId) ? toSafeBucketSelect.value : null;
+
+    if (!fromAccountId) {
+      alert("Выбери счёт списания");
       return null;
     }
 
-    const selectedDate = dateInput.value || getTodayDateValue();
-    const existingTimePart = editingTransactionId
-      ? state.transactions.find((item) => item.id === editingTransactionId)?.created_at
-      : null;
+    if (!toAccountId) {
+      alert("Выбери счёт зачисления");
+      return null;
+    }
 
-    const preservedTime = existingTimePart
-      ? String(existingTimePart).slice(11, 19) || new Date().toTimeString().slice(0, 8)
-      : new Date().toTimeString().slice(0, 8);
+    if (fromAccountId === toAccountId) {
+      const sameBuckets =
+        !isVaultAccountId(fromAccountId) ||
+        (fromSafeBucketId && toSafeBucketId && fromSafeBucketId === toSafeBucketId);
 
-    const createdAt = `${selectedDate}T${preservedTime}`;
+      if (sameBuckets) {
+        alert("Счета должны быть разными");
+        return null;
+      }
+    }
 
-    if (currentMode === "transfer") {
-  const fromAccountId = fromAccountSelect.value;
-const toAccountId = toAccountSelect.value;
+    if (isVaultAccountId(fromAccountId) && !fromSafeBucketId) {
+      alert("Выбери накопление списания");
+      return null;
+    }
 
-const fromAccount = getAccountNameById(fromAccountId);
-const toAccount = getAccountNameById(toAccountId);
-  const fromSafeBucketId =
-  isVaultAccountId(fromAccountId) ? fromSafeBucketSelect.value : null;
-const toSafeBucketId =
-  isVaultAccountId(toAccountId) ? toSafeBucketSelect.value : null;
-  const freeSafeBucket = isVaultAccountId(accountId) ? getDefaultSpendingSafeBucket() : null;
+    if (isVaultAccountId(toAccountId) && !toSafeBucketId) {
+      alert("Выбери накопление зачисления");
+      return null;
+    }
 
-  if (!fromAccount) {
-    alert("Выбери счёт списания");
+    return {
+      id: editingTransactionId || crypto.randomUUID(),
+      type: "transfer",
+      title: comment || "Перевод",
+      amount,
+      from_account_id: fromAccountId,
+      to_account_id: toAccountId,
+      from_account: fromAccount,
+      to_account: toAccount,
+      from_safe_bucket_id: fromSafeBucketId,
+      to_safe_bucket_id: toSafeBucketId,
+      created_at: createdAt,
+      time_label: getCurrentTime(),
+      category_id: null,
+      account_id: null,
+      account: null,
+    };
+  }
+
+  const accountId = accountSelect.value;
+  const account = getAccountNameById(accountId);
+
+  if (!accountId) {
+    alert("Выбери счёт");
     return null;
   }
 
-  if (!toAccount) {
-    alert("Выбери счёт зачисления");
+  if (currentMode === "income") {
+    return {
+      id: editingTransactionId || crypto.randomUUID(),
+      type: "income",
+      title: comment || "Новый доход",
+      amount,
+      account_id: accountId,
+      account,
+      category_id: null,
+      from_account_id: null,
+      to_account_id: null,
+      from_account: null,
+      to_account: null,
+      from_safe_bucket_id: null,
+      to_safe_bucket_id: isVaultAccountId(accountId)
+        ? getFreeSafeBucket()?.id || null
+        : null,
+      created_at: createdAt,
+      time_label: getCurrentTime(),
+    };
+  }
+
+  const categoryId = categorySelect.value;
+
+  if (!categoryId) {
+    alert("Выбери категорию");
     return null;
   }
 
-  if (fromAccountId === toAccountId) {
-  const sameBuckets =
-    !isVaultAccountId(fromAccountId) ||
-    (fromSafeBucketId && toSafeBucketId && fromSafeBucketId === toSafeBucketId);
+  const freeSafeBucket = isVaultAccountId(accountId) ? getFreeSafeBucket() : null;
 
-  if (sameBuckets) {
-    alert("Счета должны быть разными");
-    return null;
-  }
-}
-
-  if (isVaultAccountId(fromAccountId) && !fromSafeBucketId) {
-    alert("Выбери сейф списания");
-    return null;
-  }
-
-  if (isVaultAccountId(toAccountId) && !toSafeBucketId) {
-    alert("Выбери сейф зачисления");
+  if (isVaultAccountId(accountId) && !freeSafeBucket) {
+    alert("Не найдено накопление, помеченное как свободные деньги.");
     return null;
   }
 
   return {
-  id: editingTransactionId || crypto.randomUUID(),
-  type: "transfer",
-  title: comment || "Перевод",
-  amount,
-  from_account_id: fromAccountId,
-  to_account_id: toAccountId,
-  from_account: fromAccount,
-  to_account: toAccount,
-  from_safe_bucket_id: fromSafeBucketId,
-  to_safe_bucket_id: toSafeBucketId,
-  created_at: isoDate,
-};
+    id: editingTransactionId || crypto.randomUUID(),
+    type: "expense",
+    title: comment || "Новая трата",
+    amount,
+    account_id: accountId,
+    account,
+    category_id: categoryId,
+    from_account_id: null,
+    to_account_id: null,
+    from_account: null,
+    to_account: null,
+    from_safe_bucket_id: isVaultAccountId(accountId) ? freeSafeBucket.id : null,
+    to_safe_bucket_id: null,
+    created_at: createdAt,
+    time_label: getCurrentTime(),
+  };
 }
-
-    const accountId = accountSelect.value;
-const account = getAccountNameById(accountId);
-
-    if (!account) {
-      alert("Выбери счёт");
-      return null;
-    }
-
-    if (currentMode === "income") {
-      return {
-        return {
-  id: editingTransactionId || crypto.randomUUID(),
-  type: mode,
-  title,
-  amount,
-  account_id: accountId,
-  account,
-  category_id,
-  to_safe_bucket_id: ...,
-  created_at: isoDate,
-};
-    }
-
-    const categoryId = categorySelect.value;
-
-    if (!categoryId) {
-      alert("Выбери категорию");
-      return null;
-    }
-
-    const freeSafeBucket = account === getSafeAccountName() ? getFreeSafeBucket() : null;
-
-if (account === getSafeAccountName() && !freeSafeBucket) {
-  alert("Не найден сейф, помеченный как свободные деньги.");
-  return null;
-}
-
-return {
-  return {
-  id: editingTransactionId || crypto.randomUUID(),
-  type: mode,
-  title,
-  amount,
-  account_id: accountId,
-  account,
-  category_id,
-  to_safe_bucket_id: ...,
-  created_at: isoDate,
-};
-  }
 
   async function saveTransaction() {
     const transaction = buildTransactionFromForm();
