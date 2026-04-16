@@ -243,12 +243,12 @@ let activeAccountId = null;
 
   function getCategoryName(categoryId) {
     const category = getCategoryById(categoryId);
-    return category ? category.name : "\u0411\u0435\u0437 \u043A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u0438";
+    return category ? category.name : "ÐÐµÐ· ÐºÐ°ÑÐµÐ³Ð¾ÑÐ¸Ð¸";
   }
 
   function getCategoryIcon(categoryId) {
     const category = getCategoryById(categoryId);
-    return category ? category.icon : "\uD83D\uDCE6";
+    return category ? category.icon : "ð¦";
   }
   
   function isRequiredCategory(categoryId) {
@@ -257,7 +257,7 @@ let activeAccountId = null;
 }
 
 function getCategoryTypeLabel(categoryId) {
-  return isRequiredCategory(categoryId) ? "\u041E\u0431\u044F\u0437\u0430\u0442\u0435\u043B\u044C\u043D\u0430\u044F" : "\u0413\u0438\u0431\u043A\u0430\u044F";
+  return isRequiredCategory(categoryId) ? "ÐÐ±ÑÐ·Ð°ÑÐµÐ»ÑÐ½Ð°Ñ" : "ÐÐ¸Ð±ÐºÐ°Ñ";
 }
 
 function getSafeBucketById(bucketId) {
@@ -277,7 +277,7 @@ function getAccountNameById(accountId) {
 }
 
 function getAccountIconById(accountId) {
-  return getAccountById(accountId)?.icon || "\uD83D\uDCB3";
+  return getAccountById(accountId)?.icon || "ð³";
 }
 
 function getVaultAccount() {
@@ -362,7 +362,7 @@ function getSafeBucketName(bucketId) {
 
 function getSafeBucketIcon(bucketId) {
   const bucket = getSafeBucketById(bucketId);
-  return bucket ? bucket.icon : "\uD83D\uDDC2\uFE0F";
+  return bucket ? bucket.icon : "ðï¸";
 }
 
 function getSafeAccountName() {
@@ -620,7 +620,7 @@ async function setSafeBucketTargetAmount(bucketId, nextAmount) {
   const target = roundToTwo(Number(nextAmount) || 0);
 
   if (target < 0) {
-    alert("\u0421\u0443\u043C\u043C\u0430 \u0441\u0435\u0439\u0444\u0430 \u043D\u0435 \u043C\u043E\u0436\u0435\u0442 \u0431\u044B\u0442\u044C \u043C\u0435\u043D\u044C\u0448\u0435 \u043D\u0443\u043B\u044F");
+    alert("Ð¡ÑÐ¼Ð¼Ð° ÑÐµÐ¹ÑÐ° Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑ Ð±ÑÑÑ Ð¼ÐµÐ½ÑÑÐµ Ð½ÑÐ»Ñ");
     return false;
   }
 
@@ -634,7 +634,7 @@ async function setSafeBucketTargetAmount(bucketId, nextAmount) {
   const adjustmentTransaction = {
     id: crypto.randomUUID(),
     type: "transfer",
-    title: "\u041A\u043E\u0440\u0440\u0435\u043A\u0442\u0438\u0440\u043E\u0432\u043A\u0430 \u0441\u0435\u0439\u0444\u0430",
+    title: "ÐÐ¾ÑÑÐµÐºÑÐ¸ÑÐ¾Ð²ÐºÐ° ÑÐµÐ¹ÑÐ°",
     account: null,
     category_id: null,
     from_account: getSafeAccountName(),
@@ -651,7 +651,7 @@ async function setSafeBucketTargetAmount(bucketId, nextAmount) {
     .insert(adjustmentTransaction);
 
   if (error) {
-    alert("\u041E\u0448\u0438\u0431\u043A\u0430 \u043A\u043E\u0440\u0440\u0435\u043A\u0442\u0438\u0440\u043E\u0432\u043A\u0438 \u0441\u0443\u043C\u043C\u044B \u0441\u0435\u0439\u0444\u0430");
+    alert("ÐÑÐ¸Ð±ÐºÐ° ÐºÐ¾ÑÑÐµÐºÑÐ¸ÑÐ¾Ð²ÐºÐ¸ ÑÑÐ¼Ð¼Ñ ÑÐµÐ¹ÑÐ°");
     console.error(error);
     return false;
   }
@@ -693,11 +693,11 @@ const toIsSafes = isVaultAccountId(toAccountSelect?.value);
   }
 
   if (fromIsSafes) {
-    fillSafeBucketSelect(fromSafeBucketSelect, "\u0418\u0437 \u043A\u0430\u043A\u043E\u0433\u043E \u0441\u0435\u0439\u0444\u0430", fromSafeBucketSelect?.value || "");
+    fillSafeBucketSelect(fromSafeBucketSelect, "ÐÐ· ÐºÐ°ÐºÐ¾Ð³Ð¾ ÑÐµÐ¹ÑÐ°", fromSafeBucketSelect?.value || "");
   }
 
   if (toIsSafes) {
-    fillSafeBucketSelect(toSafeBucketSelect, "\u0412 \u043A\u0430\u043A\u043E\u0439 \u0441\u0435\u0439\u0444", toSafeBucketSelect?.value || "");
+    fillSafeBucketSelect(toSafeBucketSelect, "Ð ÐºÐ°ÐºÐ¾Ð¹ ÑÐµÐ¹Ñ", toSafeBucketSelect?.value || "");
   }
 }
 
@@ -708,7 +708,7 @@ const toIsSafes = isVaultAccountId(toAccountSelect?.value);
   function getBudgetLimitLabel(categoryId) {
     const record = getBudgetLimitByCategoryId(categoryId);
     const amount = record ? Number(record.monthly_limit) || 0 : 0;
-    return amount > 0 ? formatMoney(amount) : "\u2014";
+    return amount > 0 ? formatMoney(amount) : "â";
   }
 
   function getAnalyticsSpentLimitLabel(spent, categoryId) {
@@ -744,7 +744,7 @@ const toIsSafes = isVaultAccountId(toAccountSelect?.value);
       last_paid_period: item.last_paid_period || "",
     }));
   } catch (error) {
-    console.error("\u041E\u0448\u0438\u0431\u043A\u0430 mandatory_payments", error);
+    console.error("ÐÑÐ¸Ð±ÐºÐ° mandatory_payments", error);
     return [];
   }
 }
@@ -758,7 +758,7 @@ async function saveMandatoryPaymentsToMeta() {
     });
 
   if (error) {
-    alert("\u041E\u0448\u0438\u0431\u043A\u0430 \u0441\u043E\u0445\u0440\u0430\u043D\u0435\u043D\u0438\u044F \u043E\u0431\u044F\u0437\u0430\u0442\u0435\u043B\u044C\u043D\u044B\u0445 \u043F\u043B\u0430\u0442\u0435\u0436\u0435\u0439");
+    alert("ÐÑÐ¸Ð±ÐºÐ° ÑÐ¾ÑÑÐ°Ð½ÐµÐ½Ð¸Ñ Ð¾Ð±ÑÐ·Ð°ÑÐµÐ»ÑÐ½ÑÑ Ð¿Ð»Ð°ÑÐµÐ¶ÐµÐ¹");
     console.error(error);
     return false;
   }
@@ -790,7 +790,7 @@ function getMandatoryPaymentsStats(monthKey = getCurrentMonthKey()) {
 function fillMandatoryPaymentSafeSelect(selectedId = "") {
   if (!mandatoryPaymentLinkedSafeSelect) return;
 
-  mandatoryPaymentLinkedSafeSelect.innerHTML = `<option value="">\u0411\u0435\u0437 \u043F\u0440\u0438\u0432\u044F\u0437\u043A\u0438 \u043A \u0441\u0435\u0439\u0444\u0443</option>`;
+  mandatoryPaymentLinkedSafeSelect.innerHTML = `<option value="">ÐÐµÐ· Ð¿ÑÐ¸Ð²ÑÐ·ÐºÐ¸ Ðº ÑÐµÐ¹ÑÑ</option>`;
 
   state.safeBuckets.forEach((bucket) => {
     const option = document.createElement("option");
@@ -891,8 +891,8 @@ function renderMandatoryPaymentsModal() {
     empty.className = "list-card";
     empty.innerHTML = `
       <div class="list-body">
-        <h3 class="list-title">\u041F\u043B\u0430\u0442\u0435\u0436\u0435\u0439 \u043F\u043E\u043A\u0430 \u043D\u0435\u0442</h3>
-        <p class="list-subtitle">\u0414\u043E\u0431\u0430\u0432\u044C \u043E\u0431\u044F\u0437\u0430\u0442\u0435\u043B\u044C\u043D\u044B\u0435 \u043F\u043B\u0430\u0442\u0435\u0436\u0438 \u043D\u0438\u0436\u0435</p>
+        <h3 class="list-title">ÐÐ»Ð°ÑÐµÐ¶ÐµÐ¹ Ð¿Ð¾ÐºÐ° Ð½ÐµÑ</h3>
+        <p class="list-subtitle">ÐÐ¾Ð±Ð°Ð²Ñ Ð¾Ð±ÑÐ·Ð°ÑÐµÐ»ÑÐ½ÑÐµ Ð¿Ð»Ð°ÑÐµÐ¶Ð¸ Ð½Ð¸Ð¶Ðµ</p>
       </div>
     `;
     mandatoryPaymentsList.appendChild(empty);
@@ -918,14 +918,14 @@ function renderMandatoryPaymentsModal() {
       const covered = Math.min(Number(item.amount) || 0, linkedSafeBalance);
 
       const coverageText = item.linked_safe_bucket_id
-        ? `\u0441\u0435\u0439\u0444: ${linkedSafeName} \u2022 \u043F\u043E\u043A\u0440\u044B\u0442\u043E ${formatMoney(covered)}`
-        : "\u0431\u0435\u0437 \u043F\u0440\u0438\u0432\u044F\u0437\u043A\u0438 \u043A \u0441\u0435\u0439\u0444\u0443";
+        ? `ÑÐµÐ¹Ñ: ${linkedSafeName} â¢ Ð¿Ð¾ÐºÑÑÑÐ¾ ${formatMoney(covered)}`
+        : "Ð±ÐµÐ· Ð¿ÑÐ¸Ð²ÑÐ·ÐºÐ¸ Ðº ÑÐµÐ¹ÑÑ";
 
       const card = document.createElement("div");
       card.className = "list-card";
       card.innerHTML = `
         <div class="list-icon ${isPaid ? "list-icon--green" : "list-icon--red"}">
-          ${isPaid ? "\u2713" : "!"}
+          ${isPaid ? "â" : "!"}
         </div>
 
         <div class="list-body">
@@ -933,7 +933,7 @@ function renderMandatoryPaymentsModal() {
             <h3 class="list-title">${escapeHtml(item.title)}</h3>
           </div>
           <p class="list-subtitle">
-            ${formatMoney(item.amount)} \u2022 \u0434\u043E ${String(item.due_day).padStart(2, "0")} \u0447\u0438\u0441\u043B\u0430 \u2022 ${coverageText} \u2022 ${isPaid ? "\u041E\u043F\u043B\u0430\u0447\u0435\u043D" : "\u041D\u0435 \u043E\u043F\u043B\u0430\u0447\u0435\u043D"}
+            ${formatMoney(item.amount)} â¢ Ð´Ð¾ ${String(item.due_day).padStart(2, "0")} ÑÐ¸ÑÐ»Ð° â¢ ${coverageText} â¢ ${isPaid ? "ÐÐ¿Ð»Ð°ÑÐµÐ½" : "ÐÐµ Ð¾Ð¿Ð»Ð°ÑÐµÐ½"}
           </p>
         </div>
 
@@ -942,8 +942,8 @@ function renderMandatoryPaymentsModal() {
     class="icon-action-btn icon-action-btn--toggle ${isPaid ? "is-active" : ""}"
     type="button"
     data-toggle-mandatory-id="${item.id}"
-    aria-label="${isPaid ? "\u0421\u043D\u044F\u0442\u044C \u043E\u043F\u043B\u0430\u0442\u0443" : "\u041E\u0442\u043C\u0435\u0442\u0438\u0442\u044C \u043A\u0430\u043A \u043E\u043F\u043B\u0430\u0447\u0435\u043D\u043D\u044B\u0439"}"
-    title="${isPaid ? "\u0421\u043D\u044F\u0442\u044C \u043E\u043F\u043B\u0430\u0442\u0443" : "\u041E\u0442\u043C\u0435\u0442\u0438\u0442\u044C \u043A\u0430\u043A \u043E\u043F\u043B\u0430\u0447\u0435\u043D\u043D\u044B\u0439"}"
+    aria-label="${isPaid ? "Ð¡Ð½ÑÑÑ Ð¾Ð¿Ð»Ð°ÑÑ" : "ÐÑÐ¼ÐµÑÐ¸ÑÑ ÐºÐ°Ðº Ð¾Ð¿Ð»Ð°ÑÐµÐ½Ð½ÑÐ¹"}"
+    title="${isPaid ? "Ð¡Ð½ÑÑÑ Ð¾Ð¿Ð»Ð°ÑÑ" : "ÐÑÐ¼ÐµÑÐ¸ÑÑ ÐºÐ°Ðº Ð¾Ð¿Ð»Ð°ÑÐµÐ½Ð½ÑÐ¹"}"
   >
     <svg viewBox="0 0 24 24" aria-hidden="true">
       <path d="M5 12.5 9.2 16.5 19 7.5" />
@@ -954,8 +954,8 @@ function renderMandatoryPaymentsModal() {
     class="icon-action-btn icon-action-btn--danger"
     type="button"
     data-delete-mandatory-id="${item.id}"
-    aria-label="\u0423\u0434\u0430\u043B\u0438\u0442\u044C \u043F\u043B\u0430\u0442\u0451\u0436"
-    title="\u0423\u0434\u0430\u043B\u0438\u0442\u044C \u043F\u043B\u0430\u0442\u0451\u0436"
+    aria-label="Ð£Ð´Ð°Ð»Ð¸ÑÑ Ð¿Ð»Ð°ÑÑÐ¶"
+    title="Ð£Ð´Ð°Ð»Ð¸ÑÑ Ð¿Ð»Ð°ÑÑÐ¶"
   >
     <svg viewBox="0 0 24 24" aria-hidden="true">
       <path d="M5 7h14" />
@@ -981,7 +981,7 @@ function renderMandatoryPaymentsModal() {
       });
 
       card.querySelector("[data-delete-mandatory-id]")?.addEventListener("click", async () => {
-        const ok = confirm(`\u0423\u0434\u0430\u043B\u0438\u0442\u044C \u043E\u0431\u044F\u0437\u0430\u0442\u0435\u043B\u044C\u043D\u044B\u0439 \u043F\u043B\u0430\u0442\u0451\u0436 "${item.title}"?`);
+        const ok = confirm(`Ð£Ð´Ð°Ð»Ð¸ÑÑ Ð¾Ð±ÑÐ·Ð°ÑÐµÐ»ÑÐ½ÑÐ¹ Ð¿Ð»Ð°ÑÑÐ¶ "${item.title}"?`);
         if (!ok) return;
 
         state.mandatoryPayments = state.mandatoryPayments.filter((entry) => entry.id !== item.id);
@@ -1004,17 +1004,17 @@ function renderMandatoryPaymentsModal() {
   const linkedSafeBucketId = mandatoryPaymentLinkedSafeSelect?.value || "";
 
   if (!title) {
-    alert("\u0412\u0432\u0435\u0434\u0438 \u043D\u0430\u0437\u0432\u0430\u043D\u0438\u0435 \u043F\u043B\u0430\u0442\u0435\u0436\u0430");
+    alert("ÐÐ²ÐµÐ´Ð¸ Ð½Ð°Ð·Ð²Ð°Ð½Ð¸Ðµ Ð¿Ð»Ð°ÑÐµÐ¶Ð°");
     return;
   }
 
   if (!amount || amount <= 0) {
-    alert("\u0412\u0432\u0435\u0434\u0438 \u043A\u043E\u0440\u0440\u0435\u043A\u0442\u043D\u0443\u044E \u0441\u0443\u043C\u043C\u0443");
+    alert("ÐÐ²ÐµÐ´Ð¸ ÐºÐ¾ÑÑÐµÐºÑÐ½ÑÑ ÑÑÐ¼Ð¼Ñ");
     return;
   }
 
   if (!dueDateValue) {
-    alert("\u0412\u044B\u0431\u0435\u0440\u0438 \u0434\u0430\u0442\u0443 \u043F\u043B\u0430\u0442\u0435\u0436\u0430");
+    alert("ÐÑÐ±ÐµÑÐ¸ Ð´Ð°ÑÑ Ð¿Ð»Ð°ÑÐµÐ¶Ð°");
     return;
   }
 
@@ -1076,7 +1076,7 @@ function renderMandatoryPaymentsModal() {
 
   function formatDateRangeLabel(fromValue, toValue) {
     if (!fromValue || !toValue) return "";
-    return `${formatDateShort(fromValue)} \u2014 ${formatDateShort(toValue)}`;
+    return `${formatDateShort(fromValue)} â ${formatDateShort(toValue)}`;
   }
 
   function getStartOfTodayTime() {
@@ -1175,7 +1175,7 @@ function renderMandatoryPaymentsModal() {
   }
 
   function formatMoney(value) {
-    return `${new Intl.NumberFormat("ru-RU").format(Number(value) || 0)} \u20BD`;
+    return `${new Intl.NumberFormat("ru-RU").format(Number(value) || 0)} â½`;
   }
 
   function formatDateShort(dateValue) {
@@ -1212,10 +1212,10 @@ function renderMandatoryPaymentsModal() {
   }
 
   function formatMonthButtonLabel(monthValue) {
-    if (!monthValue) return "\u041C\u0435\u0441\u044F\u0446";
+    if (!monthValue) return "ÐÐµÑÑÑ";
 
     const [year, month] = monthValue.split("-").map(Number);
-    if (!year || !month) return "\u041C\u0435\u0441\u044F\u0446";
+    if (!year || !month) return "ÐÐµÑÑÑ";
 
     const date = new Date(year, month - 1, 1);
     const monthLabel = date.toLocaleDateString("ru-RU", { month: "long" });
@@ -1225,18 +1225,18 @@ function renderMandatoryPaymentsModal() {
 
   function getRussianMonthNames() {
     return [
-      "\u042F\u043D\u0432\u0430\u0440\u044C",
-      "\u0424\u0435\u0432\u0440\u0430\u043B\u044C",
-      "\u041C\u0430\u0440\u0442",
-      "\u0410\u043F\u0440\u0435\u043B\u044C",
-      "\u041C\u0430\u0439",
-      "\u0418\u044E\u043D\u044C",
-      "\u0418\u044E\u043B\u044C",
-      "\u0410\u0432\u0433\u0443\u0441\u0442",
-      "\u0421\u0435\u043D\u0442\u044F\u0431\u0440\u044C",
-      "\u041E\u043A\u0442\u044F\u0431\u0440\u044C",
-      "\u041D\u043E\u044F\u0431\u0440\u044C",
-      "\u0414\u0435\u043A\u0430\u0431\u0440\u044C",
+      "Ð¯Ð½Ð²Ð°ÑÑ",
+      "Ð¤ÐµÐ²ÑÐ°Ð»Ñ",
+      "ÐÐ°ÑÑ",
+      "ÐÐ¿ÑÐµÐ»Ñ",
+      "ÐÐ°Ð¹",
+      "ÐÑÐ½Ñ",
+      "ÐÑÐ»Ñ",
+      "ÐÐ²Ð³ÑÑÑ",
+      "Ð¡ÐµÐ½ÑÑÐ±ÑÑ",
+      "ÐÐºÑÑÐ±ÑÑ",
+      "ÐÐ¾ÑÐ±ÑÑ",
+      "ÐÐµÐºÐ°Ð±ÑÑ",
     ];
   }
 
@@ -1632,11 +1632,11 @@ function resetInsightsMonthWheel() {
     }
 
     if (analyticsFilterPeriod === "today") {
-      return "\u0441\u0435\u0433\u043E\u0434\u043D\u044F";
+      return "ÑÐµÐ³Ð¾Ð´Ð½Ñ";
     }
 
     if (analyticsFilterPeriod === "7") {
-      return "\u0437\u0430 7 \u0434\u043D\u0435\u0439";
+      return "Ð·Ð° 7 Ð´Ð½ÐµÐ¹";
     }
 
     if (analyticsFilterPeriod === "range") {
@@ -1663,11 +1663,11 @@ function getInsightsPeriodLabel() {
   }
 
   if (insightsFilterPeriod === "today") {
-    return "\u0441\u0435\u0433\u043E\u0434\u043D\u044F";
+    return "ÑÐµÐ³Ð¾Ð´Ð½Ñ";
   }
 
   if (insightsFilterPeriod === "7") {
-    return "\u0437\u0430 7 \u0434\u043D\u0435\u0439";
+    return "Ð·Ð° 7 Ð´Ð½ÐµÐ¹";
   }
 
   if (insightsFilterPeriod === "range") {
@@ -1698,57 +1698,57 @@ function getInsightsFilteredTransactions() {
   
   const FAQ_META = {
   required_expense: {
-    title: "\u041E\u0431\u044F\u0437\u0430\u0442\u0435\u043B\u044C\u043D\u044B\u0435 \u0440\u0430\u0441\u0445\u043E\u0434\u044B",
+    title: "ÐÐ±ÑÐ·Ð°ÑÐµÐ»ÑÐ½ÑÐµ ÑÐ°ÑÑÐ¾Ð´Ñ",
     text:
-      "\u042D\u0442\u043E \u0432\u0441\u0435 \u0440\u0430\u0441\u0445\u043E\u0434\u044B \u0437\u0430 \u0432\u044B\u0431\u0440\u0430\u043D\u043D\u044B\u0439 \u043F\u0435\u0440\u0438\u043E\u0434 \u043F\u043E \u043A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u044F\u043C, \u043A\u043E\u0442\u043E\u0440\u044B\u0435 \u043F\u043E\u043C\u0435\u0447\u0435\u043D\u044B \u043A\u0430\u043A \u043E\u0431\u044F\u0437\u0430\u0442\u0435\u043B\u044C\u043D\u044B\u0435.",
+      "Ð­ÑÐ¾ Ð²ÑÐµ ÑÐ°ÑÑÐ¾Ð´Ñ Ð·Ð° Ð²ÑÐ±ÑÐ°Ð½Ð½ÑÐ¹ Ð¿ÐµÑÐ¸Ð¾Ð´ Ð¿Ð¾ ÐºÐ°ÑÐµÐ³Ð¾ÑÐ¸ÑÐ¼, ÐºÐ¾ÑÐ¾ÑÑÐµ Ð¿Ð¾Ð¼ÐµÑÐµÐ½Ñ ÐºÐ°Ðº Ð¾Ð±ÑÐ·Ð°ÑÐµÐ»ÑÐ½ÑÐµ.",
   },
 
   flexible_expense: {
-    title: "\u0413\u0438\u0431\u043A\u0438\u0435 \u0440\u0430\u0441\u0445\u043E\u0434\u044B",
+    title: "ÐÐ¸Ð±ÐºÐ¸Ðµ ÑÐ°ÑÑÐ¾Ð´Ñ",
     text:
-      "\u042D\u0442\u043E \u0432\u0441\u0435 \u0440\u0430\u0441\u0445\u043E\u0434\u044B \u0437\u0430 \u0432\u044B\u0431\u0440\u0430\u043D\u043D\u044B\u0439 \u043F\u0435\u0440\u0438\u043E\u0434 \u043F\u043E \u043A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u044F\u043C, \u043A\u043E\u0442\u043E\u0440\u044B\u0435 \u043D\u0435 \u043F\u043E\u043C\u0435\u0447\u0435\u043D\u044B \u043A\u0430\u043A \u043E\u0431\u044F\u0437\u0430\u0442\u0435\u043B\u044C\u043D\u044B\u0435.",
+      "Ð­ÑÐ¾ Ð²ÑÐµ ÑÐ°ÑÑÐ¾Ð´Ñ Ð·Ð° Ð²ÑÐ±ÑÐ°Ð½Ð½ÑÐ¹ Ð¿ÐµÑÐ¸Ð¾Ð´ Ð¿Ð¾ ÐºÐ°ÑÐµÐ³Ð¾ÑÐ¸ÑÐ¼, ÐºÐ¾ÑÐ¾ÑÑÐµ Ð½Ðµ Ð¿Ð¾Ð¼ÐµÑÐµÐ½Ñ ÐºÐ°Ðº Ð¾Ð±ÑÐ·Ð°ÑÐµÐ»ÑÐ½ÑÐµ.",
   },
 
 saved_to_safes: {
-  title: "\u041E\u0442\u043B\u043E\u0436\u0435\u043D\u043E \u0432 \u043D\u0430\u043A\u043E\u043F\u043B\u0435\u043D\u0438\u044F",
+  title: "ÐÑÐ»Ð¾Ð¶ÐµÐ½Ð¾ Ð² Ð½Ð°ÐºÐ¾Ð¿Ð»ÐµÐ½Ð¸Ñ",
   text:
-    "\u042D\u0442\u043E \u0441\u043A\u043E\u043B\u044C\u043A\u043E \u0434\u0435\u043D\u0435\u0433 \u0442\u044B \u043F\u0435\u0440\u0435\u0432\u0451\u043B \u0432 \u043D\u0430\u043A\u043E\u043F\u043B\u0435\u043D\u0438\u044F \u0438\u0437 \u043E\u0431\u044B\u0447\u043D\u044B\u0445 \u0441\u0447\u0435\u0442\u043E\u0432 \u0437\u0430 \u0432\u044B\u0431\u0440\u0430\u043D\u043D\u044B\u0439 \u043F\u0435\u0440\u0438\u043E\u0434. \u0412\u043D\u0443\u0442\u0440\u0435\u043D\u043D\u0438\u0435 \u043F\u0435\u0440\u0435\u043A\u043B\u0430\u0434\u044B\u0432\u0430\u043D\u0438\u044F \u043C\u0435\u0436\u0434\u0443 \u0441\u0430\u043C\u0438\u043C\u0438 \u043D\u0430\u043A\u043E\u043F\u043B\u0435\u043D\u0438\u044F\u043C\u0438 \u0441\u044E\u0434\u0430 \u043D\u0435 \u0432\u0445\u043E\u0434\u044F\u0442.",
+    "Ð­ÑÐ¾ ÑÐºÐ¾Ð»ÑÐºÐ¾ Ð´ÐµÐ½ÐµÐ³ ÑÑ Ð¿ÐµÑÐµÐ²ÑÐ» Ð² Ð½Ð°ÐºÐ¾Ð¿Ð»ÐµÐ½Ð¸Ñ Ð¸Ð· Ð¾Ð±ÑÑÐ½ÑÑ ÑÑÐµÑÐ¾Ð² Ð·Ð° Ð²ÑÐ±ÑÐ°Ð½Ð½ÑÐ¹ Ð¿ÐµÑÐ¸Ð¾Ð´. ÐÐ½ÑÑÑÐµÐ½Ð½Ð¸Ðµ Ð¿ÐµÑÐµÐºÐ»Ð°Ð´ÑÐ²Ð°Ð½Ð¸Ñ Ð¼ÐµÐ¶Ð´Ñ ÑÐ°Ð¼Ð¸Ð¼Ð¸ Ð½Ð°ÐºÐ¾Ð¿Ð»ÐµÐ½Ð¸ÑÐ¼Ð¸ ÑÑÐ´Ð° Ð½Ðµ Ð²ÑÐ¾Ð´ÑÑ.",
 },
 
   remaining_limits: {
-    title: "\u041E\u0441\u0442\u0430\u0442\u043E\u043A \u043B\u0438\u043C\u0438\u0442\u043E\u0432",
+    title: "ÐÑÑÐ°ÑÐ¾Ðº Ð»Ð¸Ð¼Ð¸ÑÐ¾Ð²",
     text:
-      "\u042D\u0442\u043E \u0441\u043A\u043E\u043B\u044C\u043A\u043E \u0435\u0449\u0451 \u043C\u043E\u0436\u043D\u043E \u043F\u043E\u0442\u0440\u0430\u0442\u0438\u0442\u044C \u043F\u043E \u0433\u0438\u0431\u043A\u0438\u043C \u043A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u044F\u043C \u0432 \u0442\u0435\u043A\u0443\u0449\u0435\u043C \u043C\u0435\u0441\u044F\u0446\u0435, \u0435\u0441\u043B\u0438 \u0445\u043E\u0447\u0435\u0448\u044C \u043E\u0441\u0442\u0430\u0442\u044C\u0441\u044F \u0432 \u0440\u0430\u043C\u043A\u0430\u0445 \u0441\u0432\u043E\u0438\u0445 \u043B\u0438\u043C\u0438\u0442\u043E\u0432.",
+      "Ð­ÑÐ¾ ÑÐºÐ¾Ð»ÑÐºÐ¾ ÐµÑÑ Ð¼Ð¾Ð¶Ð½Ð¾ Ð¿Ð¾ÑÑÐ°ÑÐ¸ÑÑ Ð¿Ð¾ Ð³Ð¸Ð±ÐºÐ¸Ð¼ ÐºÐ°ÑÐµÐ³Ð¾ÑÐ¸ÑÐ¼ Ð² ÑÐµÐºÑÑÐµÐ¼ Ð¼ÐµÑÑÑÐµ, ÐµÑÐ»Ð¸ ÑÐ¾ÑÐµÑÑ Ð¾ÑÑÐ°ÑÑÑÑ Ð² ÑÐ°Ð¼ÐºÐ°Ñ ÑÐ²Ð¾Ð¸Ñ Ð»Ð¸Ð¼Ð¸ÑÐ¾Ð².",
   },
 
   total_balance: {
-    title: "\u041E\u0431\u0449\u0438\u0439 \u0431\u0430\u043B\u0430\u043D\u0441",
+    title: "ÐÐ±ÑÐ¸Ð¹ Ð±Ð°Ð»Ð°Ð½Ñ",
     text:
-      "\u042D\u0442\u043E \u0441\u0443\u043C\u043C\u0430 \u0434\u0435\u043D\u0435\u0433 \u043F\u043E \u0432\u0441\u0435\u043C \u0441\u0447\u0435\u0442\u0430\u043C \u043F\u0440\u0438\u043B\u043E\u0436\u0435\u043D\u0438\u044F \u043D\u0430 \u0442\u0435\u043A\u0443\u0449\u0438\u0439 \u043C\u043E\u043C\u0435\u043D\u0442.",
+      "Ð­ÑÐ¾ ÑÑÐ¼Ð¼Ð° Ð´ÐµÐ½ÐµÐ³ Ð¿Ð¾ Ð²ÑÐµÐ¼ ÑÑÐµÑÐ°Ð¼ Ð¿ÑÐ¸Ð»Ð¾Ð¶ÐµÐ½Ð¸Ñ Ð½Ð° ÑÐµÐºÑÑÐ¸Ð¹ Ð¼Ð¾Ð¼ÐµÐ½Ñ.",
   },
 
   protected_money: {
-    title: "\u041D\u0435\u043F\u0440\u0438\u043A\u043E\u0441\u0430\u0439\u043C\u044B\u0435",
+    title: "ÐÐµÐ¿ÑÐ¸ÐºÐ¾ÑÐ°Ð¹Ð¼ÑÐµ",
     text:
-      "\u042D\u0442\u043E \u0434\u0435\u043D\u044C\u0433\u0438, \u043A\u043E\u0442\u043E\u0440\u044B\u0435 \u043F\u0440\u0438\u043B\u043E\u0436\u0435\u043D\u0438\u0435 \u0441\u0447\u0438\u0442\u0430\u0435\u0442 \u043D\u0435 \u0434\u043B\u044F \u043E\u0431\u044B\u0447\u043D\u044B\u0445 \u0442\u0440\u0430\u0442.",
+      "Ð­ÑÐ¾ Ð´ÐµÐ½ÑÐ³Ð¸, ÐºÐ¾ÑÐ¾ÑÑÐµ Ð¿ÑÐ¸Ð»Ð¾Ð¶ÐµÐ½Ð¸Ðµ ÑÑÐ¸ÑÐ°ÐµÑ Ð½Ðµ Ð´Ð»Ñ Ð¾Ð±ÑÑÐ½ÑÑ ÑÑÐ°Ñ.",
   },
 
   free_money: {
-  title: "\u0421\u0432\u043E\u0431\u043E\u0434\u043D\u044B\u0435 \u0434\u0435\u043D\u044C\u0433\u0438",
+  title: "Ð¡Ð²Ð¾Ð±Ð¾Ð´Ð½ÑÐµ Ð´ÐµÐ½ÑÐ³Ð¸",
   text:
-  "\u042D\u0442\u043E \u0434\u0435\u043D\u044C\u0433\u0438 \u0438\u0437 \u0441\u0447\u0435\u0442\u043E\u0432 \u0438 \u043D\u0430\u043A\u043E\u043F\u043B\u0435\u043D\u0438\u0439, \u043A\u043E\u0442\u043E\u0440\u044B\u0435 \u043F\u043E\u043C\u0435\u0447\u0435\u043D\u044B \u043A\u0430\u043A \u0434\u043E\u0441\u0442\u0443\u043F\u043D\u044B\u0435 \u0434\u043B\u044F \u043E\u0431\u044B\u0447\u043D\u044B\u0445 \u0442\u0440\u0430\u0442.",
+  "Ð­ÑÐ¾ Ð´ÐµÐ½ÑÐ³Ð¸ Ð¸Ð· ÑÑÐµÑÐ¾Ð² Ð¸ Ð½Ð°ÐºÐ¾Ð¿Ð»ÐµÐ½Ð¸Ð¹, ÐºÐ¾ÑÐ¾ÑÑÐµ Ð¿Ð¾Ð¼ÐµÑÐµÐ½Ñ ÐºÐ°Ðº Ð´Ð¾ÑÑÑÐ¿Ð½ÑÐµ Ð´Ð»Ñ Ð¾Ð±ÑÑÐ½ÑÑ ÑÑÐ°Ñ.",
 },
 
   can_save_now: {
-    title: "\u041C\u043E\u0436\u043D\u043E \u043E\u0442\u043B\u043E\u0436\u0438\u0442\u044C \u0441\u0435\u0439\u0447\u0430\u0441",
+    title: "ÐÐ¾Ð¶Ð½Ð¾ Ð¾ÑÐ»Ð¾Ð¶Ð¸ÑÑ ÑÐµÐ¹ÑÐ°Ñ",
     text:
-      "\u042D\u0442\u043E \u0441\u0443\u043C\u043C\u0430, \u043A\u043E\u0442\u043E\u0440\u0443\u044E \u043C\u043E\u0436\u043D\u043E \u0443\u0431\u0440\u0430\u0442\u044C \u0432 \u043D\u0430\u043A\u043E\u043F\u043B\u0435\u043D\u0438\u044F \u0431\u0435\u0437 \u043A\u043E\u043D\u0444\u043B\u0438\u043A\u0442\u0430 \u0441 \u043D\u0435\u043F\u043E\u043A\u0440\u044B\u0442\u044B\u043C\u0438 \u043E\u0431\u044F\u0437\u0430\u0442\u0435\u043B\u044C\u043D\u044B\u043C\u0438 \u043F\u043B\u0430\u0442\u0435\u0436\u0430\u043C\u0438 \u0438 \u043E\u0441\u0442\u0430\u0442\u043A\u043E\u043C \u043B\u0438\u043C\u0438\u0442\u043E\u0432.",
+      "Ð­ÑÐ¾ ÑÑÐ¼Ð¼Ð°, ÐºÐ¾ÑÐ¾ÑÑÑ Ð¼Ð¾Ð¶Ð½Ð¾ ÑÐ±ÑÐ°ÑÑ Ð² Ð½Ð°ÐºÐ¾Ð¿Ð»ÐµÐ½Ð¸Ñ Ð±ÐµÐ· ÐºÐ¾Ð½ÑÐ»Ð¸ÐºÑÐ° Ñ Ð½ÐµÐ¿Ð¾ÐºÑÑÑÑÐ¼Ð¸ Ð¾Ð±ÑÐ·Ð°ÑÐµÐ»ÑÐ½ÑÐ¼Ð¸ Ð¿Ð»Ð°ÑÐµÐ¶Ð°Ð¼Ð¸ Ð¸ Ð¾ÑÑÐ°ÑÐºÐ¾Ð¼ Ð»Ð¸Ð¼Ð¸ÑÐ¾Ð².",
   },
 
   summary_recommendation: {
-    title: "\u0412\u044B\u0432\u043E\u0434",
+    title: "ÐÑÐ²Ð¾Ð´",
     text:
-      "\u042D\u0442\u043E \u0438\u0442\u043E\u0433\u043E\u0432\u044B\u0439 \u0440\u0435\u0437\u0443\u043B\u044C\u0442\u0430\u0442 \u043D\u0430 \u043E\u0441\u043D\u043E\u0432\u0435 \u0441\u0432\u043E\u0431\u043E\u0434\u043D\u044B\u0445 \u0434\u0435\u043D\u0435\u0433, \u043D\u0435\u043F\u043E\u043A\u0440\u044B\u0442\u044B\u0445 \u043E\u0431\u044F\u0437\u0430\u0442\u0435\u043B\u044C\u043D\u044B\u0445 \u043F\u043B\u0430\u0442\u0435\u0436\u0435\u0439 \u0438 \u043E\u0441\u0442\u0430\u0442\u043A\u0430 \u043B\u0438\u043C\u0438\u0442\u043E\u0432.",
+      "Ð­ÑÐ¾ Ð¸ÑÐ¾Ð³Ð¾Ð²ÑÐ¹ ÑÐµÐ·ÑÐ»ÑÑÐ°Ñ Ð½Ð° Ð¾ÑÐ½Ð¾Ð²Ðµ ÑÐ²Ð¾Ð±Ð¾Ð´Ð½ÑÑ Ð´ÐµÐ½ÐµÐ³, Ð½ÐµÐ¿Ð¾ÐºÑÑÑÑÑ Ð¾Ð±ÑÐ·Ð°ÑÐµÐ»ÑÐ½ÑÑ Ð¿Ð»Ð°ÑÐµÐ¶ÐµÐ¹ Ð¸ Ð¾ÑÑÐ°ÑÐºÐ° Ð»Ð¸Ð¼Ð¸ÑÐ¾Ð².",
   },
 };
 
@@ -1800,7 +1800,7 @@ function getSavedToSafesBreakdown() {
   });
 
   return items.map((transaction) => ({
-    title: transaction.title || "\u041F\u0435\u0440\u0435\u0432\u043E\u0434 \u0432 \u043D\u0430\u043A\u043E\u043F\u043B\u0435\u043D\u0438\u044F",
+    title: transaction.title || "ÐÐµÑÐµÐ²Ð¾Ð´ Ð² Ð½Ð°ÐºÐ¾Ð¿Ð»ÐµÐ½Ð¸Ñ",
     amount: roundToTwo(Number(transaction.amount) || 0),
     date: formatDateShort(transaction.created_at),
   }));
@@ -1830,18 +1830,18 @@ function buildFaqFormulaText(faqKey) {
   const summary = getInsightsSummary();
 
   if (faqKey === "required_expense") {
-    return `${formatMoney(summary.requiredExpense)} = \u0441\u0443\u043C\u043C\u0430 \u0432\u0441\u0435\u0445 \u043E\u0431\u044F\u0437\u0430\u0442\u0435\u043B\u044C\u043D\u044B\u0445 expense-\u043E\u043F\u0435\u0440\u0430\u0446\u0438\u0439 \u0437\u0430 \u0432\u044B\u0431\u0440\u0430\u043D\u043D\u044B\u0439 \u043F\u0435\u0440\u0438\u043E\u0434`;
+    return `${formatMoney(summary.requiredExpense)} = ÑÑÐ¼Ð¼Ð° Ð²ÑÐµÑ Ð¾Ð±ÑÐ·Ð°ÑÐµÐ»ÑÐ½ÑÑ expense-Ð¾Ð¿ÐµÑÐ°ÑÐ¸Ð¹ Ð·Ð° Ð²ÑÐ±ÑÐ°Ð½Ð½ÑÐ¹ Ð¿ÐµÑÐ¸Ð¾Ð´`;
   }
 
   if (faqKey === "flexible_expense") {
-    return `${formatMoney(summary.flexibleExpense)} = \u0441\u0443\u043C\u043C\u0430 \u0432\u0441\u0435\u0445 \u0433\u0438\u0431\u043A\u0438\u0445 expense-\u043E\u043F\u0435\u0440\u0430\u0446\u0438\u0439 \u0437\u0430 \u0432\u044B\u0431\u0440\u0430\u043D\u043D\u044B\u0439 \u043F\u0435\u0440\u0438\u043E\u0434`;
+    return `${formatMoney(summary.flexibleExpense)} = ÑÑÐ¼Ð¼Ð° Ð²ÑÐµÑ Ð³Ð¸Ð±ÐºÐ¸Ñ expense-Ð¾Ð¿ÐµÑÐ°ÑÐ¸Ð¹ Ð·Ð° Ð²ÑÐ±ÑÐ°Ð½Ð½ÑÐ¹ Ð¿ÐµÑÐ¸Ð¾Ð´`;
   }
 
   if (faqKey === "saved_to_safes") {
     const rows = getSavedToSafesBreakdown();
 
     if (!rows.length) {
-      return `${formatMoney(0)} = \u0437\u0430 \u0432\u044B\u0431\u0440\u0430\u043D\u043D\u044B\u0439 \u043F\u0435\u0440\u0438\u043E\u0434 \u043D\u0435 \u0431\u044B\u043B\u043E \u043F\u0435\u0440\u0435\u0432\u043E\u0434\u043E\u0432 \u0432 \u043D\u0430\u043A\u043E\u043F\u043B\u0435\u043D\u0438\u044F`;
+      return `${formatMoney(0)} = Ð·Ð° Ð²ÑÐ±ÑÐ°Ð½Ð½ÑÐ¹ Ð¿ÐµÑÐ¸Ð¾Ð´ Ð½Ðµ Ð±ÑÐ»Ð¾ Ð¿ÐµÑÐµÐ²Ð¾Ð´Ð¾Ð² Ð² Ð½Ð°ÐºÐ¾Ð¿Ð»ÐµÐ½Ð¸Ñ`;
     }
 
     const parts = rows.map((item) => `${formatMoney(item.amount)} (${item.date})`);
@@ -1852,25 +1852,25 @@ function buildFaqFormulaText(faqKey) {
     const rows = getRemainingFlexibleBudgetsBreakdownCurrentMonth();
 
     if (!rows.length) {
-      return `${formatMoney(0)} = \u043F\u043E \u0433\u0438\u0431\u043A\u0438\u043C \u043A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u044F\u043C \u043D\u0435 \u043E\u0441\u0442\u0430\u043B\u043E\u0441\u044C \u0437\u0430\u043F\u0430\u0441\u0430 \u043F\u043E \u043B\u0438\u043C\u0438\u0442\u0430\u043C`;
+      return `${formatMoney(0)} = Ð¿Ð¾ Ð³Ð¸Ð±ÐºÐ¸Ð¼ ÐºÐ°ÑÐµÐ³Ð¾ÑÐ¸ÑÐ¼ Ð½Ðµ Ð¾ÑÑÐ°Ð»Ð¾ÑÑ Ð·Ð°Ð¿Ð°ÑÐ° Ð¿Ð¾ Ð»Ð¸Ð¼Ð¸ÑÐ°Ð¼`;
     }
 
     const lines = rows.map((item) => {
-      return `${item.name}: ${formatMoney(item.limit)} \u2212 ${formatMoney(item.spent)} = ${formatMoney(item.remaining)}`;
+      return `${item.name}: ${formatMoney(item.limit)} â ${formatMoney(item.spent)} = ${formatMoney(item.remaining)}`;
     });
 
     return `${formatMoney(summary.remainingBudgets)} =\n${lines.join("\n")}`;
   }
 
   if (faqKey === "total_balance") {
-    return `${formatMoney(summary.totalBalance)} = \u0441\u0443\u043C\u043C\u0430 \u0431\u0430\u043B\u0430\u043D\u0441\u043E\u0432 \u0432\u0441\u0435\u0445 \u0441\u0447\u0435\u0442\u043E\u0432 \u043F\u0440\u0438\u043B\u043E\u0436\u0435\u043D\u0438\u044F`;
+    return `${formatMoney(summary.totalBalance)} = ÑÑÐ¼Ð¼Ð° Ð±Ð°Ð»Ð°Ð½ÑÐ¾Ð² Ð²ÑÐµÑ ÑÑÐµÑÐ¾Ð² Ð¿ÑÐ¸Ð»Ð¾Ð¶ÐµÐ½Ð¸Ñ`;
   }
 
   if (faqKey === "protected_money") {
     const rows = getProtectedMoneyBreakdown();
 
     if (!rows.length) {
-      return `${formatMoney(0)} = \u0440\u0435\u0437\u0435\u0440\u0432\u044B \u0438 \u0446\u0435\u043B\u0438 \u0441\u0435\u0439\u0447\u0430\u0441 \u043F\u0443\u0441\u0442\u044B\u0435`;
+      return `${formatMoney(0)} = ÑÐµÐ·ÐµÑÐ²Ñ Ð¸ ÑÐµÐ»Ð¸ ÑÐµÐ¹ÑÐ°Ñ Ð¿ÑÑÑÑÐµ`;
     }
 
     const parts = rows.map((item) => `${formatMoney(item.amount)} (${item.label})`);
@@ -1897,7 +1897,7 @@ function buildFaqFormulaText(faqKey) {
     });
 
   if (!rows.length) {
-    return `${formatMoney(0)} = \u0441\u0435\u0439\u0447\u0430\u0441 \u043D\u0435\u0442 \u0438\u0441\u0442\u043E\u0447\u043D\u0438\u043A\u043E\u0432, \u043F\u043E\u043C\u0435\u0447\u0435\u043D\u043D\u044B\u0445 \u043A\u0430\u043A \u0441\u0432\u043E\u0431\u043E\u0434\u043D\u044B\u0435 \u0434\u0435\u043D\u044C\u0433\u0438`;
+    return `${formatMoney(0)} = ÑÐµÐ¹ÑÐ°Ñ Ð½ÐµÑ Ð¸ÑÑÐ¾ÑÐ½Ð¸ÐºÐ¾Ð², Ð¿Ð¾Ð¼ÐµÑÐµÐ½Ð½ÑÑ ÐºÐ°Ðº ÑÐ²Ð¾Ð±Ð¾Ð´Ð½ÑÐµ Ð´ÐµÐ½ÑÐ³Ð¸`;
   }
 
   const parts = rows.map((item) => `${formatMoney(item.amount)} (${item.label})`);
@@ -1905,7 +1905,7 @@ function buildFaqFormulaText(faqKey) {
 }
 
   if (faqKey === "can_save_now") {
-    return `${formatMoney(summary.canSaveNow)} = max(0, ${formatMoney(summary.freeMoney)} \u2212 ${formatMoney(summary.pendingMandatoryToDeduct)} \u2212 ${formatMoney(summary.remainingBudgets)})`;
+    return `${formatMoney(summary.canSaveNow)} = max(0, ${formatMoney(summary.freeMoney)} â ${formatMoney(summary.pendingMandatoryToDeduct)} â ${formatMoney(summary.remainingBudgets)})`;
   }
 
   if (faqKey === "summary_recommendation") {
@@ -1914,13 +1914,13 @@ function buildFaqFormulaText(faqKey) {
     );
 
     if (raw >= 0) {
-      return `${formatMoney(raw)} = ${formatMoney(summary.freeMoney)} \u2212 ${formatMoney(summary.pendingMandatoryToDeduct)} \u2212 ${formatMoney(summary.remainingBudgets)}`;
+      return `${formatMoney(raw)} = ${formatMoney(summary.freeMoney)} â ${formatMoney(summary.pendingMandatoryToDeduct)} â ${formatMoney(summary.remainingBudgets)}`;
     }
 
-    return `\u041D\u0435 \u0445\u0432\u0430\u0442\u0430\u0435\u0442 ${formatMoney(Math.abs(raw))} = ${formatMoney(summary.pendingMandatoryToDeduct)} + ${formatMoney(summary.remainingBudgets)} \u2212 ${formatMoney(summary.freeMoney)}`;
+    return `ÐÐµ ÑÐ²Ð°ÑÐ°ÐµÑ ${formatMoney(Math.abs(raw))} = ${formatMoney(summary.pendingMandatoryToDeduct)} + ${formatMoney(summary.remainingBudgets)} â ${formatMoney(summary.freeMoney)}`;
   }
 
-  return "\u2014";
+  return "â";
 }
 
 function openFaqModal(faqKey) {
@@ -1955,22 +1955,22 @@ function setInsightsHeroState(summary) {
   if (!insightsCanSaveNowStatus || !insightsCanSaveNowHint) return;
 
   if (summary.shortageBeforeSafeSaving > 0) {
-    insightsCanSaveNowStatus.textContent = "\u0421\u0435\u0439\u0447\u0430\u0441 \u0440\u0430\u043D\u043E";
+    insightsCanSaveNowStatus.textContent = "Ð¡ÐµÐ¹ÑÐ°Ñ ÑÐ°Ð½Ð¾";
     insightsCanSaveNowHint.textContent =
-      `\u041D\u0435 \u0445\u0432\u0430\u0442\u0430\u0435\u0442 ${formatMoney(summary.shortageBeforeSafeSaving)} \u043F\u043E\u0441\u043B\u0435 \u0443\u0447\u0451\u0442\u0430 \u043E\u0431\u044F\u0437\u0430\u0442\u0435\u043B\u044C\u043D\u044B\u0445 \u0438 \u043B\u0438\u043C\u0438\u0442\u043E\u0432.`;
+      `ÐÐµ ÑÐ²Ð°ÑÐ°ÐµÑ ${formatMoney(summary.shortageBeforeSafeSaving)} Ð¿Ð¾ÑÐ»Ðµ ÑÑÑÑÐ° Ð¾Ð±ÑÐ·Ð°ÑÐµÐ»ÑÐ½ÑÑ Ð¸ Ð»Ð¸Ð¼Ð¸ÑÐ¾Ð².`;
     return;
   }
 
   if (summary.canSaveNow > 0) {
-    insightsCanSaveNowStatus.textContent = "\u041C\u043E\u0436\u043D\u043E \u0441\u043F\u043E\u043A\u043E\u0439\u043D\u043E \u043E\u0442\u043B\u043E\u0436\u0438\u0442\u044C";
+    insightsCanSaveNowStatus.textContent = "ÐÐ¾Ð¶Ð½Ð¾ ÑÐ¿Ð¾ÐºÐ¾Ð¹Ð½Ð¾ Ð¾ÑÐ»Ð¾Ð¶Ð¸ÑÑ";
     insightsCanSaveNowHint.textContent =
-      "\u0421\u0443\u043C\u043C\u0430 \u0443\u0436\u0435 \u0440\u0430\u0441\u0441\u0447\u0438\u0442\u0430\u043D\u0430 \u0441 \u0443\u0447\u0451\u0442\u043E\u043C \u043E\u0431\u044F\u0437\u0430\u0442\u0435\u043B\u044C\u043D\u044B\u0445 \u043F\u043B\u0430\u0442\u0435\u0436\u0435\u0439 \u0438 \u043B\u0438\u043C\u0438\u0442\u043E\u0432.";
+      "Ð¡ÑÐ¼Ð¼Ð° ÑÐ¶Ðµ ÑÐ°ÑÑÑÐ¸ÑÐ°Ð½Ð° Ñ ÑÑÑÑÐ¾Ð¼ Ð¾Ð±ÑÐ·Ð°ÑÐµÐ»ÑÐ½ÑÑ Ð¿Ð»Ð°ÑÐµÐ¶ÐµÐ¹ Ð¸ Ð»Ð¸Ð¼Ð¸ÑÐ¾Ð².";
     return;
   }
 
-  insightsCanSaveNowStatus.textContent = "\u0417\u0430\u043F\u0430\u0441\u0430 \u043D\u0435\u0442";
+  insightsCanSaveNowStatus.textContent = "ÐÐ°Ð¿Ð°ÑÐ° Ð½ÐµÑ";
   insightsCanSaveNowHint.textContent =
-    "\u0421\u0432\u043E\u0431\u043E\u0434\u043D\u044B\u0435 \u0434\u0435\u043D\u044C\u0433\u0438 \u0441\u0435\u0439\u0447\u0430\u0441 \u043F\u043E\u043B\u043D\u043E\u0441\u0442\u044C\u044E \u0437\u0430\u043D\u044F\u0442\u044B \u043E\u0431\u044F\u0437\u0430\u0442\u0435\u043B\u044C\u0441\u0442\u0432\u0430\u043C\u0438 \u0438 \u043B\u0438\u043C\u0438\u0442\u0430\u043C\u0438.";
+    "Ð¡Ð²Ð¾Ð±Ð¾Ð´Ð½ÑÐµ Ð´ÐµÐ½ÑÐ³Ð¸ ÑÐµÐ¹ÑÐ°Ñ Ð¿Ð¾Ð»Ð½Ð¾ÑÑÑÑ Ð·Ð°Ð½ÑÑÑ Ð¾Ð±ÑÐ·Ð°ÑÐµÐ»ÑÑÑÐ²Ð°Ð¼Ð¸ Ð¸ Ð»Ð¸Ð¼Ð¸ÑÐ°Ð¼Ð¸.";
 }
 
   function getIconToneClass(type, extra = "") {
@@ -1995,8 +1995,8 @@ function setInsightsHeroState(summary) {
     if (!exists) {
       state.categories.unshift({
   id: UNCATEGORIZED_ID,
-  name: "\u0411\u0435\u0437 \u043A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u0438",
-  icon: "\uD83D\uDCE6",
+  name: "ÐÐµÐ· ÐºÐ°ÑÐµÐ³Ð¾ÑÐ¸Ð¸",
+  icon: "ð¦",
   locked: true,
   is_required: false,
   sort_order: 1,
@@ -2005,7 +2005,7 @@ function setInsightsHeroState(summary) {
   }
 
   function fillExpenseCategorySelect(selectedId = "") {
-    categorySelect.innerHTML = `<option value="">\u0412\u044B\u0431\u0435\u0440\u0438 \u043A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u044E</option>`;
+    categorySelect.innerHTML = `<option value="">ÐÑÐ±ÐµÑÐ¸ ÐºÐ°ÑÐµÐ³Ð¾ÑÐ¸Ñ</option>`;
 
     state.categories.forEach((category) => {
       const option = document.createElement("option");
@@ -2107,7 +2107,7 @@ function setInsightsHeroState(summary) {
 
   const existing = getBudgetLimitByCategoryId(categoryId);
 
-  budgetModalTitle.textContent = `\u0420\u0435\u0434\u0430\u043A\u0442\u0438\u0440\u043E\u0432\u0430\u043D\u0438\u0435: ${category.icon} ${category.name}`;
+  budgetModalTitle.textContent = `Ð ÐµÐ´Ð°ÐºÑÐ¸ÑÐ¾Ð²Ð°Ð½Ð¸Ðµ: ${category.icon} ${category.name}`;
   budgetCategoryNameInput.value = category.name || "";
   budgetCategoryIconInput.value = category.icon || "";
   budgetAmountInput.value = existing ? Number(existing.monthly_limit) : "";
@@ -2140,8 +2140,8 @@ function syncAccountPrimaryControls() {
 
   if (accountPrimaryNote) {
     accountPrimaryNote.textContent = canBePrimary
-      ? "\u042D\u0442\u043E\u0442 \u0441\u0447\u0451\u0442 \u0431\u0443\u0434\u0435\u0442 \u043F\u043E\u0434\u0441\u0442\u0430\u0432\u043B\u044F\u0442\u044C\u0441\u044F \u043F\u043E \u0443\u043C\u043E\u043B\u0447\u0430\u043D\u0438\u044E \u0432 \u0440\u0430\u0441\u0445\u043E\u0434\u0430\u0445 \u0438 \u0434\u043E\u0445\u043E\u0434\u0430\u0445."
-      : "\u0414\u043B\u044F \u044D\u0442\u043E\u0439 \u0440\u043E\u043B\u0438 \u043E\u0441\u043D\u043E\u0432\u043D\u043E\u0439 \u0441\u0447\u0451\u0442 \u043D\u0435\u0434\u043E\u0441\u0442\u0443\u043F\u0435\u043D.";
+      ? "Ð­ÑÐ¾Ñ ÑÑÑÑ Ð±ÑÐ´ÐµÑ Ð¿Ð¾Ð´ÑÑÐ°Ð²Ð»ÑÑÑÑÑ Ð¿Ð¾ ÑÐ¼Ð¾Ð»ÑÐ°Ð½Ð¸Ñ Ð² ÑÐ°ÑÑÐ¾Ð´Ð°Ñ Ð¸ Ð´Ð¾ÑÐ¾Ð´Ð°Ñ."
+      : "ÐÐ»Ñ ÑÑÐ¾Ð¹ ÑÐ¾Ð»Ð¸ Ð¾ÑÐ½Ð¾Ð²Ð½Ð¾Ð¹ ÑÑÑÑ Ð½ÐµÐ´Ð¾ÑÑÑÐ¿ÐµÐ½.";
   }
 }
 
@@ -2150,9 +2150,9 @@ function openCreateAccountModal() {
 
   activeAccountId = null;
 
-  accountModalTitle.textContent = "\u041D\u043E\u0432\u044B\u0439 \u0441\u0447\u0451\u0442";
+  accountModalTitle.textContent = "ÐÐ¾Ð²ÑÐ¹ ÑÑÑÑ";
   accountNameInput.value = "";
-  accountIconInput.value = "\uD83D\uDCB3";
+  accountIconInput.value = "ð³";
   accountRoleSelect.value = "spend";
   accountPrimarySpendInput.checked = false;
 
@@ -2169,7 +2169,7 @@ function openAccountModal(accountId) {
 
   activeAccountId = accountId;
 
-  accountModalTitle.textContent = `\u0421\u0447\u0451\u0442: ${account.icon} ${account.name}`;
+  accountModalTitle.textContent = `Ð¡ÑÑÑ: ${account.icon} ${account.name}`;
   accountNameInput.value = account.name || "";
   accountIconInput.value = account.icon || "";
   accountRoleSelect.value = account.account_kind || "spend";
@@ -2202,12 +2202,12 @@ async function saveAccountModal() {
   const nextRole = accountRoleSelect.value;
 
   if (!nextName) {
-    alert("\u0412\u0432\u0435\u0434\u0438 \u043D\u0430\u0437\u0432\u0430\u043D\u0438\u0435 \u0441\u0447\u0451\u0442\u0430");
+    alert("ÐÐ²ÐµÐ´Ð¸ Ð½Ð°Ð·Ð²Ð°Ð½Ð¸Ðµ ÑÑÑÑÐ°");
     return;
   }
 
   if (!nextIcon) {
-    alert("\u0412\u0432\u0435\u0434\u0438 \u044D\u043C\u043E\u0434\u0437\u0438 \u0441\u0447\u0451\u0442\u0430");
+    alert("ÐÐ²ÐµÐ´Ð¸ ÑÐ¼Ð¾Ð´Ð·Ð¸ ÑÑÑÑÐ°");
     return;
   }
 
@@ -2217,7 +2217,7 @@ async function saveAccountModal() {
   });
 
   if (duplicateName) {
-    alert("\u0421\u0447\u0451\u0442 \u0441 \u0442\u0430\u043A\u0438\u043C \u043D\u0430\u0437\u0432\u0430\u043D\u0438\u0435\u043C \u0443\u0436\u0435 \u0441\u0443\u0449\u0435\u0441\u0442\u0432\u0443\u0435\u0442");
+    alert("Ð¡ÑÑÑ Ñ ÑÐ°ÐºÐ¸Ð¼ Ð½Ð°Ð·Ð²Ð°Ð½Ð¸ÐµÐ¼ ÑÐ¶Ðµ ÑÑÑÐµÑÑÐ²ÑÐµÑ");
     return;
   }
 
@@ -2231,7 +2231,7 @@ async function saveAccountModal() {
       .neq("id", activeAccountId || "");
 
     if (resetPrimaryError) {
-      alert("\u041E\u0448\u0438\u0431\u043A\u0430 \u0441\u0431\u0440\u043E\u0441\u0430 \u043E\u0441\u043D\u043E\u0432\u043D\u043E\u0433\u043E \u0441\u0447\u0451\u0442\u0430");
+      alert("ÐÑÐ¸Ð±ÐºÐ° ÑÐ±ÑÐ¾ÑÐ° Ð¾ÑÐ½Ð¾Ð²Ð½Ð¾Ð³Ð¾ ÑÑÑÑÐ°");
       console.error(resetPrimaryError);
       return;
     }
@@ -2252,7 +2252,7 @@ async function saveAccountModal() {
       .eq("id", activeAccountId);
 
     if (error) {
-      alert("\u041E\u0448\u0438\u0431\u043A\u0430 \u0441\u043E\u0445\u0440\u0430\u043D\u0435\u043D\u0438\u044F \u0441\u0447\u0451\u0442\u0430");
+      alert("ÐÑÐ¸Ð±ÐºÐ° ÑÐ¾ÑÑÐ°Ð½ÐµÐ½Ð¸Ñ ÑÑÑÑÐ°");
       console.error(error);
       return;
     }
@@ -2275,7 +2275,7 @@ async function saveAccountModal() {
       });
 
     if (error) {
-      alert("\u041E\u0448\u0438\u0431\u043A\u0430 \u0441\u043E\u0437\u0434\u0430\u043D\u0438\u044F \u0441\u0447\u0451\u0442\u0430");
+      alert("ÐÑÐ¸Ð±ÐºÐ° ÑÐ¾Ð·Ð´Ð°Ð½Ð¸Ñ ÑÑÑÑÐ°");
       console.error(error);
       return;
     }
@@ -2293,7 +2293,7 @@ async function deleteAccountModalAction() {
   if (!account) return;
 
   if (account.account_kind === "vault_pool") {
-    alert("\u041D\u0430\u043A\u043E\u043F\u0438\u0442\u0435\u043B\u044C\u043D\u044B\u0439 \u0441\u0447\u0451\u0442 \u0443\u0434\u0430\u043B\u044F\u0442\u044C \u043D\u0435\u043B\u044C\u0437\u044F");
+    alert("ÐÐ°ÐºÐ¾Ð¿Ð¸ÑÐµÐ»ÑÐ½ÑÐ¹ ÑÑÑÑ ÑÐ´Ð°Ð»ÑÑÑ Ð½ÐµÐ»ÑÐ·Ñ");
     return;
   }
 
@@ -2306,11 +2306,11 @@ async function deleteAccountModalAction() {
   });
 
   if (hasTransactions) {
-    alert("\u041D\u0435\u043B\u044C\u0437\u044F \u0443\u0434\u0430\u043B\u0438\u0442\u044C \u0441\u0447\u0451\u0442, \u043A\u043E\u0442\u043E\u0440\u044B\u0439 \u0443\u0436\u0435 \u0438\u0441\u043F\u043E\u043B\u044C\u0437\u0443\u0435\u0442\u0441\u044F \u0432 \u043E\u043F\u0435\u0440\u0430\u0446\u0438\u044F\u0445");
+    alert("ÐÐµÐ»ÑÐ·Ñ ÑÐ´Ð°Ð»Ð¸ÑÑ ÑÑÑÑ, ÐºÐ¾ÑÐ¾ÑÑÐ¹ ÑÐ¶Ðµ Ð¸ÑÐ¿Ð¾Ð»ÑÐ·ÑÐµÑÑÑ Ð² Ð¾Ð¿ÐµÑÐ°ÑÐ¸ÑÑ");
     return;
   }
 
-  const ok = confirm(`\u0423\u0434\u0430\u043B\u0438\u0442\u044C \u0441\u0447\u0451\u0442 "${account.name}"?`);
+  const ok = confirm(`Ð£Ð´Ð°Ð»Ð¸ÑÑ ÑÑÑÑ "${account.name}"?`);
   if (!ok) return;
 
   const { error } = await supabaseClient
@@ -2319,7 +2319,7 @@ async function deleteAccountModalAction() {
     .eq("id", activeAccountId);
 
   if (error) {
-    alert("\u041E\u0448\u0438\u0431\u043A\u0430 \u0443\u0434\u0430\u043B\u0435\u043D\u0438\u044F \u0441\u0447\u0451\u0442\u0430");
+    alert("ÐÑÐ¸Ð±ÐºÐ° ÑÐ´Ð°Ð»ÐµÐ½Ð¸Ñ ÑÑÑÑÐ°");
     console.error(error);
     return;
   }
@@ -2332,7 +2332,7 @@ async function deleteAccountModalAction() {
 function openSafeBucketsModal() {
   if (!safeBucketsModal) return;
 
-  safeBucketsModalTitle.textContent = getSafeAccountName() || "\u041D\u0430\u043A\u043E\u043F\u043B\u0435\u043D\u0438\u044F";
+  safeBucketsModalTitle.textContent = getSafeAccountName() || "ÐÐ°ÐºÐ¾Ð¿Ð»ÐµÐ½Ð¸Ñ";
   renderSafeBucketsModal();
 
   safeBucketsModal.classList.remove("hidden");
@@ -2357,7 +2357,7 @@ function openSafeBucketAmountModal(bucketId) {
   const balance = getSafeBucketBalance(bucketId);
 
   safeBucketAmountModalTitle.textContent = `${bucket.icon} ${bucket.name}`;
-  safeBucketAmountCurrentValue.textContent = `\u0421\u0435\u0439\u0447\u0430\u0441: ${formatMoney(balance)}`;
+  safeBucketAmountCurrentValue.textContent = `Ð¡ÐµÐ¹ÑÐ°Ñ: ${formatMoney(balance)}`;
   safeBucketNameInput.value = bucket.name || "";
   safeBucketIconInput.value = bucket.icon || "";
   safeBucketAmountInput.value = String(balance).replace(".", ",");
@@ -2388,7 +2388,7 @@ function closeSafeBucketAmountModal() {
 function openSafeInterestRateModal() {
   const annualRate = getSafeInterestAnnualRate();
 
-  safeInterestRateCurrentValue.textContent = `\u0421\u0435\u0439\u0447\u0430\u0441: ${formatPercentLabel(annualRate)}`;
+  safeInterestRateCurrentValue.textContent = `Ð¡ÐµÐ¹ÑÐ°Ñ: ${formatPercentLabel(annualRate)}`;
   safeInterestRateInput.value = String(roundToTwo(annualRate * 100)).replace(".", ",");
 
   safeInterestRateModal.classList.remove("hidden");
@@ -2406,7 +2406,7 @@ async function saveSafeInterestRate() {
   const percentValue = Number(normalized);
 
   if (Number.isNaN(percentValue) || percentValue < 0) {
-    alert("\u0412\u0432\u0435\u0434\u0438 \u043A\u043E\u0440\u0440\u0435\u043A\u0442\u043D\u044B\u0439 \u043F\u0440\u043E\u0446\u0435\u043D\u0442");
+    alert("ÐÐ²ÐµÐ´Ð¸ ÐºÐ¾ÑÑÐµÐºÑÐ½ÑÐ¹ Ð¿ÑÐ¾ÑÐµÐ½Ñ");
     return;
   }
 
@@ -2420,7 +2420,7 @@ async function saveSafeInterestRate() {
     });
 
   if (error) {
-    alert("\u041E\u0448\u0438\u0431\u043A\u0430 \u0441\u043E\u0445\u0440\u0430\u043D\u0435\u043D\u0438\u044F \u0433\u043E\u0434\u043E\u0432\u043E\u0433\u043E \u043F\u0440\u043E\u0446\u0435\u043D\u0442\u0430");
+    alert("ÐÑÐ¸Ð±ÐºÐ° ÑÐ¾ÑÑÐ°Ð½ÐµÐ½Ð¸Ñ Ð³Ð¾Ð´Ð¾Ð²Ð¾Ð³Ð¾ Ð¿ÑÐ¾ÑÐµÐ½ÑÐ°");
     console.error(error);
     return;
   }
@@ -2436,7 +2436,7 @@ function renderSafeBucketsModal() {
   const totalSafeBalance = getAccountBalance(getSafeAccountName());
   const unassignedBalance = getUnassignedSafeBalance();
 
-  safeBucketsModalTotalLabel.textContent = `\u041E\u0431\u0449\u0438\u0439 \u0431\u0430\u043B\u0430\u043D\u0441: ${formatMoney(totalSafeBalance)}`;
+  safeBucketsModalTotalLabel.textContent = `ÐÐ±ÑÐ¸Ð¹ Ð±Ð°Ð»Ð°Ð½Ñ: ${formatMoney(totalSafeBalance)}`;
   if (safeBucketsRateValue) {
   safeBucketsRateValue.textContent = formatPercentLabel(getSafeInterestAnnualRate());
 }
@@ -2454,8 +2454,8 @@ function renderSafeBucketsModal() {
     const empty = document.createElement("div");
     empty.className = "safe-bucket-empty";
     empty.innerHTML = `
-      <div class="safe-bucket-empty__title">\u0421\u0435\u0439\u0444\u043E\u0432 \u043F\u043E\u043A\u0430 \u043D\u0435\u0442</div>
-      <div class="safe-bucket-empty__text">\u0414\u043E\u0431\u0430\u0432\u044C \u043F\u0435\u0440\u0432\u044B\u0439 \u0432\u043D\u0443\u0442\u0440\u0435\u043D\u043D\u0438\u0439 \u0441\u0435\u0439\u0444 \u043D\u0438\u0436\u0435</div>
+      <div class="safe-bucket-empty__title">Ð¡ÐµÐ¹ÑÐ¾Ð² Ð¿Ð¾ÐºÐ° Ð½ÐµÑ</div>
+      <div class="safe-bucket-empty__text">ÐÐ¾Ð±Ð°Ð²Ñ Ð¿ÐµÑÐ²ÑÐ¹ Ð²Ð½ÑÑÑÐµÐ½Ð½Ð¸Ð¹ ÑÐµÐ¹Ñ Ð½Ð¸Ð¶Ðµ</div>
     `;
     safeBucketsList.appendChild(empty);
     return;
@@ -2477,7 +2477,7 @@ function renderSafeBucketsModal() {
         <div class="safe-bucket-row__text">
           <div class="safe-bucket-row__title">${escapeHtml(bucket.name)}</div>
           <div class="safe-bucket-row__meta">
-            ${isLocked ? "\u0421\u0438\u0441\u0442\u0435\u043C\u043D\u044B\u0439 \u0441\u0435\u0439\u0444" : "\u0412\u043D\u0443\u0442\u0440\u0435\u043D\u043D\u0438\u0439 \u0441\u0435\u0439\u0444"}
+            ${isLocked ? "Ð¡Ð¸ÑÑÐµÐ¼Ð½ÑÐ¹ ÑÐµÐ¹Ñ" : "ÐÐ½ÑÑÑÐµÐ½Ð½Ð¸Ð¹ ÑÐµÐ¹Ñ"}
           </div>
         </div>
       </div>
@@ -2495,10 +2495,10 @@ function renderSafeBucketsModal() {
 
 async function addSafeBucket() {
   const name = newSafeBucketNameInput.value.trim();
-  const icon = newSafeBucketIconInput.value.trim() || "\uD83D\uDDC2\uFE0F";
+  const icon = newSafeBucketIconInput.value.trim() || "ðï¸";
 
   if (!name) {
-    alert("\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u043D\u0430\u0437\u0432\u0430\u043D\u0438\u0435 \u0441\u0435\u0439\u0444\u0430");
+    alert("ÐÐ²ÐµÐ´Ð¸ÑÐµ Ð½Ð°Ð·Ð²Ð°Ð½Ð¸Ðµ ÑÐµÐ¹ÑÐ°");
     return;
   }
 
@@ -2514,7 +2514,7 @@ async function addSafeBucket() {
     .insert(newSafeBucket);
 
   if (error) {
-    alert("\u041E\u0448\u0438\u0431\u043A\u0430 \u0434\u043E\u0431\u0430\u0432\u043B\u0435\u043D\u0438\u044F \u0441\u0435\u0439\u0444\u0430");
+    alert("ÐÑÐ¸Ð±ÐºÐ° Ð´Ð¾Ð±Ð°Ð²Ð»ÐµÐ½Ð¸Ñ ÑÐµÐ¹ÑÐ°");
     console.error(error);
     return;
   }
@@ -2536,17 +2536,17 @@ async function saveSafeBucketAmount() {
   const nextAmount = Number(normalized);
 
   if (!nextName) {
-    alert("\u0412\u0432\u0435\u0434\u0438 \u043D\u0430\u0437\u0432\u0430\u043D\u0438\u0435 \u0441\u0435\u0439\u0444\u0430");
+    alert("ÐÐ²ÐµÐ´Ð¸ Ð½Ð°Ð·Ð²Ð°Ð½Ð¸Ðµ ÑÐµÐ¹ÑÐ°");
     return;
   }
 
   if (!nextIcon) {
-    alert("\u0412\u0432\u0435\u0434\u0438 \u044D\u043C\u043E\u0434\u0437\u0438 \u0441\u0435\u0439\u0444\u0430");
+    alert("ÐÐ²ÐµÐ´Ð¸ ÑÐ¼Ð¾Ð´Ð·Ð¸ ÑÐµÐ¹ÑÐ°");
     return;
   }
 
   if (Number.isNaN(nextAmount) || nextAmount < 0) {
-    alert("\u0412\u0432\u0435\u0434\u0438 \u043A\u043E\u0440\u0440\u0435\u043A\u0442\u043D\u0443\u044E \u0441\u0443\u043C\u043C\u0443");
+    alert("ÐÐ²ÐµÐ´Ð¸ ÐºÐ¾ÑÑÐµÐºÑÐ½ÑÑ ÑÑÐ¼Ð¼Ñ");
     return;
   }
 
@@ -2559,7 +2559,7 @@ async function saveSafeBucketAmount() {
     .eq("id", activeSafeBucketAmountId);
 
   if (updateBucketError) {
-    alert("\u041E\u0448\u0438\u0431\u043A\u0430 \u0441\u043E\u0445\u0440\u0430\u043D\u0435\u043D\u0438\u044F \u0441\u0435\u0439\u0444\u0430");
+    alert("ÐÑÐ¸Ð±ÐºÐ° ÑÐ¾ÑÑÐ°Ð½ÐµÐ½Ð¸Ñ ÑÐµÐ¹ÑÐ°");
     console.error(updateBucketError);
     return;
   }
@@ -2581,11 +2581,11 @@ async function deleteSafeBucketFromModal() {
 
   const balanceBeforeDelete = getSafeBucketBalance(bucket.id);
   if (Math.abs(balanceBeforeDelete) > 0.009) {
-    alert("\u041D\u0435\u043B\u044C\u0437\u044F \u0443\u0434\u0430\u043B\u0438\u0442\u044C \u0441\u0435\u0439\u0444, \u043F\u043E\u043A\u0430 \u0432 \u043D\u0451\u043C \u0435\u0441\u0442\u044C \u0434\u0435\u043D\u044C\u0433\u0438");
+    alert("ÐÐµÐ»ÑÐ·Ñ ÑÐ´Ð°Ð»Ð¸ÑÑ ÑÐµÐ¹Ñ, Ð¿Ð¾ÐºÐ° Ð² Ð½ÑÐ¼ ÐµÑÑÑ Ð´ÐµÐ½ÑÐ³Ð¸");
     return;
   }
 
-  const ok = confirm(`\u0423\u0434\u0430\u043B\u0438\u0442\u044C \u0441\u0435\u0439\u0444 "${bucket.name}"?`);
+  const ok = confirm(`Ð£Ð´Ð°Ð»Ð¸ÑÑ ÑÐµÐ¹Ñ "${bucket.name}"?`);
   if (!ok) return;
 
   const { error } = await supabaseClient
@@ -2594,7 +2594,7 @@ async function deleteSafeBucketFromModal() {
     .eq("id", bucket.id);
 
   if (error) {
-    alert("\u041E\u0448\u0438\u0431\u043A\u0430 \u0443\u0434\u0430\u043B\u0435\u043D\u0438\u044F \u0441\u0435\u0439\u0444\u0430");
+    alert("ÐÑÐ¸Ð±ÐºÐ° ÑÐ´Ð°Ð»ÐµÐ½Ð¸Ñ ÑÐµÐ¹ÑÐ°");
     console.error(error);
     return;
   }
@@ -2610,10 +2610,10 @@ async function deleteSafeBucketFromModal() {
 
     const isTransferCategory = categoryId === "transfers";
     const title = isTransferCategory
-      ? "\uD83D\uDCB8 \u041F\u0435\u0440\u0435\u0432\u043E\u0434\u044B"
+      ? "ð¸ ÐÐµÑÐµÐ²Ð¾Ð´Ñ"
       : `${getCategoryIcon(categoryId)} ${getCategoryName(categoryId)}`;
 
-    const periodLabel = getAnalyticsPeriodLabel() || "\u041F\u0435\u0440\u0438\u043E\u0434";
+    const periodLabel = getAnalyticsPeriodLabel() || "ÐÐµÑÐ¸Ð¾Ð´";
     const transactions = getAnalyticsTransactionsByCategory(categoryId);
 
     analyticsCategoryModalTitle.textContent = title;
@@ -2622,7 +2622,7 @@ async function deleteSafeBucketFromModal() {
 
     if (analyticsCategoryBudgetBtn) {
       if (isTransferCategory) {
-        analyticsCategoryBudgetBtn.textContent = "\u2014";
+        analyticsCategoryBudgetBtn.textContent = "â";
         analyticsCategoryBudgetBtn.onclick = null;
         analyticsCategoryBudgetBtn.disabled = true;
       } else {
@@ -2634,7 +2634,7 @@ async function deleteSafeBucketFromModal() {
     
     if (analyticsCategoryTypeBtn) {
   if (isTransferCategory) {
-    analyticsCategoryTypeBtn.textContent = "\u0413\u0438\u0431\u043A\u0430\u044F";
+    analyticsCategoryTypeBtn.textContent = "ÐÐ¸Ð±ÐºÐ°Ñ";
     analyticsCategoryTypeBtn.disabled = true;
     analyticsCategoryTypeBtn.onclick = null;
     analyticsCategoryTypeBtn.classList.remove("analytics-category-type-btn--required");
@@ -2642,7 +2642,7 @@ async function deleteSafeBucketFromModal() {
   } else {
     const required = isRequiredCategory(categoryId);
 
-    analyticsCategoryTypeBtn.textContent = required ? "\u041E\u0431\u044F\u0437\u0430\u0442\u0435\u043B\u044C\u043D\u0430\u044F" : "\u0413\u0438\u0431\u043A\u0430\u044F";
+    analyticsCategoryTypeBtn.textContent = required ? "ÐÐ±ÑÐ·Ð°ÑÐµÐ»ÑÐ½Ð°Ñ" : "ÐÐ¸Ð±ÐºÐ°Ñ";
     analyticsCategoryTypeBtn.disabled = false;
     analyticsCategoryTypeBtn.classList.toggle("analytics-category-type-btn--required", required);
     analyticsCategoryTypeBtn.classList.toggle("analytics-category-type-btn--flex", !required);
@@ -2654,7 +2654,7 @@ async function deleteSafeBucketFromModal() {
         .eq("id", categoryId);
 
       if (error) {
-        alert("\u041E\u0448\u0438\u0431\u043A\u0430 \u043E\u0431\u043D\u043E\u0432\u043B\u0435\u043D\u0438\u044F \u0442\u0438\u043F\u0430 \u043A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u0438");
+        alert("ÐÑÐ¸Ð±ÐºÐ° Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ñ ÑÐ¸Ð¿Ð° ÐºÐ°ÑÐµÐ³Ð¾ÑÐ¸Ð¸");
         console.error(error);
         return;
       }
@@ -2671,8 +2671,8 @@ async function deleteSafeBucketFromModal() {
       empty.className = "list-card";
       empty.innerHTML = `
         <div class="list-body">
-          <h3 class="list-title">\u041E\u043F\u0435\u0440\u0430\u0446\u0438\u0439 \u043D\u0435\u0442</h3>
-          <p class="list-subtitle">\u0417\u0430 \u0432\u044B\u0431\u0440\u0430\u043D\u043D\u044B\u0439 \u043F\u0435\u0440\u0438\u043E\u0434 \u043D\u0438\u0447\u0435\u0433\u043E \u043D\u0435 \u043D\u0430\u0439\u0434\u0435\u043D\u043E</p>
+          <h3 class="list-title">ÐÐ¿ÐµÑÐ°ÑÐ¸Ð¹ Ð½ÐµÑ</h3>
+          <p class="list-subtitle">ÐÐ° Ð²ÑÐ±ÑÐ°Ð½Ð½ÑÐ¹ Ð¿ÐµÑÐ¸Ð¾Ð´ Ð½Ð¸ÑÐµÐ³Ð¾ Ð½Ðµ Ð½Ð°Ð¹Ð´ÐµÐ½Ð¾</p>
         </div>
       `;
       analyticsCategoryTransactionsList.appendChild(empty);
@@ -2696,18 +2696,18 @@ async function deleteSafeBucketFromModal() {
   amountInput.value = "";
   dateInput.value = getTodayDateValue();
   commentInput.value = "";
-  categorySelect.innerHTML = `<option value="">\u0412\u044B\u0431\u0435\u0440\u0438 \u043A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u044E</option>`;
+  categorySelect.innerHTML = `<option value="">ÐÑÐ±ÐµÑÐ¸ ÐºÐ°ÑÐµÐ³Ð¾ÑÐ¸Ñ</option>`;
   accountSelect.selectedIndex = 0;
   fromAccountSelect.selectedIndex = 0;
   toAccountSelect.selectedIndex = 0;
 
   if (fromSafeBucketSelect) {
-    fromSafeBucketSelect.innerHTML = `<option value="">\u0418\u0437 \u043A\u0430\u043A\u043E\u0433\u043E \u0441\u0435\u0439\u0444\u0430</option>`;
+    fromSafeBucketSelect.innerHTML = `<option value="">ÐÐ· ÐºÐ°ÐºÐ¾Ð³Ð¾ ÑÐµÐ¹ÑÐ°</option>`;
     fromSafeBucketSelect.value = "";
   }
 
   if (toSafeBucketSelect) {
-    toSafeBucketSelect.innerHTML = `<option value="">\u0412 \u043A\u0430\u043A\u043E\u0439 \u0441\u0435\u0439\u0444</option>`;
+    toSafeBucketSelect.innerHTML = `<option value="">Ð ÐºÐ°ÐºÐ¾Ð¹ ÑÐµÐ¹Ñ</option>`;
     toSafeBucketSelect.value = "";
   }
 
@@ -2723,8 +2723,8 @@ async function deleteSafeBucketFromModal() {
     resetForm();
 
     if (mode === "expense") {
-      modalTitle.textContent = "\u0414\u043E\u0431\u0430\u0432\u0438\u0442\u044C \u0440\u0430\u0441\u0445\u043E\u0434";
-      saveBtn.textContent = "\u0421\u043E\u0445\u0440\u0430\u043D\u0438\u0442\u044C \u0440\u0430\u0441\u0445\u043E\u0434";
+      modalTitle.textContent = "ÐÐ¾Ð±Ð°Ð²Ð¸ÑÑ ÑÐ°ÑÑÐ¾Ð´";
+      saveBtn.textContent = "Ð¡Ð¾ÑÑÐ°Ð½Ð¸ÑÑ ÑÐ°ÑÑÐ¾Ð´";
 
       categoryField.classList.remove("hidden");
       accountField.classList.remove("hidden");
@@ -2732,38 +2732,38 @@ async function deleteSafeBucketFromModal() {
       toAccountField.classList.add("hidden");
 
       fillExpenseCategorySelect();
-      fillAccountSelect(accountSelect, "\u0412\u044B\u0431\u0435\u0440\u0438 \u0441\u0447\u0451\u0442");
+      fillAccountSelect(accountSelect, "ÐÑÐ±ÐµÑÐ¸ ÑÑÑÑ");
 
 const defaultExpenseAccountId =
   getPrimarySpendAccountId() || getSpendableAccounts()[0]?.id || "";
 
 accountSelect.value = defaultExpenseAccountId;
     } else if (mode === "income") {
-      modalTitle.textContent = "\u0414\u043E\u0431\u0430\u0432\u0438\u0442\u044C \u0434\u043E\u0445\u043E\u0434";
-      saveBtn.textContent = "\u0421\u043E\u0445\u0440\u0430\u043D\u0438\u0442\u044C \u0434\u043E\u0445\u043E\u0434";
+      modalTitle.textContent = "ÐÐ¾Ð±Ð°Ð²Ð¸ÑÑ Ð´Ð¾ÑÐ¾Ð´";
+      saveBtn.textContent = "Ð¡Ð¾ÑÑÐ°Ð½Ð¸ÑÑ Ð´Ð¾ÑÐ¾Ð´";
 
       categoryField.classList.add("hidden");
       accountField.classList.remove("hidden");
       fromAccountField.classList.add("hidden");
       toAccountField.classList.add("hidden");
 
-      fillAccountSelect(accountSelect, "\u0412\u044B\u0431\u0435\u0440\u0438 \u0441\u0447\u0451\u0442");
+      fillAccountSelect(accountSelect, "ÐÑÐ±ÐµÑÐ¸ ÑÑÑÑ");
 
 const defaultIncomeAccountId =
   getPrimarySpendAccountId() || getSpendableAccounts()[0]?.id || "";
 
 accountSelect.value = defaultIncomeAccountId;
    } else if (mode === "transfer") {
-  modalTitle.textContent = "\u0421\u0434\u0435\u043B\u0430\u0442\u044C \u043F\u0435\u0440\u0435\u0432\u043E\u0434";
-  saveBtn.textContent = "\u0421\u043E\u0445\u0440\u0430\u043D\u0438\u0442\u044C \u043F\u0435\u0440\u0435\u0432\u043E\u0434";
+  modalTitle.textContent = "Ð¡Ð´ÐµÐ»Ð°ÑÑ Ð¿ÐµÑÐµÐ²Ð¾Ð´";
+  saveBtn.textContent = "Ð¡Ð¾ÑÑÐ°Ð½Ð¸ÑÑ Ð¿ÐµÑÐµÐ²Ð¾Ð´";
 
   categoryField.classList.add("hidden");
   accountField.classList.add("hidden");
   fromAccountField.classList.remove("hidden");
   toAccountField.classList.remove("hidden");
 
-  fillAccountSelect(fromAccountSelect, "\u0421 \u043A\u0430\u043A\u043E\u0433\u043E \u0441\u0447\u0451\u0442\u0430");
-fillAccountSelect(toAccountSelect, "\u041D\u0430 \u043A\u0430\u043A\u043E\u0439 \u0441\u0447\u0451\u0442");
+  fillAccountSelect(fromAccountSelect, "Ð¡ ÐºÐ°ÐºÐ¾Ð³Ð¾ ÑÑÑÑÐ°");
+fillAccountSelect(toAccountSelect, "ÐÐ° ÐºÐ°ÐºÐ¾Ð¹ ÑÑÑÑ");
 
 const defaultFromAccountId =
   getPrimarySpendAccountId() || getSpendableAccounts()[0]?.id || "";
@@ -2774,7 +2774,7 @@ const cashFallbackId =
   "";
 
 fromAccountSelect.value = defaultFromAccountId;
-fillAccountSelect(toAccountSelect, "\u041D\u0430 \u043A\u0430\u043A\u043E\u0439 \u0441\u0447\u0451\u0442", cashFallbackId, {
+fillAccountSelect(toAccountSelect, "ÐÐ° ÐºÐ°ÐºÐ¾Ð¹ ÑÑÑÑ", cashFallbackId, {
   excludeId: defaultFromAccountId,
 });
 toAccountSelect.value = cashFallbackId;
@@ -2782,8 +2782,8 @@ toAccountSelect.value = cashFallbackId;
   fromSafeBucketField.classList.add("hidden");
   toSafeBucketField.classList.add("hidden");
 
-  fillSafeBucketSelect(fromSafeBucketSelect, "\u0418\u0437 \u043A\u0430\u043A\u043E\u0433\u043E \u0441\u0435\u0439\u0444\u0430");
-  fillSafeBucketSelect(toSafeBucketSelect, "\u0412 \u043A\u0430\u043A\u043E\u0439 \u0441\u0435\u0439\u0444");
+  fillSafeBucketSelect(fromSafeBucketSelect, "ÐÐ· ÐºÐ°ÐºÐ¾Ð³Ð¾ ÑÐµÐ¹ÑÐ°");
+  fillSafeBucketSelect(toSafeBucketSelect, "Ð ÐºÐ°ÐºÐ¾Ð¹ ÑÐµÐ¹Ñ");
   updateTransferSafeFields();
 }
 
@@ -2802,8 +2802,8 @@ toAccountSelect.value = cashFallbackId;
     resetForm();
 
     if (transaction.type === "expense") {
-      modalTitle.textContent = "\u0420\u0435\u0434\u0430\u043A\u0442\u0438\u0440\u043E\u0432\u0430\u0442\u044C \u0440\u0430\u0441\u0445\u043E\u0434";
-      saveBtn.textContent = "\u0421\u043E\u0445\u0440\u0430\u043D\u0438\u0442\u044C";
+      modalTitle.textContent = "Ð ÐµÐ´Ð°ÐºÑÐ¸ÑÐ¾Ð²Ð°ÑÑ ÑÐ°ÑÑÐ¾Ð´";
+      saveBtn.textContent = "Ð¡Ð¾ÑÑÐ°Ð½Ð¸ÑÑ";
 
       categoryField.classList.remove("hidden");
       accountField.classList.remove("hidden");
@@ -2816,12 +2816,12 @@ toAccountSelect.value = cashFallbackId;
       dateInput.value = transaction.created_at
         ? String(transaction.created_at).slice(0, 10)
         : getTodayDateValue();
-      fillAccountSelect(accountSelect, "\u0412\u044B\u0431\u0435\u0440\u0438 \u0441\u0447\u0451\u0442", transaction.account_id);
+      fillAccountSelect(accountSelect, "ÐÑÐ±ÐµÑÐ¸ ÑÑÑÑ", transaction.account_id);
 accountSelect.value = transaction.account_id || "";
-      commentInput.value = transaction.title === "\u041D\u043E\u0432\u0430\u044F \u0442\u0440\u0430\u0442\u0430" ? "" : transaction.title;
+      commentInput.value = transaction.title === "ÐÐ¾Ð²Ð°Ñ ÑÑÐ°ÑÐ°" ? "" : transaction.title;
     } else if (transaction.type === "income") {
-      modalTitle.textContent = "\u0420\u0435\u0434\u0430\u043A\u0442\u0438\u0440\u043E\u0432\u0430\u0442\u044C \u0434\u043E\u0445\u043E\u0434";
-      saveBtn.textContent = "\u0421\u043E\u0445\u0440\u0430\u043D\u0438\u0442\u044C";
+      modalTitle.textContent = "Ð ÐµÐ´Ð°ÐºÑÐ¸ÑÐ¾Ð²Ð°ÑÑ Ð´Ð¾ÑÐ¾Ð´";
+      saveBtn.textContent = "Ð¡Ð¾ÑÑÐ°Ð½Ð¸ÑÑ";
 
       categoryField.classList.add("hidden");
       accountField.classList.remove("hidden");
@@ -2832,13 +2832,13 @@ accountSelect.value = transaction.account_id || "";
       dateInput.value = transaction.created_at
         ? String(transaction.created_at).slice(0, 10)
         : getTodayDateValue();
-      fillAccountSelect(accountSelect, "\u0412\u044B\u0431\u0435\u0440\u0438 \u0441\u0447\u0451\u0442", transaction.account_id);
+      fillAccountSelect(accountSelect, "ÐÑÐ±ÐµÑÐ¸ ÑÑÑÑ", transaction.account_id);
 accountSelect.value = transaction.account_id || "";
-      commentInput.value = transaction.title === "\u041D\u043E\u0432\u044B\u0439 \u0434\u043E\u0445\u043E\u0434" ? "" : transaction.title;
+      commentInput.value = transaction.title === "ÐÐ¾Ð²ÑÐ¹ Ð´Ð¾ÑÐ¾Ð´" ? "" : transaction.title;
       
     } else if (transaction.type === "transfer") {
-  modalTitle.textContent = "\u0420\u0435\u0434\u0430\u043A\u0442\u0438\u0440\u043E\u0432\u0430\u0442\u044C \u043F\u0435\u0440\u0435\u0432\u043E\u0434";
-  saveBtn.textContent = "\u0421\u043E\u0445\u0440\u0430\u043D\u0438\u0442\u044C";
+  modalTitle.textContent = "Ð ÐµÐ´Ð°ÐºÑÐ¸ÑÐ¾Ð²Ð°ÑÑ Ð¿ÐµÑÐµÐ²Ð¾Ð´";
+  saveBtn.textContent = "Ð¡Ð¾ÑÑÐ°Ð½Ð¸ÑÑ";
 
   categoryField.classList.add("hidden");
   accountField.classList.add("hidden");
@@ -2849,23 +2849,23 @@ accountSelect.value = transaction.account_id || "";
   dateInput.value = transaction.created_at
     ? String(transaction.created_at).slice(0, 10)
     : getTodayDateValue();
-  fillAccountSelect(fromAccountSelect, "\u0421 \u043A\u0430\u043A\u043E\u0433\u043E \u0441\u0447\u0451\u0442\u0430", transaction.from_account_id);
-fillAccountSelect(toAccountSelect, "\u041D\u0430 \u043A\u0430\u043A\u043E\u0439 \u0441\u0447\u0451\u0442", transaction.to_account_id, {
+  fillAccountSelect(fromAccountSelect, "Ð¡ ÐºÐ°ÐºÐ¾Ð³Ð¾ ÑÑÑÑÐ°", transaction.from_account_id);
+fillAccountSelect(toAccountSelect, "ÐÐ° ÐºÐ°ÐºÐ¾Ð¹ ÑÑÑÑ", transaction.to_account_id, {
   excludeId: transaction.from_account_id,
 });
 
 fromAccountSelect.value = transaction.from_account_id || "";
 toAccountSelect.value = transaction.to_account_id || "";
-  commentInput.value = transaction.title === "\u041F\u0435\u0440\u0435\u0432\u043E\u0434" ? "" : transaction.title;
+  commentInput.value = transaction.title === "ÐÐµÑÐµÐ²Ð¾Ð´" ? "" : transaction.title;
 
   fillSafeBucketSelect(
     fromSafeBucketSelect,
-    "\u0418\u0437 \u043A\u0430\u043A\u043E\u0433\u043E \u0441\u0435\u0439\u0444\u0430",
+    "ÐÐ· ÐºÐ°ÐºÐ¾Ð³Ð¾ ÑÐµÐ¹ÑÐ°",
     transaction.from_safe_bucket_id || ""
   );
   fillSafeBucketSelect(
     toSafeBucketSelect,
-    "\u0412 \u043A\u0430\u043A\u043E\u0439 \u0441\u0435\u0439\u0444",
+    "Ð ÐºÐ°ÐºÐ¾Ð¹ ÑÐµÐ¹Ñ",
     transaction.to_safe_bucket_id || ""
   );
   updateTransferSafeFields();
@@ -2948,10 +2948,10 @@ toAccountSelect.value = transaction.to_account_id || "";
 }
   
   function getAccountRoleLabel(account) {
-  if (account.account_kind === "vault_pool") return "\u041D\u0430\u043A\u043E\u043F\u0438\u0442\u0435\u043B\u044C\u043D\u044B\u0439 \u0441\u0447\u0451\u0442";
-  if (account.account_kind === "reserve") return "\u0420\u0435\u0437\u0435\u0440\u0432";
-  if (account.account_kind === "cash") return "\u041D\u0430\u043B\u0438\u0447\u043D\u044B\u0435";
-  return account.is_primary_spend ? "\u041E\u0441\u043D\u043E\u0432\u043D\u043E\u0439 \u0441\u0447\u0451\u0442" : "\u041E\u0431\u044B\u0447\u043D\u044B\u0439 \u0441\u0447\u0451\u0442";
+  if (account.account_kind === "vault_pool") return "ÐÐ°ÐºÐ¾Ð¿Ð¸ÑÐµÐ»ÑÐ½ÑÐ¹ ÑÑÑÑ";
+  if (account.account_kind === "reserve") return "Ð ÐµÐ·ÐµÑÐ²";
+  if (account.account_kind === "cash") return "ÐÐ°Ð»Ð¸ÑÐ½ÑÐµ";
+  return account.is_primary_spend ? "ÐÑÐ½Ð¾Ð²Ð½Ð¾Ð¹ ÑÑÑÑ" : "ÐÐ±ÑÑÐ½ÑÐ¹ ÑÑÑÑ";
 }
 
 function canAccountBePrimary(role) {
@@ -3093,7 +3093,7 @@ function getAccountRoleFlags(role) {
       if (
   (transaction.account_id === getSafeAccountId() ||
     (!transaction.account_id && transaction.account === getSafeAccountName())) &&
-  transaction.title === "\u041F\u0440\u043E\u0446\u0435\u043D\u0442\u044B \u043F\u043E \u043D\u0430\u043A\u043E\u043F\u043B\u0435\u043D\u0438\u044E"
+  transaction.title === "ÐÑÐ¾ÑÐµÐ½ÑÑ Ð¿Ð¾ Ð½Ð°ÐºÐ¾Ð¿Ð»ÐµÐ½Ð¸Ñ"
 ) {
   safeInterest += amount;
 }
@@ -3222,7 +3222,7 @@ function getAccountRoleFlags(role) {
       const interestTransaction = {
         id: crypto.randomUUID(),
         type: "income",
-        title: "\u041F\u0440\u043E\u0446\u0435\u043D\u0442\u044B \u043F\u043E \u043D\u0430\u043A\u043E\u043F\u043B\u0435\u043D\u0438\u044E",
+        title: "ÐÑÐ¾ÑÐµÐ½ÑÑ Ð¿Ð¾ Ð½Ð°ÐºÐ¾Ð¿Ð»ÐµÐ½Ð¸Ñ",
         account: getSafeAccountName(),
         category_id: null,
         from_account: null,
@@ -3240,7 +3240,7 @@ function getAccountRoleFlags(role) {
 
       if (insertError) {
         console.error(insertError);
-        alert("\u041E\u0448\u0438\u0431\u043A\u0430 \u043D\u0430\u0447\u0438\u0441\u043B\u0435\u043D\u0438\u044F \u043F\u0440\u043E\u0446\u0435\u043D\u0442\u043E\u0432 \u043F\u043E \u0441\u0435\u0439\u0444\u0430\u043C");
+        alert("ÐÑÐ¸Ð±ÐºÐ° Ð½Ð°ÑÐ¸ÑÐ»ÐµÐ½Ð¸Ñ Ð¿ÑÐ¾ÑÐµÐ½ÑÐ¾Ð² Ð¿Ð¾ ÑÐµÐ¹ÑÐ°Ð¼");
         return;
       }
 
@@ -3257,7 +3257,7 @@ function getAccountRoleFlags(role) {
 
   if (metaError) {
     console.error(metaError);
-    alert("\u041E\u0448\u0438\u0431\u043A\u0430 \u0441\u043E\u0445\u0440\u0430\u043D\u0435\u043D\u0438\u044F \u0434\u0430\u0442\u044B \u043D\u0430\u0447\u0438\u0441\u043B\u0435\u043D\u0438\u044F \u043F\u0440\u043E\u0446\u0435\u043D\u0442\u043E\u0432");
+    alert("ÐÑÐ¸Ð±ÐºÐ° ÑÐ¾ÑÑÐ°Ð½ÐµÐ½Ð¸Ñ Ð´Ð°ÑÑ Ð½Ð°ÑÐ¸ÑÐ»ÐµÐ½Ð¸Ñ Ð¿ÑÐ¾ÑÐµÐ½ÑÐ¾Ð²");
   }
 }
 
@@ -3266,10 +3266,10 @@ function getAccountRoleFlags(role) {
   const freeMoney = getFreeMoneyTotal();
 
   balanceEl.textContent = formatMoney(balance);
-  accountsTotalEl.textContent = `\u0412\u0441\u0435\u0433\u043E: ${formatMoney(balance)}`;
+  accountsTotalEl.textContent = `ÐÑÐµÐ³Ð¾: ${formatMoney(balance)}`;
 
   if (balanceFreeMoneyValueEl) {
-    balanceFreeMoneyValueEl.textContent = `\u0421\u0432\u043E\u0431\u043E\u0434\u043D\u043E: ${formatMoney(freeMoney)}`;
+    balanceFreeMoneyValueEl.textContent = `Ð¡Ð²Ð¾Ð±Ð¾Ð´Ð½Ð¾: ${formatMoney(freeMoney)}`;
   }
 }
 
@@ -3309,8 +3309,8 @@ function getAccountRoleFlags(role) {
   class="icon-action-btn"
   type="button"
   data-edit-account-id="${account.id}"
-  aria-label="\u0420\u0435\u0434\u0430\u043A\u0442\u0438\u0440\u043E\u0432\u0430\u0442\u044C \u0441\u0447\u0451\u0442"
-  title="\u0420\u0435\u0434\u0430\u043A\u0442\u0438\u0440\u043E\u0432\u0430\u0442\u044C \u0441\u0447\u0451\u0442"
+  aria-label="Ð ÐµÐ´Ð°ÐºÑÐ¸ÑÐ¾Ð²Ð°ÑÑ ÑÑÑÑ"
+  title="Ð ÐµÐ´Ð°ÐºÑÐ¸ÑÐ¾Ð²Ð°ÑÑ ÑÑÑÑ"
 >
   <svg viewBox="0 0 24 24" aria-hidden="true">
     <path d="M4 20h4l10-10-4-4L4 16v4Z" />
@@ -3341,7 +3341,7 @@ function getAccountRoleFlags(role) {
       card.className = "list-card";
 
       const lockedAttr = category.locked ? "disabled" : "";
-      const lockedSubtitle = category.locked ? "\u0421\u0438\u0441\u0442\u0435\u043C\u043D\u0430\u044F \u043A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u044F" : "\u041C\u043E\u0436\u043D\u043E \u0440\u0435\u0434\u0430\u043A\u0442\u0438\u0440\u043E\u0432\u0430\u0442\u044C";
+      const lockedSubtitle = category.locked ? "Ð¡Ð¸ÑÑÐµÐ¼Ð½Ð°Ñ ÐºÐ°ÑÐµÐ³Ð¾ÑÐ¸Ñ" : "ÐÐ¾Ð¶Ð½Ð¾ ÑÐµÐ´Ð°ÐºÑÐ¸ÑÐ¾Ð²Ð°ÑÑ";
 
       const managerTone =
         category.id === "food"
@@ -3360,9 +3360,9 @@ function getAccountRoleFlags(role) {
   <div class="list-body">
     <div class="list-title-row">
       <h3 class="list-title">${escapeHtml(category.name)}</h3>
-      ${category.is_required ? '<span class="category-required-flag">\uD83D\uDEA9</span>' : ""}
+      ${category.is_required ? '<span class="category-required-flag">ð©</span>' : ""}
     </div>
-    <p class="list-subtitle">${lockedSubtitle} \u2022 ${category.is_required ? "\u041E\u0431\u044F\u0437\u0430\u0442\u0435\u043B\u044C\u043D\u0430\u044F" : "\u0413\u0438\u0431\u043A\u0430\u044F"}</p>
+    <p class="list-subtitle">${lockedSubtitle} â¢ ${category.is_required ? "ÐÐ±ÑÐ·Ð°ÑÐµÐ»ÑÐ½Ð°Ñ" : "ÐÐ¸Ð±ÐºÐ°Ñ"}</p>
   </div>
 
   <div class="category-manager-actions">
@@ -3371,8 +3371,8 @@ function getAccountRoleFlags(role) {
     type="button"
     data-edit-id="${category.id}"
     ${lockedAttr}
-    aria-label="\u0420\u0435\u0434\u0430\u043A\u0442\u0438\u0440\u043E\u0432\u0430\u0442\u044C \u043A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u044E"
-    title="\u0420\u0435\u0434\u0430\u043A\u0442\u0438\u0440\u043E\u0432\u0430\u0442\u044C \u043A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u044E"
+    aria-label="Ð ÐµÐ´Ð°ÐºÑÐ¸ÑÐ¾Ð²Ð°ÑÑ ÐºÐ°ÑÐµÐ³Ð¾ÑÐ¸Ñ"
+    title="Ð ÐµÐ´Ð°ÐºÑÐ¸ÑÐ¾Ð²Ð°ÑÑ ÐºÐ°ÑÐµÐ³Ð¾ÑÐ¸Ñ"
   >
     <svg viewBox="0 0 24 24" aria-hidden="true">
       <path d="M4 20h4l10-10-4-4L4 16v4Z" />
@@ -3385,8 +3385,8 @@ function getAccountRoleFlags(role) {
     type="button"
     data-type-id="${category.id}"
     ${lockedAttr}
-    aria-label="\u041F\u0435\u0440\u0435\u043A\u043B\u044E\u0447\u0438\u0442\u044C \u0442\u0438\u043F \u043A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u0438"
-    title="\u041F\u0435\u0440\u0435\u043A\u043B\u044E\u0447\u0438\u0442\u044C \u0442\u0438\u043F \u043A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u0438"
+    aria-label="ÐÐµÑÐµÐºÐ»ÑÑÐ¸ÑÑ ÑÐ¸Ð¿ ÐºÐ°ÑÐµÐ³Ð¾ÑÐ¸Ð¸"
+    title="ÐÐµÑÐµÐºÐ»ÑÑÐ¸ÑÑ ÑÐ¸Ð¿ ÐºÐ°ÑÐµÐ³Ð¾ÑÐ¸Ð¸"
   >
     <svg viewBox="0 0 24 24" aria-hidden="true">
       <path d="M8 7h8a4 4 0 1 1 0 8H8a4 4 0 1 1 0-8Z" />
@@ -3399,8 +3399,8 @@ function getAccountRoleFlags(role) {
     type="button"
     data-delete-id="${category.id}"
     ${lockedAttr}
-    aria-label="\u0423\u0434\u0430\u043B\u0438\u0442\u044C \u043A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u044E"
-    title="\u0423\u0434\u0430\u043B\u0438\u0442\u044C \u043A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u044E"
+    aria-label="Ð£Ð´Ð°Ð»Ð¸ÑÑ ÐºÐ°ÑÐµÐ³Ð¾ÑÐ¸Ñ"
+    title="Ð£Ð´Ð°Ð»Ð¸ÑÑ ÐºÐ°ÑÐµÐ³Ð¾ÑÐ¸Ñ"
   >
     <svg viewBox="0 0 24 24" aria-hidden="true">
       <path d="M5 7h14" />
@@ -3429,7 +3429,7 @@ const deleteBtn = card.querySelector("[data-delete-id]");
     .eq("id", category.id);
 
   if (error) {
-    alert("\u041E\u0448\u0438\u0431\u043A\u0430 \u043E\u0431\u043D\u043E\u0432\u043B\u0435\u043D\u0438\u044F \u0442\u0438\u043F\u0430 \u043A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u0438");
+    alert("ÐÑÐ¸Ð±ÐºÐ° Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ñ ÑÐ¸Ð¿Ð° ÐºÐ°ÑÐµÐ³Ð¾ÑÐ¸Ð¸");
     console.error(error);
     return;
   }
@@ -3442,7 +3442,7 @@ const deleteBtn = card.querySelector("[data-delete-id]");
         if (category.locked) return;
 
         const ok = confirm(
-          `\u0423\u0434\u0430\u043B\u0438\u0442\u044C \u043A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u044E "${category.name}"? \u0412\u0441\u0435 \u0441\u0442\u0430\u0440\u044B\u0435 \u0440\u0430\u0441\u0445\u043E\u0434\u044B \u043F\u0435\u0440\u0435\u0439\u0434\u0443\u0442 \u0432 "\u0411\u0435\u0437 \u043A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u0438". \u041B\u0438\u043C\u0438\u0442 \u0431\u044E\u0434\u0436\u0435\u0442\u0430 \u0442\u043E\u0436\u0435 \u0443\u0434\u0430\u043B\u0438\u0442\u0441\u044F.`
+          `Ð£Ð´Ð°Ð»Ð¸ÑÑ ÐºÐ°ÑÐµÐ³Ð¾ÑÐ¸Ñ "${category.name}"? ÐÑÐµ ÑÑÐ°ÑÑÐµ ÑÐ°ÑÑÐ¾Ð´Ñ Ð¿ÐµÑÐµÐ¹Ð´ÑÑ Ð² "ÐÐµÐ· ÐºÐ°ÑÐµÐ³Ð¾ÑÐ¸Ð¸". ÐÐ¸Ð¼Ð¸Ñ Ð±ÑÐ´Ð¶ÐµÑÐ° ÑÐ¾Ð¶Ðµ ÑÐ´Ð°Ð»Ð¸ÑÑÑ.`
         );
         if (!ok) return;
 
@@ -3453,7 +3453,7 @@ const deleteBtn = card.querySelector("[data-delete-id]");
           .eq("category_id", category.id);
 
         if (txError) {
-          alert("\u041E\u0448\u0438\u0431\u043A\u0430 \u043F\u0435\u0440\u0435\u043D\u043E\u0441\u0430 \u0441\u0442\u0430\u0440\u044B\u0445 \u0440\u0430\u0441\u0445\u043E\u0434\u043E\u0432");
+          alert("ÐÑÐ¸Ð±ÐºÐ° Ð¿ÐµÑÐµÐ½Ð¾ÑÐ° ÑÑÐ°ÑÑÑ ÑÐ°ÑÑÐ¾Ð´Ð¾Ð²");
           console.error(txError);
           return;
         }
@@ -3464,7 +3464,7 @@ const deleteBtn = card.querySelector("[data-delete-id]");
           .eq("category_id", category.id);
 
         if (budgetDeleteError) {
-          alert("\u041E\u0448\u0438\u0431\u043A\u0430 \u0443\u0434\u0430\u043B\u0435\u043D\u0438\u044F \u043B\u0438\u043C\u0438\u0442\u0430 \u0431\u044E\u0434\u0436\u0435\u0442\u0430");
+          alert("ÐÑÐ¸Ð±ÐºÐ° ÑÐ´Ð°Ð»ÐµÐ½Ð¸Ñ Ð»Ð¸Ð¼Ð¸ÑÐ° Ð±ÑÐ´Ð¶ÐµÑÐ°");
           console.error(budgetDeleteError);
           return;
         }
@@ -3475,7 +3475,7 @@ const deleteBtn = card.querySelector("[data-delete-id]");
           .eq("id", category.id);
 
         if (deleteError) {
-          alert("\u041E\u0448\u0438\u0431\u043A\u0430 \u0443\u0434\u0430\u043B\u0435\u043D\u0438\u044F \u043A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u0438");
+          alert("ÐÑÐ¸Ð±ÐºÐ° ÑÐ´Ð°Ð»ÐµÐ½Ð¸Ñ ÐºÐ°ÑÐµÐ³Ð¾ÑÐ¸Ð¸");
           console.error(deleteError);
           return;
         }
@@ -3494,9 +3494,9 @@ const deleteBtn = card.querySelector("[data-delete-id]");
 
   const icon =
     transaction.type === "income"
-      ? "\uD83D\uDCB0"
+      ? "ð°"
       : transaction.type === "transfer"
-      ? "\u2197"
+      ? "â"
       : getCategoryIcon(transaction.category_id || UNCATEGORIZED_ID);
 
   const toneKey =
@@ -3516,14 +3516,14 @@ const deleteBtn = card.querySelector("[data-delete-id]");
       getAccountNameById(transaction.to_account_id) || transaction.to_account || "";
 
     const fromLabel = isVaultAccountId(transaction.from_account_id)
-      ? `${fromAccountName} \u2022 ${getSafeBucketName(transaction.from_safe_bucket_id)}`
+      ? `${fromAccountName} â¢ ${getSafeBucketName(transaction.from_safe_bucket_id)}`
       : fromAccountName;
 
     const toLabel = isVaultAccountId(transaction.to_account_id)
-      ? `${toAccountName} \u2022 ${getSafeBucketName(transaction.to_safe_bucket_id)}`
+      ? `${toAccountName} â¢ ${getSafeBucketName(transaction.to_safe_bucket_id)}`
       : toAccountName;
 
-    subtitle = `${escapeHtml(fromLabel)} \u2192 ${escapeHtml(toLabel)}`;
+    subtitle = `${escapeHtml(fromLabel)} â ${escapeHtml(toLabel)}`;
     signedAmount = formatMoney(transaction.amount);
   } else if (transaction.type === "income") {
     const incomeAccountName =
@@ -3531,24 +3531,24 @@ const deleteBtn = card.querySelector("[data-delete-id]");
 
     const incomeBucketLabel =
       isVaultAccountId(transaction.account_id) && transaction.to_safe_bucket_id
-        ? ` \u2022 ${getSafeBucketName(transaction.to_safe_bucket_id)}`
+        ? ` â¢ ${getSafeBucketName(transaction.to_safe_bucket_id)}`
         : "";
 
-    subtitle = `${escapeHtml(incomeAccountName)}${escapeHtml(incomeBucketLabel)} \u2022 \u0434\u043E\u0445\u043E\u0434`;
+    subtitle = `${escapeHtml(incomeAccountName)}${escapeHtml(incomeBucketLabel)} â¢ Ð´Ð¾ÑÐ¾Ð´`;
     signedAmount = `+${formatMoney(transaction.amount)}`;
     valueClass = "list-value list-value--green";
   } else {
     const expenseAccountName =
       getAccountNameById(transaction.account_id) || transaction.account || "";
 
-    subtitle = `${escapeHtml(getCategoryName(transaction.category_id || UNCATEGORIZED_ID))} \u2022 ${escapeHtml(expenseAccountName)}`;
-    signedAmount = `\u2212${formatMoney(transaction.amount)}`;
+    subtitle = `${escapeHtml(getCategoryName(transaction.category_id || UNCATEGORIZED_ID))} â¢ ${escapeHtml(expenseAccountName)}`;
+    signedAmount = `â${formatMoney(transaction.amount)}`;
     valueClass = "list-value list-value--red";
   }
 
   const shortDate = formatDateShort(transaction.created_at);
   const timeLabel = transaction.time_label || "";
-  const caption = `${shortDate}${shortDate && timeLabel ? " \u2022 " : ""}${timeLabel}`;
+  const caption = `${shortDate}${shortDate && timeLabel ? " â¢ " : ""}${timeLabel}`;
 
   card.innerHTML = `
     <div class="list-icon ${iconToneClass}">${icon}</div>
@@ -3578,8 +3578,8 @@ const deleteBtn = card.querySelector("[data-delete-id]");
       empty.className = "list-card";
       empty.innerHTML = `
         <div class="list-body">
-          <h3 class="list-title">\u041E\u043F\u0435\u0440\u0430\u0446\u0438\u0439 \u043F\u043E\u043A\u0430 \u043D\u0435\u0442</h3>
-          <p class="list-subtitle">\u0414\u043E\u0431\u0430\u0432\u044C \u043F\u0435\u0440\u0432\u0443\u044E \u043E\u043F\u0435\u0440\u0430\u0446\u0438\u044E \u0447\u0435\u0440\u0435\u0437 \u043A\u043D\u043E\u043F\u043A\u0438 \u0441\u0432\u0435\u0440\u0445\u0443</p>
+          <h3 class="list-title">ÐÐ¿ÐµÑÐ°ÑÐ¸Ð¹ Ð¿Ð¾ÐºÐ° Ð½ÐµÑ</h3>
+          <p class="list-subtitle">ÐÐ¾Ð±Ð°Ð²Ñ Ð¿ÐµÑÐ²ÑÑ Ð¾Ð¿ÐµÑÐ°ÑÐ¸Ñ ÑÐµÑÐµÐ· ÐºÐ½Ð¾Ð¿ÐºÐ¸ ÑÐ²ÐµÑÑÑ</p>
         </div>
       `;
       transactionsListEl.appendChild(empty);
@@ -3603,8 +3603,8 @@ const deleteBtn = card.querySelector("[data-delete-id]");
       empty.className = "list-card";
       empty.innerHTML = `
         <div class="list-body">
-          <h3 class="list-title">\u041D\u0438\u0447\u0435\u0433\u043E \u043D\u0435 \u043D\u0430\u0439\u0434\u0435\u043D\u043E</h3>
-          <p class="list-subtitle">\u0417\u0430 \u0432\u044B\u0431\u0440\u0430\u043D\u043D\u044B\u0439 \u043F\u0435\u0440\u0438\u043E\u0434 \u043D\u0435\u0442 \u043E\u043F\u0435\u0440\u0430\u0446\u0438\u0439</p>
+          <h3 class="list-title">ÐÐ¸ÑÐµÐ³Ð¾ Ð½Ðµ Ð½Ð°Ð¹Ð´ÐµÐ½Ð¾</h3>
+          <p class="list-subtitle">ÐÐ° Ð²ÑÐ±ÑÐ°Ð½Ð½ÑÐ¹ Ð¿ÐµÑÐ¸Ð¾Ð´ Ð½ÐµÑ Ð¾Ð¿ÐµÑÐ°ÑÐ¸Ð¹</p>
         </div>
       `;
       analyticsTransactionsList.appendChild(empty);
@@ -3661,13 +3661,13 @@ const deleteBtn = card.querySelector("[data-delete-id]");
 
     renderAnalyticsOperations();
 
-    const periodLabel = getAnalyticsPeriodLabel() || "\u041F\u0435\u0440\u0438\u043E\u0434";
+    const periodLabel = getAnalyticsPeriodLabel() || "ÐÐµÑÐ¸Ð¾Ð´";
     const totalExpense = breakdown.reduce((sum, item) => sum + item.amount, 0);
 
     if (!breakdown.length) {
       analyticsDonut.innerHTML = `
         <div class="analytics-panel">
-          <div class="analytics-panel__eyebrow">\u0420\u0430\u0441\u0445\u043E\u0434\u044B \u043F\u043E \u043A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u044F\u043C</div>
+          <div class="analytics-panel__eyebrow">Ð Ð°ÑÑÐ¾Ð´Ñ Ð¿Ð¾ ÐºÐ°ÑÐµÐ³Ð¾ÑÐ¸ÑÐ¼</div>
 
           <div class="analytics-panel__headline">
             <div class="analytics-panel__total">${formatMoney(0)}</div>
@@ -3679,20 +3679,20 @@ const deleteBtn = card.querySelector("[data-delete-id]");
               <div class="analytics-breakdown-row__rank analytics-breakdown-row__rank--leader">#1</div>
 
               <div class="analytics-leader__content">
-                <div class="analytics-leader__label">\u041B\u0438\u0434\u0435\u0440</div>
-                <div class="analytics-leader__title">\u041D\u0435\u0442 \u0434\u0430\u043D\u043D\u044B\u0445</div>
-                <div class="analytics-leader__meta">\u0417\u0430 \u0432\u044B\u0431\u0440\u0430\u043D\u043D\u044B\u0439 \u043F\u0435\u0440\u0438\u043E\u0434 \u043D\u0435\u0442 \u0440\u0430\u0441\u0445\u043E\u0434\u043E\u0432</div>
+                <div class="analytics-leader__label">ÐÐ¸Ð´ÐµÑ</div>
+                <div class="analytics-leader__title">ÐÐµÑ Ð´Ð°Ð½Ð½ÑÑ</div>
+                <div class="analytics-leader__meta">ÐÐ° Ð²ÑÐ±ÑÐ°Ð½Ð½ÑÐ¹ Ð¿ÐµÑÐ¸Ð¾Ð´ Ð½ÐµÑ ÑÐ°ÑÑÐ¾Ð´Ð¾Ð²</div>
               </div>
             </div>
 
-            <div class="analytics-leader__value">\u2014</div>
+            <div class="analytics-leader__value">â</div>
           </div>
         </div>
       `;
 
       analyticsLegend.innerHTML = `
         <div class="analytics-breakdown-list analytics-breakdown-list--empty">
-          <div class="analytics-empty">\u041D\u0435\u0442 \u0434\u0430\u043D\u043D\u044B\u0445 \u043F\u043E \u0440\u0430\u0441\u0445\u043E\u0434\u0430\u043C \u0437\u0430 \u0432\u044B\u0431\u0440\u0430\u043D\u043D\u044B\u0439 \u043F\u0435\u0440\u0438\u043E\u0434</div>
+          <div class="analytics-empty">ÐÐµÑ Ð´Ð°Ð½Ð½ÑÑ Ð¿Ð¾ ÑÐ°ÑÑÐ¾Ð´Ð°Ð¼ Ð·Ð° Ð²ÑÐ±ÑÐ°Ð½Ð½ÑÐ¹ Ð¿ÐµÑÐ¸Ð¾Ð´</div>
         </div>
       `;
       return;
@@ -3704,7 +3704,7 @@ const deleteBtn = card.querySelector("[data-delete-id]");
 
     analyticsDonut.innerHTML = `
       <div class="analytics-panel">
-        <div class="analytics-panel__eyebrow">\u0420\u0430\u0441\u0445\u043E\u0434\u044B \u043F\u043E \u043A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u044F\u043C</div>
+        <div class="analytics-panel__eyebrow">Ð Ð°ÑÑÐ¾Ð´Ñ Ð¿Ð¾ ÐºÐ°ÑÐµÐ³Ð¾ÑÐ¸ÑÐ¼</div>
 
         <div class="analytics-panel__headline">
           <div class="analytics-panel__total">${formatMoney(totalExpense)}</div>
@@ -3720,12 +3720,12 @@ const deleteBtn = card.querySelector("[data-delete-id]");
             <div class="analytics-breakdown-row__rank analytics-breakdown-row__rank--leader">#1</div>
 
             <div class="analytics-leader__content">
-              <div class="analytics-leader__label">\u041B\u0438\u0434\u0435\u0440</div>
+              <div class="analytics-leader__label">ÐÐ¸Ð´ÐµÑ</div>
               <div class="analytics-leader__title">
-  ${topItem.is_required ? '<span class="analytics-required-flag">\uD83D\uDEA9</span>' : ""}
+  ${topItem.is_required ? '<span class="analytics-required-flag">ð©</span>' : ""}
   ${escapeHtml(topItem.icon)} ${escapeHtml(topItem.name)}
 </div>
-              <div class="analytics-leader__meta">${topPercent}% \u043E\u0442 \u0440\u0430\u0441\u0445\u043E\u0434\u043E\u0432</div>
+              <div class="analytics-leader__meta">${topPercent}% Ð¾Ñ ÑÐ°ÑÑÐ¾Ð´Ð¾Ð²</div>
             </div>
           </div>
 
@@ -3753,10 +3753,10 @@ const deleteBtn = card.querySelector("[data-delete-id]");
               <div class="analytics-breakdown-row__rank">#${index + 2}</div>
               <div class="analytics-breakdown-row__body">
                 <div class="analytics-breakdown-row__title">
-  ${item.is_required ? '<span class="analytics-required-flag">\uD83D\uDEA9</span>' : ""}
+  ${item.is_required ? '<span class="analytics-required-flag">ð©</span>' : ""}
   ${escapeHtml(item.icon)} ${escapeHtml(item.name)}
 </div>
-                <div class="analytics-breakdown-row__subtitle">${percent}% \u043E\u0442 \u0440\u0430\u0441\u0445\u043E\u0434\u043E\u0432</div>
+                <div class="analytics-breakdown-row__subtitle">${percent}% Ð¾Ñ ÑÐ°ÑÑÐ¾Ð´Ð¾Ð²</div>
               </div>
             </div>
             <div class="analytics-breakdown-row__value ${exceeded ? "analytics-limit-value--danger" : ""}">
@@ -3797,7 +3797,7 @@ const deleteBtn = card.querySelector("[data-delete-id]");
 }
 
   const summary = getInsightsSummary();
-  const periodLabel = getInsightsPeriodLabel() || "\u0437\u0430 \u043F\u0435\u0440\u0438\u043E\u0434";
+  const periodLabel = getInsightsPeriodLabel() || "Ð·Ð° Ð¿ÐµÑÐ¸Ð¾Ð´";
 
   if (insightsPeriodLabel) {
   insightsPeriodLabel.textContent = periodLabel;
@@ -3833,13 +3833,13 @@ const deleteBtn = card.querySelector("[data-delete-id]");
   if (insightsRecommendationText) {
   if (summary.shortageBeforeSafeSaving > 0) {
     insightsRecommendationText.textContent =
-      `\u041E\u0442\u043A\u043B\u0430\u0434\u044B\u0432\u0430\u0442\u044C \u0441\u0435\u0439\u0447\u0430\u0441 \u0440\u0430\u043D\u043E. \u041F\u043E\u0441\u043B\u0435 \u0443\u0447\u0451\u0442\u0430 \u043E\u0431\u044F\u0437\u0430\u0442\u0435\u043B\u044C\u043D\u044B\u0445 \u043F\u043B\u0430\u0442\u0435\u0436\u0435\u0439 \u0438 \u043E\u0441\u0442\u0430\u0442\u043A\u043E\u0432 \u043B\u0438\u043C\u0438\u0442\u043E\u0432 \u043D\u0435 \u0445\u0432\u0430\u0442\u0430\u0435\u0442 ${formatMoney(summary.shortageBeforeSafeSaving)}.`;
+      `ÐÑÐºÐ»Ð°Ð´ÑÐ²Ð°ÑÑ ÑÐµÐ¹ÑÐ°Ñ ÑÐ°Ð½Ð¾. ÐÐ¾ÑÐ»Ðµ ÑÑÑÑÐ° Ð¾Ð±ÑÐ·Ð°ÑÐµÐ»ÑÐ½ÑÑ Ð¿Ð»Ð°ÑÐµÐ¶ÐµÐ¹ Ð¸ Ð¾ÑÑÐ°ÑÐºÐ¾Ð² Ð»Ð¸Ð¼Ð¸ÑÐ¾Ð² Ð½Ðµ ÑÐ²Ð°ÑÐ°ÐµÑ ${formatMoney(summary.shortageBeforeSafeSaving)}.`;
   } else if (summary.canSaveNow > 0) {
     insightsRecommendationText.textContent =
-      `\u0421\u0435\u0439\u0447\u0430\u0441 \u043C\u043E\u0436\u043D\u043E \u043E\u0442\u043B\u043E\u0436\u0438\u0442\u044C ${formatMoney(summary.canSaveNow)}. \u0412 \u043E\u0431\u044F\u0437\u0430\u0442\u0435\u043B\u044C\u043D\u044B\u0445 \u0443\u0436\u0435 \u0443\u0447\u0442\u0435\u043D\u043E \u043F\u043E\u043A\u0440\u044B\u0442\u0438\u0435 \u043F\u043B\u0430\u0442\u0435\u0436\u0435\u0439 \u043F\u0440\u0438\u0432\u044F\u0437\u0430\u043D\u043D\u044B\u043C\u0438 \u043D\u0430\u043A\u043E\u043F\u043B\u0435\u043D\u0438\u044F\u043C\u0438.`;
+      `Ð¡ÐµÐ¹ÑÐ°Ñ Ð¼Ð¾Ð¶Ð½Ð¾ Ð¾ÑÐ»Ð¾Ð¶Ð¸ÑÑ ${formatMoney(summary.canSaveNow)}. Ð Ð¾Ð±ÑÐ·Ð°ÑÐµÐ»ÑÐ½ÑÑ ÑÐ¶Ðµ ÑÑÑÐµÐ½Ð¾ Ð¿Ð¾ÐºÑÑÑÐ¸Ðµ Ð¿Ð»Ð°ÑÐµÐ¶ÐµÐ¹ Ð¿ÑÐ¸Ð²ÑÐ·Ð°Ð½Ð½ÑÐ¼Ð¸ Ð½Ð°ÐºÐ¾Ð¿Ð»ÐµÐ½Ð¸ÑÐ¼Ð¸.`;
   } else {
     insightsRecommendationText.textContent =
-      `\u0421\u0432\u043E\u0431\u043E\u0434\u043D\u044B\u0435 \u0434\u0435\u043D\u044C\u0433\u0438 \u0441\u0435\u0439\u0447\u0430\u0441 \u043F\u043E\u043B\u043D\u043E\u0441\u0442\u044C\u044E \u0437\u0430\u043D\u044F\u0442\u044B \u043E\u0431\u044F\u0437\u0430\u0442\u0435\u043B\u044C\u0441\u0442\u0432\u0430\u043C\u0438 \u0442\u0435\u043A\u0443\u0449\u0435\u0433\u043E \u043C\u0435\u0441\u044F\u0446\u0430 \u0438 \u043E\u0441\u0442\u0430\u0442\u043A\u0430\u043C\u0438 \u043B\u0438\u043C\u0438\u0442\u043E\u0432.`;
+      `Ð¡Ð²Ð¾Ð±Ð¾Ð´Ð½ÑÐµ Ð´ÐµÐ½ÑÐ³Ð¸ ÑÐµÐ¹ÑÐ°Ñ Ð¿Ð¾Ð»Ð½Ð¾ÑÑÑÑ Ð·Ð°Ð½ÑÑÑ Ð¾Ð±ÑÐ·Ð°ÑÐµÐ»ÑÑÑÐ²Ð°Ð¼Ð¸ ÑÐµÐºÑÑÐµÐ³Ð¾ Ð¼ÐµÑÑÑÐ° Ð¸ Ð¾ÑÑÐ°ÑÐºÐ°Ð¼Ð¸ Ð»Ð¸Ð¼Ð¸ÑÐ¾Ð².`;
   }
 }
 
@@ -3855,7 +3855,7 @@ const deleteBtn = card.querySelector("[data-delete-id]");
           <div class="list-title-row">
             <h3 class="list-title">${escapeHtml(bucket.name)}</h3>
           </div>
-          <p class="list-subtitle">${bucket.is_locked ? "\u0421\u0438\u0441\u0442\u0435\u043C\u043D\u043E\u0435 \u043D\u0430\u043A\u043E\u043F\u043B\u0435\u043D\u0438\u0435" : "\u041D\u0430\u043A\u043E\u043F\u043B\u0435\u043D\u0438\u0435"}</p>
+          <p class="list-subtitle">${bucket.is_locked ? "Ð¡Ð¸ÑÑÐµÐ¼Ð½Ð¾Ðµ Ð½Ð°ÐºÐ¾Ð¿Ð»ÐµÐ½Ð¸Ðµ" : "ÐÐ°ÐºÐ¾Ð¿Ð»ÐµÐ½Ð¸Ðµ"}</p>
         </div>
         <div class="list-right">
           <p class="list-value">${formatMoney(getSafeBucketBalance(bucket.id))}</p>
@@ -3894,7 +3894,7 @@ const deleteBtn = card.querySelector("[data-delete-id]");
   const comment = commentInput.value.trim();
 
   if (!amount || amount <= 0) {
-    alert("\u0412\u0432\u0435\u0434\u0438 \u0441\u0443\u043C\u043C\u0443");
+    alert("ÐÐ²ÐµÐ´Ð¸ ÑÑÐ¼Ð¼Ñ");
     return null;
   }
 
@@ -3922,12 +3922,12 @@ const deleteBtn = card.querySelector("[data-delete-id]");
       isVaultAccountId(toAccountId) ? toSafeBucketSelect.value : null;
 
     if (!fromAccountId) {
-      alert("\u0412\u044B\u0431\u0435\u0440\u0438 \u0441\u0447\u0451\u0442 \u0441\u043F\u0438\u0441\u0430\u043D\u0438\u044F");
+      alert("ÐÑÐ±ÐµÑÐ¸ ÑÑÑÑ ÑÐ¿Ð¸ÑÐ°Ð½Ð¸Ñ");
       return null;
     }
 
     if (!toAccountId) {
-      alert("\u0412\u044B\u0431\u0435\u0440\u0438 \u0441\u0447\u0451\u0442 \u0437\u0430\u0447\u0438\u0441\u043B\u0435\u043D\u0438\u044F");
+      alert("ÐÑÐ±ÐµÑÐ¸ ÑÑÑÑ Ð·Ð°ÑÐ¸ÑÐ»ÐµÐ½Ð¸Ñ");
       return null;
     }
 
@@ -3937,25 +3937,25 @@ const deleteBtn = card.querySelector("[data-delete-id]");
         (fromSafeBucketId && toSafeBucketId && fromSafeBucketId === toSafeBucketId);
 
       if (sameBuckets) {
-        alert("\u0421\u0447\u0435\u0442\u0430 \u0434\u043E\u043B\u0436\u043D\u044B \u0431\u044B\u0442\u044C \u0440\u0430\u0437\u043D\u044B\u043C\u0438");
+        alert("Ð¡ÑÐµÑÐ° Ð´Ð¾Ð»Ð¶Ð½Ñ Ð±ÑÑÑ ÑÐ°Ð·Ð½ÑÐ¼Ð¸");
         return null;
       }
     }
 
     if (isVaultAccountId(fromAccountId) && !fromSafeBucketId) {
-      alert("\u0412\u044B\u0431\u0435\u0440\u0438 \u043D\u0430\u043A\u043E\u043F\u043B\u0435\u043D\u0438\u0435 \u0441\u043F\u0438\u0441\u0430\u043D\u0438\u044F");
+      alert("ÐÑÐ±ÐµÑÐ¸ Ð½Ð°ÐºÐ¾Ð¿Ð»ÐµÐ½Ð¸Ðµ ÑÐ¿Ð¸ÑÐ°Ð½Ð¸Ñ");
       return null;
     }
 
     if (isVaultAccountId(toAccountId) && !toSafeBucketId) {
-      alert("\u0412\u044B\u0431\u0435\u0440\u0438 \u043D\u0430\u043A\u043E\u043F\u043B\u0435\u043D\u0438\u0435 \u0437\u0430\u0447\u0438\u0441\u043B\u0435\u043D\u0438\u044F");
+      alert("ÐÑÐ±ÐµÑÐ¸ Ð½Ð°ÐºÐ¾Ð¿Ð»ÐµÐ½Ð¸Ðµ Ð·Ð°ÑÐ¸ÑÐ»ÐµÐ½Ð¸Ñ");
       return null;
     }
 
     return {
       id: editingTransactionId || crypto.randomUUID(),
       type: "transfer",
-      title: comment || "\u041F\u0435\u0440\u0435\u0432\u043E\u0434",
+      title: comment || "ÐÐµÑÐµÐ²Ð¾Ð´",
       amount,
       from_account_id: fromAccountId,
       to_account_id: toAccountId,
@@ -3975,7 +3975,7 @@ const deleteBtn = card.querySelector("[data-delete-id]");
   const account = getAccountNameById(accountId);
 
   if (!accountId) {
-    alert("\u0412\u044B\u0431\u0435\u0440\u0438 \u0441\u0447\u0451\u0442");
+    alert("ÐÑÐ±ÐµÑÐ¸ ÑÑÑÑ");
     return null;
   }
 
@@ -3983,7 +3983,7 @@ const deleteBtn = card.querySelector("[data-delete-id]");
     return {
       id: editingTransactionId || crypto.randomUUID(),
       type: "income",
-      title: comment || "\u041D\u043E\u0432\u044B\u0439 \u0434\u043E\u0445\u043E\u0434",
+      title: comment || "ÐÐ¾Ð²ÑÐ¹ Ð´Ð¾ÑÐ¾Ð´",
       amount,
       account_id: accountId,
       account,
@@ -4004,21 +4004,21 @@ const deleteBtn = card.querySelector("[data-delete-id]");
   const categoryId = categorySelect.value;
 
   if (!categoryId) {
-    alert("\u0412\u044B\u0431\u0435\u0440\u0438 \u043A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u044E");
+    alert("ÐÑÐ±ÐµÑÐ¸ ÐºÐ°ÑÐµÐ³Ð¾ÑÐ¸Ñ");
     return null;
   }
 
   const freeSafeBucket = isVaultAccountId(accountId) ? getFreeSafeBucket() : null;
 
   if (isVaultAccountId(accountId) && !freeSafeBucket) {
-    alert("\u041D\u0435 \u043D\u0430\u0439\u0434\u0435\u043D\u043E \u043D\u0430\u043A\u043E\u043F\u043B\u0435\u043D\u0438\u0435, \u043F\u043E\u043C\u0435\u0447\u0435\u043D\u043D\u043E\u0435 \u043A\u0430\u043A \u0441\u0432\u043E\u0431\u043E\u0434\u043D\u044B\u0435 \u0434\u0435\u043D\u044C\u0433\u0438.");
+    alert("ÐÐµ Ð½Ð°Ð¹Ð´ÐµÐ½Ð¾ Ð½Ð°ÐºÐ¾Ð¿Ð»ÐµÐ½Ð¸Ðµ, Ð¿Ð¾Ð¼ÐµÑÐµÐ½Ð½Ð¾Ðµ ÐºÐ°Ðº ÑÐ²Ð¾Ð±Ð¾Ð´Ð½ÑÐµ Ð´ÐµÐ½ÑÐ³Ð¸.");
     return null;
   }
 
   return {
     id: editingTransactionId || crypto.randomUUID(),
     type: "expense",
-    title: comment || "\u041D\u043E\u0432\u0430\u044F \u0442\u0440\u0430\u0442\u0430",
+    title: comment || "ÐÐ¾Ð²Ð°Ñ ÑÑÐ°ÑÐ°",
     amount,
     account_id: accountId,
     account,
@@ -4045,7 +4045,7 @@ const deleteBtn = card.querySelector("[data-delete-id]");
         .eq("id", editingTransactionId);
 
       if (error) {
-        alert("\u041E\u0448\u0438\u0431\u043A\u0430 \u043E\u0431\u043D\u043E\u0432\u043B\u0435\u043D\u0438\u044F \u043E\u043F\u0435\u0440\u0430\u0446\u0438\u0438");
+        alert("ÐÑÐ¸Ð±ÐºÐ° Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ñ Ð¾Ð¿ÐµÑÐ°ÑÐ¸Ð¸");
         console.error(error);
         return;
       }
@@ -4055,7 +4055,7 @@ const deleteBtn = card.querySelector("[data-delete-id]");
         .insert(transaction);
 
       if (error) {
-        alert("\u041E\u0448\u0438\u0431\u043A\u0430 \u0441\u043E\u0445\u0440\u0430\u043D\u0435\u043D\u0438\u044F \u043E\u043F\u0435\u0440\u0430\u0446\u0438\u0438");
+        alert("ÐÑÐ¸Ð±ÐºÐ° ÑÐ¾ÑÑÐ°Ð½ÐµÐ½Ð¸Ñ Ð¾Ð¿ÐµÑÐ°ÑÐ¸Ð¸");
         console.error(error);
         return;
       }
@@ -4069,7 +4069,7 @@ const deleteBtn = card.querySelector("[data-delete-id]");
   async function deleteTransaction() {
     if (!editingTransactionId) return;
 
-    const ok = confirm("\u0423\u0434\u0430\u043B\u0438\u0442\u044C \u044D\u0442\u0443 \u043E\u043F\u0435\u0440\u0430\u0446\u0438\u044E?");
+    const ok = confirm("Ð£Ð´Ð°Ð»Ð¸ÑÑ ÑÑÑ Ð¾Ð¿ÐµÑÐ°ÑÐ¸Ñ?");
     if (!ok) return;
 
     const { error } = await supabaseClient
@@ -4078,7 +4078,7 @@ const deleteBtn = card.querySelector("[data-delete-id]");
       .eq("id", editingTransactionId);
 
     if (error) {
-      alert("\u041E\u0448\u0438\u0431\u043A\u0430 \u0443\u0434\u0430\u043B\u0435\u043D\u0438\u044F \u043E\u043F\u0435\u0440\u0430\u0446\u0438\u0438");
+      alert("ÐÑÐ¸Ð±ÐºÐ° ÑÐ´Ð°Ð»ÐµÐ½Ð¸Ñ Ð¾Ð¿ÐµÑÐ°ÑÐ¸Ð¸");
       console.error(error);
       return;
     }
@@ -4090,10 +4090,10 @@ const deleteBtn = card.querySelector("[data-delete-id]");
 
   async function addCategory() {
     const name = newCategoryNameInput.value.trim();
-    const icon = newCategoryIconInput.value.trim() || "\uD83D\uDCE6";
+    const icon = newCategoryIconInput.value.trim() || "ð¦";
 
     if (!name) {
-      alert("\u0412\u0432\u0435\u0434\u0438\u0442\u0435 \u043D\u0430\u0437\u0432\u0430\u043D\u0438\u0435 \u043A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u0438");
+      alert("ÐÐ²ÐµÐ´Ð¸ÑÐµ Ð½Ð°Ð·Ð²Ð°Ð½Ð¸Ðµ ÐºÐ°ÑÐµÐ³Ð¾ÑÐ¸Ð¸");
       return;
     }
 
@@ -4111,7 +4111,7 @@ const deleteBtn = card.querySelector("[data-delete-id]");
       .insert(newCategory);
 
     if (error) {
-      alert("\u041E\u0448\u0438\u0431\u043A\u0430 \u0434\u043E\u0431\u0430\u0432\u043B\u0435\u043D\u0438\u044F \u043A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u0438");
+      alert("ÐÑÐ¸Ð±ÐºÐ° Ð´Ð¾Ð±Ð°Ð²Ð»ÐµÐ½Ð¸Ñ ÐºÐ°ÑÐµÐ³Ð¾ÑÐ¸Ð¸");
       console.error(error);
       return;
     }
@@ -4131,17 +4131,17 @@ async function saveBudgetLimit() {
   const amount = Number(budgetAmountInput.value.trim());
 
   if (!nextName) {
-    alert("\u0412\u0432\u0435\u0434\u0438 \u043D\u0430\u0437\u0432\u0430\u043D\u0438\u0435 \u043A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u0438");
+    alert("ÐÐ²ÐµÐ´Ð¸ Ð½Ð°Ð·Ð²Ð°Ð½Ð¸Ðµ ÐºÐ°ÑÐµÐ³Ð¾ÑÐ¸Ð¸");
     return;
   }
 
   if (!nextIcon) {
-    alert("\u0412\u0432\u0435\u0434\u0438 \u044D\u043C\u043E\u0434\u0437\u0438 \u043A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u0438");
+    alert("ÐÐ²ÐµÐ´Ð¸ ÑÐ¼Ð¾Ð´Ð·Ð¸ ÐºÐ°ÑÐµÐ³Ð¾ÑÐ¸Ð¸");
     return;
   }
 
   if (Number.isNaN(amount) || amount < 0) {
-    alert("\u0412\u0432\u0435\u0434\u0438 \u043A\u043E\u0440\u0440\u0435\u043A\u0442\u043D\u044B\u0439 \u043B\u0438\u043C\u0438\u0442");
+    alert("ÐÐ²ÐµÐ´Ð¸ ÐºÐ¾ÑÑÐµÐºÑÐ½ÑÐ¹ Ð»Ð¸Ð¼Ð¸Ñ");
     return;
   }
 
@@ -4154,7 +4154,7 @@ async function saveBudgetLimit() {
     .eq("id", activeBudgetCategoryId);
 
   if (categoryError) {
-    alert("\u041E\u0448\u0438\u0431\u043A\u0430 \u043E\u0431\u043D\u043E\u0432\u043B\u0435\u043D\u0438\u044F \u043A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u0438");
+    alert("ÐÑÐ¸Ð±ÐºÐ° Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ñ ÐºÐ°ÑÐµÐ³Ð¾ÑÐ¸Ð¸");
     console.error(categoryError);
     return;
   }
@@ -4168,7 +4168,7 @@ async function saveBudgetLimit() {
       .eq("category_id", activeBudgetCategoryId);
 
     if (error) {
-      alert("\u041E\u0448\u0438\u0431\u043A\u0430 \u043E\u0431\u043D\u043E\u0432\u043B\u0435\u043D\u0438\u044F \u043B\u0438\u043C\u0438\u0442\u0430");
+      alert("ÐÑÐ¸Ð±ÐºÐ° Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ñ Ð»Ð¸Ð¼Ð¸ÑÐ°");
       console.error(error);
       return;
     }
@@ -4181,7 +4181,7 @@ async function saveBudgetLimit() {
       });
 
     if (error) {
-      alert("\u041E\u0448\u0438\u0431\u043A\u0430 \u0441\u043E\u0445\u0440\u0430\u043D\u0435\u043D\u0438\u044F \u043B\u0438\u043C\u0438\u0442\u0430");
+      alert("ÐÑÐ¸Ð±ÐºÐ° ÑÐ¾ÑÑÐ°Ð½ÐµÐ½Ð¸Ñ Ð»Ð¸Ð¼Ð¸ÑÐ°");
       console.error(error);
       return;
     }
@@ -4195,7 +4195,7 @@ async function saveBudgetLimit() {
   async function deleteBudgetLimit() {
     if (!activeBudgetCategoryId) return;
 
-    const ok = confirm("\u0423\u0434\u0430\u043B\u0438\u0442\u044C \u043B\u0438\u043C\u0438\u0442 \u0434\u043B\u044F \u044D\u0442\u043E\u0439 \u043A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u0438?");
+    const ok = confirm("Ð£Ð´Ð°Ð»Ð¸ÑÑ Ð»Ð¸Ð¼Ð¸Ñ Ð´Ð»Ñ ÑÑÐ¾Ð¹ ÐºÐ°ÑÐµÐ³Ð¾ÑÐ¸Ð¸?");
     if (!ok) return;
 
     const { error } = await supabaseClient
@@ -4204,7 +4204,7 @@ async function saveBudgetLimit() {
       .eq("category_id", activeBudgetCategoryId);
 
     if (error) {
-      alert("\u041E\u0448\u0438\u0431\u043A\u0430 \u0443\u0434\u0430\u043B\u0435\u043D\u0438\u044F \u043B\u0438\u043C\u0438\u0442\u0430");
+      alert("ÐÑÐ¸Ð±ÐºÐ° ÑÐ´Ð°Ð»ÐµÐ½Ð¸Ñ Ð»Ð¸Ð¼Ð¸ÑÐ°");
       console.error(error);
       return;
     }
@@ -4233,37 +4233,37 @@ async function saveBudgetLimit() {
 
   if (accountsError) {
     console.error(accountsError);
-    alert("\u041E\u0448\u0438\u0431\u043A\u0430 \u0437\u0430\u0433\u0440\u0443\u0437\u043A\u0438 \u0441\u0447\u0435\u0442\u043E\u0432 \u0438\u0437 Supabase");
+    alert("ÐÑÐ¸Ð±ÐºÐ° Ð·Ð°Ð³ÑÑÐ·ÐºÐ¸ ÑÑÐµÑÐ¾Ð² Ð¸Ð· Supabase");
     return;
   }
 
   if (categoriesError) {
     console.error(categoriesError);
-    alert("\u041E\u0448\u0438\u0431\u043A\u0430 \u0437\u0430\u0433\u0440\u0443\u0437\u043A\u0438 \u043A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u0439 \u0438\u0437 Supabase");
+    alert("ÐÑÐ¸Ð±ÐºÐ° Ð·Ð°Ð³ÑÑÐ·ÐºÐ¸ ÐºÐ°ÑÐµÐ³Ð¾ÑÐ¸Ð¹ Ð¸Ð· Supabase");
     return;
   }
 
   if (transactionsError) {
     console.error(transactionsError);
-    alert("\u041E\u0448\u0438\u0431\u043A\u0430 \u0437\u0430\u0433\u0440\u0443\u0437\u043A\u0438 \u043E\u043F\u0435\u0440\u0430\u0446\u0438\u0439 \u0438\u0437 Supabase");
+    alert("ÐÑÐ¸Ð±ÐºÐ° Ð·Ð°Ð³ÑÑÐ·ÐºÐ¸ Ð¾Ð¿ÐµÑÐ°ÑÐ¸Ð¹ Ð¸Ð· Supabase");
     return;
   }
 
   if (budgetLimitsError) {
     console.error(budgetLimitsError);
-    alert("\u041E\u0448\u0438\u0431\u043A\u0430 \u0437\u0430\u0433\u0440\u0443\u0437\u043A\u0438 \u043B\u0438\u043C\u0438\u0442\u043E\u0432 \u0431\u044E\u0434\u0436\u0435\u0442\u0430 \u0438\u0437 Supabase");
+    alert("ÐÑÐ¸Ð±ÐºÐ° Ð·Ð°Ð³ÑÑÐ·ÐºÐ¸ Ð»Ð¸Ð¼Ð¸ÑÐ¾Ð² Ð±ÑÐ´Ð¶ÐµÑÐ° Ð¸Ð· Supabase");
     return;
   }
 
   if (safeBucketsError) {
     console.error(safeBucketsError);
-    alert("\u041E\u0448\u0438\u0431\u043A\u0430 \u0437\u0430\u0433\u0440\u0443\u0437\u043A\u0438 \u0441\u0435\u0439\u0444\u043E\u0432 \u0438\u0437 Supabase");
+    alert("ÐÑÐ¸Ð±ÐºÐ° Ð·Ð°Ð³ÑÑÐ·ÐºÐ¸ ÑÐµÐ¹ÑÐ¾Ð² Ð¸Ð· Supabase");
     return;
   }
 
   if (appMetaError) {
     console.error(appMetaError);
-    alert("\u041E\u0448\u0438\u0431\u043A\u0430 \u0437\u0430\u0433\u0440\u0443\u0437\u043A\u0438 \u0441\u043B\u0443\u0436\u0435\u0431\u043D\u044B\u0445 \u0434\u0430\u043D\u043D\u044B\u0445 \u043F\u0440\u0438\u043B\u043E\u0436\u0435\u043D\u0438\u044F");
+    alert("ÐÑÐ¸Ð±ÐºÐ° Ð·Ð°Ð³ÑÑÐ·ÐºÐ¸ ÑÐ»ÑÐ¶ÐµÐ±Ð½ÑÑ Ð´Ð°Ð½Ð½ÑÑ Ð¿ÑÐ¸Ð»Ð¾Ð¶ÐµÐ½Ð¸Ñ");
     return;
   }
 
@@ -4535,4 +4535,140 @@ insightsRangeToInput?.addEventListener("change", () => {
   closeBudgetModalBtn?.addEventListener("click", closeBudgetModal);
   saveBudgetBtn?.addEventListener("click", saveBudgetLimit);
   deleteBudgetBtn?.addEventListener("click", deleteBudgetLimit);
-  closeSafeBucketsModalBtn?.ad
+  closeSafeBucketsModalBtn?.addEventListener("click", closeSafeBucketsModal);
+  openMandatoryPaymentsModalBtn?.addEventListener("click", openMandatoryPaymentsModal);
+closeMandatoryPaymentsModalBtn?.addEventListener("click", closeMandatoryPaymentsModal);
+addMandatoryPaymentBtn?.addEventListener("click", addMandatoryPayment);
+addSafeBucketBtn?.addEventListener("click", addSafeBucket);
+closeSafeBucketAmountModalBtn?.addEventListener("click", closeSafeBucketAmountModal);
+cancelSafeBucketAmountBtn?.addEventListener("click", closeSafeBucketAmountModal);
+saveSafeBucketAmountBtn?.addEventListener("click", saveSafeBucketAmount);
+deleteSafeBucketBtn?.addEventListener("click", deleteSafeBucketFromModal);
+safeBucketsRateBtn?.addEventListener("click", openSafeInterestRateModal);
+closeSafeInterestRateModalBtn?.addEventListener("click", closeSafeInterestRateModal);
+cancelSafeInterestRateBtn?.addEventListener("click", closeSafeInterestRateModal);
+saveSafeInterestRateBtn?.addEventListener("click", saveSafeInterestRate);
+safeInterestRateModal?.addEventListener("click", (event) => {
+  if (event.target === safeInterestRateModal) closeSafeInterestRateModal();
+});
+
+  modal?.addEventListener("click", (event) => {
+    if (event.target === modal) closeModal();
+  });
+
+  budgetModal?.addEventListener("click", (event) => {
+    if (event.target === budgetModal) closeBudgetModal();
+  });
+  mandatoryPaymentsModal?.addEventListener("click", (event) => {
+  if (event.target === mandatoryPaymentsModal) closeMandatoryPaymentsModal();
+});
+  
+  safeBucketsModal?.addEventListener("click", (event) => {
+  if (event.target === safeBucketsModal) closeSafeBucketsModal();
+});
+
+  safeBucketAmountModal?.addEventListener("click", (event) => {
+  if (event.target === safeBucketAmountModal) closeSafeBucketAmountModal();
+});
+
+  closeAnalyticsCategoryModalBtn?.addEventListener("click", closeAnalyticsCategoryModal);
+
+  analyticsCategoryModal?.addEventListener("click", (event) => {
+    if (event.target === analyticsCategoryModal) closeAnalyticsCategoryModal();
+  });
+
+  document.addEventListener("click", (event) => {
+  if (isAnalyticsMonthWheelOpen && analyticsMonthWheelWrap) {
+    const clickedInsidePopover = analyticsMonthWheelWrap.contains(event.target);
+    const clickedMonthBtn = analyticsMonthBtn?.contains(event.target);
+
+    if (!clickedInsidePopover && !clickedMonthBtn) {
+      closeAnalyticsMonthWheel();
+    }
+  }
+
+  if (isInsightsMonthWheelOpen && insightsMonthWheelWrap) {
+    const clickedInsideInsightsPopover = insightsMonthWheelWrap.contains(event.target);
+    const clickedInsightsMonthBtn = insightsMonthBtn?.contains(event.target);
+
+    if (!clickedInsideInsightsPopover && !clickedInsightsMonthBtn) {
+      closeInsightsMonthWheel();
+    }
+  }
+});
+
+  document.addEventListener("keydown", (event) => {
+  if (event.key !== "Escape") return;
+
+  if (modal && !modal.classList.contains("hidden")) {
+    closeModal();
+    return;
+  }
+
+  if (budgetModal && !budgetModal.classList.contains("hidden")) {
+    closeBudgetModal();
+    return;
+  }
+  
+  if (accountModal && !accountModal.classList.contains("hidden")) {
+  closeAccountModal();
+  return;
+}
+
+  if (safeBucketsModal && !safeBucketsModal.classList.contains("hidden")) {
+    closeSafeBucketsModal();
+    return;
+  }
+
+  if (safeBucketAmountModal && !safeBucketAmountModal.classList.contains("hidden")) {
+    closeSafeBucketAmountModal();
+    return;
+  }
+
+  if (safeInterestRateModal && !safeInterestRateModal.classList.contains("hidden")) {
+    closeSafeInterestRateModal();
+    return;
+  }
+
+  if (analyticsCategoryModal && !analyticsCategoryModal.classList.contains("hidden")) {
+    closeAnalyticsCategoryModal();
+    return;
+  }
+
+  if (mandatoryPaymentsModal && !mandatoryPaymentsModal.classList.contains("hidden")) {
+    closeMandatoryPaymentsModal();
+    return;
+  }
+
+  if (faqModal && !faqModal.classList.contains("hidden")) {
+    closeFaqModal();
+    return;
+  }
+  
+  if (analyticsFiltersModal && !analyticsFiltersModal.classList.contains("hidden")) {
+  closeAnalyticsFiltersModal();
+  return;
+}
+
+if (insightsFiltersModal && !insightsFiltersModal.classList.contains("hidden")) {
+  closeInsightsFiltersModal();
+  return;
+}
+
+  if (isInsightsMonthWheelOpen) {
+    closeInsightsMonthWheel();
+    return;
+  }
+
+  if (isAnalyticsMonthWheelOpen) {
+    closeAnalyticsMonthWheel();
+    return;
+  }
+});
+
+  await loadDataFromSupabase();
+  await applySafeInterestIfNeeded();
+  await loadDataFromSupabase();
+  renderAll();
+  showWalletView();
+});
