@@ -1648,11 +1648,11 @@ function getInsightsFilteredTransactions() {
       "Это все расходы за выбранный период по категориям, которые не помечены как обязательные.",
   },
 
-  saved_to_safes: {
-    title: "Отложено в сейфы",
-    text:
-      "Это сколько денег ты перевёл в сейфы из обычных счетов за выбранный период. Внутренние перекладывания между самими сейфами сюда не входят.",
-  },
+saved_to_safes: {
+  title: "Отложено в накопления",
+  text:
+    "Это сколько денег ты перевёл в накопления из обычных счетов за выбранный период. Внутренние перекладывания между самими накоплениями сюда не входят.",
+},
 
   remaining_limits: {
     title: "Остаток лимитов",
@@ -1675,7 +1675,7 @@ function getInsightsFilteredTransactions() {
   free_money: {
   title: "Свободные деньги",
   text:
-  "Это деньги из счетов и сейфов, которые помечены как доступные для обычных трат.",
+  "Это деньги из счетов и накоплений, которые помечены как доступные для обычных трат.",
 },
 
   can_save_now: {
@@ -1739,7 +1739,7 @@ function getSavedToSafesBreakdown() {
   });
 
   return items.map((transaction) => ({
-    title: transaction.title || "Перевод в сейф",
+    title: transaction.title || "Перевод в накопления",
     amount: roundToTwo(Number(transaction.amount) || 0),
     date: formatDateShort(transaction.created_at),
   }));
@@ -1780,7 +1780,7 @@ function buildFaqFormulaText(faqKey) {
     const rows = getSavedToSafesBreakdown();
 
     if (!rows.length) {
-      return `${formatMoney(0)} = за выбранный период не было переводов в сейфы`;
+      return `${formatMoney(0)} = за выбранный период не было переводов в накопления`;
     }
 
     const parts = rows.map((item) => `${formatMoney(item.amount)} (${item.date})`);
@@ -3573,7 +3573,7 @@ const deleteBtn = card.querySelector("[data-delete-id]");
       `Откладывать сейчас рано. После учёта обязательных платежей и остатков лимитов не хватает ${formatMoney(summary.shortageBeforeSafeSaving)}.`;
   } else if (summary.canSaveNow > 0) {
     insightsRecommendationText.textContent =
-      `Сейчас можно отложить ${formatMoney(summary.canSaveNow)}. В обязательных уже учтено покрытие платежей привязанными сейфами.`;
+      `Сейчас можно отложить ${formatMoney(summary.canSaveNow)}. В обязательных уже учтено покрытие платежей привязанными накоплениями.`;
   } else {
     insightsRecommendationText.textContent =
       `Свободные деньги сейчас полностью заняты обязательствами текущего месяца и остатками лимитов.`;
@@ -3592,7 +3592,7 @@ const deleteBtn = card.querySelector("[data-delete-id]");
           <div class="list-title-row">
             <h3 class="list-title">${escapeHtml(bucket.name)}</h3>
           </div>
-          <p class="list-subtitle">${bucket.is_locked ? "Системный сейф" : "Внутренний сейф"}</p>
+          <p class="list-subtitle">${bucket.is_locked ? "Системное накопление" : "Накопление"}</p>
         </div>
         <div class="list-right">
           <p class="list-value">${formatMoney(getSafeBucketBalance(bucket.id))}</p>
