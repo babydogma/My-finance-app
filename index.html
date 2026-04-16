@@ -45,10 +45,25 @@
 
       <!-- ACCOUNTS -->
       <section class="section">
-        <div class="section-head">
-          <h2 class="section-title">Счета</h2>
-          <div class="section-note" id="accountsTotal">Всего: 0 ₽</div>
-        </div>
+        <div class="section-head accounts-section-head">
+  <h2 class="section-title">Счета</h2>
+
+  <div class="accounts-section-head__right">
+    <div class="section-note" id="accountsTotal">Всего: 0 ₽</div>
+
+    <button
+      class="icon-action-btn icon-action-btn--primary"
+      type="button"
+      id="openCreateAccountModalBtn"
+      aria-label="Добавить счёт"
+      title="Добавить счёт"
+    >
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 5v14M5 12h14" />
+      </svg>
+    </button>
+  </div>
+</div>
 
         <div class="list" id="accountsList"></div>
       </section>
@@ -631,10 +646,11 @@
       Этот счёт будет подставляться по умолчанию в расходах и доходах.
     </div>
 
-    <div class="modal-actions">
-      <button class="btn btn-secondary" type="button" id="cancelAccountModalBtn">Отмена</button>
-      <button class="btn btn-primary" type="button" id="saveAccountModalBtn">Сохранить</button>
-    </div>
+    <div class="modal-actions modal-actions--triple">
+  <button class="btn btn-danger hidden" type="button" id="deleteAccountModalBtn">Удалить</button>
+  <button class="btn btn-secondary" type="button" id="cancelAccountModalBtn">Отмена</button>
+  <button class="btn btn-primary" type="button" id="saveAccountModalBtn">Сохранить</button>
+</div>
   </div>
 </div>
   
