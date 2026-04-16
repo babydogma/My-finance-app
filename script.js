@@ -250,6 +250,70 @@ function getSafeBucketById(bucketId) {
   return state.safeBuckets.find((item) => item.id === bucketId);
 }
 
+function getAccountsByKind(kind) {
+  return state.accounts.filter((account) => account.account_kind === kind);
+}
+
+function getPrimarySpendAccount() {
+  return (
+    state.accounts.find(
+      (account) =>
+        account.is_primary_spend === true &&
+        account.account_kind !== "vault_pool"
+    ) || null
+  );
+}
+
+function getPrimarySpendAccountName() {
+  return getPrimarySpendAccount()?.name || "";
+}
+
+function getVaultAccount() {
+  return state.accounts.find((account) => account.account_kind === "vault_pool") || null;
+}
+
+function getVaultAccountName() {
+  return getVaultAccount()?.name || "";
+}
+
+function isVaultAccountName(name) {
+  const vaultName = getVaultAccountName();
+  return Boolean(vaultName && name === vaultName);
+}
+
+function getCashAccount() {
+  return state.accounts.find((account) => account.account_kind === "cash") || null;
+}
+
+function getCashAccountName() {
+  return getCashAccount()?.name || "";
+}
+
+function getProtectedAccounts() {
+  return state.accounts.filter((account) => account.is_protected === true);
+}
+
+function getFreeMoneyAccounts() {
+  return state.accounts.filter((account) => account.include_in_free_money === true);
+}
+
+function getSafeBucketsByKind(kinds) {
+  const list = Array.isArray(kinds) ? kinds : [kinds];
+  return state.safeBuckets.filter((bucket) => list.includes(bucket.bucket_kind));
+}
+
+function getFreeSafeBucket() {
+  return state.safeBuckets.find((bucket) => bucket.include_in_free_money === true) || null;
+}
+
+function getProtectedSafeBuckets() {
+  return state.safeBuckets.filter((bucket) => bucket.is_protected === true);
+}
+
+function getSpendableAccounts() {
+  return state.accounts.filter((account) => account.account_kind !== "vault_pool");
+}
+
 function getSafeBucketName(bucketId) {
   const bucket = getSafeBucketById(bucketId);
   return bucket ? bucket.name : "";
@@ -261,7 +325,7 @@ function getSafeBucketIcon(bucketId) {
 }
 
 function getSafeAccountName() {
-  return "Сейфы Яндекса";
+  return getVaultAccountName();
 }
 
 function getSafeInterestAnnualRate() {
@@ -358,19 +422,21 @@ function getFreeSafeBalance() {
 }
 
 function getStrictSafeBalance() {
-  return getSafeBucketsByNames(["Налоги", "Квартира"]).reduce((sum, bucket) => {
+  return getSafeBucketsByKind(["tax", "housing"]).reduce((sum, bucket) => {
     return sum + getSafeBucketBalance(bucket.id);
   }, 0);
 }
 
 function getSoftReserveSafeBalance() {
-  return getSafeBucketsByNames(["Накопления"]).reduce((sum, bucket) => {
+  return getSafeBucketsByKind(["reserve"]).reduce((sum, bucket) => {
     return sum + getSafeBucketBalance(bucket.id);
   }, 0);
 }
 
 function getCashReserveBalance() {
-  return getAccountBalance("Наличный резерв");
+  return getProtectedAccounts()
+    .filter((account) => account.account_kind === "reserve")
+    .reduce((sum, account) => sum + getAccountBalance(account.name), 0);
 }
 
 function getSecondLineReserveBalance() {
@@ -468,9 +534,17 @@ function getProtectedMoneyTotal() {
 }
 
 function getFreeMoneyTotal() {
-  const totalBalance = roundToTwo(calculateBalance());
-  const protectedMoney = getProtectedMoneyTotal();
-  return roundToTwo(Math.max(0, totalBalance - protectedMoney));
+  const accountsPart = getFreeMoneyAccounts().reduce((sum, account) => {
+    return sum + getAccountBalance(account.name);
+  }, 0);
+
+  const bucketsPart = state.safeBuckets
+    .filter((bucket) => bucket.include_in_free_money === true)
+    .reduce((sum, bucket) => {
+      return sum + getSafeBucketBalance(bucket.id);
+    }, 0);
+
+  return roundToTwo(Math.max(0, accountsPart + bucketsPart));
 }
 
 function getInsightsWorkingMinimum(requiredExpense, flexibleExpense) {
@@ -559,8 +633,8 @@ function fillSafeBucketSelect(selectEl, placeholder, selectedId = "") {
 }
 
 function updateTransferSafeFields() {
-  const fromIsSafes = fromAccountSelect?.value === "Сейфы Яндекса";
-  const toIsSafes = toAccountSelect?.value === "Сейфы Яндекса";
+  const fromIsSafes = isVaultAccountName(fromAccountSelect?.value);
+const toIsSafes = isVaultAccountName(toAccountSelect?.value);
 
   fromSafeBucketField?.classList.toggle("hidden", !fromIsSafes);
   toSafeBucketField?.classList.toggle("hidden", !toIsSafes);
@@ -688,10 +762,7 @@ function fillMandatoryPaymentSafeSelect(selectedId = "") {
 
 function isProtectedSafeBucket(bucketId) {
   const bucket = getSafeBucketById(bucketId);
-  if (!bucket) return false;
-
-  const normalized = normalizeMoneyBucketName(bucket.name);
-  return ["налоги", "квартира", "накопления"].includes(normalized);
+  return Boolean(bucket?.is_protected);
 }
 
 function getMandatoryPaymentsCoverageStats(monthKey = getCurrentMonthKey()) {
@@ -1871,6 +1942,32 @@ function setInsightsHeroState(summary) {
       categorySelect.appendChild(option);
     });
   }
+  
+  function fillAccountSelect(selectEl, placeholder, selectedValue = "", options = {}) {
+  if (!selectEl) return;
+
+  const {
+    includeVault = true,
+    includeProtected = true,
+  } = options;
+
+  selectEl.innerHTML = `<option value="">${placeholder}</option>`;
+
+  state.accounts.forEach((account) => {
+    if (!includeVault && account.account_kind === "vault_pool") return;
+    if (!includeProtected && account.is_protected) return;
+
+    const option = document.createElement("option");
+    option.value = account.name;
+    option.textContent = `${account.icon} ${account.name}`;
+
+    if (selectedValue && selectedValue === account.name) {
+      option.selected = true;
+    }
+
+    selectEl.appendChild(option);
+  });
+}
 
   function setActiveNav(viewName) {
   navWalletBtn?.classList.toggle("is-active", viewName === "wallet");
@@ -2353,7 +2450,12 @@ async function deleteSafeBucketFromModal() {
       toAccountField.classList.add("hidden");
 
       fillExpenseCategorySelect();
-      accountSelect.value = "Сейфы Яндекса";
+      fillAccountSelect(accountSelect, "Выбери счёт");
+
+const defaultExpenseAccountName =
+  getPrimarySpendAccountName() || getSpendableAccounts()[0]?.name || "";
+
+accountSelect.value = defaultExpenseAccountName;
     } else if (mode === "income") {
       modalTitle.textContent = "Добавить доход";
       saveBtn.textContent = "Сохранить доход";
@@ -2363,7 +2465,12 @@ async function deleteSafeBucketFromModal() {
       fromAccountField.classList.add("hidden");
       toAccountField.classList.add("hidden");
 
-      accountSelect.value = "Яндекс Банк";
+      fillAccountSelect(accountSelect, "Выбери счёт");
+
+const defaultIncomeAccountName =
+  getPrimarySpendAccountName() || getSpendableAccounts()[0]?.name || "";
+
+accountSelect.value = defaultIncomeAccountName;
    } else if (mode === "transfer") {
   modalTitle.textContent = "Сделать перевод";
   saveBtn.textContent = "Сохранить перевод";
@@ -2373,8 +2480,19 @@ async function deleteSafeBucketFromModal() {
   fromAccountField.classList.remove("hidden");
   toAccountField.classList.remove("hidden");
 
-  fromAccountSelect.value = "Яндекс Банк";
-  toAccountSelect.value = "Наличные";
+  fillAccountSelect(fromAccountSelect, "С какого счёта");
+fillAccountSelect(toAccountSelect, "На какой счёт");
+
+const defaultFromAccount =
+  getPrimarySpendAccountName() || getSpendableAccounts()[0]?.name || "";
+
+const cashFallback =
+  getCashAccountName() ||
+  getSpendableAccounts().find((account) => account.name !== defaultFromAccount)?.name ||
+  "";
+
+fromAccountSelect.value = defaultFromAccount;
+toAccountSelect.value = cashFallback;
 
   fromSafeBucketField.classList.add("hidden");
   toSafeBucketField.classList.add("hidden");
@@ -2413,6 +2531,7 @@ async function deleteSafeBucketFromModal() {
       dateInput.value = transaction.created_at
         ? String(transaction.created_at).slice(0, 10)
         : getTodayDateValue();
+      fillAccountSelect(accountSelect, "Выбери счёт", transaction.account);
       accountSelect.value = transaction.account;
       commentInput.value = transaction.title === "Новая трата" ? "" : transaction.title;
     } else if (transaction.type === "income") {
@@ -2428,8 +2547,11 @@ async function deleteSafeBucketFromModal() {
       dateInput.value = transaction.created_at
         ? String(transaction.created_at).slice(0, 10)
         : getTodayDateValue();
+      fillAccountSelect(accountSelect, "Выбери счёт", transaction.account);
       accountSelect.value = transaction.account;
       commentInput.value = transaction.title === "Новый доход" ? "" : transaction.title;
+      fillAccountSelect(fromAccountSelect, "С какого счёта", transaction.from_account);
+fillAccountSelect(toAccountSelect, "На какой счёт", transaction.to_account);
     } else if (transaction.type === "transfer") {
   modalTitle.textContent = "Редактировать перевод";
   saveBtn.textContent = "Сохранить";
@@ -2793,13 +2915,13 @@ async function deleteSafeBucketFromModal() {
     }
 
     const accountTone =
-      account.id === "yandex"
-        ? "list-icon--green"
-        : account.id === "cash"
-        ? "list-icon--blue"
-        : account.id === "cash_reserve"
-        ? "list-icon--neutral"
-        : "list-icon--amber";
+  account.account_kind === "spend"
+    ? "list-icon--green"
+    : account.account_kind === "cash"
+    ? "list-icon--blue"
+    : account.account_kind === "reserve"
+    ? "list-icon--neutral"
+    : "list-icon--amber";
 
     card.innerHTML = `
       <div class="list-icon ${accountTone}">${account.icon}</div>
@@ -2965,12 +3087,12 @@ const deleteBtn = card.querySelector("[data-delete-id]");
 
     if (transaction.type === "transfer") {
   const fromLabel =
-    transaction.from_account === "Сейфы Яндекса" && transaction.from_safe_bucket_id
+    isVaultAccountName(transaction.from_account)
       ? `${transaction.from_account} • ${getSafeBucketName(transaction.from_safe_bucket_id)}`
       : transaction.from_account;
 
   const toLabel =
-    transaction.to_account === "Сейфы Яндекса" && transaction.to_safe_bucket_id
+    isVaultAccountName(transaction.to_account)
       ? `${transaction.to_account} • ${getSafeBucketName(transaction.to_safe_bucket_id)}`
       : transaction.to_account;
 
@@ -3361,9 +3483,9 @@ else if (transaction.type === "income") {
   const fromAccount = fromAccountSelect.value;
   const toAccount = toAccountSelect.value;
   const fromSafeBucketId =
-    fromAccount === "Сейфы Яндекса" ? fromSafeBucketSelect.value : null;
-  const toSafeBucketId =
-    toAccount === "Сейфы Яндекса" ? toSafeBucketSelect.value : null;
+  isVaultAccountName(fromAccount) ? fromSafeBucketSelect.value : null;
+const toSafeBucketId =
+  isVaultAccountName(toAccount) ? toSafeBucketSelect.value : null;
 
   if (fromAccount === "С какого счёта") {
     alert("Выбери счёт списания");
@@ -3377,7 +3499,7 @@ else if (transaction.type === "income") {
 
   if (fromAccount === toAccount) {
     const sameBuckets =
-      fromAccount !== "Сейфы Яндекса" ||
+      !isVaultAccountName(fromAccount)
       (fromSafeBucketId && toSafeBucketId && fromSafeBucketId === toSafeBucketId);
 
     if (sameBuckets) {
@@ -3386,12 +3508,12 @@ else if (transaction.type === "income") {
     }
   }
 
-  if (fromAccount === "Сейфы Яндекса" && !fromSafeBucketId) {
+  if (isVaultAccountName(fromAccount) && !fromSafeBucketId) {
     alert("Выбери сейф списания");
     return null;
   }
 
-  if (toAccount === "Сейфы Яндекса" && !toSafeBucketId) {
+  if (isVaultAccountName(toAccount) && !toSafeBucketId) {
     alert("Выбери сейф зачисления");
     return null;
   }
