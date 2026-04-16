@@ -3111,12 +3111,18 @@ function getAccountRoleFlags(role) {
     }
 
     if (
-      transaction.type === "transfer" &&
-      transaction.to_account === getSafeAccountName() &&
-      transaction.from_account !== getSafeAccountName()
-    ) {
-      savedToSafes += amount;
-    }
+  transaction.type === "transfer" &&
+  (
+    transaction.to_account_id === getSafeAccountId() ||
+    (!transaction.to_account_id && transaction.to_account === getSafeAccountName())
+  ) &&
+  (
+    transaction.from_account_id !== getSafeAccountId() &&
+    transaction.from_account !== getSafeAccountName()
+  )
+) {
+  savedToSafes += amount;
+}
   });
 
   const mandatoryCoverage = getMandatoryPaymentsCoverageStats(getCurrentMonthKey());
