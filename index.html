@@ -591,6 +591,52 @@
     </div>
   </div>
 </div>
+
+<div class="modal hidden" id="accountModal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+
+    <div class="section-head">
+      <h3 class="modal-title" id="accountModalTitle" style="margin:0; text-align:left;">
+        Настройка счёта
+      </h3>
+      <button class="manager-back-btn" type="button" id="closeAccountModalBtn">
+        Закрыть
+      </button>
+    </div>
+
+    <div class="field">
+      <input class="input" id="accountNameInput" type="text" placeholder="Название счёта" />
+    </div>
+
+    <div class="field">
+      <input class="input" id="accountIconInput" type="text" maxlength="4" placeholder="Эмодзи, например 💳" />
+    </div>
+
+    <div class="field">
+      <select class="select" id="accountRoleSelect">
+        <option value="spend">Обычный счёт</option>
+        <option value="cash">Наличные</option>
+        <option value="reserve">Резерв</option>
+        <option value="vault_pool">Накопительный счёт</option>
+      </select>
+    </div>
+
+    <label class="account-primary-row" for="accountPrimarySpendInput">
+      <input type="checkbox" id="accountPrimarySpendInput" />
+      <span>Основной счёт для списаний</span>
+    </label>
+
+    <div class="section-note account-primary-note" id="accountPrimaryNote">
+      Этот счёт будет подставляться по умолчанию в расходах и доходах.
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-secondary" type="button" id="cancelAccountModalBtn">Отмена</button>
+      <button class="btn btn-primary" type="button" id="saveAccountModalBtn">Сохранить</button>
+    </div>
+  </div>
+</div>
   
   <div class="modal hidden" id="safeBucketsModal">
   <div class="modal-sheet safe-buckets-sheet">
