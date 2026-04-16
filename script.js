@@ -1675,7 +1675,7 @@ function getInsightsFilteredTransactions() {
   free_money: {
   title: "Свободные деньги",
   text:
-    "Это совокупность налички и денег из сейфа «Свободные», которые можно тратить без затрагивания резервов и целей.",
+  "Это деньги из счетов и сейфов, которые помечены как доступные для обычных трат.",
 },
 
   can_save_now: {
@@ -3079,13 +3079,13 @@ function getAccountRoleFlags(role) {
     }
 
     const accountTone =
-  account.account_kind === "spend"
-    ? "list-icon--green"
-    : account.account_kind === "cash"
-    ? "list-icon--blue"
-    : account.account_kind === "reserve"
-    ? "list-icon--neutral"
-    : "list-icon--amber";
+      account.account_kind === "spend"
+        ? "list-icon--green"
+        : account.account_kind === "cash"
+        ? "list-icon--blue"
+        : account.account_kind === "reserve"
+        ? "list-icon--neutral"
+        : "list-icon--amber";
 
     card.innerHTML = `
       <div class="list-icon ${accountTone}">${account.icon}</div>
@@ -3093,12 +3093,20 @@ function getAccountRoleFlags(role) {
         <div class="list-title-row">
           <h3 class="list-title">${escapeHtml(account.name)}</h3>
         </div>
-        <p class="list-subtitle">${escapeHtml(account.subtitle)}</p>
+        <p class="list-subtitle">${escapeHtml(getAccountRoleLabel(account))}</p>
       </div>
       <div class="list-right">
         <p class="list-value">${formatMoney(currentBalance)}</p>
+        <button class="accounts-edit-btn" type="button" data-edit-account-id="${account.id}">
+          Изм.
+        </button>
       </div>
     `;
+
+    card.querySelector("[data-edit-account-id]")?.addEventListener("click", (event) => {
+      event.stopPropagation();
+      openAccountModal(account.id);
+    });
 
     if (account.name === getSafeAccountName()) {
       card.addEventListener("click", openSafeBucketsModal);
@@ -3230,84 +3238,72 @@ const deleteBtn = card.querySelector("[data-delete-id]");
   }
 
   function createTransactionCard(transaction) {
-    const card = document.createElement("div");
-    card.className = "list-card list-card--clickable";
+  const card = document.createElement("div");
+  card.className = "list-card list-card--clickable";
 
-    const icon =
-      transaction.type === "income"
-        ? "💰"
-        : transaction.type === "transfer"
-        ? "↗"
-        : getCategoryIcon(transaction.category_id || UNCATEGORIZED_ID);
+  const icon =
+    transaction.type === "income"
+      ? "💰"
+      : transaction.type === "transfer"
+      ? "↗"
+      : getCategoryIcon(transaction.category_id || UNCATEGORIZED_ID);
 
-    const toneKey =
-      transaction.type === "expense" ? transaction.category_id || UNCATEGORIZED_ID : "";
+  const toneKey =
+    transaction.type === "expense" ? transaction.category_id || UNCATEGORIZED_ID : "";
 
-    const iconToneClass = getIconToneClass(transaction.type, toneKey);
+  const iconToneClass = getIconToneClass(transaction.type, toneKey);
 
-    let subtitle = "";
-    let signedAmount = "";
-    let valueClass = "list-value";
+  let subtitle = "";
+  let signedAmount = "";
+  let valueClass = "list-value";
 
-    if (transaction.type === "transfer") {
-  const fromLabel =
-    isVaultAccountName(transaction.from_account)
+  if (transaction.type === "transfer") {
+    const fromLabel = isVaultAccountName(transaction.from_account)
       ? `${transaction.from_account} • ${getSafeBucketName(transaction.from_safe_bucket_id)}`
       : transaction.from_account;
 
-  const toLabel =
-    isVaultAccountName(transaction.to_account)
+    const toLabel = isVaultAccountName(transaction.to_account)
       ? `${transaction.to_account} • ${getSafeBucketName(transaction.to_safe_bucket_id)}`
       : transaction.to_account;
 
-  subtitle = `${escapeHtml(fromLabel)} → ${escapeHtml(toLabel)}`;
-  signedAmount = formatMoney(transaction.amount);
-}
+    subtitle = `${escapeHtml(fromLabel)} → ${escapeHtml(toLabel)}`;
+    signedAmount = formatMoney(transaction.amount);
+  } else if (transaction.type === "income") {
+    const incomeBucketLabel =
+      transaction.account === getSafeAccountName() && transaction.to_safe_bucket_id
+        ? ` • ${getSafeBucketName(transaction.to_safe_bucket_id)}`
+        : "";
 
-else if (transaction.type === "income") {
-  const incomeBucketLabel =
-    transaction.account === getSafeAccountName() && transaction.to_safe_bucket_id
-      ? ` • ${getSafeBucketName(transaction.to_safe_bucket_id)}`
-      : "";
-
-  subtitle = `${escapeHtml(transaction.account)}${escapeHtml(incomeBucketLabel)} • доход`;
-  signedAmount = `+${formatMoney(transaction.amount)}`;
-  valueClass = "list-value list-value--green";
-
-     } else {
-      subtitle = `${escapeHtml(getCategoryName(transaction.category_id || UNCATEGORIZED_ID))} • ${escapeHtml(transaction.account)}`;
-      signedAmount = `−${formatMoney(transaction.amount)}`;
-      valueClass = "list-value list-value--red";
-    }
-
-    const shortDate = formatDateShort(transaction.created_at);
-    const timeLabel = transaction.time_label || "";
-    const caption = `${shortDate}${shortDate && timeLabel ? " • " : ""}${timeLabel}`;
-
-    card.innerHTML = `
-  <div class="list-icon ${accountTone}">${account.icon}</div>
-  <div class="list-body">
-    <div class="list-title-row">
-      <h3 class="list-title">${escapeHtml(account.name)}</h3>
-    </div>
-    <p class="list-subtitle">${escapeHtml(getAccountRoleLabel(account))}</p>
-  </div>
-  <div class="list-right">
-    <p class="list-value">${formatMoney(currentBalance)}</p>
-    <button class="accounts-edit-btn" type="button" data-edit-account-id="${account.id}">
-      Изм.
-    </button>
-  </div>
-`;
-
-card.querySelector("[data-edit-account-id]")?.addEventListener("click", (event) => {
-  event.stopPropagation();
-  openAccountModal(account.id);
-});
-
-    card.addEventListener("click", () => openEditModal(transaction.id));
-    return card;
+    subtitle = `${escapeHtml(transaction.account)}${escapeHtml(incomeBucketLabel)} • доход`;
+    signedAmount = `+${formatMoney(transaction.amount)}`;
+    valueClass = "list-value list-value--green";
+  } else {
+    subtitle = `${escapeHtml(getCategoryName(transaction.category_id || UNCATEGORIZED_ID))} • ${escapeHtml(transaction.account)}`;
+    signedAmount = `−${formatMoney(transaction.amount)}`;
+    valueClass = "list-value list-value--red";
   }
+
+  const shortDate = formatDateShort(transaction.created_at);
+  const timeLabel = transaction.time_label || "";
+  const caption = `${shortDate}${shortDate && timeLabel ? " • " : ""}${timeLabel}`;
+
+  card.innerHTML = `
+    <div class="list-icon ${iconToneClass}">${icon}</div>
+    <div class="list-body">
+      <div class="list-title-row">
+        <h3 class="list-title">${escapeHtml(transaction.title)}</h3>
+      </div>
+      <p class="list-subtitle">${subtitle}</p>
+    </div>
+    <div class="list-right">
+      <p class="${valueClass}">${signedAmount}</p>
+      <div class="list-caption">${caption}</div>
+    </div>
+  `;
+
+  card.addEventListener("click", () => openEditModal(transaction.id));
+  return card;
+}
 
   function renderTransactions() {
     transactionsListEl.innerHTML = "";
@@ -3737,7 +3733,7 @@ const toSafeBucketId =
     const freeSafeBucket = account === getSafeAccountName() ? getFreeSafeBucket() : null;
 
 if (account === getSafeAccountName() && !freeSafeBucket) {
-  alert('Не найден сейф "Свободные". Создай его или переименуй существующий.');
+  alert("Не найден сейф, помеченный как свободные деньги.");
   return null;
 }
 
