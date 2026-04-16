@@ -452,7 +452,7 @@ function getAllSafeBucketsBalance() {
 }
 
 function getUnassignedSafeBalance() {
-  const totalSafeBalance = getAccountBalance(getSafeAccountName());
+  const totalSafeBalance = getAccountBalance(getSafeAccountId());
   const distributedBalance = getAllSafeBucketsBalance();
   return totalSafeBalance - distributedBalance;
 }
@@ -489,7 +489,7 @@ function getSoftReserveSafeBalance() {
 function getCashReserveBalance() {
   return getProtectedAccounts()
     .filter((account) => account.account_kind === "reserve")
-    .reduce((sum, account) => sum + getAccountBalance(account.name), 0);
+    .reduce((sum, account) => sum + getAccountBalance(account.id), 0);
 }
 
 function getSecondLineReserveBalance() {
@@ -588,7 +588,7 @@ function getProtectedMoneyTotal() {
 
 function getFreeMoneyTotal() {
   const accountsPart = getFreeMoneyAccounts().reduce((sum, account) => {
-    return sum + getAccountBalance(account.name);
+    return sum + getAccountBalance(account.id);
   }, 0);
 
   const bucketsPart = state.safeBuckets
@@ -1069,7 +1069,7 @@ function renderMandatoryPaymentsModal() {
   }
 
   function getSafeBalance() {
-  return getAccountBalance(getSafeAccountName());
+  return getAccountBalance(getSafeAccountId());
 }
 
   function roundToTwo(num) {
@@ -1835,7 +1835,7 @@ function getProtectedMoneyBreakdown() {
   getProtectedAccounts().forEach((account) => {
     rows.push({
       label: account.name,
-      amount: roundToTwo(getAccountBalance(account.name)),
+      amount: roundToTwo(getAccountBalance(account.id)),
     });
   });
 
@@ -1904,11 +1904,11 @@ function buildFaqFormulaText(faqKey) {
   const rows = [];
 
   getFreeMoneyAccounts().forEach((account) => {
-    rows.push({
-      label: account.name,
-      amount: roundToTwo(getAccountBalance(account.name)),
-    });
+  rows.push({
+    label: account.name,
+    amount: roundToTwo(getAccountBalance(account.id)),
   });
+});
 
   state.safeBuckets
     .filter((bucket) => bucket.include_in_free_money === true)
@@ -2342,11 +2342,17 @@ async function deleteAccountModalAction() {
   }
 
   const hasTransactions = state.transactions.some((transaction) => {
-    return (
-      transaction.account === account.name ||
-      transaction.from_account === account.name ||
-      transaction.to_account === account.name
-    );
+    const byId =
+      transaction.account_id === account.id ||
+      transaction.from_account_id === account.id ||
+      transaction.to_account_id === account.id;
+
+    const byLegacyName =
+      (!transaction.account_id && transaction.account === account.name) ||
+      (!transaction.from_account_id && transaction.from_account === account.name) ||
+      (!transaction.to_account_id && transaction.to_account === account.name);
+
+    return byId || byLegacyName;
   });
 
   if (hasTransactions) {
@@ -2477,7 +2483,7 @@ async function saveSafeInterestRate() {
 function renderSafeBucketsModal() {
   if (!safeBucketsList) return;
 
-  const totalSafeBalance = getAccountBalance(getSafeAccountName());
+  const totalSafeBalance = getAccountBalance(getSafeAccountId());
   const unassignedBalance = getUnassignedSafeBalance();
 
   safeBucketsModalTotalLabel.textContent = `Общий баланс: ${formatMoney(totalSafeBalance)}`;
@@ -3031,8 +3037,8 @@ function getAccountRoleFlags(role) {
 }
 
   function calculateBalance() {
-    return state.accounts.reduce((sum, account) => sum + getAccountBalance(account.name), 0);
-  }
+  return state.accounts.reduce((sum, account) => sum + getAccountBalance(account.id), 0);
+}
 
   function getAnalyticsFilteredTransactions() {
     return filterTransactionsByPeriod(
@@ -3327,12 +3333,12 @@ function getAccountRoleFlags(role) {
   accountsListEl.innerHTML = "";
 
   state.accounts.forEach((account) => {
-    const currentBalance = getAccountBalance(account.name);
+    const currentBalance = getAccountBalance(account.id);
 
     const card = document.createElement("div");
     card.className = "list-card";
 
-    if (account.name === getSafeAccountName()) {
+    if (account.id === getSafeAccountId()) {
       card.classList.add("list-card--clickable");
     }
 
@@ -3355,18 +3361,18 @@ function getAccountRoleFlags(role) {
       </div>
       <div class="list-right">
         <p class="list-value">${formatMoney(currentBalance)}</p>
-       <button
-  class="icon-action-btn"
-  type="button"
-  data-edit-account-id="${account.id}"
-  aria-label="Редактировать счёт"
-  title="Редактировать счёт"
->
-  <svg viewBox="0 0 24 24" aria-hidden="true">
-    <path d="M4 20h4l10-10-4-4L4 16v4Z" />
-    <path d="M13 7l4 4" />
-  </svg>
-</button>
+        <button
+          class="icon-action-btn"
+          type="button"
+          data-edit-account-id="${account.id}"
+          aria-label="Редактировать счёт"
+          title="Редактировать счёт"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 20h4l10-10-4-4L4 16v4Z" />
+            <path d="M13 7l4 4" />
+          </svg>
+        </button>
       </div>
     `;
 
@@ -3375,7 +3381,7 @@ function getAccountRoleFlags(role) {
       openAccountModal(account.id);
     });
 
-    if (account.name === getSafeAccountName()) {
+    if (account.id === getSafeAccountId()) {
       card.addEventListener("click", openSafeBucketsModal);
     }
 
@@ -4316,7 +4322,7 @@ async function saveBudgetLimit() {
 
   if (safeBucketsError) {
     console.error(safeBucketsError);
-    alert("Ошибка загрузки сейфов из Supabase");
+    alert("Ошибка загрузки накоплений из Supabase");
     return;
   }
 
