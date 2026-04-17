@@ -419,8 +419,9 @@ button {
 }
 
 #accountsList .list-title {
-  font-size: 16px;
-  font-weight: 860;
+  font-size: 17px;
+  font-weight: 760;
+  letter-spacing: -0.028em;
 }
 
 #accountsList .list-subtitle {
@@ -431,27 +432,75 @@ button {
 
 #accountsList .list-value {
   font-size: 15.5px;
-  font-weight: 850;
+  font-weight: 820;
   letter-spacing: -0.03em;
 }
 
 #transactionsList .list-card {
-  min-height: 74px;
+  min-height: 78px;
   padding: 12px 14px;
+  background:
+    linear-gradient(180deg, rgba(60, 66, 84, 0.28) 0%, rgba(31, 36, 50, 0.18) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.045);
+  box-shadow:
+    0 8px 16px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.045);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+#transactionsList .list-card::before {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.04) 0%,
+    rgba(255, 255, 255, 0.012) 28%,
+    rgba(255, 255, 255, 0) 56%
+  );
+}
+
+#transactionsList .list-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.035),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.008);
 }
 
 #transactionsList .list-title {
-  font-size: 15px;
-  font-weight: 840;
+  font-size: 16px;
+  font-weight: 760;
+  letter-spacing: -0.025em;
 }
 
 #transactionsList .list-subtitle {
-  color: rgba(255, 255, 255, 0.5);
+  font-size: 11px;
+  font-weight: 620;
+  color: rgba(255, 255, 255, 0.42);
 }
 
 #transactionsList .list-value {
   font-size: 15.5px;
-  font-weight: 880;
+  font-weight: 820;
+  letter-spacing: -0.03em;
+}
+
+#transactionsList .list-caption {
+  font-size: 11px;
+  font-weight: 620;
+  color: rgba(255, 255, 255, 0.34);
+}
+
+#transactionsList .list-icon {
+  width: 54px;
+  height: 54px;
+  min-width: 54px;
+  border-radius: 18px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 6px 14px rgba(0, 0, 0, 0.08);
 }
 
 /* =========================================================
@@ -2430,6 +2479,68 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   white-space: nowrap;
 }
 
+#openCreateAccountModalBtn {
+  width: 54px;
+  height: 54px;
+  min-width: 54px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background:
+    linear-gradient(180deg, rgba(111, 156, 255, 0.82) 0%, rgba(86, 132, 245, 0.74) 100%);
+  box-shadow:
+    0 10px 22px rgba(47, 83, 170, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.94);
+}
+
+#openCreateAccountModalBtn:hover,
+#openCreateAccountModalBtn:active {
+  transform: translateY(1px);
+  box-shadow:
+    0 6px 14px rgba(47, 83, 170, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+#openExpenseModal,
+#openIncomeModal,
+#openTransferModal,
+#openCategoriesManagerBtn {
+  min-height: 110px;
+  border-radius: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background:
+    linear-gradient(180deg, rgba(62, 68, 86, 0.46) 0%, rgba(33, 38, 52, 0.28) 100%);
+  box-shadow:
+    0 10px 22px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+#openExpenseModal .quick-action__icon,
+#openIncomeModal .quick-action__icon,
+#openTransferModal .quick-action__icon,
+#openCategoriesManagerBtn .quick-action__icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 18px;
+  background:
+    linear-gradient(180deg, rgba(111, 156, 255, 0.88) 0%, rgba(96, 143, 255, 0.78) 100%);
+  box-shadow:
+    0 8px 18px rgba(80, 120, 220, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+#openExpenseModal .quick-action__label,
+#openIncomeModal .quick-action__label,
+#openTransferModal .quick-action__label,
+#openCategoriesManagerBtn .quick-action__label {
+  font-size: 15px;
+  font-weight: 760;
+  letter-spacing: -0.02em;
+  color: rgba(255, 255, 255, 0.94);
+}
+
 /* =========================================================
    18. MANDATORY PAYMENTS — DATE + LINKED SAFE
    ========================================================= */
@@ -3888,6 +3999,10 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 #insightsView #accountsTotal,
 #analyticsView #accountsTotal {
   display: block !important;
+}
+
+#accountsTotal {
+  display: none !important;
 }
 
 @media (max-width: 420px) {
