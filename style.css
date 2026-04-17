@@ -4585,15 +4585,15 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .wallet-scene--desk {
   position: relative;
   display: grid;
-  grid-template-columns: 118px minmax(0, 1fr) 96px;
+  grid-template-columns: 86px minmax(0, 1fr) 68px;
   grid-template-rows: auto 1fr auto;
   grid-template-areas:
     "counter briefcase actions"
     "cards briefcase actions"
     "bottom bottom bottom";
-  gap: 14px 14px;
+  gap: 12px 10px;
   min-height: 610px;
-  padding: 16px 12px 12px;
+  padding: 14px 10px 10px;
   border-radius: 34px;
   background: transparent;
   border: none;
@@ -4647,13 +4647,18 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   pointer-events: none;
 }
 
-.desk-counter,
-.desk-cards,
-.desk-briefcase,
-.desk-actions,
-.desk-bottom-actions {
-  position: relative;
-  z-index: 2;
+.desk-counter {
+  grid-area: counter;
+  align-self: start;
+  width: 100%;
+  padding: 8px 8px 9px;
+  border-radius: 18px;
+  background:
+    linear-gradient(180deg, rgba(20, 22, 28, 0.98) 0%, rgba(12, 14, 18, 1) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  box-shadow:
+    0 12px 24px rgba(0, 0, 0, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
 }
 
 .desk-counter {
@@ -4671,33 +4676,48 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .desk-counter__label {
-  margin: 0 0 8px;
-  color: rgba(255, 255, 255, 0.38);
-  font-size: 10px;
+  margin: 0 0 6px;
+  color: rgba(255, 255, 255, 0.32);
+  font-size: 8.5px;
   font-weight: 800;
   line-height: 1;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
 .desk-counter__value.balance-amount {
   margin: 0;
   width: 100%;
-  font-size: 22px;
+  font-size: 16px;
   line-height: 0.9;
-  font-weight: 940;
-  letter-spacing: -0.055em;
+  font-weight: 930;
+  letter-spacing: -0.045em;
   text-align: left;
   color: #f7f9ff;
+  word-break: break-word;
 }
 
 .desk-counter__sub {
-  margin: 9px 0 0;
-  color: rgba(255, 255, 255, 0.56);
-  font-size: 10px;
-  font-weight: 720;
+  margin: 7px 0 0;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 8.5px;
+  font-weight: 700;
   line-height: 1.08;
-  letter-spacing: -0.014em;
+  letter-spacing: -0.012em;
+}
+
+.desk-counter::before {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.028);
+  pointer-events: none;
+}
+
+.desk-counter__value.balance-amount,
+.desk-counter__sub {
+  font-variant-numeric: tabular-nums;
 }
 
 .desk-cards {
@@ -4705,7 +4725,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   align-self: end;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   min-height: 0;
 }
 
@@ -4718,24 +4738,24 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .desk-cards__title {
-  color: rgba(247, 249, 255, 0.94);
-  font-size: 15px;
-  font-weight: 860;
-  letter-spacing: -0.03em;
+  color: rgba(247, 249, 255, 0.9);
+  font-size: 12px;
+  font-weight: 820;
+  letter-spacing: -0.025em;
 }
 
 .desk-cards__add {
-  width: 34px;
-  height: 34px;
-  min-width: 34px;
-  border-radius: 14px;
+  width: 26px;
+  height: 26px;
+  min-width: 26px;
+  border-radius: 10px;
   background:
-    linear-gradient(180deg, rgba(187, 198, 226, 0.42) 0%, rgba(141, 155, 190, 0.22) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  color: rgba(255, 255, 255, 0.88);
+    linear-gradient(180deg, rgba(187, 198, 226, 0.34) 0%, rgba(141, 155, 190, 0.16) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.84);
   box-shadow:
-    0 12px 20px rgba(0, 0, 0, 0.14),
-    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+    0 8px 14px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .scene-accounts-list--desk {
@@ -4748,18 +4768,18 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 .scene-accounts-list--desk .scene-account-card {
   position: relative;
-  width: 110px;
-  min-height: 102px;
-  padding: 12px 11px 11px;
-  border-radius: 22px;
+  width: 78px;
+  min-height: 50px;
+  padding: 8px 7px 7px;
+  border-radius: 14px;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.34) 0%, rgba(219, 231, 255, 0.17) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.26);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.3) 0%, rgba(219, 231, 255, 0.12) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.24);
   box-shadow:
-    0 18px 28px rgba(0, 0, 0, 0.16),
-    inset 0 1px 0 rgba(255, 255, 255, 0.28);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+    0 10px 18px rgba(0, 0, 0, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.24);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   transform-origin: left bottom;
   overflow: hidden;
 }
@@ -4774,54 +4794,54 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .scene-accounts-list--desk .scene-account-card:nth-child(odd) {
-  transform: rotate(-6deg);
+  transform: rotate(-8deg);
 }
 
 .scene-accounts-list--desk .scene-account-card:nth-child(even) {
-  transform: rotate(-2.5deg);
+  transform: rotate(-4deg);
 }
 
 .scene-accounts-list--desk .scene-account-card__top {
-  gap: 7px;
+  gap: 5px;
   align-items: flex-start;
 }
 
 .scene-accounts-list--desk .scene-account-card__icon {
-  width: 15px;
-  height: 15px;
-  flex: 0 0 15px;
-  color: rgba(20, 24, 34, 0.82);
+  width: 10px;
+  height: 10px;
+  flex: 0 0 10px;
+  color: rgba(20, 24, 34, 0.8);
 }
 
 .scene-accounts-list--desk .scene-account-card__icon svg {
-  width: 15px;
-  height: 15px;
+  width: 10px;
+  height: 10px;
 }
 
 .scene-accounts-list--desk .scene-account-card__name {
-  color: rgba(14, 18, 26, 0.88);
-  font-size: 11.5px;
-  font-weight: 850;
-  line-height: 1.06;
+  color: rgba(14, 18, 26, 0.86);
+  font-size: 8.5px;
+  font-weight: 820;
+  line-height: 1.02;
   white-space: normal;
-  overflow: visible;
+  overflow: hidden;
   text-overflow: clip;
 }
 
 .scene-accounts-list--desk .scene-account-card__role {
-  margin-top: 10px;
-  color: rgba(18, 24, 34, 0.4);
-  font-size: 10px;
+  margin-top: 6px;
+  color: rgba(18, 24, 34, 0.34);
+  font-size: 7px;
   font-weight: 700;
-  line-height: 1.08;
+  line-height: 1.04;
 }
 
 .scene-accounts-list--desk .scene-account-card__value {
-  margin-top: 10px;
+  margin-top: 6px;
   color: rgba(12, 18, 26, 0.9);
-  font-size: 12px;
-  font-weight: 880;
-  letter-spacing: -0.028em;
+  font-size: 9px;
+  font-weight: 860;
+  letter-spacing: -0.02em;
 }
 
 .desk-briefcase {
@@ -4829,25 +4849,25 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   align-self: center;
   justify-self: center;
   width: 100%;
-  max-width: 322px;
-  aspect-ratio: 1 / 1.04;
+  max-width: 356px;
+  aspect-ratio: 1 / 1.08;
   position: relative;
 }
 
 .desk-briefcase__lid {
   position: absolute;
   left: 50%;
-  top: -2px;
-  width: 92%;
-  height: 38%;
+  top: -4px;
+  width: 96%;
+  height: 40%;
   transform-origin: bottom center;
-  transform: translateX(-50%) perspective(1000px) rotateX(68deg);
-  border-radius: 28px 28px 18px 18px;
+  transform: translateX(-50%) perspective(1000px) rotateX(70deg);
+  border-radius: 30px 30px 18px 18px;
   background:
-    linear-gradient(180deg, rgba(96, 58, 31, 1) 0%, rgba(67, 40, 22, 1) 100%);
-  border: 2px solid rgba(154, 114, 73, 0.52);
+    linear-gradient(180deg, rgba(98, 58, 31, 1) 0%, rgba(67, 40, 22, 1) 100%);
+  border: 2px solid rgba(154, 114, 73, 0.54);
   box-shadow:
-    0 12px 26px rgba(0, 0, 0, 0.2),
+    0 14px 28px rgba(0, 0, 0, 0.22),
     inset 0 1px 0 rgba(255, 255, 255, 0.09);
   overflow: hidden;
 }
@@ -4896,16 +4916,16 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   left: 50%;
   bottom: 0;
   width: 100%;
-  height: 62%;
+  height: 64%;
   transform: translateX(-50%);
-  border-radius: 24px 24px 28px 28px;
+  border-radius: 26px 26px 30px 30px;
   background:
-    linear-gradient(180deg, rgba(96, 58, 31, 1) 0%, rgba(63, 39, 23, 1) 100%);
-  border: 2px solid rgba(154, 114, 73, 0.52);
+    linear-gradient(180deg, rgba(98, 58, 31, 1) 0%, rgba(63, 39, 23, 1) 100%);
+  border: 2px solid rgba(154, 114, 73, 0.54);
   box-shadow:
-    0 22px 36px rgba(0, 0, 0, 0.24),
+    0 24px 40px rgba(0, 0, 0, 0.24),
     inset 0 1px 0 rgba(255, 255, 255, 0.08);
-  padding: 12px;
+  padding: 14px;
 }
 
 .desk-briefcase__base::before {
@@ -4925,8 +4945,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .desk-briefcase__inner {
   width: 100%;
   height: 100%;
-  padding: 10px 10px 8px;
-  border-radius: 18px 18px 22px 22px;
+  padding: 12px 12px 10px;
+  border-radius: 20px 20px 24px 24px;
   background:
     linear-gradient(180deg, rgba(188, 169, 145, 0.98) 0%, rgba(158, 137, 111, 0.98) 100%);
   box-shadow:
@@ -4994,33 +5014,35 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   align-self: center;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 10px;
 }
 
 .desk-actions__btn {
-  min-height: 88px;
-  border-radius: 24px;
+  min-height: 52px;
+  min-width: 64px;
+  padding: 8px 6px;
+  border-radius: 18px;
   background:
     linear-gradient(180deg, rgba(28, 32, 43, 0.94) 0%, rgba(17, 20, 29, 0.98) 100%);
   border: 1px solid rgba(255, 255, 255, 0.06);
   box-shadow:
-    0 16px 30px rgba(0, 0, 0, 0.18),
+    0 12px 22px rgba(0, 0, 0, 0.16),
     inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
 .desk-actions__btn .scene-action-btn__icon {
-  width: 26px;
-  height: 26px;
-  border-radius: 10px;
+  width: 18px;
+  height: 18px;
+  border-radius: 7px;
   background:
     linear-gradient(180deg, rgba(156, 168, 197, 0.34) 0%, rgba(108, 120, 152, 0.2) 100%);
   color: rgba(245, 248, 255, 0.9);
-  font-size: 14px;
+  font-size: 11px;
 }
 
 .desk-actions__btn .scene-action-btn__label {
-  font-size: 12px;
-  font-weight: 780;
+  font-size: 9px;
+  font-weight: 760;
 }
 
 .desk-bottom-actions {
@@ -5059,12 +5081,12 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 @media (max-width: 420px) {
   .wallet-scene--desk {
-    grid-template-columns: 108px minmax(0, 1fr) 84px;
-    gap: 10px;
-    min-height: 568px;
-    padding: 14px 10px 10px;
-    border-radius: 28px;
-  }
+  grid-template-columns: 78px minmax(0, 1fr) 64px;
+  gap: 9px;
+  min-height: 560px;
+  padding: 12px 8px 10px;
+  border-radius: 28px;
+}
 
   .wallet-scene__surface--desk {
     inset: 24px 0 72px;
@@ -5077,7 +5099,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   }
 
   .desk-counter__value.balance-amount {
-    font-size: 20px;
+    font-size: 14px;
   }
 
   .desk-counter__sub {
@@ -5089,11 +5111,11 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   }
 
   .scene-accounts-list--desk .scene-account-card {
-    width: 100px;
-    min-height: 94px;
-    padding: 10px 9px 10px;
-    border-radius: 18px;
-  }
+  width: 72px;
+  min-height: 46px;
+  padding: 7px 6px 6px;
+  border-radius: 12px;
+}
 
   .scene-accounts-list--desk .scene-account-card__name {
     font-size: 11px;
@@ -5104,12 +5126,12 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   }
 
   .desk-briefcase {
-    max-width: 274px;
+    max-width: 380px;
   }
 
   .desk-actions__btn {
-    min-height: 78px;
-    border-radius: 20px;
+    min-height: 46px;
+    border-radius: 16px;
   }
 
   .desk-bottom-actions {
