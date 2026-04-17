@@ -13,47 +13,36 @@
     <!-- MAIN VIEW -->
     <div id="mainView">
 
-    <!-- MAIN DESK SCENE -->
+      <!-- MAIN DESK SCENE -->
 <section class="wallet-scene-section wallet-scene-section--desk">
   <div class="wallet-scene wallet-scene--desk">
-    <div class="wallet-scene__bg"></div>
 
-    <div class="desk-table">
-      <div class="desk-table__top"></div>
-      <div class="desk-table__leg desk-table__leg--lt"></div>
-      <div class="desk-table__leg desk-table__leg--rt"></div>
-      <div class="desk-table__leg desk-table__leg--lb"></div>
-      <div class="desk-table__leg desk-table__leg--rb"></div>
+    <div class="desk-scene">
+
+      <img
+        class="desk-scene__table"
+        src="assets/scene/table-top.png"
+        alt=""
+        aria-hidden="true"
+      />
+
+      <img
+        class="desk-scene__briefcase"
+        src="assets/scene/briefcase-open.png"
+        alt=""
+        aria-hidden="true"
+      />
 
       <div class="desk-counter">
         <div class="desk-counter__screen">
           <div class="desk-counter__value balance-amount">0 ₽</div>
         </div>
+        <div class="desk-counter__sub" id="balanceFreeMoneyValue">Свободно: 0 ₽</div>
       </div>
-
-      <div class="desk-briefcase">
-        <div class="desk-briefcase__hinge desk-briefcase__hinge--left"></div>
-        <div class="desk-briefcase__hinge desk-briefcase__hinge--right"></div>
-
-        <div class="desk-briefcase__lid">
-          <div class="desk-briefcase__lid-inner"></div>
-        </div>
-
-        <div class="desk-briefcase__body">
-          <div class="desk-briefcase__inner">
-            <div class="money-case__grid money-case__grid--briefcase" id="moneyCaseGrid"></div>
-          </div>
-
-          <div class="desk-briefcase__lock desk-briefcase__lock--left"></div>
-          <div class="desk-briefcase__lock desk-briefcase__lock--right"></div>
-          <div class="desk-briefcase__handle"></div>
-        </div>
-      </div>
-
-      <div class="desk-counter-sub" id="balanceFreeMoneyValue">Свободно: 0 ₽</div>
 
       <div class="desk-accounts-wrap">
         <div class="scene-accounts-list scene-accounts-list--desk" id="accountsList"></div>
+
         <button
           class="desk-add-account-btn"
           type="button"
@@ -63,6 +52,7 @@
         >
           +
         </button>
+
         <div class="hidden" id="accountsTotal"></div>
       </div>
 
@@ -77,6 +67,9 @@
           <span class="desk-side-action__label">Доход</span>
         </button>
       </div>
+
+      <!-- Оставляем скрытым, чтобы не ломать текущий JS -->
+      <div class="money-case__grid money-case__grid--briefcase hidden" id="moneyCaseGrid"></div>
     </div>
 
     <div class="desk-bottom-actions">
@@ -90,6 +83,7 @@
         <span class="desk-bottom-btn__label">Категории</span>
       </button>
     </div>
+
   </div>
 </section>
 
