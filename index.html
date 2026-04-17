@@ -100,25 +100,15 @@
         <div class="categories-create-card__note">добавь название и эмодзи</div>
       </div>
 
-      <div class="categories-create-grid">
-        <div class="field categories-create-grid__name">
-          <input
-            class="input"
-            id="newCategoryNameInput"
-            type="text"
-            placeholder="Например: Продукты"
-          />
-        </div>
-
-        <div class="field categories-create-grid__emoji">
-          <input
-            class="input"
-            id="newCategoryIconInput"
-            type="text"
-            placeholder="🍔"
-            maxlength="4"
-          />
-        </div>
+      <div class="categories-create-grid categories-create-grid--single">
+  <div class="field categories-create-grid__name">
+    <input
+      class="input"
+      id="newCategoryNameInput"
+      type="text"
+      placeholder="Например: Продукты"
+    />
+  </div>
       </div>
 
       <button class="btn btn-primary manager-add-btn categories-create-btn" type="button" id="addCategoryBtn">
@@ -588,10 +578,6 @@
     <h3 class="modal-title" id="budgetModalTitle">Редактирование категории</h3>
 
     <div class="field">
-      <input class="input" id="budgetCategoryNameInput" type="text" placeholder="Название категории" />
-    </div>
-
-    <div class="field">
       <input class="input" id="budgetCategoryIconInput" type="text" placeholder="Эмодзи, например 🍔" maxlength="4" />
     </div>
 
@@ -622,10 +608,6 @@
 
     <div class="field">
       <input class="input" id="accountNameInput" type="text" placeholder="Название счёта" />
-    </div>
-
-    <div class="field">
-      <input class="input" id="accountIconInput" type="text" maxlength="4" placeholder="Эмодзи, например 💳" />
     </div>
 
     <div class="field">
@@ -687,10 +669,6 @@
         <input class="input" id="newSafeBucketNameInput" type="text" placeholder="Название накопления" />
       </div>
 
-      <div class="field">
-        <input class="input" id="newSafeBucketIconInput" type="text" placeholder="Эмодзи, например 🏠" maxlength="4" />
-      </div>
-
       <button class="btn btn-primary manager-add-btn" type="button" id="addSafeBucketBtn">
         Добавить счёт
       </button>
@@ -721,16 +699,6 @@
         id="safeBucketNameInput"
         type="text"
         placeholder="Название накопления"
-      />
-    </div>
-
-    <div class="field">
-      <input
-        class="input"
-        id="safeBucketIconInput"
-        type="text"
-        maxlength="4"
-        placeholder="Эмодзи, например 🏠"
       />
     </div>
 
