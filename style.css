@@ -182,21 +182,24 @@ button {
 }
 
 .action-card {
-  min-height: 82px;
+  min-height: 86px;
   padding: 10px 8px;
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.055);
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
   background:
-    linear-gradient(180deg, rgba(43, 47, 59, 0.96) 0%, rgba(32, 35, 45, 0.98) 100%);
+    linear-gradient(180deg, rgba(48, 52, 66, 0.74) 0%, rgba(28, 32, 44, 0.54) 100%);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 9px;
+  gap: 8px;
   text-align: center;
   box-shadow:
-    0 12px 28px rgba(0, 0, 0, 0.24),
-    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    0 10px 22px rgba(0, 0, 0, 0.14),
+    0 0 14px rgba(111, 156, 255, 0.02),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   transition: transform 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
 }
 
@@ -205,36 +208,35 @@ button {
 }
 
 .action-card:hover {
-  border-color: rgba(255, 255, 255, 0.09);
+  border-color: rgba(255, 255, 255, 0.075);
   box-shadow:
-    0 14px 30px rgba(0, 0, 0, 0.28),
-    0 0 20px rgba(111, 156, 255, 0.06),
-    inset 0 1px 0 rgba(255, 255, 255, 0.045);
+    0 12px 26px rgba(0, 0, 0, 0.16),
+    0 0 16px rgba(111, 156, 255, 0.035),
+    inset 0 1px 0 rgba(255, 255, 255, 0.055);
 }
 
 .action-icon {
-  width: 34px;
-  height: 34px;
-  border-radius: 12px;
+  width: 30px;
+  height: 30px;
+  border-radius: 11px;
   background:
-    radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.15), transparent 45%),
-    linear-gradient(180deg, rgba(120, 166, 255, 0.98) 0%, rgba(92, 144, 255, 0.96) 100%);
+    linear-gradient(180deg, rgba(109, 154, 255, 0.92) 0%, rgba(92, 143, 255, 0.84) 100%);
   color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
+  font-size: 14px;
   box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.04),
-    0 10px 22px rgba(111, 156, 255, 0.2);
+    0 0 0 1px rgba(255, 255, 255, 0.03),
+    0 8px 16px rgba(111, 156, 255, 0.14);
 }
 
 .action-label {
-  color: #edf3ff;
-  font-size: 12px;
-  font-weight: 840;
+  color: rgba(237, 243, 255, 0.92);
+  font-size: 11.5px;
+  font-weight: 760;
   line-height: 1.05;
-  letter-spacing: -0.025em;
+  letter-spacing: -0.02em;
 }
 
 /* =========================================================
@@ -2195,9 +2197,10 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   }
 
   .action-card {
-    min-height: 78px;
-    padding: 9px 7px;
-  }
+  min-height: 80px;
+  padding: 9px 7px;
+  border-radius: 22px;
+}
 
   .list-card {
     min-height: 68px;
@@ -2480,65 +2483,25 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 #openCreateAccountModalBtn {
-  width: 54px;
-  height: 54px;
-  min-width: 54px;
-  border-radius: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  width: 46px;
+  height: 46px;
+  min-width: 46px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
   background:
-    linear-gradient(180deg, rgba(111, 156, 255, 0.82) 0%, rgba(86, 132, 245, 0.74) 100%);
+    linear-gradient(180deg, rgba(108, 152, 255, 0.88) 0%, rgba(90, 140, 255, 0.8) 100%);
   box-shadow:
-    0 10px 22px rgba(47, 83, 170, 0.18),
-    inset 0 1px 0 rgba(255, 255, 255, 0.12);
-  color: rgba(255, 255, 255, 0.94);
+    0 8px 18px rgba(47, 83, 170, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.92);
 }
 
 #openCreateAccountModalBtn:hover,
 #openCreateAccountModalBtn:active {
-  transform: translateY(1px);
+  transform: translateY(1px) scale(0.988);
   box-shadow:
-    0 6px 14px rgba(47, 83, 170, 0.14),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
-}
-
-#openExpenseModal,
-#openIncomeModal,
-#openTransferModal,
-#openCategoriesManagerBtn {
-  min-height: 110px;
-  border-radius: 28px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  background:
-    linear-gradient(180deg, rgba(62, 68, 86, 0.46) 0%, rgba(33, 38, 52, 0.28) 100%);
-  box-shadow:
-    0 10px 22px rgba(0, 0, 0, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.06);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-}
-
-#openExpenseModal .quick-action__icon,
-#openIncomeModal .quick-action__icon,
-#openTransferModal .quick-action__icon,
-#openCategoriesManagerBtn .quick-action__icon {
-  width: 52px;
-  height: 52px;
-  border-radius: 18px;
-  background:
-    linear-gradient(180deg, rgba(111, 156, 255, 0.88) 0%, rgba(96, 143, 255, 0.78) 100%);
-  box-shadow:
-    0 8px 18px rgba(80, 120, 220, 0.14),
-    inset 0 1px 0 rgba(255, 255, 255, 0.12);
-}
-
-#openExpenseModal .quick-action__label,
-#openIncomeModal .quick-action__label,
-#openTransferModal .quick-action__label,
-#openCategoriesManagerBtn .quick-action__label {
-  font-size: 15px;
-  font-weight: 760;
-  letter-spacing: -0.02em;
-  color: rgba(255, 255, 255, 0.94);
+    0 6px 14px rgba(47, 83, 170, 0.11),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
 /* =========================================================
