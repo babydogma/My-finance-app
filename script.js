@@ -3322,7 +3322,10 @@ function getAccountRoleFlags(role) {
   const freeMoney = getFreeMoneyTotal();
 
   balanceEl.textContent = formatMoney(balance);
-  accountsTotalEl.textContent = `Всего: ${formatMoney(balance)}`;
+
+  if (accountsTotalEl) {
+    accountsTotalEl.textContent = "";
+  }
 
   if (balanceFreeMoneyValueEl) {
     balanceFreeMoneyValueEl.textContent = `Свободно: ${formatMoney(freeMoney)}`;
