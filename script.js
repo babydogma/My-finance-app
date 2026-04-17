@@ -13,7 +13,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   const budgetModal = document.getElementById("budgetModal");
 const budgetModalTitle = document.getElementById("budgetModalTitle");
 const budgetCategoryNameInput = document.getElementById("budgetCategoryNameInput");
-const budgetCategoryIconInput = document.getElementById("budgetCategoryIconInput");
 const budgetAmountInput = document.getElementById("budgetAmountInput");
 const closeBudgetModalBtn = document.getElementById("closeBudgetModalBtn");
 const saveBudgetBtn = document.getElementById("saveBudgetBtn");
@@ -22,7 +21,6 @@ const deleteBudgetBtn = document.getElementById("deleteBudgetBtn");
 const accountModal = document.getElementById("accountModal");
 const accountModalTitle = document.getElementById("accountModalTitle");
 const accountNameInput = document.getElementById("accountNameInput");
-const accountIconInput = document.getElementById("accountIconInput");
 const accountRoleSelect = document.getElementById("accountRoleSelect");
 const accountPrimarySpendInput = document.getElementById("accountPrimarySpendInput");
 const accountPrimaryNote = document.getElementById("accountPrimaryNote");
@@ -54,7 +52,6 @@ const deleteAccountModalBtn = document.getElementById("deleteAccountModalBtn");
 
   const categoriesManagerList = document.getElementById("categoriesManagerList");
   const newCategoryNameInput = document.getElementById("newCategoryNameInput");
-  const newCategoryIconInput = document.getElementById("newCategoryIconInput");
   const addCategoryBtn = document.getElementById("addCategoryBtn");
 
   const analyticsPeriodButtons = document.querySelectorAll("[data-analytics-period]");
@@ -164,7 +161,6 @@ const addMandatoryPaymentBtn = document.getElementById("addMandatoryPaymentBtn")
   const safeBucketsList = document.getElementById("safeBucketsList");
   const closeSafeBucketsModalBtn = document.getElementById("closeSafeBucketsModalBtn");
   const newSafeBucketNameInput = document.getElementById("newSafeBucketNameInput");
-  const newSafeBucketIconInput = document.getElementById("newSafeBucketIconInput");
   const addSafeBucketBtn = document.getElementById("addSafeBucketBtn");
   
   const safeBucketAmountModal = document.getElementById("safeBucketAmountModal");
@@ -182,7 +178,6 @@ const addMandatoryPaymentBtn = document.getElementById("addMandatoryPaymentBtn")
   const safeBucketAmountModalTitle = document.getElementById("safeBucketAmountModalTitle");
 const safeBucketAmountCurrentValue = document.getElementById("safeBucketAmountCurrentValue");
 const safeBucketNameInput = document.getElementById("safeBucketNameInput");
-const safeBucketIconInput = document.getElementById("safeBucketIconInput");
 const safeBucketAmountInput = document.getElementById("safeBucketAmountInput");
 const closeSafeBucketAmountModalBtn = document.getElementById("closeSafeBucketAmountModalBtn");
 const cancelSafeBucketAmountBtn = document.getElementById("cancelSafeBucketAmountBtn");
@@ -259,9 +254,8 @@ let activeAccountId = null;
   }
 
   function getCategoryIcon(categoryId) {
-    const category = getCategoryById(categoryId);
-    return category ? category.icon : "📦";
-  }
+  return "";
+}
   
   function isRequiredCategory(categoryId) {
   const category = getCategoryById(categoryId);
@@ -289,7 +283,7 @@ function getAccountNameById(accountId) {
 }
 
 function getAccountIconById(accountId) {
-  return getAccountById(accountId)?.icon || "💳";
+  return "";
 }
 
 function getVaultAccount() {
@@ -373,8 +367,7 @@ function getSafeBucketName(bucketId) {
 }
 
 function getSafeBucketIcon(bucketId) {
-  const bucket = getSafeBucketById(bucketId);
-  return bucket ? bucket.icon : "🗂️";
+  return "";
 }
 
 function getSafeInterestAnnualRate() {
@@ -678,7 +671,7 @@ function fillSafeBucketSelect(selectEl, placeholder, selectedId = "") {
   state.safeBuckets.forEach((bucket) => {
     const option = document.createElement("option");
     option.value = bucket.id;
-    option.textContent = `${bucket.icon} ${bucket.name}`;
+    option.textContent = bucket.name;
 
     if (selectedId && selectedId === bucket.id) {
       option.selected = true;
@@ -809,7 +802,7 @@ function fillMandatoryPaymentSafeSelect(selectedId = "") {
   state.safeBuckets.forEach((bucket) => {
     const option = document.createElement("option");
     option.value = bucket.id;
-    option.textContent = `${bucket.icon} ${bucket.name}`;
+    option.textContent = bucket.name;
 
     if (selectedId && selectedId === bucket.id) {
       option.selected = true;
@@ -2024,20 +2017,20 @@ function setInsightsHeroState(summary) {
   }
 
   function fillExpenseCategorySelect(selectedId = "") {
-    categorySelect.innerHTML = `<option value="">Выбери категорию</option>`;
+  categorySelect.innerHTML = `<option value="">Выбери категорию</option>`;
 
-    state.categories.forEach((category) => {
-      const option = document.createElement("option");
-      option.value = category.id;
-      option.textContent = `${category.icon} ${category.name}`;
+  state.categories.forEach((category) => {
+    const option = document.createElement("option");
+    option.value = category.id;
+    option.textContent = category.name;
 
-      if (selectedId && selectedId === category.id) {
-        option.selected = true;
-      }
+    if (selectedId && selectedId === category.id) {
+      option.selected = true;
+    }
 
-      categorySelect.appendChild(option);
-    });
-  }
+    categorySelect.appendChild(option);
+  });
+}
   
   function fillAccountSelect(selectEl, placeholder, selectedValue = "", options = {}) {
   if (!selectEl) return;
@@ -2057,7 +2050,7 @@ function setInsightsHeroState(summary) {
 
     const option = document.createElement("option");
     option.value = account.id;
-    option.textContent = `${account.icon} ${account.name}`;
+    option.textContent = account.name;
 
     if (selectedValue && selectedValue === account.id) {
       option.selected = true;
@@ -2121,7 +2114,7 @@ function setInsightsHeroState(summary) {
   /* =========================================================
      07. MODALS: BUDGET / ACCOUNTS / НАКОПЛЕНИЯ
      ========================================================= */
-  function openBudgetModal(categoryId) {
+function openBudgetModal(categoryId) {
   const category = getCategoryById(categoryId);
   if (!category) return;
 
@@ -2129,9 +2122,8 @@ function setInsightsHeroState(summary) {
 
   const existing = getBudgetLimitByCategoryId(categoryId);
 
-  budgetModalTitle.textContent = `Редактирование: ${category.icon} ${category.name}`;
+  budgetModalTitle.textContent = `Редактирование: ${category.name}`;
   budgetCategoryNameInput.value = category.name || "";
-  budgetCategoryIconInput.value = category.icon || "";
   budgetAmountInput.value = existing ? Number(existing.monthly_limit) : "";
   deleteBudgetBtn.classList.toggle("hidden", !existing);
 
@@ -2144,7 +2136,6 @@ function closeBudgetModal() {
   document.body.style.overflow = "";
   activeBudgetCategoryId = null;
   budgetCategoryNameInput.value = "";
-  budgetCategoryIconInput.value = "";
   budgetAmountInput.value = "";
 }
 
@@ -2181,7 +2172,6 @@ function openCreateAccountModal() {
 
   accountModalTitle.textContent = "Новый счёт";
   accountNameInput.value = "";
-  accountIconInput.value = "💳";
   accountRoleSelect.value = "spend";
   accountPrimarySpendInput.checked = false;
 
@@ -2198,9 +2188,8 @@ function openAccountModal(accountId) {
 
   activeAccountId = accountId;
 
-  accountModalTitle.textContent = `Счёт: ${account.icon} ${account.name}`;
+  accountModalTitle.textContent = `Счёт: ${account.name}`;
   accountNameInput.value = account.name || "";
-  accountIconInput.value = account.icon || "";
   accountRoleSelect.value = account.account_kind || "spend";
   accountPrimarySpendInput.checked = Boolean(account.is_primary_spend);
 
@@ -2219,7 +2208,6 @@ function closeAccountModal() {
   activeAccountId = null;
 
   accountNameInput.value = "";
-  accountIconInput.value = "";
   accountRoleSelect.value = "spend";
   accountPrimarySpendInput.checked = false;
   deleteAccountModalBtn?.classList.add("hidden");
@@ -2227,16 +2215,10 @@ function closeAccountModal() {
 
 async function saveAccountModal() {
   const nextName = accountNameInput.value.trim();
-  const nextIcon = accountIconInput.value.trim();
   const nextRole = accountRoleSelect.value;
 
   if (!nextName) {
     alert("Введи название счёта");
-    return;
-  }
-
-  if (!nextIcon) {
-    alert("Введи эмодзи счёта");
     return;
   }
 
@@ -2282,7 +2264,6 @@ async function saveAccountModal() {
       .from("accounts")
       .update({
         name: nextName,
-        icon: nextIcon,
         account_kind: nextRole,
         include_in_free_money: flags.include_in_free_money,
         is_protected: flags.is_protected,
@@ -2305,7 +2286,6 @@ async function saveAccountModal() {
       .insert({
         id: crypto.randomUUID(),
         name: nextName,
-        icon: nextIcon,
         account_kind: nextRole,
         include_in_free_money: flags.include_in_free_money,
         is_protected: flags.is_protected,
@@ -2402,10 +2382,9 @@ function openSafeBucketAmountModal(bucketId) {
 
   const balance = getSafeBucketBalance(bucketId);
 
-  safeBucketAmountModalTitle.textContent = `${bucket.icon} ${bucket.name}`;
+  safeBucketAmountModalTitle.textContent = bucket.name;
   safeBucketAmountCurrentValue.textContent = `Сейчас: ${formatMoney(balance)}`;
   safeBucketNameInput.value = bucket.name || "";
-  safeBucketIconInput.value = bucket.icon || "";
   safeBucketAmountInput.value = String(balance).replace(".", ",");
 
   if (deleteSafeBucketBtn) {
@@ -2423,7 +2402,6 @@ function closeSafeBucketAmountModal() {
   safeBucketAmountModal.classList.add("hidden");
   activeSafeBucketAmountId = null;
   safeBucketNameInput.value = "";
-  safeBucketIconInput.value = "";
   safeBucketAmountInput.value = "";
 
   if (deleteSafeBucketBtn) {
@@ -2484,8 +2462,8 @@ function renderSafeBucketsModal() {
 
   safeBucketsModalTotalLabel.textContent = `Общий баланс: ${formatMoney(totalSafeBalance)}`;
   if (safeBucketsRateValue) {
-  safeBucketsRateValue.textContent = formatPercentLabel(getSafeInterestAnnualRate());
-}
+    safeBucketsRateValue.textContent = formatPercentLabel(getSafeInterestAnnualRate());
+  }
   safeBucketsUnassignedValue.textContent =
     Math.abs(unassignedBalance) < 0.009 ? formatMoney(0) : formatMoney(unassignedBalance);
 
@@ -2518,8 +2496,6 @@ function renderSafeBucketsModal() {
 
     card.innerHTML = `
       <div class="safe-bucket-row__left">
-        <div class="safe-bucket-row__icon">${bucket.icon}</div>
-
         <div class="safe-bucket-row__text">
           <div class="safe-bucket-row__title">${escapeHtml(bucket.name)}</div>
           <div class="safe-bucket-row__meta">
@@ -2541,7 +2517,6 @@ function renderSafeBucketsModal() {
 
 async function addSafeBucket() {
   const name = newSafeBucketNameInput.value.trim();
-  const icon = newSafeBucketIconInput.value.trim() || "🗂️";
 
   if (!name) {
     alert("Введите название накопления");
@@ -2550,7 +2525,7 @@ async function addSafeBucket() {
 
   const newSafeBucket = {
     name,
-    icon,
+    icon: "",
     is_locked: false,
     sort_order: state.safeBuckets.length + 1,
   };
@@ -2566,7 +2541,6 @@ async function addSafeBucket() {
   }
 
   newSafeBucketNameInput.value = "";
-  newSafeBucketIconInput.value = "";
 
   await loadDataFromSupabase();
   renderAll();
@@ -2577,17 +2551,11 @@ async function saveSafeBucketAmount() {
   if (!activeSafeBucketAmountId) return;
 
   const nextName = safeBucketNameInput.value.trim();
-  const nextIcon = safeBucketIconInput.value.trim();
   const normalized = safeBucketAmountInput.value.replace(/\s/g, "").replace(",", ".");
   const nextAmount = Number(normalized);
 
   if (!nextName) {
     alert("Введи название накопления");
-    return;
-  }
-
-  if (!nextIcon) {
-    alert("Введи эмодзи накопления");
     return;
   }
 
@@ -2600,7 +2568,6 @@ async function saveSafeBucketAmount() {
     .from("safe_buckets")
     .update({
       name: nextName,
-      icon: nextIcon,
     })
     .eq("id", activeSafeBucketAmountId);
 
@@ -4146,55 +4113,47 @@ function getAccountRoleFlags(role) {
   /* =========================================================
      10. CATEGORIES / BUDGETS CRUD
      ========================================================= */
-  async function addCategory() {
-    const name = newCategoryNameInput.value.trim();
-    const icon = newCategoryIconInput.value.trim() || "📦";
+async function addCategory() {
+  const name = newCategoryNameInput.value.trim();
 
-    if (!name) {
-      alert("Введите название категории");
-      return;
-    }
-
-    const newCategory = {
-  id: crypto.randomUUID(),
-  name,
-  icon,
-  locked: false,
-  is_required: false,
-  sort_order: state.categories.length + 1,
-};
-
-    const { error } = await supabaseClient
-      .from("categories")
-      .insert(newCategory);
-
-    if (error) {
-      alert("Ошибка добавления категории");
-      console.error(error);
-      return;
-    }
-
-    newCategoryNameInput.value = "";
-    newCategoryIconInput.value = "";
-
-    await loadDataFromSupabase();
-    renderAll();
+  if (!name) {
+    alert("Введите название категории");
+    return;
   }
+
+  const newCategory = {
+    id: crypto.randomUUID(),
+    name,
+    icon: "",
+    locked: false,
+    is_required: false,
+    sort_order: state.categories.length + 1,
+  };
+
+  const { error } = await supabaseClient
+    .from("categories")
+    .insert(newCategory);
+
+  if (error) {
+    alert("Ошибка добавления категории");
+    console.error(error);
+    return;
+  }
+
+  newCategoryNameInput.value = "";
+
+  await loadDataFromSupabase();
+  renderAll();
+}
 
 async function saveBudgetLimit() {
   if (!activeBudgetCategoryId) return;
 
   const nextName = budgetCategoryNameInput.value.trim();
-  const nextIcon = budgetCategoryIconInput.value.trim();
   const amount = Number(budgetAmountInput.value.trim());
 
   if (!nextName) {
     alert("Введи название категории");
-    return;
-  }
-
-  if (!nextIcon) {
-    alert("Введи эмодзи категории");
     return;
   }
 
@@ -4207,7 +4166,6 @@ async function saveBudgetLimit() {
     .from("categories")
     .update({
       name: nextName,
-      icon: nextIcon,
     })
     .eq("id", activeBudgetCategoryId);
 
