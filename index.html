@@ -13,71 +13,81 @@
     <!-- MAIN VIEW -->
     <div id="mainView">
 
-  <!-- MAIN DESK SCENE -->
+    <!-- MAIN DESK SCENE -->
 <section class="wallet-scene-section wallet-scene-section--desk">
   <div class="wallet-scene wallet-scene--desk">
-    <div class="wallet-scene__surface wallet-scene__surface--desk"></div>
+    <div class="wallet-scene__bg"></div>
 
-    <div class="desk-counter">
-      <div class="desk-counter__label">Всего</div>
-      <div class="desk-counter__value balance-amount">0 ₽</div>
-      <div class="desk-counter__sub" id="balanceFreeMoneyValue">Свободно: 0 ₽</div>
-    </div>
+    <div class="desk-table">
+      <div class="desk-table__top"></div>
+      <div class="desk-table__leg desk-table__leg--lt"></div>
+      <div class="desk-table__leg desk-table__leg--rt"></div>
+      <div class="desk-table__leg desk-table__leg--lb"></div>
+      <div class="desk-table__leg desk-table__leg--rb"></div>
 
-    <div class="desk-cards">
-      <div class="desk-cards__head">
-        <div class="desk-cards__title">Счета</div>
+      <div class="desk-counter">
+        <div class="desk-counter__screen">
+          <div class="desk-counter__value balance-amount">0 ₽</div>
+        </div>
+      </div>
 
+      <div class="desk-briefcase">
+        <div class="desk-briefcase__hinge desk-briefcase__hinge--left"></div>
+        <div class="desk-briefcase__hinge desk-briefcase__hinge--right"></div>
+
+        <div class="desk-briefcase__lid">
+          <div class="desk-briefcase__lid-inner"></div>
+        </div>
+
+        <div class="desk-briefcase__body">
+          <div class="desk-briefcase__inner">
+            <div class="money-case__grid money-case__grid--briefcase" id="moneyCaseGrid"></div>
+          </div>
+
+          <div class="desk-briefcase__lock desk-briefcase__lock--left"></div>
+          <div class="desk-briefcase__lock desk-briefcase__lock--right"></div>
+          <div class="desk-briefcase__handle"></div>
+        </div>
+      </div>
+
+      <div class="desk-counter-sub" id="balanceFreeMoneyValue">Свободно: 0 ₽</div>
+
+      <div class="desk-accounts-wrap">
+        <div class="scene-accounts-list scene-accounts-list--desk" id="accountsList"></div>
         <button
-          class="scene-icon-btn desk-cards__add"
+          class="desk-add-account-btn"
           type="button"
           id="openCreateAccountModalBtn"
           aria-label="Добавить счёт"
           title="Добавить счёт"
         >
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M12 5v14M5 12h14" />
-          </svg>
+          +
+        </button>
+        <div class="hidden" id="accountsTotal"></div>
+      </div>
+
+      <div class="desk-side-actions">
+        <button class="desk-side-action desk-side-action--expense" type="button" id="openExpenseModal">
+          <span class="desk-side-action__icon">−</span>
+          <span class="desk-side-action__label">Расход</span>
+        </button>
+
+        <button class="desk-side-action desk-side-action--income" type="button" id="openIncomeModal">
+          <span class="desk-side-action__icon">+</span>
+          <span class="desk-side-action__label">Доход</span>
         </button>
       </div>
-
-      <div class="scene-accounts-list scene-accounts-list--desk" id="accountsList"></div>
-      <div class="hidden" id="accountsTotal"></div>
-    </div>
-
-    <div class="desk-briefcase">
-      <div class="desk-briefcase__lid">
-        <div class="desk-briefcase__lid-inner"></div>
-      </div>
-
-      <div class="desk-briefcase__base">
-        <div class="desk-briefcase__inner">
-          <div class="money-case__grid money-case__grid--briefcase" id="moneyCaseGrid"></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="desk-actions">
-      <button class="scene-action-btn scene-action-btn--expense desk-actions__btn" type="button" id="openExpenseModal">
-        <span class="scene-action-btn__icon">−</span>
-        <span class="scene-action-btn__label">Расход</span>
-      </button>
-
-      <button class="scene-action-btn scene-action-btn--income desk-actions__btn" type="button" id="openIncomeModal">
-        <span class="scene-action-btn__icon">+</span>
-        <span class="scene-action-btn__label">Доход</span>
-      </button>
     </div>
 
     <div class="desk-bottom-actions">
-      <button class="scene-utility-btn scene-utility-btn--desk" type="button" id="openTransferModal">
-        <span class="scene-utility-btn__icon">↗</span>
-        <span class="scene-utility-btn__label">Перевод</span>
+      <button class="desk-bottom-btn" type="button" id="openTransferModal">
+        <span class="desk-bottom-btn__icon">↗</span>
+        <span class="desk-bottom-btn__label">Перевод</span>
       </button>
 
-      <button class="scene-utility-btn scene-utility-btn--desk" type="button" id="openCategoriesManagerBtn">
-        <span class="scene-utility-btn__icon">⇄</span>
-        <span class="scene-utility-btn__label">Категории</span>
+      <button class="desk-bottom-btn" type="button" id="openCategoriesManagerBtn">
+        <span class="desk-bottom-btn__icon">⇄</span>
+        <span class="desk-bottom-btn__label">Категории</span>
       </button>
     </div>
   </div>
