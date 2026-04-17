@@ -185,9 +185,9 @@ button {
   min-height: 86px;
   padding: 10px 8px;
   border-radius: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.048);
   background:
-    linear-gradient(180deg, rgba(48, 52, 66, 0.74) 0%, rgba(28, 32, 44, 0.54) 100%);
+    linear-gradient(180deg, rgba(58, 63, 78, 0.46) 0%, rgba(31, 35, 46, 0.32) 100%);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -195,12 +195,13 @@ button {
   gap: 8px;
   text-align: center;
   box-shadow:
-    0 10px 22px rgba(0, 0, 0, 0.14),
-    0 0 14px rgba(111, 156, 255, 0.02),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  transition: transform 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
+    0 10px 20px rgba(0, 0, 0, 0.12),
+    0 0 12px rgba(111, 156, 255, 0.012),
+    inset 0 1px 0 rgba(255, 255, 255, 0.045),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.012);
+  backdrop-filter: blur(13px);
+  -webkit-backdrop-filter: blur(13px);
+  transition: transform 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
 }
 
 .action-card:active {
@@ -208,35 +209,36 @@ button {
 }
 
 .action-card:hover {
-  border-color: rgba(255, 255, 255, 0.075);
+  border-color: rgba(255, 255, 255, 0.062);
   box-shadow:
-    0 12px 26px rgba(0, 0, 0, 0.16),
-    0 0 16px rgba(111, 156, 255, 0.035),
-    inset 0 1px 0 rgba(255, 255, 255, 0.055);
+    0 12px 24px rgba(0, 0, 0, 0.14),
+    0 0 14px rgba(111, 156, 255, 0.02),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 .action-icon {
-  width: 30px;
-  height: 30px;
-  border-radius: 11px;
+  width: 28px;
+  height: 28px;
+  border-radius: 10px;
   background:
-    linear-gradient(180deg, rgba(109, 154, 255, 0.92) 0%, rgba(92, 143, 255, 0.84) 100%);
-  color: #fff;
+    linear-gradient(180deg, rgba(126, 140, 176, 0.52) 0%, rgba(91, 103, 136, 0.38) 100%);
+  color: rgba(245, 248, 255, 0.88);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
+  font-size: 13px;
   box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.03),
-    0 8px 16px rgba(111, 156, 255, 0.14);
+    0 0 0 1px rgba(255, 255, 255, 0.025),
+    0 6px 12px rgba(70, 84, 120, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
 .action-label {
-  color: rgba(237, 243, 255, 0.92);
+  color: rgba(232, 238, 248, 0.82);
   font-size: 11.5px;
-  font-weight: 760;
+  font-weight: 700;
   line-height: 1.05;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.018em;
 }
 
 /* =========================================================
@@ -2483,25 +2485,27 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 #openCreateAccountModalBtn {
-  width: 46px;
-  height: 46px;
-  min-width: 46px;
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  border-radius: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.055);
   background:
-    linear-gradient(180deg, rgba(108, 152, 255, 0.88) 0%, rgba(90, 140, 255, 0.8) 100%);
+    linear-gradient(180deg, rgba(124, 139, 176, 0.58) 0%, rgba(90, 103, 136, 0.42) 100%);
   box-shadow:
-    0 8px 18px rgba(47, 83, 170, 0.14),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.92);
+    0 8px 16px rgba(32, 38, 54, 0.16),
+    0 0 12px rgba(111, 156, 255, 0.015),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  color: rgba(244, 248, 255, 0.88);
 }
 
 #openCreateAccountModalBtn:hover,
 #openCreateAccountModalBtn:active {
   transform: translateY(1px) scale(0.988);
   box-shadow:
-    0 6px 14px rgba(47, 83, 170, 0.11),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    0 6px 12px rgba(32, 38, 54, 0.14),
+    0 0 10px rgba(111, 156, 255, 0.012),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
 /* =========================================================
