@@ -4572,12 +4572,12 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     min-width: 30px;
     border-radius: 10px;
 
-     /* =========================================================
-   35. DESK SCENE — ASSET BASED COMPOSITION
+/* =========================================================
+   35. DESK SCENE — ASSET BASED COMPOSITION (FIXED)
    ========================================================= */
 
 .wallet-scene-section--desk {
-  margin-top: 6px;
+  margin-top: 4px;
 }
 
 .wallet-scene--desk {
@@ -4591,10 +4591,12 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 .desk-scene {
   position: relative;
-  min-height: 760px;
+  min-height: 560px;
+  overflow: hidden;
   border-radius: 34px;
-  overflow: visible;
 }
+
+/* ---------- ASSETS ---------- */
 
 .desk-scene__table,
 .desk-scene__briefcase {
@@ -4607,34 +4609,36 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 .desk-scene__table {
   left: 50%;
-  top: 96px;
-  width: 100%;
-  max-width: 452px;
+  top: 28px;
+  width: 112%;
+  max-width: none;
   transform: translateX(-50%);
   z-index: 1;
 }
 
 .desk-scene__briefcase {
   left: 50%;
-  top: 218px;
-  width: 100%;
-  max-width: 288px;
+  top: 150px;
+  width: 63%;
+  max-width: none;
   transform: translateX(-50%);
   z-index: 3;
-  filter: drop-shadow(0 22px 36px rgba(0, 0, 0, 0.28));
+  filter: drop-shadow(0 18px 28px rgba(0, 0, 0, 0.26));
 }
+
+/* ---------- COUNTER ---------- */
 
 .desk-counter {
   position: absolute;
-  top: 118px;
+  top: 74px;
   left: 18px;
-  width: 148px;
+  width: 132px;
   z-index: 4;
 }
 
 .desk-counter__screen {
-  min-height: 78px;
-  padding: 10px 12px;
+  min-height: 72px;
+  padding: 10px 10px;
   border-radius: 22px;
   background:
     linear-gradient(180deg, rgba(34, 38, 48, 0.98) 0%, rgba(18, 21, 29, 1) 100%);
@@ -4665,7 +4669,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   width: 100%;
   text-align: center;
   color: #c8f4b0;
-  font-size: 25px;
+  font-size: 24px;
   line-height: 0.92;
   font-weight: 920;
   letter-spacing: -0.06em;
@@ -4676,42 +4680,44 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .desk-counter__sub {
-  margin-top: 8px;
+  margin-top: 6px;
   color: rgba(245, 247, 252, 0.72);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 760;
   letter-spacing: -0.02em;
   text-align: center;
 }
 
+/* ---------- ACCOUNTS ON TABLE ---------- */
+
 .desk-accounts-wrap {
   position: absolute;
-  left: 18px;
-  top: 412px;
-  width: 142px;
-  min-height: 220px;
+  left: 20px;
+  top: 340px;
+  width: 132px;
+  min-height: 170px;
   z-index: 4;
 }
 
 .scene-accounts-list--desk {
   position: relative;
-  min-height: 210px;
+  min-height: 168px;
 }
 
 .scene-accounts-list--desk .scene-account-card {
   position: absolute;
-  width: 84px;
-  min-height: 116px;
-  padding: 9px 8px 8px;
+  width: 72px;
+  min-height: 96px;
+  padding: 8px 7px 7px;
   border: 1px solid rgba(255, 255, 255, 0.16);
-  border-radius: 18px;
+  border-radius: 16px;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.34) 0%, rgba(226, 234, 247, 0.18) 100%);
   box-shadow:
-    0 12px 20px rgba(0, 0, 0, 0.14),
+    0 10px 18px rgba(0, 0, 0, 0.14),
     inset 0 1px 0 rgba(255, 255, 255, 0.24);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   overflow: hidden;
 }
 
@@ -4726,18 +4732,18 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .scene-accounts-list--desk .scene-account-card:nth-child(1) {
   left: 0;
   top: 0;
-  transform: rotate(-9deg);
+  transform: rotate(-8deg);
 }
 
 .scene-accounts-list--desk .scene-account-card:nth-child(2) {
-  left: 10px;
-  top: 86px;
-  transform: rotate(-3deg);
+  left: 0;
+  top: 78px;
+  transform: rotate(-1deg);
 }
 
 .scene-accounts-list--desk .scene-account-card:nth-child(3) {
-  left: 74px;
-  top: 92px;
+  left: 66px;
+  top: 82px;
   transform: rotate(4deg);
 }
 
@@ -4751,77 +4757,79 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .scene-accounts-list--desk .scene-account-card__icon {
-  width: 10px;
-  height: 10px;
-  flex: 0 0 10px;
+  width: 9px;
+  height: 9px;
+  flex: 0 0 9px;
   color: rgba(16, 20, 28, 0.78);
 }
 
 .scene-accounts-list--desk .scene-account-card__icon svg {
-  width: 10px;
-  height: 10px;
+  width: 9px;
+  height: 9px;
 }
 
 .scene-accounts-list--desk .scene-account-card__name {
   color: rgba(18, 22, 28, 0.92);
-  font-size: 7px;
+  font-size: 6.4px;
   font-weight: 860;
-  line-height: 1.05;
+  line-height: 1.04;
   white-space: normal;
   overflow: hidden;
   text-overflow: clip;
 }
 
 .scene-accounts-list--desk .scene-account-card__role {
-  margin-top: 10px;
+  margin-top: 8px;
   color: rgba(24, 28, 36, 0.34);
-  font-size: 5.6px;
+  font-size: 5.2px;
   font-weight: 760;
   line-height: 1.04;
 }
 
 .scene-accounts-list--desk .scene-account-card__value {
-  margin-top: 10px;
+  margin-top: 8px;
   color: rgba(12, 16, 22, 0.9);
-  font-size: 7px;
+  font-size: 6.6px;
   font-weight: 900;
   letter-spacing: -0.02em;
 }
 
 .desk-add-account-btn {
   position: absolute;
-  left: 94px;
-  top: -12px;
-  width: 32px;
-  height: 32px;
+  left: 92px;
+  top: -8px;
+  width: 26px;
+  height: 26px;
   border: none;
-  border-radius: 12px;
+  border-radius: 10px;
   background:
     linear-gradient(180deg, rgba(210, 218, 237, 0.94) 0%, rgba(171, 181, 212, 0.88) 100%);
   color: rgba(255,255,255,0.92);
-  font-size: 22px;
+  font-size: 18px;
   line-height: 1;
   box-shadow:
-    0 8px 16px rgba(0,0,0,0.14),
+    0 8px 14px rgba(0,0,0,0.14),
     inset 0 1px 0 rgba(255,255,255,0.16);
   z-index: 5;
 }
 
+/* ---------- SIDE ACTIONS ---------- */
+
 .desk-side-actions {
   position: absolute;
-  right: 20px;
-  top: 338px;
+  right: 18px;
+  top: 318px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
   z-index: 4;
 }
 
 .desk-side-action {
-  width: 82px;
-  min-height: 82px;
+  width: 70px;
+  min-height: 70px;
   border: none;
-  border-radius: 22px;
+  border-radius: 20px;
   background:
     linear-gradient(180deg, rgba(28, 32, 43, 0.96) 0%, rgba(17, 20, 29, 1) 100%);
   border: 1px solid rgba(255,255,255,0.06);
@@ -4832,45 +4840,49 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 7px;
+  gap: 6px;
 }
 
 .desk-side-action__icon {
-  width: 26px;
-  height: 26px;
-  border-radius: 10px;
+  width: 22px;
+  height: 22px;
+  border-radius: 8px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   background:
     linear-gradient(180deg, rgba(156, 168, 197, 0.34) 0%, rgba(108, 120, 152, 0.2) 100%);
   color: rgba(245,248,255,0.9);
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 800;
 }
 
 .desk-side-action__label {
   color: #eef3ff;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 780;
   letter-spacing: -0.02em;
 }
+
+/* ---------- MONEY GRID OFF ---------- */
 
 .money-case__grid--briefcase {
   display: none !important;
 }
 
+/* ---------- BOTTOM ACTIONS ---------- */
+
 .desk-bottom-actions {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 14px;
-  margin-top: 10px;
+  gap: 12px;
+  margin-top: -8px;
 }
 
 .desk-bottom-btn {
-  min-height: 82px;
+  min-height: 72px;
   border: none;
-  border-radius: 28px;
+  border-radius: 24px;
   background:
     linear-gradient(180deg, rgba(22, 27, 39, 0.94) 0%, rgba(15, 19, 29, 0.99) 100%);
   border: 1px solid rgba(255,255,255,0.06);
@@ -4880,52 +4892,55 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: 10px;
 }
 
 .desk-bottom-btn__icon {
-  width: 30px;
-  height: 30px;
-  border-radius: 10px;
+  width: 26px;
+  height: 26px;
+  border-radius: 9px;
   background:
     linear-gradient(180deg, rgba(156, 168, 197, 0.34) 0%, rgba(108, 120, 152, 0.2) 100%);
   color: rgba(245,248,255,0.9);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 15px;
+  font-size: 14px;
 }
 
 .desk-bottom-btn__label {
   color: #eef3ff;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 780;
   letter-spacing: -0.025em;
 }
 
+/* ---------- MOBILE ---------- */
+
 @media (max-width: 420px) {
   .desk-scene {
-    min-height: 708px;
+    min-height: 520px;
+    border-radius: 28px;
   }
 
   .desk-scene__table {
-    top: 92px;
-    max-width: 410px;
+    top: 20px;
+    width: 116%;
   }
 
   .desk-scene__briefcase {
-    top: 214px;
-    max-width: 260px;
+    top: 142px;
+    width: 66%;
   }
 
   .desk-counter {
-    top: 114px;
+    top: 66px;
     left: 14px;
-    width: 134px;
+    width: 124px;
   }
 
   .desk-counter__screen {
-    min-height: 72px;
+    min-height: 68px;
     border-radius: 20px;
     padding: 9px 10px;
   }
@@ -4940,91 +4955,88 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   }
 
   .desk-counter__sub {
-    font-size: 10px;
-    margin-top: 7px;
+    font-size: 9.5px;
+    margin-top: 6px;
   }
 
   .desk-accounts-wrap {
-    left: 14px;
-    top: 398px;
-    width: 132px;
-    min-height: 208px;
+    left: 16px;
+    top: 326px;
+    width: 126px;
+    min-height: 160px;
   }
 
   .scene-accounts-list--desk {
-    min-height: 198px;
+    min-height: 160px;
   }
 
   .scene-accounts-list--desk .scene-account-card {
-    width: 78px;
-    min-height: 106px;
-    padding: 8px 7px 7px;
-    border-radius: 16px;
+    width: 68px;
+    min-height: 90px;
+    padding: 7px 6px 6px;
+    border-radius: 15px;
   }
 
   .scene-accounts-list--desk .scene-account-card:nth-child(2) {
-    top: 82px;
+    top: 72px;
   }
 
   .scene-accounts-list--desk .scene-account-card:nth-child(3) {
-    left: 66px;
-    top: 88px;
+    left: 60px;
+    top: 76px;
   }
 
   .desk-add-account-btn {
-    left: 88px;
-    top: -10px;
-    width: 30px;
-    height: 30px;
-    border-radius: 11px;
-    font-size: 21px;
+    left: 86px;
+    top: -6px;
+    width: 24px;
+    height: 24px;
+    border-radius: 9px;
+    font-size: 17px;
   }
 
   .desk-side-actions {
     right: 14px;
-    top: 324px;
-    gap: 10px;
+    top: 304px;
+    gap: 8px;
   }
 
   .desk-side-action {
-    width: 74px;
-    min-height: 74px;
-    border-radius: 20px;
-    gap: 6px;
+    width: 64px;
+    min-height: 64px;
+    border-radius: 18px;
+    gap: 5px;
   }
 
   .desk-side-action__icon {
-    width: 24px;
-    height: 24px;
-    border-radius: 9px;
-    font-size: 14px;
+    width: 20px;
+    height: 20px;
+    border-radius: 7px;
+    font-size: 12px;
   }
 
   .desk-side-action__label {
-    font-size: 10.5px;
+    font-size: 9px;
   }
 
   .desk-bottom-actions {
     gap: 10px;
-    margin-top: 8px;
+    margin-top: -2px;
   }
 
   .desk-bottom-btn {
-    min-height: 72px;
-    border-radius: 24px;
-    gap: 10px;
+    min-height: 68px;
+    border-radius: 22px;
+    gap: 9px;
   }
 
   .desk-bottom-btn__icon {
-    width: 26px;
-    height: 26px;
-    font-size: 14px;
+    width: 24px;
+    height: 24px;
+    font-size: 13px;
   }
 
   .desk-bottom-btn__label {
-    font-size: 13px;
+    font-size: 12.5px;
   }
 }
-  }
-}
-
