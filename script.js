@@ -3336,11 +3336,7 @@ function getAccountRoleFlags(role) {
     const currentBalance = getAccountBalance(account.id);
 
     const card = document.createElement("div");
-    card.className = "list-card";
-
-    if (account.id === getSafeAccountId()) {
-      card.classList.add("list-card--clickable");
-    }
+    card.className = "list-card list-card--clickable";
 
     const accountTone =
       account.account_kind === "spend"
@@ -3361,29 +3357,16 @@ function getAccountRoleFlags(role) {
       </div>
       <div class="list-right">
         <p class="list-value">${formatMoney(currentBalance)}</p>
-        <button
-          class="icon-action-btn"
-          type="button"
-          data-edit-account-id="${account.id}"
-          aria-label="Редактировать счёт"
-          title="Редактировать счёт"
-        >
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M4 20h4l10-10-4-4L4 16v4Z" />
-            <path d="M13 7l4 4" />
-          </svg>
-        </button>
       </div>
     `;
 
-    card.querySelector("[data-edit-account-id]")?.addEventListener("click", (event) => {
-      event.stopPropagation();
-      openAccountModal(account.id);
+    card.addEventListener("click", () => {
+      if (account.id === getSafeAccountId()) {
+        openSafeBucketsModal();
+      } else {
+        openAccountModal(account.id);
+      }
     });
-
-    if (account.id === getSafeAccountId()) {
-      card.addEventListener("click", openSafeBucketsModal);
-    }
 
     accountsListEl.appendChild(card);
   });
