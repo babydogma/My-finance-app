@@ -938,20 +938,16 @@ function renderMandatoryPaymentsModal() {
       const card = document.createElement("div");
       card.className = "list-card";
       card.innerHTML = `
-        <div class="list-icon ${isPaid ? "list-icon--green" : "list-icon--red"}">
-          ${isPaid ? "✓" : "!"}
-        </div>
+  <div class="list-body">
+    <div class="list-title-row">
+      <h3 class="list-title">${escapeHtml(item.title)}</h3>
+    </div>
+    <p class="list-subtitle">
+      ${formatMoney(item.amount)} • до ${String(item.due_day).padStart(2, "0")} числа • ${coverageText} • ${isPaid ? "Оплачен" : "Не оплачен"}
+    </p>
+  </div>
 
-        <div class="list-body">
-          <div class="list-title-row">
-            <h3 class="list-title">${escapeHtml(item.title)}</h3>
-          </div>
-          <p class="list-subtitle">
-            ${formatMoney(item.amount)} • до ${String(item.due_day).padStart(2, "0")} числа • ${coverageText} • ${isPaid ? "Оплачен" : "Не оплачен"}
-          </p>
-        </div>
-
-        <div class="category-manager-actions">
+  <div class="category-manager-actions">
   <button
     class="icon-action-btn icon-action-btn--toggle ${isPaid ? "is-active" : ""}"
     type="button"
@@ -2660,8 +2656,8 @@ async function deleteSafeBucketFromModal() {
 
     const isTransferCategory = categoryId === "transfers";
     const title = isTransferCategory
-      ? "💸 Переводы"
-      : `${getCategoryIcon(categoryId)} ${getCategoryName(categoryId)}`;
+  ? "Переводы"
+  : getCategoryName(categoryId);
 
     const periodLabel = getAnalyticsPeriodLabel() || "Период";
     const transactions = getAnalyticsTransactionsByCategory(categoryId);
@@ -3004,6 +3000,52 @@ toAccountSelect.value = transaction.to_account_id || "";
   return account.is_primary_spend ? "Основной счёт" : "Обычный счёт";
 }
 
+function getAccountRoleIconName(account) {
+  if (account.account_kind === "vault_pool") return "vault";
+  if (account.account_kind === "reserve") return "shield";
+  if (account.account_kind === "cash") return "cash";
+  return "card";
+}
+
+function getAccountRoleIconSvg(account) {
+  const iconName = getAccountRoleIconName(account);
+
+  if (iconName === "vault") {
+    return `
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M4 10.5 12 5l8 5.5" />
+        <path d="M6 10.5V19h12v-8.5" />
+        <path d="M9.5 19v-5h5v5" />
+      </svg>
+    `;
+  }
+
+  if (iconName === "shield") {
+    return `
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 4 18 6.5v5.2c0 3.7-2.2 6.3-6 8.3-3.8-2-6-4.6-6-8.3V6.5L12 4Z" />
+      </svg>
+    `;
+  }
+
+  if (iconName === "cash") {
+    return `
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M3.5 7.5h17v9h-17z" />
+        <path d="M7 12h10" />
+        <circle cx="12" cy="12" r="2.2" />
+      </svg>
+    `;
+  }
+
+  return `
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <rect x="3.5" y="6.5" width="17" height="11" rx="2.5" />
+      <path d="M3.5 10h17" />
+    </svg>
+  `;
+}
+
 function canAccountBePrimary(role) {
   return role === "spend" || role === "cash";
 }
@@ -3341,23 +3383,18 @@ function getAccountRoleFlags(role) {
     const card = document.createElement("div");
     card.className = "list-card list-card--clickable";
 
-    const accountTone =
-      account.account_kind === "spend"
-        ? "list-icon--green"
-        : account.account_kind === "cash"
-        ? "list-icon--blue"
-        : account.account_kind === "reserve"
-        ? "list-icon--neutral"
-        : "list-icon--amber";
-
     card.innerHTML = `
-      <div class="list-icon ${accountTone}">${account.icon}</div>
+      <div class="list-icon list-icon--account">
+        ${getAccountRoleIconSvg(account)}
+      </div>
+
       <div class="list-body">
         <div class="list-title-row">
           <h3 class="list-title">${escapeHtml(account.name)}</h3>
         </div>
         <p class="list-subtitle">${escapeHtml(getAccountRoleLabel(account))}</p>
       </div>
+
       <div class="list-right">
         <p class="list-value">${formatMoney(currentBalance)}</p>
       </div>
@@ -3376,175 +3413,150 @@ function getAccountRoleFlags(role) {
 }
 
   function renderCategoriesManager() {
-    categoriesManagerList.innerHTML = "";
+  categoriesManagerList.innerHTML = "";
 
-    state.categories.forEach((category) => {
-      const card = document.createElement("div");
-      card.className = "list-card";
+  state.categories.forEach((category) => {
+    const card = document.createElement("div");
+    card.className = "list-card";
 
-      const lockedAttr = category.locked ? "disabled" : "";
-      const lockedSubtitle = category.locked ? "Системная категория" : "Можно редактировать";
+    const lockedAttr = category.locked ? "disabled" : "";
+    const lockedSubtitle = category.locked ? "Системная категория" : "Можно редактировать";
 
-      const managerTone =
-        category.id === "food"
-          ? "list-icon--green"
-          : category.id === "transport"
-          ? "list-icon--blue"
-          : category.id === "fun"
-          ? "list-icon--purple"
-          : category.id === "snack"
-          ? "list-icon--amber"
-          : "list-icon--neutral";
+    card.innerHTML = `
+      <div class="list-body">
+        <div class="list-title-row">
+          <h3 class="list-title">${escapeHtml(category.name)}</h3>
+          ${category.is_required ? '<span class="category-required-flag">🚩</span>' : ""}
+        </div>
+        <p class="list-subtitle">${lockedSubtitle} • ${category.is_required ? "Обязательная" : "Гибкая"}</p>
+      </div>
 
-      card.innerHTML = `
-  <div class="list-icon ${managerTone}">${category.icon}</div>
+      <div class="category-manager-actions">
+        <button
+          class="icon-action-btn"
+          type="button"
+          data-edit-id="${category.id}"
+          ${lockedAttr}
+          aria-label="Редактировать категорию"
+          title="Редактировать категорию"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 20h4l10-10-4-4L4 16v4Z" />
+            <path d="M13 7l4 4" />
+          </svg>
+        </button>
 
-  <div class="list-body">
-    <div class="list-title-row">
-      <h3 class="list-title">${escapeHtml(category.name)}</h3>
-      ${category.is_required ? '<span class="category-required-flag">🚩</span>' : ""}
-    </div>
-    <p class="list-subtitle">${lockedSubtitle} • ${category.is_required ? "Обязательная" : "Гибкая"}</p>
-  </div>
+        <button
+          class="icon-action-btn icon-action-btn--toggle ${category.is_required ? "is-active" : ""}"
+          type="button"
+          data-type-id="${category.id}"
+          ${lockedAttr}
+          aria-label="Переключить тип категории"
+          title="Переключить тип категории"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M8 7h8a4 4 0 1 1 0 8H8a4 4 0 1 1 0-8Z" />
+            <circle cx="16" cy="11" r="2.5" />
+          </svg>
+        </button>
 
-  <div class="category-manager-actions">
-  <button
-    class="icon-action-btn"
-    type="button"
-    data-edit-id="${category.id}"
-    ${lockedAttr}
-    aria-label="Редактировать категорию"
-    title="Редактировать категорию"
-  >
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M4 20h4l10-10-4-4L4 16v4Z" />
-      <path d="M13 7l4 4" />
-    </svg>
-  </button>
+        <button
+          class="icon-action-btn icon-action-btn--danger"
+          type="button"
+          data-delete-id="${category.id}"
+          ${lockedAttr}
+          aria-label="Удалить категорию"
+          title="Удалить категорию"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M5 7h14" />
+            <path d="M9 7V5h6v2" />
+            <path d="M8 7l1 12h6l1-12" />
+            <path d="M10 11v5M14 11v5" />
+          </svg>
+        </button>
+      </div>
+    `;
 
-  <button
-    class="icon-action-btn icon-action-btn--toggle ${category.is_required ? "is-active" : ""}"
-    type="button"
-    data-type-id="${category.id}"
-    ${lockedAttr}
-    aria-label="Переключить тип категории"
-    title="Переключить тип категории"
-  >
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M8 7h8a4 4 0 1 1 0 8H8a4 4 0 1 1 0-8Z" />
-      <circle cx="16" cy="11" r="2.5" />
-    </svg>
-  </button>
+    const editBtn = card.querySelector("[data-edit-id]");
+    const typeBtn = card.querySelector("[data-type-id]");
+    const deleteBtn = card.querySelector("[data-delete-id]");
 
-  <button
-    class="icon-action-btn icon-action-btn--danger"
-    type="button"
-    data-delete-id="${category.id}"
-    ${lockedAttr}
-    aria-label="Удалить категорию"
-    title="Удалить категорию"
-  >
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M5 7h14" />
-      <path d="M9 7V5h6v2" />
-      <path d="M8 7l1 12h6l1-12" />
-      <path d="M10 11v5M14 11v5" />
-    </svg>
-  </button>
-</div>
-`;
-
-      const editBtn = card.querySelector("[data-edit-id]");
-const typeBtn = card.querySelector("[data-type-id]");
-const deleteBtn = card.querySelector("[data-delete-id]");
-
-      editBtn?.addEventListener("click", () => {
-  openBudgetModal(category.id);
-});
-      
-      typeBtn?.addEventListener("click", async () => {
-  if (category.locked) return;
-
-  const { error } = await supabaseClient
-    .from("categories")
-    .update({ is_required: !category.is_required })
-    .eq("id", category.id);
-
-  if (error) {
-    alert("Ошибка обновления типа категории");
-    console.error(error);
-    return;
-  }
-
-  await loadDataFromSupabase();
-  renderAll();
-});
-
-      deleteBtn?.addEventListener("click", async () => {
-        if (category.locked) return;
-
-        const ok = confirm(
-          `Удалить категорию "${category.name}"? Все старые расходы перейдут в "Без категории". Лимит бюджета тоже удалится.`
-        );
-        if (!ok) return;
-
-        const { error: txError } = await supabaseClient
-          .from("transactions")
-          .update({ category_id: UNCATEGORIZED_ID })
-          .eq("type", "expense")
-          .eq("category_id", category.id);
-
-        if (txError) {
-          alert("Ошибка переноса старых расходов");
-          console.error(txError);
-          return;
-        }
-
-        const { error: budgetDeleteError } = await supabaseClient
-          .from("budget_limits")
-          .delete()
-          .eq("category_id", category.id);
-
-        if (budgetDeleteError) {
-          alert("Ошибка удаления лимита бюджета");
-          console.error(budgetDeleteError);
-          return;
-        }
-
-        const { error: deleteError } = await supabaseClient
-          .from("categories")
-          .delete()
-          .eq("id", category.id);
-
-        if (deleteError) {
-          alert("Ошибка удаления категории");
-          console.error(deleteError);
-          return;
-        }
-
-        await loadDataFromSupabase();
-        renderAll();
-      });
-
-      categoriesManagerList.appendChild(card);
+    editBtn?.addEventListener("click", () => {
+      openBudgetModal(category.id);
     });
-  }
+
+    typeBtn?.addEventListener("click", async () => {
+      if (category.locked) return;
+
+      const { error } = await supabaseClient
+        .from("categories")
+        .update({ is_required: !category.is_required })
+        .eq("id", category.id);
+
+      if (error) {
+        alert("Ошибка обновления типа категории");
+        console.error(error);
+        return;
+      }
+
+      await loadDataFromSupabase();
+      renderAll();
+    });
+
+    deleteBtn?.addEventListener("click", async () => {
+      if (category.locked) return;
+
+      const ok = confirm(
+        `Удалить категорию "${category.name}"? Все старые расходы перейдут в "Без категории". Лимит бюджета тоже удалится.`
+      );
+      if (!ok) return;
+
+      const { error: txError } = await supabaseClient
+        .from("transactions")
+        .update({ category_id: UNCATEGORIZED_ID })
+        .eq("type", "expense")
+        .eq("category_id", category.id);
+
+      if (txError) {
+        alert("Ошибка переноса старых расходов");
+        console.error(txError);
+        return;
+      }
+
+      const { error: budgetDeleteError } = await supabaseClient
+        .from("budget_limits")
+        .delete()
+        .eq("category_id", category.id);
+
+      if (budgetDeleteError) {
+        alert("Ошибка удаления лимита бюджета");
+        console.error(budgetDeleteError);
+        return;
+      }
+
+      const { error: deleteError } = await supabaseClient
+        .from("categories")
+        .delete()
+        .eq("id", category.id);
+
+      if (deleteError) {
+        alert("Ошибка удаления категории");
+        console.error(deleteError);
+        return;
+      }
+
+      await loadDataFromSupabase();
+      renderAll();
+    });
+
+    categoriesManagerList.appendChild(card);
+  });
+}
 
   function createTransactionCard(transaction) {
   const card = document.createElement("div");
   card.className = "list-card list-card--clickable";
-
-  const icon =
-    transaction.type === "income"
-      ? "💰"
-      : transaction.type === "transfer"
-      ? "↗"
-      : getCategoryIcon(transaction.category_id || UNCATEGORIZED_ID);
-
-  const toneKey =
-    transaction.type === "expense" ? transaction.category_id || UNCATEGORIZED_ID : "";
-
-  const iconToneClass = getIconToneClass(transaction.type, toneKey);
 
   let subtitle = "";
   let signedAmount = "";
@@ -3593,7 +3605,6 @@ const deleteBtn = card.querySelector("[data-delete-id]");
   const caption = `${shortDate}${shortDate && timeLabel ? " • " : ""}${timeLabel}`;
 
   card.innerHTML = `
-    <div class="list-icon ${iconToneClass}">${icon}</div>
     <div class="list-body">
       <div class="list-title-row">
         <h3 class="list-title">${escapeHtml(transaction.title)}</h3>
@@ -3765,7 +3776,7 @@ const deleteBtn = card.querySelector("[data-delete-id]");
               <div class="analytics-leader__label">Лидер</div>
               <div class="analytics-leader__title">
   ${topItem.is_required ? '<span class="analytics-required-flag">🚩</span>' : ""}
-  ${escapeHtml(topItem.icon)} ${escapeHtml(topItem.name)}
+  ${escapeHtml(topItem.name)}
 </div>
               <div class="analytics-leader__meta">${topPercent}% от расходов</div>
             </div>
@@ -3796,7 +3807,7 @@ const deleteBtn = card.querySelector("[data-delete-id]");
               <div class="analytics-breakdown-row__body">
                 <div class="analytics-breakdown-row__title">
   ${item.is_required ? '<span class="analytics-required-flag">🚩</span>' : ""}
-  ${escapeHtml(item.icon)} ${escapeHtml(item.name)}
+  ${escapeHtml(item.name)}
 </div>
                 <div class="analytics-breakdown-row__subtitle">${percent}% от расходов</div>
               </div>
@@ -3892,17 +3903,16 @@ const deleteBtn = card.querySelector("[data-delete-id]");
       const row = document.createElement("div");
       row.className = "list-card";
       row.innerHTML = `
-        <div class="list-icon list-icon--amber">${bucket.icon}</div>
-        <div class="list-body">
-          <div class="list-title-row">
-            <h3 class="list-title">${escapeHtml(bucket.name)}</h3>
-          </div>
-          <p class="list-subtitle">${bucket.is_locked ? "Системное накопление" : "Накопление"}</p>
-        </div>
-        <div class="list-right">
-          <p class="list-value">${formatMoney(getSafeBucketBalance(bucket.id))}</p>
-        </div>
-      `;
+  <div class="list-body">
+    <div class="list-title-row">
+      <h3 class="list-title">${escapeHtml(bucket.name)}</h3>
+    </div>
+    <p class="list-subtitle">${bucket.is_locked ? "Системное накопление" : "Накопление"}</p>
+  </div>
+  <div class="list-right">
+    <p class="list-value">${formatMoney(getSafeBucketBalance(bucket.id))}</p>
+  </div>
+`;
       insightsSafeList.appendChild(row);
     });
   }
