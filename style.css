@@ -2416,15 +2416,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   }
 }
 
-#budgetCategoryIconInput,
-#safeBucketIconInput,
-#newCategoryIconInput,
-#newSafeBucketIconInput {
-  text-align: center;
-  font-size: 24px;
-  letter-spacing: 0;
-}
-
 /* =========================================================
    17. INSIGHTS REWORK + MANDATORY PAYMENTS
    ========================================================= */
@@ -4139,16 +4130,12 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   align-items: start;
 }
 
-.categories-create-grid .field {
-  margin-bottom: 0;
+.categories-create-grid--single {
+  grid-template-columns: minmax(0, 1fr);
 }
 
-.categories-create-grid__emoji .input {
-  text-align: center;
-  font-size: 28px;
-  letter-spacing: 0;
-  padding-left: 12px;
-  padding-right: 12px;
+.categories-create-grid .field {
+  margin-bottom: 0;
 }
 
 .categories-create-btn {
@@ -4297,13 +4284,13 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   }
 
   .categories-create-grid {
-    grid-template-columns: minmax(0, 1fr) 84px;
-    gap: 8px;
-  }
+  grid-template-columns: minmax(0, 1fr) 84px;
+  gap: 8px;
+}
 
-  .categories-create-grid__emoji .input {
-    font-size: 24px;
-  }
+.categories-create-grid--single {
+  grid-template-columns: minmax(0, 1fr);
+}
 
   .categories-create-btn {
     height: 50px;
