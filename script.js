@@ -3583,7 +3583,7 @@ const deleteBtn = card.querySelector("[data-delete-id]");
     const expenseAccountName =
       getAccountNameById(transaction.account_id) || transaction.account || "";
 
-    subtitle = `${escapeHtml(getCategoryName(transaction.category_id || UNCATEGORIZED_ID))} • ${escapeHtml(expenseAccountName)}`;
+    subtitle = `${escapeHtml(getCategoryName(transaction.category_id || UNCATEGORIZED_ID))} · ${escapeHtml(expenseAccountName)}`;
     signedAmount = `−${formatMoney(transaction.amount)}`;
     valueClass = "list-value list-value--red";
   }
