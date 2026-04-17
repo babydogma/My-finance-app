@@ -153,11 +153,6 @@ const addMandatoryPaymentBtn = document.getElementById("addMandatoryPaymentBtn")
   const accountsListEl = document.getElementById("accountsList");
   const transactionsListEl = document.getElementById("transactionsList");
   
-  const moneyCaseGridEl = document.getElementById("moneyCaseGrid");
-const sceneIncomeValueEl = document.getElementById("sceneIncomeValue");
-const sceneExpenseValueEl = document.getElementById("sceneExpenseValue");
-const sceneFreeValueEl = document.getElementById("sceneFreeValue");
-  
   const safeBucketsModal = document.getElementById("safeBucketsModal");
   const safeBucketsModalTitle = document.getElementById("safeBucketsModalTitle");
   const safeBucketsModalTotalLabel = document.getElementById("safeBucketsModalTotalLabel");
@@ -2013,6 +2008,7 @@ function setInsightsHeroState(summary) {
       state.categories.unshift({
   id: UNCATEGORIZED_ID,
   name: "Без категории",
+  icon: "📦",
   locked: true,
   is_required: false,
   sort_order: 1,
@@ -2375,6 +2371,7 @@ function closeSafeBucketsModal() {
   safeBucketsModal.classList.add("hidden");
   document.body.style.overflow = "";
   newSafeBucketNameInput.value = "";
+  newSafeBucketIconInput.value = "";
 }
 
 function openSafeBucketAmountModal(bucketId) {
@@ -3052,89 +3049,6 @@ function getAccountRoleFlags(role) {
   return state.accounts.reduce((sum, account) => sum + getAccountBalance(account.id), 0);
 }
 
-function getCurrentMonthIncomeExpenseSummary() {
-  const monthTransactions = filterTransactionsByPeriod(
-    state.transactions,
-    "month",
-    getCurrentMonthValue(),
-    "",
-    ""
-  );
-
-  let income = 0;
-  let expense = 0;
-
-  monthTransactions.forEach((transaction) => {
-    const amount = Number(transaction.amount) || 0;
-
-    if (transaction.type === "income") income += amount;
-    if (transaction.type === "expense") expense += amount;
-  });
-
-  return {
-    income: roundToTwo(income),
-    expense: roundToTwo(expense),
-  };
-}
-
-function getMoneyCaseVisualState(balance) {
-  const maxStacks = 60;
-  const billsPerStack = 8;
-  const stackValue = 5000;
-  const safeBalance = Math.max(0, Number(balance) || 0);
-
-  const totalUnits = safeBalance / stackValue;
-  const fullStacks = Math.min(maxStacks, Math.floor(totalUnits));
-  const remainder = totalUnits - fullStacks;
-  const partialBills =
-    fullStacks < maxStacks ? Math.max(0, Math.min(billsPerStack, Math.round(remainder * billsPerStack))) : 0;
-
-  return {
-    maxStacks,
-    billsPerStack,
-    fullStacks,
-    partialBills,
-  };
-}
-
-function renderMoneyCase(balance) {
-  if (!moneyCaseGridEl) return;
-
-  const { maxStacks, billsPerStack, fullStacks, partialBills } = getMoneyCaseVisualState(balance);
-
-  moneyCaseGridEl.innerHTML = "";
-
-  for (let i = 0; i < maxStacks; i += 1) {
-    const stack = document.createElement("div");
-    stack.className = "money-case-stack";
-
-    if (i < fullStacks) {
-      stack.classList.add("is-filled");
-    } else if (i === fullStacks && partialBills > 0) {
-      stack.classList.add("is-partial");
-    }
-
-    const bills = document.createElement("div");
-    bills.className = "money-case-stack__bills";
-
-    for (let b = 0; b < billsPerStack; b += 1) {
-      const bill = document.createElement("span");
-      bill.className = "money-case-stack__bill";
-
-      if (i < fullStacks) {
-        bill.classList.add("is-on");
-      } else if (i === fullStacks && b < partialBills) {
-        bill.classList.add("is-on");
-      }
-
-      bills.appendChild(bill);
-    }
-
-    stack.appendChild(bills);
-    moneyCaseGridEl.appendChild(stack);
-  }
-}
-
   function getAnalyticsFilteredTransactions() {
     return filterTransactionsByPeriod(
       state.transactions,
@@ -3184,6 +3098,7 @@ function renderMoneyCase(balance) {
         return {
   id: category.id,
   name: category.name,
+  icon: category.icon,
   is_required: Boolean(category.is_required),
   amount,
 };
@@ -3414,11 +3329,8 @@ function renderMoneyCase(balance) {
   function renderBalance() {
   const balance = calculateBalance();
   const freeMoney = getFreeMoneyTotal();
-  const monthSummary = getCurrentMonthIncomeExpenseSummary();
 
-  if (balanceEl) {
-    balanceEl.textContent = formatMoney(balance);
-  }
+  balanceEl.textContent = formatMoney(balance);
 
   if (accountsTotalEl) {
     accountsTotalEl.textContent = "";
@@ -3427,55 +3339,32 @@ function renderMoneyCase(balance) {
   if (balanceFreeMoneyValueEl) {
     balanceFreeMoneyValueEl.textContent = `Свободно: ${formatMoney(freeMoney)}`;
   }
-
-  if (sceneIncomeValueEl) {
-    sceneIncomeValueEl.textContent = formatMoney(monthSummary.income);
-  }
-
-  if (sceneExpenseValueEl) {
-    sceneExpenseValueEl.textContent = formatMoney(monthSummary.expense);
-  }
-
-  if (sceneFreeValueEl) {
-    sceneFreeValueEl.textContent = formatMoney(freeMoney);
-  }
-
-  renderMoneyCase(balance);
 }
 
   function renderAccounts() {
-  if (!accountsListEl) return;
-
   accountsListEl.innerHTML = "";
-
-  if (!state.accounts.length) {
-    const empty = document.createElement("div");
-    empty.className = "scene-account-card";
-    empty.innerHTML = `
-      <div class="scene-account-card__name">Нет счетов</div>
-      <div class="scene-account-card__role">Добавь первый счёт</div>
-    `;
-    accountsListEl.appendChild(empty);
-    return;
-  }
 
   state.accounts.forEach((account) => {
     const currentBalance = getAccountBalance(account.id);
 
-    const card = document.createElement("button");
-    card.type = "button";
-    card.className = "scene-account-card";
+    const card = document.createElement("div");
+    card.className = "list-card list-card--clickable";
 
     card.innerHTML = `
-      <div class="scene-account-card__top">
-        <div class="scene-account-card__icon">
-          ${getAccountRoleIconSvg(account)}
-        </div>
-        <div class="scene-account-card__name">${escapeHtml(account.name)}</div>
+      <div class="list-icon list-icon--account">
+        ${getAccountRoleIconSvg(account)}
       </div>
 
-      <div class="scene-account-card__role">${escapeHtml(getAccountRoleLabel(account))}</div>
-      <div class="scene-account-card__value">${formatMoney(currentBalance)}</div>
+      <div class="list-body">
+        <div class="list-title-row">
+          <h3 class="list-title">${escapeHtml(account.name)}</h3>
+        </div>
+        <p class="list-subtitle">${escapeHtml(getAccountRoleLabel(account))}</p>
+      </div>
+
+      <div class="list-right">
+        <p class="list-value">${formatMoney(currentBalance)}</p>
+      </div>
     `;
 
     card.addEventListener("click", () => {
