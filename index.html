@@ -13,79 +13,60 @@
     <!-- MAIN VIEW -->
     <div id="mainView">
 
-      <!-- MAIN DESK SCENE -->
-<section class="wallet-scene-section wallet-scene-section--desk">
-  <div class="wallet-scene wallet-scene--desk">
-
-    <div class="desk-scene">
-
-      <img
-        class="desk-scene__table"
-        src="assets/scene/table-top.png"
-        alt=""
-        aria-hidden="true"
-      />
-
-      <img
-        class="desk-scene__briefcase"
-        src="assets/scene/briefcase-open.png"
-        alt=""
-        aria-hidden="true"
-      />
-
-      <div class="desk-counter">
-        <div class="desk-counter__screen">
-          <div class="desk-counter__value balance-amount">0 ₽</div>
-        </div>
-        <div class="desk-counter__sub" id="balanceFreeMoneyValue">Свободно: 0 ₽</div>
-      </div>
-
-      <div class="desk-accounts-wrap">
-        <div class="scene-accounts-list scene-accounts-list--desk" id="accountsList"></div>
-
-        <button
-          class="desk-add-account-btn"
-          type="button"
-          id="openCreateAccountModalBtn"
-          aria-label="Добавить счёт"
-          title="Добавить счёт"
-        >
-          +
-        </button>
-
-        <div class="hidden" id="accountsTotal"></div>
-      </div>
-
-      <div class="desk-side-actions">
-        <button class="desk-side-action desk-side-action--expense" type="button" id="openExpenseModal">
-          <span class="desk-side-action__icon">−</span>
-          <span class="desk-side-action__label">Расход</span>
-        </button>
-
-        <button class="desk-side-action desk-side-action--income" type="button" id="openIncomeModal">
-          <span class="desk-side-action__icon">+</span>
-          <span class="desk-side-action__label">Доход</span>
-        </button>
-      </div>
-
-      <!-- Оставляем скрытым, чтобы не ломать текущий JS -->
-      <div class="money-case__grid money-case__grid--briefcase hidden" id="moneyCaseGrid"></div>
-    </div>
-
-    <div class="desk-bottom-actions">
-      <button class="desk-bottom-btn" type="button" id="openTransferModal">
-        <span class="desk-bottom-btn__icon">↗</span>
-        <span class="desk-bottom-btn__label">Перевод</span>
-      </button>
-
-      <button class="desk-bottom-btn" type="button" id="openCategoriesManagerBtn">
-        <span class="desk-bottom-btn__icon">⇄</span>
-        <span class="desk-bottom-btn__label">Категории</span>
-      </button>
-    </div>
-
-  </div>
+    <!-- BALANCE -->
+<section class="balance">
+  <p class="balance-label">Баланс</p>
+  <h1 class="balance-amount">0 ₽</h1>
+  <p class="balance-subline" id="balanceFreeMoneyValue">Свободно: 0 ₽</p>
 </section>
+
+      <!-- ACTIONS -->
+      <section class="actions">
+        <button class="action-card" type="button" id="openExpenseModal">
+          <div class="action-icon">−</div>
+          <div class="action-label">Расход</div>
+        </button>
+
+        <button class="action-card" type="button" id="openIncomeModal">
+          <div class="action-icon">+</div>
+          <div class="action-label">Доход</div>
+        </button>
+
+        <button class="action-card" type="button" id="openTransferModal">
+          <div class="action-icon">↗</div>
+          <div class="action-label">Перевод</div>
+        </button>
+
+        <button class="action-card" type="button" id="openCategoriesManagerBtn">
+          <div class="action-icon">⇄</div>
+          <div class="action-label">Категории</div>
+        </button>
+      </section>
+
+      <!-- ACCOUNTS -->
+      <section class="section">
+        <div class="section-head accounts-section-head">
+  <h2 class="section-title">Счета</h2>
+
+  <div class="accounts-section-head__right">
+    <div class="section-note" id="accountsTotal">Всего: 0 ₽</div>
+
+    <button
+      class="icon-action-btn icon-action-btn--primary"
+      type="button"
+      id="openCreateAccountModalBtn"
+      aria-label="Добавить счёт"
+      title="Добавить счёт"
+    >
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 5v14M5 12h14" />
+      </svg>
+    </button>
+  </div>
+</div>
+
+        <div class="list" id="accountsList"></div>
+      </section>
 
       <!-- TRANSACTIONS -->
       <section class="section">
