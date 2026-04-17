@@ -13,60 +13,96 @@
     <!-- MAIN VIEW -->
     <div id="mainView">
 
-    <!-- BALANCE -->
-<section class="balance">
-  <p class="balance-label">Баланс</p>
-  <h1 class="balance-amount">0 ₽</h1>
-  <p class="balance-subline" id="balanceFreeMoneyValue">Свободно: 0 ₽</p>
+<!-- MAIN HERO SCENE -->
+<section class="wallet-scene-section">
+  <div class="wallet-scene">
+    <div class="wallet-scene__surface"></div>
+
+    <div class="wallet-scene__left">
+      <div class="scene-panel scene-panel--accounts">
+        <div class="scene-panel__head">
+          <h2 class="scene-panel__title">Счета</h2>
+
+          <button
+            class="scene-icon-btn"
+            type="button"
+            id="openCreateAccountModalBtn"
+            aria-label="Добавить счёт"
+            title="Добавить счёт"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+          </button>
+        </div>
+
+        <div class="scene-accounts-list" id="accountsList"></div>
+        <div class="hidden" id="accountsTotal"></div>
+      </div>
+    </div>
+
+    <div class="wallet-scene__center">
+      <section class="money-case">
+        <div class="money-case__lid"></div>
+
+        <div class="money-case__head">
+          <p class="money-case__label">Баланс</p>
+          <h1 class="balance-amount">0 ₽</h1>
+          <p class="balance-subline" id="balanceFreeMoneyValue">Свободно: 0 ₽</p>
+        </div>
+
+        <div class="money-case__grid" id="moneyCaseGrid"></div>
+      </section>
+    </div>
+
+    <div class="wallet-scene__right">
+      <div class="scene-panel scene-panel--stats">
+        <div class="scene-calc">
+          <div class="scene-calc__row">
+            <span class="scene-calc__label">Доходы</span>
+            <span class="scene-calc__value scene-calc__value--green" id="sceneIncomeValue">0 ₽</span>
+          </div>
+
+          <div class="scene-calc__row">
+            <span class="scene-calc__label">Расходы</span>
+            <span class="scene-calc__value scene-calc__value--red" id="sceneExpenseValue">0 ₽</span>
+          </div>
+
+          <div class="scene-calc__row">
+            <span class="scene-calc__label">Свободно</span>
+            <span class="scene-calc__value" id="sceneFreeValue">0 ₽</span>
+          </div>
+        </div>
+
+        <div class="scene-actions">
+          <button class="scene-action-btn scene-action-btn--expense" type="button" id="openExpenseModal">
+            <span class="scene-action-btn__icon">−</span>
+            <span class="scene-action-btn__label">Расход</span>
+          </button>
+
+          <button class="scene-action-btn scene-action-btn--income" type="button" id="openIncomeModal">
+            <span class="scene-action-btn__icon">+</span>
+            <span class="scene-action-btn__label">Доход</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 </section>
 
-      <!-- ACTIONS -->
-      <section class="actions">
-        <button class="action-card" type="button" id="openExpenseModal">
-          <div class="action-icon">−</div>
-          <div class="action-label">Расход</div>
-        </button>
+<section class="scene-utility-section">
+  <div class="scene-utility-grid">
+    <button class="scene-utility-btn" type="button" id="openTransferModal">
+      <span class="scene-utility-btn__icon">↗</span>
+      <span class="scene-utility-btn__label">Перевод</span>
+    </button>
 
-        <button class="action-card" type="button" id="openIncomeModal">
-          <div class="action-icon">+</div>
-          <div class="action-label">Доход</div>
-        </button>
-
-        <button class="action-card" type="button" id="openTransferModal">
-          <div class="action-icon">↗</div>
-          <div class="action-label">Перевод</div>
-        </button>
-
-        <button class="action-card" type="button" id="openCategoriesManagerBtn">
-          <div class="action-icon">⇄</div>
-          <div class="action-label">Категории</div>
-        </button>
-      </section>
-
-      <!-- ACCOUNTS -->
-      <section class="section">
-        <div class="section-head accounts-section-head">
-  <h2 class="section-title">Счета</h2>
-
-  <div class="accounts-section-head__right">
-    <div class="section-note" id="accountsTotal">Всего: 0 ₽</div>
-
-    <button
-      class="icon-action-btn icon-action-btn--primary"
-      type="button"
-      id="openCreateAccountModalBtn"
-      aria-label="Добавить счёт"
-      title="Добавить счёт"
-    >
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M12 5v14M5 12h14" />
-      </svg>
+    <button class="scene-utility-btn" type="button" id="openCategoriesManagerBtn">
+      <span class="scene-utility-btn__icon">⇄</span>
+      <span class="scene-utility-btn__label">Категории</span>
     </button>
   </div>
-</div>
-
-        <div class="list" id="accountsList"></div>
-      </section>
+</section>
 
       <!-- TRANSACTIONS -->
       <section class="section">
