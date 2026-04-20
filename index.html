@@ -260,16 +260,16 @@
 </div>
 
 <!-- INSIGHTS VIEW -->
-<div id="insightsView" class="hidden">
-  <section class="section section--manager-top insights-cinema-head">
-    <div class="insights-cinema-head__row">
-      <div class="insights-cinema-head__title-wrap">
-        <h2 class="insights-cinema-head__title">Итоги</h2>
-        <p class="insights-cinema-head__subtitle">Финансовая сцена месяца</p>
+ <div id="insightsView" class="hidden">
+  <section class="section section--manager-top insights-orbit-head">
+    <div class="insights-orbit-head__row">
+      <div class="insights-orbit-head__title-wrap">
+        <h2 class="insights-orbit-head__title">Итоги</h2>
+        <p class="insights-orbit-head__subtitle">Общая картина денег</p>
       </div>
 
       <button
-        class="screen-filter-btn insights-cinema-head__filter"
+        class="screen-filter-btn insights-orbit-head__filter"
         type="button"
         id="openInsightsFiltersBtn"
         aria-label="Открыть фильтры итогов"
@@ -353,101 +353,107 @@
     </div>
   </div>
 
-  <section class="section insights-cinema-hero-section">
-    <div class="insights-cinema-hero">
-      <div class="insights-cinema-hero__top">
-        <div class="insights-cinema-hero__eyebrow">
+  <section class="section insights-orbit-hero-section">
+    <div class="insights-orbit-hero">
+      <div class="insights-orbit-hero__bg"></div>
+
+      <div class="insights-orbit-hero__top">
+        <div class="insights-orbit-hero__eyebrow">
           Можно отложить
           <button class="faq-chip" type="button" data-faq-key="can_save_now" aria-label="Что это?">❔</button>
         </div>
 
-        <div class="insights-cinema-hero__status" id="insightsCanSaveNowStatus">—</div>
+        <div class="insights-orbit-hero__status" id="insightsCanSaveNowStatus">—</div>
       </div>
 
-      <div class="insights-cinema-hero__middle">
-        <div class="insights-cinema-hero__glow"></div>
-        <p class="insights-cinema-hero__value" id="insightsCanSaveNowValue">0 ₽</p>
+      <div class="insights-orbit-hero__center">
+        <p class="insights-orbit-hero__value" id="insightsCanSaveNowValue">0 ₽</p>
       </div>
 
-      <p class="insights-cinema-hero__hint" id="insightsCanSaveNowHint">—</p>
+      <p class="insights-orbit-hero__hint" id="insightsCanSaveNowHint">—</p>
     </div>
   </section>
 
-  <section class="section insights-cinema-stage-section">
-    <div class="section-head insights-cinema-section-head">
-      <h2 class="section-title insights-cinema-section-title">Сцена денег</h2>
+  <section class="section insights-orbit-radar-section">
+    <div class="section-head insights-orbit-section-head">
+      <h2 class="section-title insights-orbit-section-title">Картина денег</h2>
     </div>
 
-    <div class="insights-cinema-stage">
-      <div class="insights-cinema-stage__strip">
-        <div class="insights-cinema-kpi insights-cinema-kpi--wide">
-          <div class="insights-cinema-kpi__label">
-            Общий баланс
-            <button class="faq-chip" type="button" data-faq-key="total_balance" aria-label="Что это?">❔</button>
-          </div>
-          <div class="insights-cinema-kpi__value" id="insightsTotalBalanceValue">0 ₽</div>
+    <div class="insights-orbit-radar">
+      <div class="insights-orbit-radar__core">
+        <div class="insights-orbit-radar__core-label">
+          Общий баланс
+          <button class="faq-chip" type="button" data-faq-key="total_balance" aria-label="Что это?">❔</button>
         </div>
-
-        <div class="insights-cinema-kpi insights-cinema-kpi--accent">
-          <div class="insights-cinema-kpi__label">
-            Свободные деньги
-            <button class="faq-chip" type="button" data-faq-key="free_money" aria-label="Что это?">❔</button>
-          </div>
-          <div class="insights-cinema-kpi__value" id="insightsFreeMoneyValue">0 ₽</div>
-        </div>
+        <div class="insights-orbit-radar__core-value" id="insightsTotalBalanceValue">0 ₽</div>
       </div>
 
-      <div class="insights-cinema-stage__chips">
-        <div class="insights-cinema-chip">
-          <div class="insights-cinema-chip__label">
-            Защищённые деньги
-            <button class="faq-chip" type="button" data-faq-key="protected_money" aria-label="Что это?">❔</button>
-          </div>
-          <div class="insights-cinema-chip__value" id="insightsProtectedMoneyValue">0 ₽</div>
+      <div class="insights-orbit-radar__arc insights-orbit-radar__arc--free">
+        <div class="insights-orbit-radar__arc-label">
+          Свободные деньги
+          <button class="faq-chip" type="button" data-faq-key="free_money" aria-label="Что это?">❔</button>
         </div>
+        <div class="insights-orbit-radar__arc-value" id="insightsFreeMoneyValue">0 ₽</div>
+      </div>
 
-        <div class="insights-cinema-chip insights-cinema-chip--blue">
-          <div class="insights-cinema-chip__label">Проценты по накоплению</div>
-          <div class="insights-cinema-chip__value" id="insightsInterestValue">0 ₽</div>
+      <div class="insights-orbit-radar__arc insights-orbit-radar__arc--protected">
+        <div class="insights-orbit-radar__arc-label">
+          Защищённые деньги
+          <button class="faq-chip" type="button" data-faq-key="protected_money" aria-label="Что это?">❔</button>
         </div>
+        <div class="insights-orbit-radar__arc-value" id="insightsProtectedMoneyValue">0 ₽</div>
+      </div>
+
+      <div class="insights-orbit-radar__interest">
+        <div class="insights-orbit-radar__interest-label">Проценты по накоплению</div>
+        <div class="insights-orbit-radar__interest-value" id="insightsInterestValue">0 ₽</div>
       </div>
     </div>
   </section>
 
-  <section class="section insights-cinema-flow-section">
-    <div class="section-head insights-cinema-section-head">
-      <h2 class="section-title insights-cinema-section-title">Поток денег</h2>
+  <section class="section insights-orbit-stream-section">
+    <div class="section-head insights-orbit-section-head">
+      <h2 class="section-title insights-orbit-section-title">Поток расходов</h2>
     </div>
 
-    <div class="insights-cinema-flow">
-      <div class="insights-cinema-flow__main">
-        <div class="insights-cinema-flow__main-label">Расходы</div>
-        <div class="insights-cinema-flow__main-value" id="insightsExpenseValue">0 ₽</div>
+    <div class="insights-orbit-stream">
+      <div class="insights-orbit-stream__hero">
+        <div class="insights-orbit-stream__hero-label">Расходы</div>
+        <div class="insights-orbit-stream__hero-value" id="insightsExpenseValue">0 ₽</div>
       </div>
 
-      <div class="insights-cinema-flow__rows">
-        <div class="insights-cinema-flow-row">
-          <div class="insights-cinema-flow-row__name">
-            Обязательные расходы
-            <button class="faq-chip" type="button" data-faq-key="required_expense" aria-label="Что это?">❔</button>
+      <div class="insights-orbit-stream__bands">
+        <div class="insights-orbit-band">
+          <div class="insights-orbit-band__left">
+            <div class="insights-orbit-band__dot"></div>
+            <div class="insights-orbit-band__name">
+              Обязательные расходы
+              <button class="faq-chip" type="button" data-faq-key="required_expense" aria-label="Что это?">❔</button>
+            </div>
           </div>
-          <div class="insights-cinema-flow-row__value" id="insightsRequiredValue">0 ₽</div>
+          <div class="insights-orbit-band__value" id="insightsRequiredValue">0 ₽</div>
         </div>
 
-        <div class="insights-cinema-flow-row">
-          <div class="insights-cinema-flow-row__name">
-            Гибкие расходы
-            <button class="faq-chip" type="button" data-faq-key="flexible_expense" aria-label="Что это?">❔</button>
+        <div class="insights-orbit-band">
+          <div class="insights-orbit-band__left">
+            <div class="insights-orbit-band__dot"></div>
+            <div class="insights-orbit-band__name">
+              Гибкие расходы
+              <button class="faq-chip" type="button" data-faq-key="flexible_expense" aria-label="Что это?">❔</button>
+            </div>
           </div>
-          <div class="insights-cinema-flow-row__value" id="insightsFlexibleValue">0 ₽</div>
+          <div class="insights-orbit-band__value" id="insightsFlexibleValue">0 ₽</div>
         </div>
 
-        <div class="insights-cinema-flow-row insights-cinema-flow-row--blue">
-          <div class="insights-cinema-flow-row__name">
-            Отложено в накопления
-            <button class="faq-chip" type="button" data-faq-key="saved_to_safes" aria-label="Что это?">❔</button>
+        <div class="insights-orbit-band insights-orbit-band--blue">
+          <div class="insights-orbit-band__left">
+            <div class="insights-orbit-band__dot"></div>
+            <div class="insights-orbit-band__name">
+              Отложено в накопления
+              <button class="faq-chip" type="button" data-faq-key="saved_to_safes" aria-label="Что это?">❔</button>
+            </div>
           </div>
-          <div class="insights-cinema-flow-row__value" id="insightsSavedValue">0 ₽</div>
+          <div class="insights-orbit-band__value" id="insightsSavedValue">0 ₽</div>
         </div>
       </div>
     </div>
@@ -457,63 +463,49 @@
     </div>
   </section>
 
-  <section class="section insights-cinema-obligations-section">
-    <div class="section-head insights-cinema-section-head insights-cinema-section-head--actions">
-      <h2 class="section-title insights-cinema-section-title">Обязательства месяца</h2>
-      <button class="manager-back-btn insights-cinema-payments-btn" type="button" id="openMandatoryPaymentsModalBtn">
+  <section class="section insights-orbit-mandatory-section">
+    <div class="section-head insights-orbit-section-head insights-orbit-section-head--actions">
+      <h2 class="section-title insights-orbit-section-title">Обязательства месяца</h2>
+      <button class="manager-back-btn insights-orbit-payments-btn" type="button" id="openMandatoryPaymentsModalBtn">
         Платежи
       </button>
     </div>
 
-    <div class="insights-cinema-obligations">
-      <div class="insights-cinema-obligations__rail"></div>
-
-      <div class="insights-cinema-obligation">
-        <div class="insights-cinema-obligation__left">
-          <div class="insights-cinema-obligation__dot"></div>
-          <div class="insights-cinema-obligation__text">Обязательные всего</div>
-        </div>
-        <div class="insights-cinema-obligation__value" id="insightsMandatoryTotalValue">0 ₽</div>
+    <div class="insights-orbit-ledger">
+      <div class="insights-orbit-ledger__row">
+        <div class="insights-orbit-ledger__label">Обязательные всего</div>
+        <div class="insights-orbit-ledger__value" id="insightsMandatoryTotalValue">0 ₽</div>
       </div>
 
-      <div class="insights-cinema-obligation">
-        <div class="insights-cinema-obligation__left">
-          <div class="insights-cinema-obligation__dot"></div>
-          <div class="insights-cinema-obligation__text">Покрыто накоплениями</div>
-        </div>
-        <div class="insights-cinema-obligation__value" id="insightsMandatoryCoveredValue">0 ₽</div>
+      <div class="insights-orbit-ledger__row">
+        <div class="insights-orbit-ledger__label">Покрыто накоплениями</div>
+        <div class="insights-orbit-ledger__value" id="insightsMandatoryCoveredValue">0 ₽</div>
       </div>
 
-      <div class="insights-cinema-obligation">
-        <div class="insights-cinema-obligation__left">
-          <div class="insights-cinema-obligation__dot"></div>
-          <div class="insights-cinema-obligation__text">К вычету из свободных</div>
-        </div>
-        <div class="insights-cinema-obligation__value" id="insightsPendingMandatoryValue">0 ₽</div>
+      <div class="insights-orbit-ledger__row">
+        <div class="insights-orbit-ledger__label">К вычету из свободных</div>
+        <div class="insights-orbit-ledger__value" id="insightsPendingMandatoryValue">0 ₽</div>
       </div>
 
-      <div class="insights-cinema-obligation">
-        <div class="insights-cinema-obligation__left">
-          <div class="insights-cinema-obligation__dot"></div>
-          <div class="insights-cinema-obligation__text">
-            Остаток лимитов
-            <button class="faq-chip" type="button" data-faq-key="remaining_limits" aria-label="Что это?">❔</button>
-          </div>
+      <div class="insights-orbit-ledger__row">
+        <div class="insights-orbit-ledger__label">
+          Остаток лимитов
+          <button class="faq-chip" type="button" data-faq-key="remaining_limits" aria-label="Что это?">❔</button>
         </div>
-        <div class="insights-cinema-obligation__value" id="insightsRemainingBudgetsValue">0 ₽</div>
+        <div class="insights-orbit-ledger__value" id="insightsRemainingBudgetsValue">0 ₽</div>
       </div>
     </div>
   </section>
 
-  <section class="section insights-cinema-safes-section">
-    <div class="insights-cinema-safes">
-      <button class="insights-cinema-safes__head" type="button" id="insightsSafesToggleBtn">
-        <span class="insights-cinema-safes__title">Накопления</span>
+  <section class="section insights-orbit-safes-section">
+    <div class="insights-orbit-safes">
+      <button class="insights-orbit-safes__head" type="button" id="insightsSafesToggleBtn">
+        <span class="insights-orbit-safes__title">Накопления</span>
         <span class="insights-collapse-arrow is-open" id="insightsSafesArrow">⌄</span>
       </button>
 
-      <div class="insights-cinema-safes__body is-open" id="insightsSafesBody">
-        <div class="list insights-safe-list insights-safe-list--cinema" id="insightsSafeList"></div>
+      <div class="insights-orbit-safes__body is-open" id="insightsSafesBody">
+        <div class="list insights-safe-list insights-safe-list--orbit" id="insightsSafeList"></div>
       </div>
     </div>
   </section>
