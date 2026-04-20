@@ -590,7 +590,7 @@
   <div class="modal hidden" id="budgetModal">
   <div class="modal-sheet">
     <div class="modal-handle"></div>
-    <h3 class="modal-title" id="budgetModalTitle">Редактирование категории</h3>
+    <h3 class="modal-title" id="budgetModalTitle">Категория</h3>
     
     <div class="field">
   <input
@@ -601,15 +601,25 @@
   />
 </div>
 
+<label class="account-primary-row" for="budgetCategoryRequiredInput">
+  <input type="checkbox" id="budgetCategoryRequiredInput" />
+  <span>Обязательная категория</span>
+</label>
+
+<div class="section-note account-primary-note" id="budgetCategoryRequiredNote">
+  Обязательные категории учитываются отдельно от гибких расходов.
+</div>
+
     <div class="field">
       <input class="input" id="budgetAmountInput" type="number" placeholder="Лимит на месяц" />
     </div>
 
+    
     <div class="modal-actions modal-actions--triple">
-      <button class="btn btn-danger hidden" type="button" id="deleteBudgetBtn">Удалить</button>
-      <button class="btn btn-secondary" type="button" id="closeBudgetModalBtn">Отмена</button>
-      <button class="btn btn-primary" type="button" id="saveBudgetBtn">Сохранить</button>
-    </div>
+  <button class="btn btn-danger" type="button" id="deleteCategoryBtn">Удалить категорию</button>
+  <button class="btn btn-secondary" type="button" id="closeBudgetModalBtn">Отмена</button>
+  <button class="btn btn-primary" type="button" id="saveBudgetBtn">Сохранить</button>
+</div>
   </div>
 </div>
 
