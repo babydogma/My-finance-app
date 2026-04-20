@@ -2371,7 +2371,6 @@ function closeSafeBucketsModal() {
   safeBucketsModal.classList.add("hidden");
   document.body.style.overflow = "";
   newSafeBucketNameInput.value = "";
-  newSafeBucketIconInput.value = "";
 }
 
 function openSafeBucketAmountModal(bucketId) {
@@ -4124,7 +4123,6 @@ async function addCategory() {
   const newCategory = {
     id: crypto.randomUUID(),
     name,
-    icon: "",
     locked: false,
     is_required: false,
     sort_order: state.categories.length + 1,
