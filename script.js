@@ -144,14 +144,16 @@ const navOperationsBtn = document.getElementById("navOperationsBtn");
 const operationsView = document.getElementById("operationsView");
 
 const analyticsTabOverviewBtn = document.getElementById("analyticsTabOverviewBtn");
-const analyticsTabCategoriesBtn = document.getElementById("analyticsTabCategoriesBtn");
 const analyticsTabExpensesBtn = document.getElementById("analyticsTabExpensesBtn");
 const analyticsTabSafesBtn = document.getElementById("analyticsTabSafesBtn");
 
 const analyticsOverviewSection = document.getElementById("analyticsOverviewSection");
-const analyticsCategoriesSection = document.getElementById("analyticsCategoriesSection");
 const analyticsExpensesSection = document.getElementById("analyticsExpensesSection");
 const analyticsSafesSection = document.getElementById("analyticsSafesSection");
+
+const analyticsExpensesRing = document.getElementById("analyticsExpensesRing");
+const analyticsExpensesRingCenterValue = document.getElementById("analyticsExpensesRingCenterValue");
+const analyticsExpensesRingCenterLabel = document.getElementById("analyticsExpensesRingCenterLabel");
 
 const openAnalyticsFiltersBtn = document.getElementById("openAnalyticsFiltersBtn");
 const closeAnalyticsFiltersBtn = document.getElementById("closeAnalyticsFiltersBtn");
@@ -1368,88 +1370,6 @@ function updateAnalyticsWheelDraftFromScroll() {
   renderAnalyticsMonthWheel();
 }
 
-function renderAnalyticsCategoryBreakdown() {
-  const breakdown = getAnalyticsCategoryBreakdown();
-  const total = roundToTwo(breakdown.reduce((sum, item) => sum + item.amount, 0));
-
-  const donutProgress = document.getElementById("analyticsDonutProgress");
-  const donutValue = document.getElementById("analyticsDonutValue");
-  const donutLabel = document.getElementById("analyticsDonutLabel");
-
-  if (analyticsLegend) {
-    analyticsLegend.innerHTML = "";
-  }
-
-  if (!breakdown.length) {
-    if (donutProgress) {
-      const circumference = 2 * Math.PI * 42;
-      donutProgress.style.strokeDasharray = `${circumference}`;
-      donutProgress.style.strokeDashoffset = `${circumference}`;
-      donutProgress.style.stroke = "rgba(255,255,255,0.16)";
-    }
-
-    if (donutValue) donutValue.textContent = "0%";
-    if (donutLabel) donutLabel.textContent = "Категория";
-
-    if (analyticsLegend) {
-      const empty = document.createElement("div");
-      empty.className = "list-card";
-      empty.innerHTML = `
-        <div class="list-body">
-          <h3 class="list-title">Расходов нет</h3>
-          <p class="list-subtitle">За выбранный период пока нет расходов по категориям</p>
-        </div>
-      `;
-      analyticsLegend.appendChild(empty);
-    }
-
-    return;
-  }
-
-  const leader = breakdown[0];
-  const leaderPercent = total > 0 ? Math.round((leader.amount / total) * 100) : 0;
-  const circumference = 2 * Math.PI * 42;
-  const offset = circumference * (1 - leaderPercent / 100);
-
-  if (donutProgress) {
-    donutProgress.style.strokeDasharray = `${circumference}`;
-    donutProgress.style.strokeDashoffset = `${offset}`;
-    donutProgress.style.stroke = "#ff4d94";
-  }
-
-  if (donutValue) donutValue.textContent = `${leaderPercent}%`;
-  if (donutLabel) donutLabel.textContent = leader.name;
-
-  breakdown.forEach((item) => {
-    const [startColor] = getCategoryAccent(item.id);
-    const percent = total > 0 ? Math.round((item.amount / total) * 100) : 0;
-
-    const row = document.createElement("button");
-    row.type = "button";
-    row.className = "analytics-expense-category-row";
-    row.innerHTML = `
-      <div class="analytics-expense-category-row__left">
-        <div class="analytics-expense-category-meta">
-          <div class="analytics-expense-category-meta__name">${escapeHtml(item.name)}</div>
-          <div class="analytics-expense-category-meta__sub">${percent}% от расходов</div>
-        </div>
-      </div>
-
-      <div class="analytics-expense-category-value">
-        <div class="analytics-expense-category-value__amount" style="color:${startColor};">
-          ${formatMoney(item.amount)}
-        </div>
-      </div>
-    `;
-
-    row.addEventListener("click", () => {
-      openAnalyticsCategoryModal(item.id);
-    });
-
-    analyticsLegend?.appendChild(row);
-  });
-}
-
   function renderAnalyticsMonthWheel() {
   if (!analyticsMonthNamesColumn || !analyticsMonthYearsColumn) return;
 
@@ -1855,9 +1775,7 @@ function renderAnalyticsExpensesByCategory() {
 
   expenseTransactions.forEach((item) => {
     const key = item.category_id || "uncategorized";
-    if (!byCategory.has(key)) {
-      byCategory.set(key, 0);
-    }
+    if (!byCategory.has(key)) byCategory.set(key, 0);
     byCategory.set(key, roundToTwo(byCategory.get(key) + item.amount));
   });
 
@@ -1872,44 +1790,85 @@ function renderAnalyticsExpensesByCategory() {
     })
     .sort((a, b) => b.amount - a.amount);
 
-  rows.forEach((row) => {
-    const [startColor, endColor] = getCategoryAccent(row.categoryId);
-    const percent = totalExpense > 0 ? row.amount / totalExpense : 0;
-    const circumference = 2 * Math.PI * 18;
-    const offset = circumference * (1 - percent);
+  if (!rows.length) {
+    if (analyticsExpensesRing) {
+      analyticsExpensesRing.style.background =
+        "conic-gradient(from -90deg, rgba(255,255,255,0.08) 0deg 360deg)";
+    }
 
-    const node = document.createElement("div");
+    if (analyticsExpensesRingCenterValue) analyticsExpensesRingCenterValue.textContent = "0%";
+    if (analyticsExpensesRingCenterLabel) analyticsExpensesRingCenterLabel.textContent = "Категория";
+
+    const empty = document.createElement("div");
+    empty.className = "list-card";
+    empty.innerHTML = `
+      <div class="list-body">
+        <h3 class="list-title">Расходов нет</h3>
+        <p class="list-subtitle">За выбранный период пока нет расходов по категориям</p>
+      </div>
+    `;
+    analyticsExpensesCategoriesList.appendChild(empty);
+    return;
+  }
+
+  const leader = rows[0];
+  const leaderPercent = totalExpense > 0 ? Math.round((leader.amount / totalExpense) * 100) : 0;
+
+  if (analyticsExpensesRingCenterValue) {
+    analyticsExpensesRingCenterValue.textContent = `${leaderPercent}%`;
+  }
+
+  if (analyticsExpensesRingCenterLabel) {
+    analyticsExpensesRingCenterLabel.textContent = leader.name;
+  }
+
+  const segments = [];
+  let currentDeg = 0;
+
+  rows.forEach((row) => {
+    const [startColor] = getCategoryAccent(row.categoryId);
+    const percent = totalExpense > 0 ? row.amount / totalExpense : 0;
+    const deg = percent * 360;
+
+    segments.push(`${startColor} ${currentDeg}deg ${currentDeg + deg}deg`);
+    currentDeg += deg;
+  });
+
+  if (currentDeg < 360) {
+    segments.push(`rgba(255,255,255,0.08) ${currentDeg}deg 360deg`);
+  }
+
+  if (analyticsExpensesRing) {
+    analyticsExpensesRing.style.background = `conic-gradient(from -90deg, ${segments.join(", ")})`;
+  }
+
+  rows.forEach((row) => {
+    const [startColor] = getCategoryAccent(row.categoryId);
+    const percent = totalExpense > 0 ? Math.round((row.amount / totalExpense) * 100) : 0;
+
+    const node = document.createElement("button");
+    node.type = "button";
     node.className = "analytics-expense-category-row";
     node.innerHTML = `
       <div class="analytics-expense-category-row__left">
-        <div class="analytics-expense-category-ring">
-          <svg viewBox="0 0 44 44" aria-hidden="true">
-            <circle class="analytics-expense-category-ring__track" cx="22" cy="22" r="18"></circle>
-            <circle
-              class="analytics-expense-category-ring__progress"
-              cx="22"
-              cy="22"
-              r="18"
-              style="
-                stroke: ${startColor};
-                stroke-dasharray: ${circumference};
-                stroke-dashoffset: ${offset};
-                filter: drop-shadow(0 0 8px ${startColor}55);
-              "
-            ></circle>
-          </svg>
-        </div>
+        <span class="analytics-expense-category-dot" style="color:${startColor}; background:${startColor};"></span>
 
         <div class="analytics-expense-category-meta">
           <div class="analytics-expense-category-meta__name">${escapeHtml(row.name)}</div>
-          <div class="analytics-expense-category-meta__sub">${Math.round(percent * 100)}% от расходов</div>
+          <div class="analytics-expense-category-meta__sub">${percent}% от расходов</div>
         </div>
       </div>
 
       <div class="analytics-expense-category-value">
-        <div class="analytics-expense-category-value__amount" style="color:${startColor};">${formatMoney(row.amount)}</div>
+        <div class="analytics-expense-category-value__amount" style="color:${startColor};">
+          ${formatMoney(row.amount)}
+        </div>
       </div>
     `;
+
+    node.addEventListener("click", () => {
+      openAnalyticsCategoryModal(row.categoryId);
+    });
 
     analyticsExpensesCategoriesList.appendChild(node);
   });
@@ -3402,22 +3361,18 @@ function getAccountRoleFlags(role) {
 
   function renderAnalytics() {
   const isOverview = analyticsTab === "overview";
-  const isCategories = analyticsTab === "categories";
   const isExpenses = analyticsTab === "expenses";
   const isSafes = analyticsTab === "safes";
 
   analyticsOverviewSection.classList.toggle("hidden", !isOverview);
-  analyticsCategoriesSection.classList.toggle("hidden", !isCategories);
   analyticsExpensesSection.classList.toggle("hidden", !isExpenses);
   analyticsSafesSection.classList.toggle("hidden", !isSafes);
 
   analyticsTabOverviewBtn.classList.toggle("is-active", isOverview);
-  analyticsTabCategoriesBtn.classList.toggle("is-active", isCategories);
   analyticsTabExpensesBtn.classList.toggle("is-active", isExpenses);
   analyticsTabSafesBtn.classList.toggle("is-active", isSafes);
 
   if (isOverview) renderAnalyticsOverview();
-  if (isCategories) renderAnalyticsCategoryBreakdown();
   if (isExpenses) renderAnalyticsExpensesByCategory();
   if (isSafes) renderAnalyticsSafes();
 }
@@ -3870,7 +3825,6 @@ navAnalyticsBtn?.addEventListener("click", showAnalyticsView);
 navOperationsBtn?.addEventListener("click", showOperationsView);
 
 analyticsTabOverviewBtn?.addEventListener("click", () => setAnalyticsTab("overview"));
-analyticsTabCategoriesBtn?.addEventListener("click", () => setAnalyticsTab("categories"));
 analyticsTabExpensesBtn?.addEventListener("click", () => setAnalyticsTab("expenses"));
 analyticsTabSafesBtn?.addEventListener("click", () => setAnalyticsTab("safes"));
 
