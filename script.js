@@ -99,7 +99,6 @@ const insightsMandatoryCoveredValue = document.getElementById("insightsMandatory
 const insightsCanSaveNowStatus = document.getElementById("insightsCanSaveNowStatus");
 const insightsCanSaveNowHint = document.getElementById("insightsCanSaveNowHint");
 
-const insightsRecommendationText = document.getElementById("insightsRecommendationText");
 const insightsSafeList = document.getElementById("insightsSafeList");
 
 const insightsSafesToggleBtn = document.getElementById("insightsSafesToggleBtn");
@@ -3715,15 +3714,10 @@ function getAccountRoleFlags(role) {
   function renderInsights() {
   if (!insightsView) return;
   if (insightsFilterPeriod !== "range" && insightsFilterPeriod !== "month") {
-  closeInsightsFiltersModal();
-}
+    closeInsightsFiltersModal();
+  }
 
   const summary = getInsightsSummary();
-  const periodLabel = getInsightsPeriodLabel() || "за период";
-
-  if (insightsPeriodLabel) {
-  insightsPeriodLabel.textContent = periodLabel;
-}
 
   insightsIncomeValue.textContent = formatMoney(summary.income);
   insightsExpenseValue.textContent = formatMoney(summary.expense);
@@ -3742,28 +3736,13 @@ function getAccountRoleFlags(role) {
   insightsRemainingBudgetsValue.textContent = formatMoney(summary.remainingBudgets);
 
   insightsCanSaveNowValue.classList.remove("is-positive", "is-negative");
-  if (summary.canSaveNow > 0) {
-    insightsCanSaveNowValue.textContent = formatMoney(summary.canSaveNow);
-    insightsCanSaveNowValue.classList.add("is-positive");
-  } else {
-    insightsCanSaveNowValue.textContent = formatMoney(0);
-    insightsCanSaveNowValue.classList.add("is-negative");
-  }
+  insightsCanSaveNowValue.classList.add(
+    summary.canSaveNow > 0 ? "is-positive" : "is-negative"
+  );
+  insightsCanSaveNowValue.textContent =
+    summary.canSaveNow > 0 ? formatMoney(summary.canSaveNow) : formatMoney(0);
 
   setInsightsHeroState(summary);
-
-  if (insightsRecommendationText) {
-  if (summary.shortageBeforeSafeSaving > 0) {
-    insightsRecommendationText.textContent =
-      `Откладывать сейчас рано. После учёта обязательных платежей и остатков лимитов не хватает ${formatMoney(summary.shortageBeforeSafeSaving)}.`;
-  } else if (summary.canSaveNow > 0) {
-    insightsRecommendationText.textContent =
-      `Сейчас можно отложить ${formatMoney(summary.canSaveNow)}. В обязательных уже учтено покрытие платежей привязанными накоплениями.`;
-  } else {
-    insightsRecommendationText.textContent =
-      `Свободные деньги сейчас полностью заняты обязательствами текущего месяца и остатками лимитов.`;
-  }
-}
 
   if (insightsSafeList) {
     insightsSafeList.innerHTML = "";
@@ -3772,16 +3751,16 @@ function getAccountRoleFlags(role) {
       const row = document.createElement("div");
       row.className = "list-card";
       row.innerHTML = `
-  <div class="list-body">
-    <div class="list-title-row">
-      <h3 class="list-title">${escapeHtml(bucket.name)}</h3>
-    </div>
-    <p class="list-subtitle">${bucket.is_locked ? "Системное накопление" : "Накопление"}</p>
-  </div>
-  <div class="list-right">
-    <p class="list-value">${formatMoney(getSafeBucketBalance(bucket.id))}</p>
-  </div>
-`;
+        <div class="list-body">
+          <div class="list-title-row">
+            <h3 class="list-title">${escapeHtml(bucket.name)}</h3>
+          </div>
+          <p class="list-subtitle">${bucket.is_locked ? "Системное накопление" : "Накопление"}</p>
+        </div>
+        <div class="list-right">
+          <p class="list-value">${formatMoney(getSafeBucketBalance(bucket.id))}</p>
+        </div>
+      `;
       insightsSafeList.appendChild(row);
     });
   }
