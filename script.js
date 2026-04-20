@@ -196,13 +196,7 @@ const operationsRangeToInput = document.getElementById("operationsRangeToInput")
   let analyticsRangeEnd = "";
   
   let analyticsTab = "overview";
-
-let operationsFilterPeriod = "month";
-let operationsSelectedMonth = getCurrentMonthValue();
-let operationsRangeStart = "";
-let operationsRangeEnd = "";
-let operationsType = "all";
-
+  
   let analyticsDraftMonth = "";
 let analyticsDraftYear = "";
 let isAnalyticsMonthWheelOpen = false;
@@ -1374,6 +1368,88 @@ function updateAnalyticsWheelDraftFromScroll() {
   renderAnalyticsMonthWheel();
 }
 
+function renderAnalyticsCategoryBreakdown() {
+  const breakdown = getAnalyticsCategoryBreakdown();
+  const total = roundToTwo(breakdown.reduce((sum, item) => sum + item.amount, 0));
+
+  const donutProgress = document.getElementById("analyticsDonutProgress");
+  const donutValue = document.getElementById("analyticsDonutValue");
+  const donutLabel = document.getElementById("analyticsDonutLabel");
+
+  if (analyticsLegend) {
+    analyticsLegend.innerHTML = "";
+  }
+
+  if (!breakdown.length) {
+    if (donutProgress) {
+      const circumference = 2 * Math.PI * 42;
+      donutProgress.style.strokeDasharray = `${circumference}`;
+      donutProgress.style.strokeDashoffset = `${circumference}`;
+      donutProgress.style.stroke = "rgba(255,255,255,0.16)";
+    }
+
+    if (donutValue) donutValue.textContent = "0%";
+    if (donutLabel) donutLabel.textContent = "Категория";
+
+    if (analyticsLegend) {
+      const empty = document.createElement("div");
+      empty.className = "list-card";
+      empty.innerHTML = `
+        <div class="list-body">
+          <h3 class="list-title">Расходов нет</h3>
+          <p class="list-subtitle">За выбранный период пока нет расходов по категориям</p>
+        </div>
+      `;
+      analyticsLegend.appendChild(empty);
+    }
+
+    return;
+  }
+
+  const leader = breakdown[0];
+  const leaderPercent = total > 0 ? Math.round((leader.amount / total) * 100) : 0;
+  const circumference = 2 * Math.PI * 42;
+  const offset = circumference * (1 - leaderPercent / 100);
+
+  if (donutProgress) {
+    donutProgress.style.strokeDasharray = `${circumference}`;
+    donutProgress.style.strokeDashoffset = `${offset}`;
+    donutProgress.style.stroke = "#ff4d94";
+  }
+
+  if (donutValue) donutValue.textContent = `${leaderPercent}%`;
+  if (donutLabel) donutLabel.textContent = leader.name;
+
+  breakdown.forEach((item) => {
+    const [startColor] = getCategoryAccent(item.id);
+    const percent = total > 0 ? Math.round((item.amount / total) * 100) : 0;
+
+    const row = document.createElement("button");
+    row.type = "button";
+    row.className = "analytics-expense-category-row";
+    row.innerHTML = `
+      <div class="analytics-expense-category-row__left">
+        <div class="analytics-expense-category-meta">
+          <div class="analytics-expense-category-meta__name">${escapeHtml(item.name)}</div>
+          <div class="analytics-expense-category-meta__sub">${percent}% от расходов</div>
+        </div>
+      </div>
+
+      <div class="analytics-expense-category-value">
+        <div class="analytics-expense-category-value__amount" style="color:${startColor};">
+          ${formatMoney(item.amount)}
+        </div>
+      </div>
+    `;
+
+    row.addEventListener("click", () => {
+      openAnalyticsCategoryModal(item.id);
+    });
+
+    analyticsLegend?.appendChild(row);
+  });
+}
+
   function renderAnalyticsMonthWheel() {
   if (!analyticsMonthNamesColumn || !analyticsMonthYearsColumn) return;
 
@@ -1964,6 +2040,7 @@ function setAnalyticsTab(nextTab) {
   mainView.classList.remove("hidden");
   categoriesManagerView.classList.add("hidden");
   analyticsView.classList.add("hidden");
+  operationsView.classList.add("hidden");
   closeAnalyticsMonthWheel();
   setActiveNav("wallet");
 }
@@ -1973,6 +2050,7 @@ function setAnalyticsTab(nextTab) {
   mainView.classList.add("hidden");
   categoriesManagerView.classList.remove("hidden");
   analyticsView.classList.add("hidden");
+  operationsView.classList.add("hidden");
   closeAnalyticsMonthWheel();
   setActiveNav("wallet");
 }
