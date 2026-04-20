@@ -1757,21 +1757,37 @@ function animateCurrencyValue(el, value, options = {}) {
 }
 
 function getAnalyticsOverviewSummary() {
-  const summary = getSummary();
-  const freeMoney = summary.available;
-  const protectedMoney = roundToTwo(summary.totalBalance - freeMoney);
-  const canSaveNow = Math.max(0, roundToTwo(freeMoney - summary.pendingMandatory - summary.remainingBudgets));
+  const totalBalance = roundToTwo(calculateBalance());
+  const freeMoney = roundToTwo(getFreeMoneyTotal());
+  const protectedMoney = roundToTwo(getProtectedMoneyTotal());
+
+  const mandatoryStats = getMandatoryPaymentsCoverageStats();
+  const pendingMandatoryTotal = mandatoryStats.total;
+  const pendingMandatoryCoveredByLinkedSafes = mandatoryStats.coveredByLinkedSafes;
+  const pendingMandatoryToDeduct = mandatoryStats.chargeToFreeMoney;
+
+  const remainingBudgets = roundToTwo(getRemainingFlexibleBudgetsCurrentMonth());
+  const safeInterest = roundToTwo(
+    state.transactions
+      .filter((item) => item.type === "income" && item.title === "Проценты по накоплению")
+      .reduce((sum, item) => sum + (Number(item.amount) || 0), 0)
+  );
+
+  const canSaveNow = Math.max(
+    0,
+    roundToTwo(freeMoney - pendingMandatoryToDeduct - remainingBudgets)
+  );
 
   return {
-    totalBalance: summary.totalBalance,
+    totalBalance,
     freeMoney,
     protectedMoney,
-    pendingMandatoryTotal: summary.pendingMandatory,
-    pendingMandatoryCoveredByLinkedSafes: summary.pendingMandatoryCoveredByLinkedSafes || 0,
-    pendingMandatoryToDeduct: summary.pendingMandatory,
-    remainingBudgets: summary.remainingBudgets,
+    pendingMandatoryTotal,
+    pendingMandatoryCoveredByLinkedSafes,
+    pendingMandatoryToDeduct,
+    remainingBudgets,
     canSaveNow,
-    safeInterest: summary.safeInterest || 0,
+    safeInterest,
   };
 }
 
@@ -1931,11 +1947,21 @@ function renderOperationsView() {
 
   operationsTransactionsList.innerHTML = "";
 
+  if (!items.length) {
+    const empty = document.createElement("div");
+    empty.className = "list-card";
+    empty.innerHTML = `
+      <div class="list-body">
+        <h3 class="list-title">Операций пока нет</h3>
+        <p class="list-subtitle">История появится после добавления операций</p>
+      </div>
+    `;
+    operationsTransactionsList.appendChild(empty);
+    return;
+  }
+
   items.forEach((item) => {
-    const card = document.createElement("div");
-    card.className = "transaction-card";
-    card.innerHTML = renderTransactionCard(item);
-    operationsTransactionsList.appendChild(card);
+    operationsTransactionsList.appendChild(createTransactionCard(item));
   });
 }
 
@@ -3391,6 +3417,7 @@ function getAccountRoleFlags(role) {
   analyticsTabSafesBtn.classList.toggle("is-active", isSafes);
 
   if (isOverview) renderAnalyticsOverview();
+  if (isCategories) renderAnalyticsCategoryBreakdown();
   if (isExpenses) renderAnalyticsExpensesByCategory();
   if (isSafes) renderAnalyticsSafes();
 }
