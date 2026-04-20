@@ -15,11 +15,9 @@ const budgetModalTitle = document.getElementById("budgetModalTitle");
 const budgetCategoryNameInput = document.getElementById("budgetCategoryNameInput");
 const budgetAmountInput = document.getElementById("budgetAmountInput");
 const budgetCategoryRequiredInput = document.getElementById("budgetCategoryRequiredInput");
-const budgetCategoryRequiredNote = document.getElementById("budgetCategoryRequiredNote");
 const deleteCategoryBtn = document.getElementById("deleteCategoryBtn");
 const closeBudgetModalBtn = document.getElementById("closeBudgetModalBtn");
 const saveBudgetBtn = document.getElementById("saveBudgetBtn");
-const deleteBudgetBtn = document.getElementById("deleteBudgetBtn");
 
 const accountModal = document.getElementById("accountModal");
 const accountModalTitle = document.getElementById("accountModalTitle");
@@ -2130,7 +2128,9 @@ function openBudgetModal(categoryId) {
   budgetCategoryRequiredInput.checked = Boolean(category.is_required);
   budgetAmountInput.value = existing ? Number(existing.monthly_limit) : "";
 
-  deleteBudgetBtn.classList.toggle("hidden", Boolean(category.locked));
+  if (deleteCategoryBtn) {
+    deleteCategoryBtn.classList.toggle("hidden", Boolean(category.locked));
+  }
 
   budgetModal.classList.remove("hidden");
   document.body.style.overflow = "hidden";
@@ -2143,6 +2143,10 @@ function closeBudgetModal() {
   budgetCategoryNameInput.value = "";
   budgetCategoryRequiredInput.checked = false;
   budgetAmountInput.value = "";
+
+  if (deleteCategoryBtn) {
+    deleteCategoryBtn.classList.add("hidden");
+  }
 }
 
 function syncAccountPrimaryControls() {
@@ -4158,28 +4162,6 @@ async function deleteCategory() {
   closeBudgetModal();
 }
 
-  async function deleteBudgetLimit() {
-    if (!activeBudgetCategoryId) return;
-
-    const ok = confirm("Удалить лимит для этой категории?");
-    if (!ok) return;
-
-    const { error } = await supabaseClient
-      .from("budget_limits")
-      .delete()
-      .eq("category_id", activeBudgetCategoryId);
-
-    if (error) {
-      alert("Ошибка удаления лимита");
-      console.error(error);
-      return;
-    }
-
-    await loadDataFromSupabase();
-    renderAll();
-    closeBudgetModal();
-  }
-
   /* =========================================================
      11. SUPABASE LOAD + BOOTSTRAP
      ========================================================= */
@@ -4508,7 +4490,6 @@ insightsRangeToInput?.addEventListener("change", () => {
 
   closeBudgetModalBtn?.addEventListener("click", closeBudgetModal);
   saveBudgetBtn?.addEventListener("click", saveBudgetLimit);
-  deleteBudgetBtn?.addEventListener("click", deleteBudgetLimit);
   closeSafeBucketsModalBtn?.addEventListener("click", closeSafeBucketsModal);
   openMandatoryPaymentsModalBtn?.addEventListener("click", openMandatoryPaymentsModal);
 closeMandatoryPaymentsModalBtn?.addEventListener("click", closeMandatoryPaymentsModal);
