@@ -82,47 +82,54 @@
 
     <!-- CATEGORIES MANAGER VIEW -->
     <div id="categoriesManagerView" class="hidden">
-  <section class="section section--manager-top categories-shell">
-    <div class="categories-shell__head">
-      <button class="manager-back-btn categories-shell__back" type="button" id="closeCategoriesManagerBtn">
+  <section class="section section--manager-top categories-screen">
+    <div class="categories-screen__top">
+      <button
+        class="manager-back-btn categories-screen__back"
+        type="button"
+        id="closeCategoriesManagerBtn"
+      >
         ← Назад
       </button>
 
-      <div class="categories-shell__title-wrap">
-        <h2 class="categories-shell__title">Категории</h2>
-        <div class="categories-shell__subtitle">управление расходами</div>
+      <div class="categories-screen__head">
+        <h2 class="categories-screen__title">Категории</h2>
+        <p class="categories-screen__subtitle">Управление расходами</p>
       </div>
     </div>
 
-    <div class="manager-card categories-create-card">
-      <div class="categories-create-card__head">
-        <h3 class="categories-create-card__title">Новая категория</h3>
-        <div class="categories-create-card__note">добавь название и эмодзи</div>
+    <div class="categories-composer">
+      <div class="categories-composer__head">
+        <h3 class="categories-composer__title">Добавить категорию</h3>
       </div>
 
-      <div class="categories-create-grid categories-create-grid--single">
-  <div class="field categories-create-grid__name">
-    <input
-      class="input"
-      id="newCategoryNameInput"
-      type="text"
-      placeholder="Например: Продукты"
-    />
-  </div>
-      </div>
+      <div class="categories-composer__body">
+        <div class="field categories-composer__field">
+          <input
+            class="input categories-composer__input"
+            id="newCategoryNameInput"
+            type="text"
+            placeholder="Например: Продукты"
+          />
+        </div>
 
-      <button class="btn btn-primary manager-add-btn categories-create-btn" type="button" id="addCategoryBtn">
-        Добавить категорию
-      </button>
+        <button
+          class="btn btn-primary categories-composer__submit"
+          type="button"
+          id="addCategoryBtn"
+        >
+          Добавить
+        </button>
+      </div>
     </div>
   </section>
 
-  <section class="section categories-list-section">
+  <section class="section categories-list-section categories-list-section--rebuilt">
     <div class="section-head categories-list-head">
       <h2 class="section-title categories-list-title">Список категорий</h2>
     </div>
 
-    <div class="list categories-manager-list" id="categoriesManagerList"></div>
+    <div class="list categories-manager-list categories-manager-list--rebuilt" id="categoriesManagerList"></div>
   </section>
 </div>
 
@@ -584,10 +591,6 @@
   <div class="modal-sheet">
     <div class="modal-handle"></div>
     <h3 class="modal-title" id="budgetModalTitle">Редактирование категории</h3>
-
-    <div class="field">
-      <input class="input" id="budgetCategoryIconInput" type="text" placeholder="Эмодзи, например 🍔" maxlength="4" />
-    </div>
     
     <div class="field">
   <input
