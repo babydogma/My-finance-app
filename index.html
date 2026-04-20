@@ -158,11 +158,10 @@
   </section>
 
   <div class="analytics-mode-switch analytics-mode-switch--wide">
-    <button class="analytics-mode-switch__btn is-active" type="button" id="analyticsTabOverviewBtn">Обзор</button>
-    <button class="analytics-mode-switch__btn" type="button" id="analyticsTabCategoriesBtn">Категории</button>
-    <button class="analytics-mode-switch__btn" type="button" id="analyticsTabExpensesBtn">Расходы</button>
-    <button class="analytics-mode-switch__btn" type="button" id="analyticsTabSafesBtn">Накопления</button>
-  </div>
+  <button class="analytics-mode-switch__btn is-active" type="button" id="analyticsTabOverviewBtn">Обзор</button>
+  <button class="analytics-mode-switch__btn" type="button" id="analyticsTabExpensesBtn">Расходы</button>
+  <button class="analytics-mode-switch__btn" type="button" id="analyticsTabSafesBtn">Накопления</button>
+</div>
 
   <div class="modal hidden" id="analyticsFiltersModal">
     <div class="modal-sheet filters-sheet">
@@ -310,42 +309,32 @@
     </div>
   </section>
 
-  <section class="section hidden" id="analyticsCategoriesSection">
-    <div class="section-head analytics-section-head">
-      <h2 class="section-title analytics-section-title">Категории</h2>
-    </div>
+  
 
-    <div class="analytics-breakdown-shell">
-      <div class="analytics-breakdown-shell__chart">
-        <div class="analytics-donut-wrap">
-          <svg class="analytics-donut" viewBox="0 0 120 120" aria-hidden="true">
-            <circle class="analytics-donut__track" cx="60" cy="60" r="42"></circle>
-            <circle class="analytics-donut__progress" id="analyticsDonutProgress" cx="60" cy="60" r="42"></circle>
-          </svg>
-          <div class="analytics-donut__center">
-            <p class="analytics-donut__value" id="analyticsDonutValue">0%</p>
-            <p class="analytics-donut__label" id="analyticsDonutLabel">Категория</p>
-          </div>
-        </div>
-      </div>
+  <<section class="section hidden" id="analyticsExpensesSection">
+  <div class="section-head analytics-section-head">
+    <h2 class="section-title analytics-section-title">Расходы</h2>
+  </div>
 
-      <div class="analytics-breakdown-shell__legend" id="analyticsLegend"></div>
-    </div>
-  </section>
-
-  <section class="section hidden" id="analyticsExpensesSection">
-    <div class="section-head analytics-section-head">
-      <h2 class="section-title analytics-section-title">Расходы по категориям</h2>
-    </div>
-
-    <div class="analytics-expenses-hero">
+  <div class="analytics-expenses-hero analytics-expenses-hero--with-ring">
+    <div class="analytics-expenses-hero__content">
       <div class="analytics-expenses-hero__label">Общий поток расходов</div>
       <div class="analytics-expenses-hero__value" id="analyticsExpenseValue">0 ₽</div>
       <div class="analytics-expenses-hero__note" id="analyticsExpensesPeriodNote">за период</div>
     </div>
 
-    <div class="analytics-expenses-categories" id="analyticsExpensesCategoriesList"></div>
-  </section>
+    <div class="analytics-expenses-ring-card">
+      <div class="analytics-expenses-ring" id="analyticsExpensesRing">
+        <div class="analytics-expenses-ring__inner">
+          <div class="analytics-expenses-ring__center-value" id="analyticsExpensesRingCenterValue">0%</div>
+          <div class="analytics-expenses-ring__center-label" id="analyticsExpensesRingCenterLabel">Категория</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="analytics-expenses-categories analytics-expenses-categories--flat" id="analyticsExpensesCategoriesList"></div>
+</section>
 
   <section class="section hidden" id="analyticsSafesSection">
     <div class="section-head analytics-section-head">
