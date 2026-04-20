@@ -44,12 +44,11 @@ const deleteAccountModalBtn = document.getElementById("deleteAccountModalBtn");
 
   const navWalletBtn = document.getElementById("navWalletBtn");
   const navAnalyticsBtn = document.getElementById("navAnalyticsBtn");
-  const navInsightsBtn = document.getElementById("navInsightsBtn");
+  
   
   const mainView = document.getElementById("mainView");
   const categoriesManagerView = document.getElementById("categoriesManagerView");
   const analyticsView = document.getElementById("analyticsView");
-  const insightsView = document.getElementById("insightsView");
 
   const categoriesManagerList = document.getElementById("categoriesManagerList");
   const newCategoryNameInput = document.getElementById("newCategoryNameInput");
@@ -79,45 +78,7 @@ const deleteAccountModalBtn = document.getElementById("deleteAccountModalBtn");
 const openAnalyticsFiltersBtn = document.getElementById("openAnalyticsFiltersBtn");
 const closeAnalyticsFiltersBtn = document.getElementById("closeAnalyticsFiltersBtn");
   
-    const insightsPeriodLabel = document.getElementById("insightsPeriodLabel");
-  const insightsIncomeValue = document.getElementById("insightsIncomeValue");
-  const insightsExpenseValue = document.getElementById("insightsExpenseValue");
-  const insightsRequiredValue = document.getElementById("insightsRequiredValue");
-  const insightsFlexibleValue = document.getElementById("insightsFlexibleValue");
-  const insightsSavedValue = document.getElementById("insightsSavedValue");
-  const insightsInterestValue = document.getElementById("insightsInterestValue");
-
-  const insightsPendingMandatoryValue = document.getElementById("insightsPendingMandatoryValue");
-const insightsRemainingBudgetsValue = document.getElementById("insightsRemainingBudgetsValue");
-const insightsTotalBalanceValue = document.getElementById("insightsTotalBalanceValue");
-const insightsProtectedMoneyValue = document.getElementById("insightsProtectedMoneyValue");
-const insightsFreeMoneyValue = document.getElementById("insightsFreeMoneyValue");
-const insightsCanSaveNowValue = document.getElementById("insightsCanSaveNowValue");
-
-const insightsMandatoryTotalValue = document.getElementById("insightsMandatoryTotalValue");
-const insightsMandatoryCoveredValue = document.getElementById("insightsMandatoryCoveredValue");
-const insightsCanSaveNowStatus = document.getElementById("insightsCanSaveNowStatus");
-const insightsCanSaveNowHint = document.getElementById("insightsCanSaveNowHint");
-
-const insightsSafeList = document.getElementById("insightsSafeList");
-
-const insightsSafesToggleBtn = document.getElementById("insightsSafesToggleBtn");
-const insightsSafesBody = document.getElementById("insightsSafesBody");
-const insightsSafesArrow = document.getElementById("insightsSafesArrow");
-  const insightsPeriodButtons = document.querySelectorAll("[data-insights-period]");
-const insightsMonthBtn = document.getElementById("insightsMonthBtn");
-const insightsMonthWheelWrap = document.getElementById("insightsMonthWheelWrap");
-const insightsMonthNamesColumn = document.getElementById("insightsMonthNamesColumn");
-const insightsMonthYearsColumn = document.getElementById("insightsMonthYearsColumn");
-const insightsMonthResetBtn = document.getElementById("insightsMonthResetBtn");
-const insightsMonthApplyBtn = document.getElementById("insightsMonthApplyBtn");
-const insightsRangeFromInput = document.getElementById("insightsRangeFromInput");
-const insightsRangeToInput = document.getElementById("insightsRangeToInput");
-const insightsSelectedPeriodLabel = document.getElementById("insightsSelectedPeriodLabel");
-const insightsFiltersModal = document.getElementById("insightsFiltersModal");
-const openInsightsFiltersBtn = document.getElementById("openInsightsFiltersBtn");
-const closeInsightsFiltersBtn = document.getElementById("closeInsightsFiltersBtn");
-
+  
   const mandatoryPaymentsModal = document.getElementById("mandatoryPaymentsModal");
   const openMandatoryPaymentsModalBtn = document.getElementById("openMandatoryPaymentsModalBtn");
   const closeMandatoryPaymentsModalBtn = document.getElementById("closeMandatoryPaymentsModalBtn");
@@ -194,7 +155,50 @@ const faqButtons = document.querySelectorAll("[data-faq-key]");
 const insightsExpenseRingRequired = document.getElementById("insightsExpenseRingRequired");
 const insightsExpenseRingFlexible = document.getElementById("insightsExpenseRingFlexible");
 const insightsPeriodCaption = document.getElementById("insightsPeriodCaption");
-const openExpenseBreakdownBtn = document.getElementById("openExpenseBreakdownBtn");
+
+const navOperationsBtn = document.getElementById("navOperationsBtn");
+const operationsView = document.getElementById("operationsView");
+
+const analyticsTabOverviewBtn = document.getElementById("analyticsTabOverviewBtn");
+const analyticsTabCategoriesBtn = document.getElementById("analyticsTabCategoriesBtn");
+const analyticsTabExpensesBtn = document.getElementById("analyticsTabExpensesBtn");
+const analyticsTabSafesBtn = document.getElementById("analyticsTabSafesBtn");
+
+const analyticsOverviewSection = document.getElementById("analyticsOverviewSection");
+const analyticsCategoriesSection = document.getElementById("analyticsCategoriesSection");
+const analyticsExpensesSection = document.getElementById("analyticsExpensesSection");
+const analyticsSafesSection = document.getElementById("analyticsSafesSection");
+
+const openAnalyticsFiltersBtn = document.getElementById("openAnalyticsFiltersBtn");
+const closeAnalyticsFiltersBtn = document.getElementById("closeAnalyticsFiltersBtn");
+const analyticsFiltersModal = document.getElementById("analyticsFiltersModal");
+
+const analyticsCanSaveNowValue = document.getElementById("analyticsCanSaveNowValue");
+const analyticsCanSaveNowStatus = document.getElementById("analyticsCanSaveNowStatus");
+const analyticsCanSaveNowHint = document.getElementById("analyticsCanSaveNowHint");
+
+const analyticsTotalBalanceValue = document.getElementById("analyticsTotalBalanceValue");
+const analyticsFreeMoneyValue = document.getElementById("analyticsFreeMoneyValue");
+const analyticsProtectedMoneyValue = document.getElementById("analyticsProtectedMoneyValue");
+
+const analyticsPendingMandatoryValue = document.getElementById("analyticsPendingMandatoryValue");
+const analyticsMandatoryTotalValue = document.getElementById("analyticsMandatoryTotalValue");
+const analyticsMandatoryCoveredValue = document.getElementById("analyticsMandatoryCoveredValue");
+const analyticsRemainingBudgetsValue = document.getElementById("analyticsRemainingBudgetsValue");
+
+const analyticsExpenseValue = document.getElementById("analyticsExpenseValue");
+const analyticsExpensesPeriodNote = document.getElementById("analyticsExpensesPeriodNote");
+const analyticsExpensesCategoriesList = document.getElementById("analyticsExpensesCategoriesList");
+
+const analyticsInterestValue = document.getElementById("analyticsInterestValue");
+const analyticsSafeList = document.getElementById("analyticsSafeList");
+
+const operationsTransactionsList = document.getElementById("operationsTransactionsList");
+const operationsFiltersModal = document.getElementById("operationsFiltersModal");
+const openOperationsFiltersBtn = document.getElementById("openOperationsFiltersBtn");
+const closeOperationsFiltersBtn = document.getElementById("closeOperationsFiltersBtn");
+const operationsRangeFromInput = document.getElementById("operationsRangeFromInput");
+const operationsRangeToInput = document.getElementById("operationsRangeToInput");
 
   /* =========================================================
      02. UI STATE
@@ -207,14 +211,13 @@ const openExpenseBreakdownBtn = document.getElementById("openExpenseBreakdownBtn
   let analyticsRangeStart = "";
   let analyticsRangeEnd = "";
   
-  let insightsFilterPeriod = "month";
-let insightsSelectedMonth = getCurrentMonthValue();
-let insightsRangeStart = "";
-let insightsRangeEnd = "";
+  let analyticsTab = "overview";
 
-let insightsDraftMonth = "";
-let insightsDraftYear = "";
-let isInsightsMonthWheelOpen = false;
+let operationsFilterPeriod = "month";
+let operationsSelectedMonth = getCurrentMonthValue();
+let operationsRangeStart = "";
+let operationsRangeEnd = "";
+let operationsType = "all";
 
   let analyticsDraftMonth = "";
 let analyticsDraftYear = "";
@@ -1968,64 +1971,6 @@ function toggleInsightsCollapse(bodyEl, arrowEl) {
   arrowEl.classList.toggle("is-open", willOpen);
 }
 
-function setInsightsHeroState(summary) {
-  if (!insightsCanSaveNowStatus || !insightsCanSaveNowHint) return;
-
-  if (summary.shortageBeforeSafeSaving > 0) {
-    insightsCanSaveNowStatus.textContent = "Сейчас рано";
-    insightsCanSaveNowHint.textContent =
-      `Не хватает ${formatMoney(summary.shortageBeforeSafeSaving)} после учёта обязательных и лимитов.`;
-    return;
-  }
-
-  if (summary.canSaveNow > 0) {
-    insightsCanSaveNowStatus.textContent = "Можно спокойно отложить";
-    insightsCanSaveNowHint.textContent =
-      "Сумма уже рассчитана с учётом обязательных платежей и лимитов.";
-    return;
-  }
-
-  insightsCanSaveNowStatus.textContent = "Запаса нет";
-  insightsCanSaveNowHint.textContent =
-    "Свободные деньги сейчас полностью заняты обязательствами и лимитами.";
-}
-
-function getInsightsPeriodCaptionText() {
-  if (insightsFilterPeriod === "month") return "за месяц";
-  if (insightsFilterPeriod === "today") return "за сегодня";
-  if (insightsFilterPeriod === "7") return "за 7 дней";
-  if (insightsFilterPeriod === "range") return "за выбранный период";
-  return "за период";
-}
-
-function setExpenseRing(requiredAmount, flexibleAmount) {
-  if (!insightsExpenseRingRequired || !insightsExpenseRingFlexible) return;
-
-  const total = Math.max(0, roundToTwo((Number(requiredAmount) || 0) + (Number(flexibleAmount) || 0)));
-  const circumference = 2 * Math.PI * 46;
-
-  insightsExpenseRingRequired.style.strokeDasharray = `${circumference}`;
-  insightsExpenseRingFlexible.style.strokeDasharray = `${circumference}`;
-
-  if (total <= 0) {
-    insightsExpenseRingRequired.style.strokeDashoffset = `${circumference}`;
-    insightsExpenseRingFlexible.style.strokeDashoffset = `${circumference}`;
-    return;
-  }
-
-  const requiredRatio = Math.max(0, Math.min(1, requiredAmount / total));
-  const flexibleRatio = Math.max(0, Math.min(1, flexibleAmount / total));
-
-  const requiredLength = circumference * requiredRatio;
-  const flexibleLength = circumference * flexibleRatio;
-
-  insightsExpenseRingRequired.style.strokeDashoffset = `${circumference - requiredLength}`;
-  insightsExpenseRingFlexible.style.strokeDashoffset = `${circumference - flexibleLength}`;
-
-  insightsExpenseRingFlexible.style.transform = `rotate(${requiredRatio * 360}deg)`;
-  insightsExpenseRingFlexible.style.transformOrigin = "50% 50%";
-}
-
 function animateCurrencyValue(el, value, options = {}) {
   if (!el) return;
 
@@ -2050,18 +1995,202 @@ function animateCurrencyValue(el, value, options = {}) {
   requestAnimationFrame(frame);
 }
 
-function playInsightsIntro() {
-  if (!insightsView || insightsView.classList.contains("hidden")) return;
+function getAnalyticsOverviewSummary() {
+  const summary = getSummary();
+  const freeMoney = summary.available;
+  const protectedMoney = roundToTwo(summary.totalBalance - freeMoney);
+  const canSaveNow = Math.max(0, roundToTwo(freeMoney - summary.pendingMandatory - summary.remainingBudgets));
 
-  insightsView.querySelectorAll(".insights-reveal").forEach((node) => {
-    node.classList.remove("is-visible");
+  return {
+    totalBalance: summary.totalBalance,
+    freeMoney,
+    protectedMoney,
+    pendingMandatoryTotal: summary.pendingMandatory,
+    pendingMandatoryCoveredByLinkedSafes: summary.pendingMandatoryCoveredByLinkedSafes || 0,
+    pendingMandatoryToDeduct: summary.pendingMandatory,
+    remainingBudgets: summary.remainingBudgets,
+    canSaveNow,
+    safeInterest: summary.safeInterest || 0,
+  };
+}
+
+function getAnalyticsExpensesPeriodNote() {
+  if (analyticsFilterPeriod === "month") return "за месяц";
+  if (analyticsFilterPeriod === "today") return "за сегодня";
+  if (analyticsFilterPeriod === "7") return "за 7 дней";
+  if (analyticsFilterPeriod === "range") return "за выбранный период";
+  return "за период";
+}
+
+function getCategoryAccent(categoryId) {
+  const palette = [
+    ["#ff4d94", "#ff8ac4"],
+    ["#6f9cff", "#9abaff"],
+    ["#00e5cc", "#00b8a9"],
+    ["#ff8c42", "#ffb36b"],
+    ["#b27cff", "#d0a8ff"],
+    ["#ffd84d", "#ffe68f"],
+    ["#5de27a", "#99f0ad"],
+    ["#ff6c7e", "#ff9aa5"],
+    ["#4dd2ff", "#8ce8ff"],
+    ["#8f73d8", "#baa3f4"],
+  ];
+
+  const ids = state.categories.map((c) => c.id);
+  const index = Math.max(0, ids.indexOf(categoryId));
+  return palette[index % palette.length];
+}
+
+function renderAnalyticsOverview() {
+  const summary = getAnalyticsOverviewSummary();
+
+  analyticsTotalBalanceValue.textContent = formatMoney(summary.totalBalance);
+  analyticsFreeMoneyValue.textContent = formatMoney(summary.freeMoney);
+  analyticsProtectedMoneyValue.textContent = formatMoney(summary.protectedMoney);
+  analyticsPendingMandatoryValue.textContent = formatMoney(summary.pendingMandatoryToDeduct);
+  analyticsMandatoryTotalValue.textContent = formatMoney(summary.pendingMandatoryTotal);
+  analyticsMandatoryCoveredValue.textContent = formatMoney(summary.pendingMandatoryCoveredByLinkedSafes);
+  analyticsRemainingBudgetsValue.textContent = formatMoney(summary.remainingBudgets);
+
+  analyticsCanSaveNowValue.classList.remove("is-positive", "is-negative");
+  analyticsCanSaveNowValue.classList.add(summary.canSaveNow > 0 ? "is-positive" : "is-negative");
+  analyticsCanSaveNowValue.textContent = formatMoney(summary.canSaveNow > 0 ? summary.canSaveNow : 0);
+
+  if (summary.canSaveNow > 0) {
+    analyticsCanSaveNowStatus.textContent = "Можно";
+    analyticsCanSaveNowHint.textContent = `После обязательных платежей и лимитов остаётся ${formatMoney(summary.canSaveNow)}.`;
+  } else {
+    analyticsCanSaveNowStatus.textContent = "Сейчас рано";
+    const deficit = Math.abs(roundToTwo(summary.freeMoney - summary.pendingMandatoryTotal - summary.remainingBudgets));
+    analyticsCanSaveNowHint.textContent = `Не хватает ${formatMoney(deficit)} после учёта обязательных и лимитов.`;
+  }
+}
+
+function renderAnalyticsExpensesByCategory() {
+  const expenseTransactions = getFilteredAnalyticsTransactions().filter((item) => item.type === "expense");
+  const totalExpense = roundToTwo(expenseTransactions.reduce((sum, item) => sum + item.amount, 0));
+
+  analyticsExpenseValue.textContent = formatMoney(totalExpense);
+  analyticsExpensesPeriodNote.textContent = getAnalyticsExpensesPeriodNote();
+  analyticsExpensesCategoriesList.innerHTML = "";
+
+  const byCategory = new Map();
+
+  expenseTransactions.forEach((item) => {
+    const key = item.category_id || "uncategorized";
+    if (!byCategory.has(key)) {
+      byCategory.set(key, 0);
+    }
+    byCategory.set(key, roundToTwo(byCategory.get(key) + item.amount));
   });
 
-  requestAnimationFrame(() => {
-    insightsView.querySelectorAll(".insights-reveal").forEach((node) => {
-      node.classList.add("is-visible");
-    });
+  const rows = [...byCategory.entries()]
+    .map(([categoryId, amount]) => {
+      const category = getCategoryById(categoryId);
+      return {
+        categoryId,
+        name: category?.name || "Без категории",
+        amount,
+      };
+    })
+    .sort((a, b) => b.amount - a.amount);
+
+  rows.forEach((row) => {
+    const [startColor, endColor] = getCategoryAccent(row.categoryId);
+    const percent = totalExpense > 0 ? row.amount / totalExpense : 0;
+    const circumference = 2 * Math.PI * 18;
+    const offset = circumference * (1 - percent);
+
+    const node = document.createElement("div");
+    node.className = "analytics-expense-category-row";
+    node.innerHTML = `
+      <div class="analytics-expense-category-row__left">
+        <div class="analytics-expense-category-ring">
+          <svg viewBox="0 0 44 44" aria-hidden="true">
+            <circle class="analytics-expense-category-ring__track" cx="22" cy="22" r="18"></circle>
+            <circle
+              class="analytics-expense-category-ring__progress"
+              cx="22"
+              cy="22"
+              r="18"
+              style="
+                stroke: ${startColor};
+                stroke-dasharray: ${circumference};
+                stroke-dashoffset: ${offset};
+                filter: drop-shadow(0 0 8px ${startColor}55);
+              "
+            ></circle>
+          </svg>
+        </div>
+
+        <div class="analytics-expense-category-meta">
+          <div class="analytics-expense-category-meta__name">${escapeHtml(row.name)}</div>
+          <div class="analytics-expense-category-meta__sub">${Math.round(percent * 100)}% от расходов</div>
+        </div>
+      </div>
+
+      <div class="analytics-expense-category-value">
+        <div class="analytics-expense-category-value__amount" style="color:${startColor};">${formatMoney(row.amount)}</div>
+      </div>
+    `;
+
+    analyticsExpensesCategoriesList.appendChild(node);
   });
+}
+
+function renderAnalyticsSafes() {
+  const summary = getAnalyticsOverviewSummary();
+  analyticsInterestValue.textContent = formatMoney(summary.safeInterest);
+
+  analyticsSafeList.innerHTML = "";
+
+  state.safeBuckets.forEach((bucket) => {
+    const row = document.createElement("div");
+    row.className = "list-card";
+    row.innerHTML = `
+      <div class="list-body">
+        <div class="list-title-row">
+          <h3 class="list-title">${escapeHtml(bucket.name)}</h3>
+        </div>
+        <p class="list-subtitle">${bucket.is_locked ? "Системное накопление" : "Накопление"}</p>
+      </div>
+      <div class="list-right">
+        <p class="list-value">${formatMoney(getSafeBucketBalance(bucket.id))}</p>
+      </div>
+    `;
+    analyticsSafeList.appendChild(row);
+  });
+}
+
+function renderOperationsView() {
+  if (!operationsTransactionsList) return;
+
+  const items = [...state.transactions]
+    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+  operationsTransactionsList.innerHTML = "";
+
+  items.forEach((item) => {
+    const card = document.createElement("div");
+    card.className = "transaction-card";
+    card.innerHTML = renderTransactionCard(item);
+    operationsTransactionsList.appendChild(card);
+  });
+}
+
+function showOperationsView() {
+  document.querySelector(".app")?.classList.add("app--analytics");
+  mainView.classList.add("hidden");
+  categoriesManagerView.classList.add("hidden");
+  analyticsView.classList.add("hidden");
+  operationsView.classList.remove("hidden");
+  setActiveNav("operations");
+  renderOperationsView();
+}
+
+function setAnalyticsTab(nextTab) {
+  analyticsTab = nextTab;
+  renderAnalytics();
 }
 
   function getIconToneClass(type, extra = "") {
@@ -2139,10 +2268,10 @@ function playInsightsIntro() {
   });
 }
 
-  function setActiveNav(viewName) {
-  navWalletBtn?.classList.toggle("is-active", viewName === "wallet");
-  navAnalyticsBtn?.classList.toggle("is-active", viewName === "analytics");
-  navInsightsBtn?.classList.toggle("is-active", viewName === "insights");
+  function setActiveNav(next) {
+  navWalletBtn.classList.toggle("is-active", next === "wallet");
+  navAnalyticsBtn.classList.toggle("is-active", next === "analytics");
+  navOperationsBtn.classList.toggle("is-active", next === "operations");
 }
 
   function showWalletView() {
@@ -2173,22 +2302,10 @@ function playInsightsIntro() {
   document.querySelector(".app")?.classList.add("app--analytics");
   mainView.classList.add("hidden");
   categoriesManagerView.classList.add("hidden");
+  operationsView.classList.add("hidden");
   analyticsView.classList.remove("hidden");
-  insightsView.classList.add("hidden");
   setActiveNav("analytics");
   renderAnalytics();
-}
-
-  function showInsightsView() {
-  document.querySelector(".app")?.classList.add("app--analytics");
-  mainView.classList.add("hidden");
-  categoriesManagerView.classList.add("hidden");
-  analyticsView.classList.add("hidden");
-  insightsView.classList.remove("hidden");
-  closeAnalyticsMonthWheel();
-  setActiveNav("insights");
-  renderInsights();
-  playInsightsIntro();
 }
 
   /* =========================================================
@@ -3220,102 +3337,6 @@ function getAccountRoleFlags(role) {
 
     return sortTransactionsByLatest(items);
   }
-  
-  function getInsightsSummary() {
-  const periodTransactions = getInsightsFilteredTransactions();
-
-  let income = 0;
-  let expense = 0;
-  let requiredExpense = 0;
-  let flexibleExpense = 0;
-  let savedToSafes = 0;
-  let safeInterest = 0;
-
-  periodTransactions.forEach((transaction) => {
-    const amount = Number(transaction.amount) || 0;
-
-    if (transaction.type === "income") {
-      income += amount;
-
-      if (
-  (transaction.account_id === getSafeAccountId() ||
-    (!transaction.account_id && transaction.account === getSafeAccountName())) &&
-  transaction.title === "Проценты по накоплению"
-) {
-  safeInterest += amount;
-}
-    }
-
-    if (transaction.type === "expense") {
-      expense += amount;
-
-      const categoryId = transaction.category_id || UNCATEGORIZED_ID;
-      if (isRequiredCategory(categoryId)) {
-        requiredExpense += amount;
-      } else {
-        flexibleExpense += amount;
-      }
-    }
-
-    if (
-  transaction.type === "transfer" &&
-  (
-    transaction.to_account_id === getSafeAccountId() ||
-    (!transaction.to_account_id && transaction.to_account === getSafeAccountName())
-  ) &&
-  (
-    transaction.from_account_id !== getSafeAccountId() &&
-    transaction.from_account !== getSafeAccountName()
-  )
-) {
-  savedToSafes += amount;
-}
-  });
-
-  const mandatoryCoverage = getMandatoryPaymentsCoverageStats(getCurrentMonthKey());
-  const remainingBudgets = getRemainingFlexibleBudgetsCurrentMonth();
-
-  const totalBalance = roundToTwo(calculateBalance());
-  const protectedMoney = getProtectedMoneyTotal();
-  const freeMoney = getFreeMoneyTotal();
-
-  const mandatoryToDeduct = mandatoryCoverage.chargeToFreeMoney;
-
-  const canSaveNowRaw = roundToTwo(
-    freeMoney - mandatoryToDeduct - remainingBudgets
-  );
-
-  const canSaveNow = Math.max(0, canSaveNowRaw);
-  const shortageBeforeSafeSaving = Math.max(0, roundToTwo(-canSaveNowRaw));
-
-  return {
-    income: roundToTwo(income),
-    expense: roundToTwo(expense),
-    net: roundToTwo(income - expense),
-
-    requiredExpense: roundToTwo(requiredExpense),
-    flexibleExpense: roundToTwo(flexibleExpense),
-
-    savedToSafes: roundToTwo(savedToSafes),
-    safeInterest: roundToTwo(safeInterest),
-
-    totalBalance,
-    protectedMoney,
-    freeMoney,
-
-    pendingMandatoryTotal: mandatoryCoverage.total,
-    pendingMandatoryCoveredByLinkedSafes: mandatoryCoverage.coveredByLinkedSafes,
-    pendingMandatoryCoveredByProtectedSafes: mandatoryCoverage.coveredByProtectedSafes,
-    pendingMandatoryUncoveredAfterLinkedSafes: mandatoryCoverage.uncoveredAfterLinkedSafes,
-    pendingMandatoryToDeduct: mandatoryToDeduct,
-    pendingMandatoryCount: mandatoryCoverage.count,
-
-    remainingBudgets,
-
-    canSaveNow,
-    shortageBeforeSafeSaving,
-  };
-}
 
   async function applySafeInterestIfNeeded() {
   const annualRate = getSafeInterestAnnualRate();
@@ -3618,261 +3639,25 @@ function getAccountRoleFlags(role) {
   }
 
   function renderAnalytics() {
-  if (!analyticsView) return;
-  if (analyticsFilterPeriod !== "range" && analyticsFilterPeriod !== "month") {
-  closeAnalyticsFiltersModal();
-}
+  const isOverview = analyticsTab === "overview";
+  const isCategories = analyticsTab === "categories";
+  const isExpenses = analyticsTab === "expenses";
+  const isSafes = analyticsTab === "safes";
 
-  const breakdown = getAnalyticsCategoryBreakdown();
-  
-    analyticsPeriodButtons.forEach((btn) => {
-      btn.classList.toggle("is-active", btn.dataset.analyticsPeriod === analyticsFilterPeriod);
-    });
+  analyticsOverviewSection.classList.toggle("hidden", !isOverview);
+  analyticsCategoriesSection.classList.toggle("hidden", !isCategories);
+  analyticsExpensesSection.classList.toggle("hidden", !isExpenses);
+  analyticsSafesSection.classList.toggle("hidden", !isSafes);
 
-    analyticsTypeButtons.forEach((btn) => {
-      btn.classList.toggle("is-active", btn.dataset.analyticsType === analyticsOperationType);
-    });
+  analyticsTabOverviewBtn.classList.toggle("is-active", isOverview);
+  analyticsTabCategoriesBtn.classList.toggle("is-active", isCategories);
+  analyticsTabExpensesBtn.classList.toggle("is-active", isExpenses);
+  analyticsTabSafesBtn.classList.toggle("is-active", isSafes);
 
-    analyticsModeCategoriesBtn?.classList.toggle("is-active", analyticsMode === "categories");
-    analyticsModeOperationsBtn?.classList.toggle("is-active", analyticsMode === "operations");
-
-    analyticsCategoriesBreakdownSection?.classList.toggle("hidden", analyticsMode !== "categories");
-
-    analyticsOperationsSection?.classList.toggle("hidden", analyticsMode !== "operations");
-    analyticsOperationTypeFilters?.classList.toggle("hidden", analyticsMode !== "operations");
-
-    const isAnalyticsRange = analyticsFilterPeriod === "range";
-
-    setNativePickerVisibility(analyticsRangeFromInput, isAnalyticsRange);
-    setNativePickerVisibility(analyticsRangeToInput, isAnalyticsRange);
-
-    if (analyticsMonthBtn) {
-      analyticsMonthBtn.textContent = formatMonthButtonLabel(analyticsSelectedMonth);
-    }
-
-    if (analyticsMonthWheelWrap) {
-      analyticsMonthWheelWrap.classList.toggle("hidden", !isAnalyticsMonthWheelOpen);
-    }
-
-    if (analyticsSelectedPeriodLabel) {
-      analyticsSelectedPeriodLabel.classList.add("hidden");
-      analyticsSelectedPeriodLabel.textContent = "";
-      analyticsSelectedPeriodLabel.style.display = "none";
-    }
-
-    renderAnalyticsOperations();
-
-    const periodLabel = getAnalyticsPeriodLabel() || "Период";
-    const totalExpense = breakdown.reduce((sum, item) => sum + item.amount, 0);
-
-    if (!breakdown.length) {
-      analyticsDonut.innerHTML = `
-        <div class="analytics-panel">
-          <div class="analytics-panel__eyebrow">Расходы по категориям</div>
-
-          <div class="analytics-panel__headline">
-            <div class="analytics-panel__total">${formatMoney(0)}</div>
-            <div class="analytics-panel__period">${escapeHtml(periodLabel)}</div>
-          </div>
-
-          <div class="analytics-leader analytics-leader--empty">
-            <div class="analytics-leader__left">
-              <div class="analytics-breakdown-row__rank analytics-breakdown-row__rank--leader">#1</div>
-
-              <div class="analytics-leader__content">
-                <div class="analytics-leader__label">Лидер</div>
-                <div class="analytics-leader__title">Нет данных</div>
-                <div class="analytics-leader__meta">За выбранный период нет расходов</div>
-              </div>
-            </div>
-
-            <div class="analytics-leader__value">—</div>
-          </div>
-        </div>
-      `;
-
-      analyticsLegend.innerHTML = `
-        <div class="analytics-breakdown-list analytics-breakdown-list--empty">
-          <div class="analytics-empty">Нет данных по расходам за выбранный период</div>
-        </div>
-      `;
-      return;
-    }
-
-    const topItem = breakdown[0];
-    const topPercent = totalExpense > 0 ? Math.round((topItem.amount / totalExpense) * 100) : 0;
-    const topExceeded = isBudgetExceeded(topItem.amount, topItem.id);
-
-    analyticsDonut.innerHTML = `
-      <div class="analytics-panel">
-        <div class="analytics-panel__eyebrow">Расходы по категориям</div>
-
-        <div class="analytics-panel__headline">
-          <div class="analytics-panel__total">${formatMoney(totalExpense)}</div>
-          <div class="analytics-panel__period">${escapeHtml(periodLabel)}</div>
-        </div>
-
-        <button
-          class="analytics-leader analytics-leader--button"
-          type="button"
-          data-analytics-category-id="${escapeHtml(topItem.id)}"
-        >
-          <div class="analytics-leader__left">
-            <div class="analytics-breakdown-row__rank analytics-breakdown-row__rank--leader">#1</div>
-
-            <div class="analytics-leader__content">
-              <div class="analytics-leader__label">Лидер</div>
-              <div class="analytics-leader__title">
-  ${topItem.is_required ? '<span class="analytics-required-flag">🚩</span>' : ""}
-  ${escapeHtml(topItem.name)}
-</div>
-              <div class="analytics-leader__meta">${topPercent}% от расходов</div>
-            </div>
-          </div>
-
-          <div class="analytics-leader__value ${topExceeded ? "analytics-limit-value--danger" : ""}">
-            ${getAnalyticsSpentLimitLabel(topItem.amount, topItem.id)}
-          </div>
-        </button>
-      </div>
-    `;
-
-    const restItems = breakdown.slice(1);
-
-    const listMarkup = restItems
-      .map((item, index) => {
-        const percent = totalExpense > 0 ? Math.round((item.amount / totalExpense) * 100) : 0;
-        const exceeded = isBudgetExceeded(item.amount, item.id);
-
-        return `
-          <button
-            class="analytics-breakdown-row analytics-breakdown-row--button"
-            type="button"
-            data-analytics-category-id="${escapeHtml(item.id)}"
-          >
-            <div class="analytics-breakdown-row__left">
-              <div class="analytics-breakdown-row__rank">#${index + 2}</div>
-              <div class="analytics-breakdown-row__body">
-                <div class="analytics-breakdown-row__title">
-  ${item.is_required ? '<span class="analytics-required-flag">🚩</span>' : ""}
-  ${escapeHtml(item.name)}
-</div>
-                <div class="analytics-breakdown-row__subtitle">${percent}% от расходов</div>
-              </div>
-            </div>
-            <div class="analytics-breakdown-row__value ${exceeded ? "analytics-limit-value--danger" : ""}">
-              ${getAnalyticsSpentLimitLabel(item.amount, item.id)}
-            </div>
-          </button>
-        `;
-      })
-      .join("");
-
-    analyticsLegend.innerHTML = `
-      <div class="analytics-breakdown-list">
-        ${listMarkup}
-      </div>
-    `;
-
-    analyticsDonut
-      .querySelectorAll("[data-analytics-category-id]")
-      .forEach((el) => {
-        el.addEventListener("click", () => {
-          openAnalyticsCategoryModal(el.dataset.analyticsCategoryId);
-        });
-      });
-
-    analyticsLegend
-      .querySelectorAll("[data-analytics-category-id]")
-      .forEach((el) => {
-        el.addEventListener("click", () => {
-          openAnalyticsCategoryModal(el.dataset.analyticsCategoryId);
-        });
-      });
-  }
-  
-  function renderInsights() {
-  if (!insightsView) return;
-  if (insightsFilterPeriod !== "range" && insightsFilterPeriod !== "month") {
-    closeInsightsFiltersModal();
-  }
-
-  const summary = getInsightsSummary();
-
-  insightsIncomeValue.textContent = formatMoney(summary.income);
-  insightsRequiredValue.textContent = formatMoney(summary.requiredExpense);
-  insightsFlexibleValue.textContent = formatMoney(summary.flexibleExpense);
-  insightsSavedValue.textContent = formatMoney(summary.savedToSafes);
-  insightsInterestValue.textContent = formatMoney(summary.safeInterest);
-
-  insightsMandatoryTotalValue.textContent = formatMoney(summary.pendingMandatoryTotal);
-  insightsMandatoryCoveredValue.textContent = formatMoney(summary.pendingMandatoryCoveredByLinkedSafes);
-  insightsPendingMandatoryValue.textContent = formatMoney(summary.pendingMandatoryToDeduct);
-  insightsRemainingBudgetsValue.textContent = formatMoney(summary.remainingBudgets);
-
-  insightsCanSaveNowValue.classList.remove("is-positive", "is-negative");
-  insightsCanSaveNowValue.classList.add(
-    summary.canSaveNow > 0 ? "is-positive" : "is-negative"
-  );
-  insightsCanSaveNowValue.textContent =
-    summary.canSaveNow > 0 ? formatMoney(summary.canSaveNow) : formatMoney(0);
-
-  setInsightsHeroState(summary);
-
-  if (insightsPeriodCaption) {
-    insightsPeriodCaption.textContent = getInsightsPeriodCaptionText();
-  }
-
-  animateCurrencyValue(insightsExpenseValue, summary.expense, { duration: 720 });
-  animateCurrencyValue(insightsTotalBalanceValue, summary.totalBalance, { duration: 720 });
-  animateCurrencyValue(insightsFreeMoneyValue, summary.freeMoney, { duration: 720 });
-  animateCurrencyValue(insightsProtectedMoneyValue, summary.protectedMoney, { duration: 720 });
-
-  setExpenseRing(summary.requiredExpense, summary.flexibleExpense);
-
-  if (insightsSafeList) {
-    insightsSafeList.innerHTML = "";
-
-    state.safeBuckets.forEach((bucket) => {
-      const row = document.createElement("div");
-      row.className = "list-card";
-      row.innerHTML = `
-        <div class="list-body">
-          <div class="list-title-row">
-            <h3 class="list-title">${escapeHtml(bucket.name)}</h3>
-          </div>
-          <p class="list-subtitle">${bucket.is_locked ? "Системное накопление" : "Накопление"}</p>
-        </div>
-        <div class="list-right">
-          <p class="list-value">${formatMoney(getSafeBucketBalance(bucket.id))}</p>
-        </div>
-      `;
-      insightsSafeList.appendChild(row);
-    });
-  }
-
-  insightsPeriodButtons.forEach((btn) => {
-    btn.classList.toggle("is-active", btn.dataset.insightsPeriod === insightsFilterPeriod);
-  });
-
-  const isInsightsRange = insightsFilterPeriod === "range";
-
-  setNativePickerVisibility(insightsRangeFromInput, isInsightsRange);
-  setNativePickerVisibility(insightsRangeToInput, isInsightsRange);
-
-  if (insightsMonthBtn) {
-    insightsMonthBtn.textContent = formatMonthButtonLabel(insightsSelectedMonth);
-  }
-
-  if (insightsMonthWheelWrap) {
-    insightsMonthWheelWrap.classList.toggle("hidden", !isInsightsMonthWheelOpen);
-  }
-
-  if (insightsSelectedPeriodLabel) {
-    insightsSelectedPeriodLabel.classList.add("hidden");
-    insightsSelectedPeriodLabel.textContent = "";
-    insightsSelectedPeriodLabel.style.display = "none";
-  }
+  if (isOverview) renderAnalyticsOverview();
+  if (isCategories) renderAnalyticsCategoryBreakdown();
+  if (isExpenses) renderAnalyticsExpensesByCategory();
+  if (isSafes) renderAnalyticsSafes();
 }
 
   /* =========================================================
@@ -4323,9 +4108,17 @@ openExpenseBreakdownBtn?.addEventListener("click", () => {
 
   navWalletBtn?.addEventListener("click", showWalletView);
 navAnalyticsBtn?.addEventListener("click", showAnalyticsView);
-navInsightsBtn?.addEventListener("click", showInsightsView);
 openAnalyticsFiltersBtn?.addEventListener("click", openAnalyticsFiltersModal);
 closeAnalyticsFiltersBtn?.addEventListener("click", closeAnalyticsFiltersModal);
+
+navWalletBtn?.addEventListener("click", showMainView);
+navAnalyticsBtn?.addEventListener("click", showAnalyticsView);
+navOperationsBtn?.addEventListener("click", showOperationsView);
+
+analyticsTabOverviewBtn?.addEventListener("click", () => setAnalyticsTab("overview"));
+analyticsTabCategoriesBtn?.addEventListener("click", () => setAnalyticsTab("categories"));
+analyticsTabExpensesBtn?.addEventListener("click", () => setAnalyticsTab("expenses"));
+analyticsTabSafesBtn?.addEventListener("click", () => setAnalyticsTab("safes"));
 
 openInsightsFiltersBtn?.addEventListener("click", openInsightsFiltersModal);
 closeInsightsFiltersBtn?.addEventListener("click", closeInsightsFiltersModal);
