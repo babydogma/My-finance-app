@@ -191,6 +191,11 @@ const faqModalFormula = document.getElementById("faqModalFormula");
 const closeFaqModalBtn = document.getElementById("closeFaqModalBtn");
 const faqButtons = document.querySelectorAll("[data-faq-key]");
 
+const insightsExpenseRingRequired = document.getElementById("insightsExpenseRingRequired");
+const insightsExpenseRingFlexible = document.getElementById("insightsExpenseRingFlexible");
+const insightsPeriodCaption = document.getElementById("insightsPeriodCaption");
+const openExpenseBreakdownBtn = document.getElementById("openExpenseBreakdownBtn");
+
   /* =========================================================
      02. UI STATE
      ========================================================= */
@@ -1985,6 +1990,80 @@ function setInsightsHeroState(summary) {
     "Свободные деньги сейчас полностью заняты обязательствами и лимитами.";
 }
 
+function getInsightsPeriodCaptionText() {
+  if (insightsFilterPeriod === "month") return "за месяц";
+  if (insightsFilterPeriod === "today") return "за сегодня";
+  if (insightsFilterPeriod === "7") return "за 7 дней";
+  if (insightsFilterPeriod === "range") return "за выбранный период";
+  return "за период";
+}
+
+function setExpenseRing(requiredAmount, flexibleAmount) {
+  if (!insightsExpenseRingRequired || !insightsExpenseRingFlexible) return;
+
+  const total = Math.max(0, roundToTwo((Number(requiredAmount) || 0) + (Number(flexibleAmount) || 0)));
+  const circumference = 2 * Math.PI * 46;
+
+  insightsExpenseRingRequired.style.strokeDasharray = `${circumference}`;
+  insightsExpenseRingFlexible.style.strokeDasharray = `${circumference}`;
+
+  if (total <= 0) {
+    insightsExpenseRingRequired.style.strokeDashoffset = `${circumference}`;
+    insightsExpenseRingFlexible.style.strokeDashoffset = `${circumference}`;
+    return;
+  }
+
+  const requiredRatio = Math.max(0, Math.min(1, requiredAmount / total));
+  const flexibleRatio = Math.max(0, Math.min(1, flexibleAmount / total));
+
+  const requiredLength = circumference * requiredRatio;
+  const flexibleLength = circumference * flexibleRatio;
+
+  insightsExpenseRingRequired.style.strokeDashoffset = `${circumference - requiredLength}`;
+  insightsExpenseRingFlexible.style.strokeDashoffset = `${circumference - flexibleLength}`;
+
+  insightsExpenseRingFlexible.style.transform = `rotate(${requiredRatio * 360}deg)`;
+  insightsExpenseRingFlexible.style.transformOrigin = "50% 50%";
+}
+
+function animateCurrencyValue(el, value, options = {}) {
+  if (!el) return;
+
+  const duration = options.duration || 700;
+  const startValue = 0;
+  const endValue = Number(value) || 0;
+  const startTime = performance.now();
+
+  function frame(now) {
+    const progress = Math.min((now - startTime) / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    const current = roundToTwo(startValue + (endValue - startValue) * eased);
+    el.textContent = formatMoney(current);
+
+    if (progress < 1) {
+      requestAnimationFrame(frame);
+    } else {
+      el.textContent = formatMoney(endValue);
+    }
+  }
+
+  requestAnimationFrame(frame);
+}
+
+function playInsightsIntro() {
+  if (!insightsView || insightsView.classList.contains("hidden")) return;
+
+  insightsView.querySelectorAll(".insights-reveal").forEach((node) => {
+    node.classList.remove("is-visible");
+  });
+
+  requestAnimationFrame(() => {
+    insightsView.querySelectorAll(".insights-reveal").forEach((node) => {
+      node.classList.add("is-visible");
+    });
+  });
+}
+
   function getIconToneClass(type, extra = "") {
     if (type === "income") return "list-icon--green";
     if (type === "transfer") return "list-icon--blue";
@@ -2109,6 +2188,7 @@ function setInsightsHeroState(summary) {
   closeAnalyticsMonthWheel();
   setActiveNav("insights");
   renderInsights();
+  playInsightsIntro();
 }
 
   /* =========================================================
@@ -3720,15 +3800,10 @@ function getAccountRoleFlags(role) {
   const summary = getInsightsSummary();
 
   insightsIncomeValue.textContent = formatMoney(summary.income);
-  insightsExpenseValue.textContent = formatMoney(summary.expense);
   insightsRequiredValue.textContent = formatMoney(summary.requiredExpense);
   insightsFlexibleValue.textContent = formatMoney(summary.flexibleExpense);
   insightsSavedValue.textContent = formatMoney(summary.savedToSafes);
   insightsInterestValue.textContent = formatMoney(summary.safeInterest);
-
-  insightsTotalBalanceValue.textContent = formatMoney(summary.totalBalance);
-  insightsProtectedMoneyValue.textContent = formatMoney(summary.protectedMoney);
-  insightsFreeMoneyValue.textContent = formatMoney(summary.freeMoney);
 
   insightsMandatoryTotalValue.textContent = formatMoney(summary.pendingMandatoryTotal);
   insightsMandatoryCoveredValue.textContent = formatMoney(summary.pendingMandatoryCoveredByLinkedSafes);
@@ -3743,6 +3818,17 @@ function getAccountRoleFlags(role) {
     summary.canSaveNow > 0 ? formatMoney(summary.canSaveNow) : formatMoney(0);
 
   setInsightsHeroState(summary);
+
+  if (insightsPeriodCaption) {
+    insightsPeriodCaption.textContent = getInsightsPeriodCaptionText();
+  }
+
+  animateCurrencyValue(insightsExpenseValue, summary.expense, { duration: 720 });
+  animateCurrencyValue(insightsTotalBalanceValue, summary.totalBalance, { duration: 720 });
+  animateCurrencyValue(insightsFreeMoneyValue, summary.freeMoney, { duration: 720 });
+  animateCurrencyValue(insightsProtectedMoneyValue, summary.protectedMoney, { duration: 720 });
+
+  setExpenseRing(summary.requiredExpense, summary.flexibleExpense);
 
   if (insightsSafeList) {
     insightsSafeList.innerHTML = "";
@@ -4226,6 +4312,11 @@ function renderAll() {
   openTransferModalBtn?.addEventListener("click", () => openModal("transfer"));
   fromAccountSelect?.addEventListener("change", updateTransferSafeFields);
 toAccountSelect?.addEventListener("change", updateTransferSafeFields);
+
+openExpenseBreakdownBtn?.addEventListener("click", () => {
+  analyticsMode = "categories";
+  showAnalyticsView();
+});
 
   openCategoriesManagerBtn?.addEventListener("click", openCategoriesManager);
   closeCategoriesManagerBtn?.addEventListener("click", closeCategoriesManager);
