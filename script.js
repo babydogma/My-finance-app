@@ -1633,6 +1633,44 @@ function getRemainingFlexibleBudgetsBreakdownCurrentMonth() {
     .sort((a, b) => b.remaining - a.remaining);
 }
 
+function buildFaqFormulaText(faqKey) {
+  const summary = getAnalyticsOverviewSummary();
+
+  if (faqKey === "total_balance") {
+    return `Общий баланс = ${formatMoney(summary.totalBalance)}`;
+  }
+
+  if (faqKey === "free_money") {
+    return `Свободные деньги = ${formatMoney(summary.freeMoney)}`;
+  }
+
+  if (faqKey === "protected_money") {
+    return `Защищённые деньги = ${formatMoney(summary.protectedMoney)}`;
+  }
+
+  if (faqKey === "remaining_limits") {
+    return `Остаток лимитов = ${formatMoney(summary.remainingBudgets)}`;
+  }
+
+  if (faqKey === "can_save_now") {
+    return `Можно отложить = Свободные деньги (${formatMoney(summary.freeMoney)}) − К вычету из свободных (${formatMoney(summary.pendingMandatoryToDeduct)}) − Остаток лимитов (${formatMoney(summary.remainingBudgets)})`;
+  }
+
+  if (faqKey === "saved_to_safes") {
+    return "Считаются только переводы в накопления из обычных счетов за выбранный период.";
+  }
+
+  if (faqKey === "required_expense") {
+    return "Сумма расходов по категориям, помеченным как обязательные.";
+  }
+
+  if (faqKey === "flexible_expense") {
+    return "Сумма расходов по категориям, не помеченным как обязательные.";
+  }
+
+  return "Формула недоступна для этого показателя.";
+}
+
 function openFaqModal(faqKey) {
   const meta = FAQ_META[faqKey];
   if (!meta || !faqModal) return;
@@ -3850,11 +3888,14 @@ analyticsFiltersModal?.addEventListener("click", (event) => {
   }
 });
 
-faqButtons.forEach((btn) => {
-  btn.addEventListener("click", (event) => {
-    event.stopPropagation();
-    openFaqModal(btn.dataset.faqKey);
-  });
+document.addEventListener("click", (event) => {
+  const faqBtn = event.target.closest("[data-faq-key]");
+  if (!faqBtn) return;
+
+  event.preventDefault();
+  event.stopPropagation();
+
+  openFaqModal(faqBtn.dataset.faqKey);
 });
 
 closeFaqModalBtn?.addEventListener("click", closeFaqModal);
