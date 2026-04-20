@@ -133,146 +133,20 @@
   </section>
 </div>
 
-  <!-- ANALYTICS VIEW -->
+<!--analyticsView -->
 <div id="analyticsView" class="hidden">
-    <section class="section section--manager-top screen-shell screen-shell--analytics">
-  <div class="screen-shell__top screen-shell__top--analytics">
-    <div class="analytics-mode-switch-wrap">
-      <div class="analytics-mode-switch">
-        <button
-          class="analytics-mode-switch__btn is-active"
-          type="button"
-          id="analyticsModeCategoriesBtn"
-        >
-          Категории
-        </button>
-
-        <button
-          class="analytics-mode-switch__btn"
-          type="button"
-          id="analyticsModeOperationsBtn"
-        >
-          Операции
-        </button>
-      </div>
-    </div>
-
-    <button class="screen-filter-btn" type="button" id="openAnalyticsFiltersBtn" aria-label="Открыть фильтры аналитики">
-  <svg viewBox="0 0 24 24" aria-hidden="true">
-    <path d="M4 7h16" />
-    <path d="M7 12h10" />
-    <path d="M10 17h4" />
-  </svg>
-</button>
-  </div>
-</section>
-
-<div class="modal hidden" id="analyticsFiltersModal">
-  <div class="modal-sheet filters-sheet">
-    <div class="modal-handle"></div>
-
-    <div class="section-head filters-sheet__head">
-      <h3 class="modal-title filters-sheet__title">Фильтры аналитики</h3>
-      <button class="manager-back-btn" type="button" id="closeAnalyticsFiltersBtn">Закрыть</button>
-    </div>
-
-    <div class="history-filters history-filters--modal">
-      <div class="history-filter-group history-filter-group--primary">
-        <div class="month-filter-wrap month-filter-wrap--inline">
-          <button
-            class="history-filter-btn history-filter-btn--month is-active"
-            type="button"
-            data-analytics-period="month"
-            id="analyticsMonthBtn"
-          >
-            Месяц
-          </button>
-        </div>
-      </div>
-
-      <div class="analytics-month-popover hidden" id="analyticsMonthWheelWrap">
-        <div class="analytics-month-popover__panel">
-          <div class="month-wheel" id="analyticsMonthWheelInline">
-            <div class="month-wheel__fade month-wheel__fade--top"></div>
-            <div class="month-wheel__fade month-wheel__fade--bottom"></div>
-            <div class="month-wheel__center-line"></div>
-
-            <div class="month-wheel__column" id="analyticsMonthNamesColumn"></div>
-            <div class="month-wheel__column" id="analyticsMonthYearsColumn"></div>
-          </div>
-
-          <div class="analytics-month-popover__actions">
-            <button
-              class="analytics-month-popover__reset"
-              type="button"
-              id="analyticsMonthResetBtn"
-            >
-              Сбросить
-            </button>
-
-            <button
-              class="analytics-month-popover__apply"
-              type="button"
-              id="analyticsMonthApplyBtn"
-              aria-label="Подтвердить выбор месяца"
-            >
-              ✓
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div class="history-filter-group history-filter-group--secondary">
-        <button class="history-filter-btn" type="button" data-analytics-period="today">Сегодня</button>
-        <button class="history-filter-btn" type="button" data-analytics-period="7">7 дней</button>
-        <button class="history-filter-btn" type="button" data-analytics-period="range">Период</button>
-      </div>
-
-      <div class="history-filter-group history-filter-group--inputs">
-        <input class="input hidden" type="date" id="analyticsRangeFromInput" />
-        <input class="input hidden" type="date" id="analyticsRangeToInput" />
-        <div class="section-note hidden" id="analyticsSelectedPeriodLabel"></div>
-      </div>
-
-      <div
-        class="history-filter-group analytics-operation-type-group hidden"
-        id="analyticsOperationTypeFilters"
-      >
-        <button class="history-filter-btn is-active" type="button" data-analytics-type="all">Все</button>
-        <button class="history-filter-btn" type="button" data-analytics-type="income">Доходы</button>
-        <button class="history-filter-btn" type="button" data-analytics-type="expense">Расходы</button>
-        <button class="history-filter-btn" type="button" data-analytics-type="transfer">Переводы</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<section class="section" id="analyticsCategoriesBreakdownSection">
-  <div class="manager-card analytics-chart-card analytics-chart-card--clean">
-    <div class="analytics-overview" id="analyticsDonut"></div>
-    <div class="analytics-breakdown" id="analyticsLegend"></div>
-  </div>
-</section>
-
-<section class="section hidden" id="analyticsOperationsSection">
-  <div class="list" id="analyticsTransactionsList"></div>
-</section>
-</div>
-
-<!-- INSIGHTS VIEW -->
-    <div id="insightsView" class="hidden">
-  <section class="section section--manager-top insights-flow-head">
-    <div class="insights-flow-head__row">
-      <div class="insights-flow-head__title-wrap">
-        <h2 class="insights-flow-head__title">Итоги</h2>
-        <p class="insights-flow-head__subtitle">Сводка по деньгам и решениям</p>
+  <section class="section section--manager-top analytics-hub-head">
+    <div class="analytics-hub-head__row">
+      <div class="analytics-hub-head__title-wrap">
+        <h2 class="analytics-hub-head__title">Аналитика</h2>
+        <p class="analytics-hub-head__subtitle">Разбор денег по периодам</p>
       </div>
 
       <button
-        class="screen-filter-btn insights-flow-head__filter"
+        class="screen-filter-btn analytics-hub-head__filter"
         type="button"
-        id="openInsightsFiltersBtn"
-        aria-label="Открыть фильтры итогов"
+        id="openAnalyticsFiltersBtn"
+        aria-label="Открыть фильтры аналитики"
       >
         <svg viewBox="0 0 24 24" aria-hidden="true">
           <path d="M4 7h16" />
@@ -283,13 +157,20 @@
     </div>
   </section>
 
-  <div class="modal hidden" id="insightsFiltersModal">
+  <div class="analytics-mode-switch analytics-mode-switch--wide">
+    <button class="analytics-mode-switch__btn is-active" type="button" id="analyticsTabOverviewBtn">Обзор</button>
+    <button class="analytics-mode-switch__btn" type="button" id="analyticsTabCategoriesBtn">Категории</button>
+    <button class="analytics-mode-switch__btn" type="button" id="analyticsTabExpensesBtn">Расходы</button>
+    <button class="analytics-mode-switch__btn" type="button" id="analyticsTabSafesBtn">Накопления</button>
+  </div>
+
+  <div class="modal hidden" id="analyticsFiltersModal">
     <div class="modal-sheet filters-sheet">
       <div class="modal-handle"></div>
 
       <div class="section-head filters-sheet__head">
-        <h3 class="modal-title filters-sheet__title">Фильтры итогов</h3>
-        <button class="manager-back-btn" type="button" id="closeInsightsFiltersBtn">Закрыть</button>
+        <h3 class="modal-title filters-sheet__title">Фильтры аналитики</h3>
+        <button class="manager-back-btn" type="button" id="closeAnalyticsFiltersBtn">Закрыть</button>
       </div>
 
       <div class="history-filters history-filters--modal">
@@ -298,30 +179,30 @@
             <button
               class="history-filter-btn history-filter-btn--month is-active"
               type="button"
-              data-insights-period="month"
-              id="insightsMonthBtn"
+              data-analytics-period="month"
+              id="analyticsMonthBtn"
             >
               Месяц
             </button>
           </div>
         </div>
 
-        <div class="analytics-month-popover hidden" id="insightsMonthWheelWrap">
+        <div class="analytics-month-popover hidden" id="analyticsMonthWheelWrap">
           <div class="analytics-month-popover__panel">
-            <div class="month-wheel" id="insightsMonthWheelInline">
+            <div class="month-wheel" id="analyticsMonthWheelInline">
               <div class="month-wheel__fade month-wheel__fade--top"></div>
               <div class="month-wheel__fade month-wheel__fade--bottom"></div>
               <div class="month-wheel__center-line"></div>
 
-              <div class="month-wheel__column" id="insightsMonthNamesColumn"></div>
-              <div class="month-wheel__column" id="insightsMonthYearsColumn"></div>
+              <div class="month-wheel__column" id="analyticsMonthNamesColumn"></div>
+              <div class="month-wheel__column" id="analyticsMonthYearsColumn"></div>
             </div>
 
             <div class="analytics-month-popover__actions">
               <button
                 class="analytics-month-popover__reset"
                 type="button"
-                id="insightsMonthResetBtn"
+                id="analyticsMonthResetBtn"
               >
                 Сбросить
               </button>
@@ -329,7 +210,7 @@
               <button
                 class="analytics-month-popover__apply"
                 type="button"
-                id="insightsMonthApplyBtn"
+                id="analyticsMonthApplyBtn"
                 aria-label="Подтвердить выбор месяца"
               >
                 ✓
@@ -339,226 +220,224 @@
         </div>
 
         <div class="history-filter-group history-filter-group--secondary">
-          <button class="history-filter-btn" type="button" data-insights-period="today">Сегодня</button>
-          <button class="history-filter-btn" type="button" data-insights-period="7">7 дней</button>
-          <button class="history-filter-btn" type="button" data-insights-period="range">Период</button>
+          <button class="history-filter-btn" type="button" data-analytics-period="today">Сегодня</button>
+          <button class="history-filter-btn" type="button" data-analytics-period="7">7 дней</button>
+          <button class="history-filter-btn" type="button" data-analytics-period="range">Период</button>
         </div>
 
         <div class="history-filter-group history-filter-group--inputs">
-          <input class="input hidden" type="date" id="insightsRangeFromInput" />
-          <input class="input hidden" type="date" id="insightsRangeToInput" />
-          <div class="section-note hidden" id="insightsSelectedPeriodLabel"></div>
+          <input class="input hidden" type="date" id="analyticsRangeFromInput" />
+          <input class="input hidden" type="date" id="analyticsRangeToInput" />
+          <div class="section-note hidden" id="analyticsSelectedPeriodLabel"></div>
         </div>
       </div>
     </div>
   </div>
 
-  <section class="section insights-flow-hero-section insights-reveal" style="--reveal-delay:0ms;">
-    <div class="insights-flow-hero">
-      <div class="insights-flow-hero__glow"></div>
-
-      <div class="insights-flow-hero__top">
-        <div class="insights-flow-hero__label">
+  <section class="section analytics-overview-section" id="analyticsOverviewSection">
+    <div class="analytics-overview-save-card">
+      <div class="analytics-overview-save-card__top">
+        <div class="analytics-overview-save-card__label">
           Можно отложить
           <button class="faq-chip" type="button" data-faq-key="can_save_now" aria-label="Что это?">❔</button>
         </div>
-
-        <div class="insights-flow-hero__status" id="insightsCanSaveNowStatus">—</div>
+        <div class="analytics-overview-save-card__status" id="analyticsCanSaveNowStatus">—</div>
       </div>
 
-      <div class="insights-flow-hero__value-wrap">
-        <p class="insights-flow-hero__value" id="insightsCanSaveNowValue">0 ₽</p>
-      </div>
-
-      <p class="insights-flow-hero__hint" id="insightsCanSaveNowHint">—</p>
-    </div>
-  </section>
-
-  <section class="section insights-flow-expense-section insights-reveal" style="--reveal-delay:70ms;">
-    <div class="section-head insights-flow-section-head">
-      <h2 class="section-title insights-flow-section-title">Поток расходов</h2>
+      <div class="analytics-overview-save-card__value" id="analyticsCanSaveNowValue">0 ₽</div>
+      <div class="analytics-overview-save-card__hint" id="analyticsCanSaveNowHint">—</div>
     </div>
 
-    <div class="insights-expense-showcase">
-      <div class="insights-expense-showcase__hero">
-        <div class="insights-expense-showcase__ring">
-          <svg viewBox="0 0 120 120" aria-hidden="true">
-            <circle class="insights-expense-showcase__track" cx="60" cy="60" r="46"></circle>
-            <circle class="insights-expense-showcase__seg insights-expense-showcase__seg--required" id="insightsExpenseRingRequired" cx="60" cy="60" r="46"></circle>
-            <circle class="insights-expense-showcase__seg insights-expense-showcase__seg--flexible" id="insightsExpenseRingFlexible" cx="60" cy="60" r="46"></circle>
-          </svg>
-        </div>
-
-        <div class="insights-expense-showcase__hero-content">
-          <div class="insights-expense-showcase__hero-label">Общий поток расходов</div>
-          <div class="insights-expense-showcase__hero-value" id="insightsExpenseValue">0 ₽</div>
-          <div class="insights-expense-showcase__hero-note" id="insightsPeriodCaption">за период</div>
-        </div>
-      </div>
-
-      <div class="insights-expense-showcase__grid">
-        <div class="insights-expense-mini-card">
-          <div class="insights-expense-mini-card__left">
-            <span class="insights-expense-mini-card__dot insights-expense-mini-card__dot--required"></span>
-            <div class="insights-expense-mini-card__meta">
-              <div class="insights-expense-mini-card__label">
-                Обязательные расходы
-                <button class="faq-chip" type="button" data-faq-key="required_expense" aria-label="Что это?">❔</button>
-              </div>
-            </div>
-          </div>
-          <div class="insights-expense-mini-card__value insights-expense-mini-card__value--required" id="insightsRequiredValue">0 ₽</div>
-        </div>
-
-        <div class="insights-expense-mini-card">
-          <div class="insights-expense-mini-card__left">
-            <span class="insights-expense-mini-card__dot insights-expense-mini-card__dot--flexible"></span>
-            <div class="insights-expense-mini-card__meta">
-              <div class="insights-expense-mini-card__label">
-                Гибкие расходы
-                <button class="faq-chip" type="button" data-faq-key="flexible_expense" aria-label="Что это?">❔</button>
-              </div>
-            </div>
-          </div>
-          <div class="insights-expense-mini-card__value insights-expense-mini-card__value--flexible" id="insightsFlexibleValue">0 ₽</div>
-        </div>
-
-        <div class="insights-expense-mini-card insights-expense-mini-card--saved">
-          <div class="insights-expense-mini-card__left">
-            <span class="insights-expense-mini-card__dot insights-expense-mini-card__dot--saved"></span>
-            <div class="insights-expense-mini-card__meta">
-              <div class="insights-expense-mini-card__label">
-                Отложено в накопления
-                <button class="faq-chip" type="button" data-faq-key="saved_to_safes" aria-label="Что это?">❔</button>
-              </div>
-            </div>
-          </div>
-          <div class="insights-expense-mini-card__value insights-expense-mini-card__value--saved" id="insightsSavedValue">0 ₽</div>
-        </div>
-      </div>
-
-      <button class="insights-expense-showcase__cta" type="button" id="openExpenseBreakdownBtn">
-        <span class="insights-expense-showcase__cta-icon">📈</span>
-        <span>Разобрать расходы</span>
-      </button>
-    </div>
-
-    <div class="hidden">
-      <p id="insightsIncomeValue">0 ₽</p>
-    </div>
-  </section>
-
-  <section class="section insights-flow-money-section insights-reveal" style="--reveal-delay:140ms;">
-    <div class="section-head insights-flow-section-head">
-      <h2 class="section-title insights-flow-section-title">Картина денег</h2>
-    </div>
-
-    <div class="insights-money-board">
-      <div class="insights-money-board__total">
-        <div class="insights-money-board__label">
+    <div class="analytics-overview-money-board">
+      <div class="analytics-overview-money-board__total">
+        <div class="analytics-overview-money-board__label">
           Общий баланс
           <button class="faq-chip" type="button" data-faq-key="total_balance" aria-label="Что это?">❔</button>
         </div>
-        <div class="insights-money-board__value" id="insightsTotalBalanceValue">0 ₽</div>
+        <div class="analytics-overview-money-board__value" id="analyticsTotalBalanceValue">0 ₽</div>
       </div>
 
-      <div class="insights-money-board__split">
-        <div class="insights-money-chip insights-money-chip--free">
-          <div class="insights-money-chip__label">
+      <div class="analytics-overview-money-board__split">
+        <div class="analytics-overview-money-chip">
+          <div class="analytics-overview-money-chip__label">
             Свободные деньги
             <button class="faq-chip" type="button" data-faq-key="free_money" aria-label="Что это?">❔</button>
           </div>
-          <div class="insights-money-chip__value" id="insightsFreeMoneyValue">0 ₽</div>
+          <div class="analytics-overview-money-chip__value" id="analyticsFreeMoneyValue">0 ₽</div>
         </div>
 
-        <div class="insights-money-chip insights-money-chip--protected">
-          <div class="insights-money-chip__label">
+        <div class="analytics-overview-money-chip">
+          <div class="analytics-overview-money-chip__label">
             Защищённые деньги
             <button class="faq-chip" type="button" data-faq-key="protected_money" aria-label="Что это?">❔</button>
           </div>
-          <div class="insights-money-chip__value" id="insightsProtectedMoneyValue">0 ₽</div>
+          <div class="analytics-overview-money-chip__value" id="analyticsProtectedMoneyValue">0 ₽</div>
         </div>
-      </div>
-
-      <div class="insights-money-board__interest">
-        <div class="insights-money-board__interest-label">Проценты по накоплению</div>
-        <div class="insights-money-board__interest-value" id="insightsInterestValue">0 ₽</div>
       </div>
     </div>
-  </section>
 
-  <section class="section insights-flow-mandatory-section insights-reveal" style="--reveal-delay:210ms;">
-    <div class="section-head insights-flow-section-head">
-      <h2 class="section-title insights-flow-section-title">Обязательства месяца</h2>
-    </div>
-
-    <div class="insights-mandatory-stack">
-      <div class="insights-mandatory-stack__main">
-        <div class="insights-mandatory-stack__main-label">К вычету из свободных</div>
-        <div class="insights-mandatory-stack__main-value" id="insightsPendingMandatoryValue">0 ₽</div>
+    <div class="analytics-overview-mandatory-card">
+      <div class="analytics-overview-mandatory-card__main">
+        <div class="analytics-overview-mandatory-card__main-label">К вычету из свободных</div>
+        <div class="analytics-overview-mandatory-card__main-value" id="analyticsPendingMandatoryValue">0 ₽</div>
       </div>
 
-      <div class="insights-mandatory-stack__meta">
-        <div class="insights-mandatory-stack__row">
-          <div class="insights-mandatory-stack__row-label">Обязательные всего</div>
-          <div class="insights-mandatory-stack__row-value" id="insightsMandatoryTotalValue">0 ₽</div>
+      <div class="analytics-overview-mandatory-card__rows">
+        <div class="analytics-overview-mandatory-card__row">
+          <span>Обязательные всего</span>
+          <strong id="analyticsMandatoryTotalValue">0 ₽</strong>
         </div>
 
-        <div class="insights-mandatory-stack__row">
-          <div class="insights-mandatory-stack__row-label">Покрыто накоплениями</div>
-          <div class="insights-mandatory-stack__row-value" id="insightsMandatoryCoveredValue">0 ₽</div>
+        <div class="analytics-overview-mandatory-card__row">
+          <span>Покрыто накоплениями</span>
+          <strong id="analyticsMandatoryCoveredValue">0 ₽</strong>
         </div>
       </div>
 
-      <div class="insights-mandatory-stack__footer">
-        <div class="insights-mandatory-stack__footer-left">
-          <span class="insights-mandatory-stack__footer-label">
+      <div class="analytics-overview-mandatory-card__footer">
+        <div class="analytics-overview-mandatory-card__footer-left">
+          <span>
             Остаток лимитов
             <button class="faq-chip" type="button" data-faq-key="remaining_limits" aria-label="Что это?">❔</button>
           </span>
-          <span class="insights-mandatory-stack__footer-value" id="insightsRemainingBudgetsValue">0 ₽</span>
+          <strong id="analyticsRemainingBudgetsValue">0 ₽</strong>
         </div>
 
-        <button class="insights-mandatory-stack__btn" type="button" id="openMandatoryPaymentsModalBtn">
+        <button class="analytics-overview-mandatory-card__btn" type="button" id="openMandatoryPaymentsModalBtn">
           Платежи
         </button>
       </div>
     </div>
   </section>
 
-  <section class="section insights-flow-safes-section insights-reveal" style="--reveal-delay:280ms;">
-    <div class="insights-flow-safes">
-      <button class="insights-flow-safes__head" type="button" id="insightsSafesToggleBtn">
-        <span class="insights-flow-safes__title">Накопления</span>
-        <span class="insights-collapse-arrow is-open" id="insightsSafesArrow">⌄</span>
-      </button>
+  <section class="section hidden" id="analyticsCategoriesSection">
+    <div class="section-head analytics-section-head">
+      <h2 class="section-title analytics-section-title">Категории</h2>
+    </div>
 
-      <div class="insights-flow-safes__body is-open" id="insightsSafesBody">
-        <div class="list insights-safe-list insights-safe-list--flow" id="insightsSafeList"></div>
+    <div class="analytics-breakdown-shell">
+      <div class="analytics-breakdown-shell__chart">
+        <div class="analytics-donut-wrap">
+          <svg class="analytics-donut" viewBox="0 0 120 120" aria-hidden="true">
+            <circle class="analytics-donut__track" cx="60" cy="60" r="42"></circle>
+            <circle class="analytics-donut__progress" id="analyticsDonutProgress" cx="60" cy="60" r="42"></circle>
+          </svg>
+          <div class="analytics-donut__center">
+            <p class="analytics-donut__value" id="analyticsDonutValue">0%</p>
+            <p class="analytics-donut__label" id="analyticsDonutLabel">Категория</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="analytics-breakdown-shell__legend" id="analyticsLegend"></div>
+    </div>
+  </section>
+
+  <section class="section hidden" id="analyticsExpensesSection">
+    <div class="section-head analytics-section-head">
+      <h2 class="section-title analytics-section-title">Расходы по категориям</h2>
+    </div>
+
+    <div class="analytics-expenses-hero">
+      <div class="analytics-expenses-hero__label">Общий поток расходов</div>
+      <div class="analytics-expenses-hero__value" id="analyticsExpenseValue">0 ₽</div>
+      <div class="analytics-expenses-hero__note" id="analyticsExpensesPeriodNote">за период</div>
+    </div>
+
+    <div class="analytics-expenses-categories" id="analyticsExpensesCategoriesList"></div>
+  </section>
+
+  <section class="section hidden" id="analyticsSafesSection">
+    <div class="section-head analytics-section-head">
+      <h2 class="section-title analytics-section-title">Накопления</h2>
+    </div>
+
+    <div class="analytics-safes-interest-card">
+      <div class="analytics-safes-interest-card__label">Проценты по накоплению</div>
+      <div class="analytics-safes-interest-card__value" id="analyticsInterestValue">0 ₽</div>
+    </div>
+
+    <div class="list analytics-safe-list" id="analyticsSafeList"></div>
+  </section>
+</div>
+
+<div id="operationsView" class="hidden">
+  <section class="section section--manager-top operations-screen">
+    <div class="operations-screen__top">
+      <div class="operations-screen__head">
+        <h2 class="operations-screen__title">Операции</h2>
+        <p class="operations-screen__subtitle">Вся история движений</p>
+      </div>
+
+      <button
+        class="screen-filter-btn"
+        type="button"
+        id="openOperationsFiltersBtn"
+        aria-label="Открыть фильтры операций"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 7h16" />
+          <path d="M7 12h10" />
+          <path d="M10 17h4" />
+        </svg>
+      </button>
+    </div>
+  </section>
+
+  <div class="modal hidden" id="operationsFiltersModal">
+    <div class="modal-sheet filters-sheet">
+      <div class="modal-handle"></div>
+
+      <div class="section-head filters-sheet__head">
+        <h3 class="modal-title filters-sheet__title">Фильтры операций</h3>
+        <button class="manager-back-btn" type="button" id="closeOperationsFiltersBtn">Закрыть</button>
+      </div>
+
+      <div class="history-filters history-filters--modal">
+        <div class="history-filter-group history-filter-group--secondary">
+          <button class="history-filter-btn is-active" type="button" data-operations-period="month">Месяц</button>
+          <button class="history-filter-btn" type="button" data-operations-period="today">Сегодня</button>
+          <button class="history-filter-btn" type="button" data-operations-period="7">7 дней</button>
+          <button class="history-filter-btn" type="button" data-operations-period="range">Период</button>
+        </div>
+
+        <div class="history-filter-group history-filter-group--secondary">
+          <button class="history-filter-btn is-active" type="button" data-operations-type="all">Все</button>
+          <button class="history-filter-btn" type="button" data-operations-type="expense">Расходы</button>
+          <button class="history-filter-btn" type="button" data-operations-type="income">Доходы</button>
+          <button class="history-filter-btn" type="button" data-operations-type="transfer">Переводы</button>
+        </div>
+
+        <div class="history-filter-group history-filter-group--inputs">
+          <input class="input hidden" type="date" id="operationsRangeFromInput" />
+          <input class="input hidden" type="date" id="operationsRangeToInput" />
+        </div>
       </div>
     </div>
+  </div>
+
+  <section class="section">
+    <div class="list" id="operationsTransactionsList"></div>
   </section>
 </div>
 
 <!-- BOTTOM NAV -->
-  <div class="bottom-nav-wrap">
-  <nav class="bottom-nav bottom-nav--triple">
-    <button class="nav-item is-active" type="button" id="navWalletBtn">
-      <div class="nav-icon">👛</div>
-      <div class="nav-label">Кошелёк</div>
-    </button>
+  <nav class="bottom-nav">
+  <button class="nav-item is-active" type="button" id="navWalletBtn">
+    <div class="nav-icon">💸</div>
+    <div class="nav-label">Кошелёк</div>
+  </button>
 
-    <button class="nav-item" type="button" id="navAnalyticsBtn">
-      <div class="nav-icon">📈</div>
-      <div class="nav-label">Аналитика</div>
-    </button>
+  <button class="nav-item" type="button" id="navAnalyticsBtn">
+    <div class="nav-icon">📈</div>
+    <div class="nav-label">Аналитика</div>
+  </button>
 
-    <button class="nav-item" type="button" id="navInsightsBtn">
-      <div class="nav-icon">✨</div>
-      <div class="nav-label">Итоги</div>
-    </button>
-  </nav>
-</div>
+  <button class="nav-item" type="button" id="navOperationsBtn">
+    <div class="nav-icon">🧾</div>
+    <div class="nav-label">Операции</div>
+  </button>
+</nav>
 
   <!-- TRANSACTION MODAL -->
 <div class="modal hidden" id="transactionModal">
