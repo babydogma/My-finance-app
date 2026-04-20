@@ -4202,17 +4202,18 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 #categoriesManagerList .list-card {
-  min-height: 78px;
-  padding: 12px 14px;
+  min-height: 82px;
+  padding: 14px 15px;
   border-radius: 24px;
   align-items: center;
   background:
-    linear-gradient(180deg, rgba(50, 54, 69, 0.985) 0%, rgba(39, 43, 57, 1) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+    linear-gradient(180deg, rgba(60, 66, 84, 0.28) 0%, rgba(31, 36, 50, 0.18) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.045);
   box-shadow:
-    0 10px 24px rgba(0, 0, 0, 0.2),
-    0 0 16px rgba(111, 156, 255, 0.025),
-    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+    0 8px 16px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.045);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 #categoriesManagerList .list-body {
@@ -4225,42 +4226,64 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 #categoriesManagerList .list-title {
-  font-size: 17px;
-  font-weight: 880;
-  line-height: 1.02;
-  letter-spacing: -0.04em;
+  font-size: 16px;
+  font-weight: 760;
+  line-height: 1.08;
+  letter-spacing: -0.025em;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-#categoriesManagerList .list-subtitle {
-  display: none;
+.category-row {
+  width: 100%;
+  text-align: left;
 }
 
-#categoriesManagerList .category-manager-actions {
+.category-row__meta {
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   margin-left: auto;
-  flex: 0 0 auto;
 }
 
-#categoriesManagerList .icon-action-btn {
-  width: 36px;
-  height: 36px;
-  min-width: 36px;
-  border-radius: 13px;
+.category-row__pill {
+  min-height: 30px;
+  padding: 0 12px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(234, 239, 248, 0.76);
+  font-size: 11.5px;
+  font-weight: 820;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
 }
 
-#categoriesManagerList .icon-action-btn svg {
-  width: 16px;
-  height: 16px;
+.category-row__pill--required {
+  background: rgba(255, 114, 104, 0.14);
+  color: #ffaaa3;
 }
 
-#categoriesManagerList .icon-action-btn:disabled {
-  opacity: 0.32;
-  box-shadow: none;
+.category-row__chevron {
+  color: rgba(255, 255, 255, 0.34);
+  font-size: 24px;
+  line-height: 1;
+  transform: translateY(-1px);
+}
+
+#categoriesManagerList .list-subtitle {
+  display: block;
+  margin-top: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: rgba(255, 255, 255, 0.38);
+  font-size: 11.5px;
+  font-weight: 700;
 }
 
 @media (max-width: 420px) {
@@ -4311,17 +4334,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
   #categoriesManagerList .list-title {
     font-size: 16px;
-  }
-
-  #categoriesManagerList .category-manager-actions {
-    gap: 6px;
-  }
-
-  #categoriesManagerList .icon-action-btn {
-    width: 34px;
-    height: 34px;
-    min-width: 34px;
-    border-radius: 12px;
   }
 }
 
