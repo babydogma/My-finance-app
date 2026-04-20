@@ -14,6 +14,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 const budgetModalTitle = document.getElementById("budgetModalTitle");
 const budgetCategoryNameInput = document.getElementById("budgetCategoryNameInput");
 const budgetAmountInput = document.getElementById("budgetAmountInput");
+const budgetCategoryRequiredInput = document.getElementById("budgetCategoryRequiredInput");
+const budgetCategoryRequiredNote = document.getElementById("budgetCategoryRequiredNote");
+const deleteCategoryBtn = document.getElementById("deleteCategoryBtn");
 const closeBudgetModalBtn = document.getElementById("closeBudgetModalBtn");
 const saveBudgetBtn = document.getElementById("saveBudgetBtn");
 const deleteBudgetBtn = document.getElementById("deleteBudgetBtn");
@@ -2122,10 +2125,12 @@ function openBudgetModal(categoryId) {
 
   const existing = getBudgetLimitByCategoryId(categoryId);
 
-  budgetModalTitle.textContent = `Редактирование: ${category.name}`;
+  budgetModalTitle.textContent = category.name || "Категория";
   budgetCategoryNameInput.value = category.name || "";
+  budgetCategoryRequiredInput.checked = Boolean(category.is_required);
   budgetAmountInput.value = existing ? Number(existing.monthly_limit) : "";
-  deleteBudgetBtn.classList.toggle("hidden", !existing);
+
+  deleteBudgetBtn.classList.toggle("hidden", Boolean(category.locked));
 
   budgetModal.classList.remove("hidden");
   document.body.style.overflow = "hidden";
@@ -2136,6 +2141,7 @@ function closeBudgetModal() {
   document.body.style.overflow = "";
   activeBudgetCategoryId = null;
   budgetCategoryNameInput.value = "";
+  budgetCategoryRequiredInput.checked = false;
   budgetAmountInput.value = "";
 }
 
@@ -3382,138 +3388,31 @@ function getAccountRoleFlags(role) {
   categoriesManagerList.innerHTML = "";
 
   state.categories.forEach((category) => {
-    const card = document.createElement("div");
-    card.className = "list-card";
+    const card = document.createElement("button");
+    card.type = "button";
+    card.className = "list-card list-card--clickable category-row";
 
-    const lockedAttr = category.locked ? "disabled" : "";
-    const lockedSubtitle = category.locked ? "Системная категория" : "Можно редактировать";
+    const typeLabel = category.is_required ? "Обязательная" : "Гибкая";
+    const lockedLabel = category.locked ? "Системная" : "Редактируемая";
 
     card.innerHTML = `
       <div class="list-body">
         <div class="list-title-row">
           <h3 class="list-title">${escapeHtml(category.name)}</h3>
-          ${category.is_required ? '<span class="category-required-flag">🚩</span>' : ""}
         </div>
-        <p class="list-subtitle">${lockedSubtitle} • ${category.is_required ? "Обязательная" : "Гибкая"}</p>
+        <p class="list-subtitle">${lockedLabel} • ${typeLabel}</p>
       </div>
 
-      <div class="category-manager-actions">
-        <button
-          class="icon-action-btn"
-          type="button"
-          data-edit-id="${category.id}"
-          ${lockedAttr}
-          aria-label="Редактировать категорию"
-          title="Редактировать категорию"
-        >
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M4 20h4l10-10-4-4L4 16v4Z" />
-            <path d="M13 7l4 4" />
-          </svg>
-        </button>
-
-        <button
-          class="icon-action-btn icon-action-btn--toggle ${category.is_required ? "is-active" : ""}"
-          type="button"
-          data-type-id="${category.id}"
-          ${lockedAttr}
-          aria-label="Переключить тип категории"
-          title="Переключить тип категории"
-        >
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M8 7h8a4 4 0 1 1 0 8H8a4 4 0 1 1 0-8Z" />
-            <circle cx="16" cy="11" r="2.5" />
-          </svg>
-        </button>
-
-        <button
-          class="icon-action-btn icon-action-btn--danger"
-          type="button"
-          data-delete-id="${category.id}"
-          ${lockedAttr}
-          aria-label="Удалить категорию"
-          title="Удалить категорию"
-        >
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M5 7h14" />
-            <path d="M9 7V5h6v2" />
-            <path d="M8 7l1 12h6l1-12" />
-            <path d="M10 11v5M14 11v5" />
-          </svg>
-        </button>
+      <div class="category-row__meta">
+        <span class="category-row__pill ${category.is_required ? "category-row__pill--required" : ""}">
+          ${typeLabel}
+        </span>
+        <span class="category-row__chevron">›</span>
       </div>
     `;
 
-    const editBtn = card.querySelector("[data-edit-id]");
-    const typeBtn = card.querySelector("[data-type-id]");
-    const deleteBtn = card.querySelector("[data-delete-id]");
-
-    editBtn?.addEventListener("click", () => {
+    card.addEventListener("click", () => {
       openBudgetModal(category.id);
-    });
-
-    typeBtn?.addEventListener("click", async () => {
-      if (category.locked) return;
-
-      const { error } = await supabaseClient
-        .from("categories")
-        .update({ is_required: !category.is_required })
-        .eq("id", category.id);
-
-      if (error) {
-        alert("Ошибка обновления типа категории");
-        console.error(error);
-        return;
-      }
-
-      await loadDataFromSupabase();
-      renderAll();
-    });
-
-    deleteBtn?.addEventListener("click", async () => {
-      if (category.locked) return;
-
-      const ok = confirm(
-        `Удалить категорию "${category.name}"? Все старые расходы перейдут в "Без категории". Лимит бюджета тоже удалится.`
-      );
-      if (!ok) return;
-
-      const { error: txError } = await supabaseClient
-        .from("transactions")
-        .update({ category_id: UNCATEGORIZED_ID })
-        .eq("type", "expense")
-        .eq("category_id", category.id);
-
-      if (txError) {
-        alert("Ошибка переноса старых расходов");
-        console.error(txError);
-        return;
-      }
-
-      const { error: budgetDeleteError } = await supabaseClient
-        .from("budget_limits")
-        .delete()
-        .eq("category_id", category.id);
-
-      if (budgetDeleteError) {
-        alert("Ошибка удаления лимита бюджета");
-        console.error(budgetDeleteError);
-        return;
-      }
-
-      const { error: deleteError } = await supabaseClient
-        .from("categories")
-        .delete()
-        .eq("id", category.id);
-
-      if (deleteError) {
-        alert("Ошибка удаления категории");
-        console.error(deleteError);
-        return;
-      }
-
-      await loadDataFromSupabase();
-      renderAll();
     });
 
     categoriesManagerList.appendChild(card);
@@ -4148,7 +4047,9 @@ async function saveBudgetLimit() {
   if (!activeBudgetCategoryId) return;
 
   const nextName = budgetCategoryNameInput.value.trim();
-  const amount = Number(budgetAmountInput.value.trim());
+  const isRequired = Boolean(budgetCategoryRequiredInput.checked);
+  const amountRaw = budgetAmountInput.value.trim();
+  const amount = amountRaw === "" ? 0 : Number(amountRaw);
 
   if (!nextName) {
     alert("Введи название категории");
@@ -4164,6 +4065,7 @@ async function saveBudgetLimit() {
     .from("categories")
     .update({
       name: nextName,
+      is_required: isRequired,
     })
     .eq("id", activeBudgetCategoryId);
 
@@ -4199,6 +4101,56 @@ async function saveBudgetLimit() {
       console.error(error);
       return;
     }
+  }
+
+  await loadDataFromSupabase();
+  renderAll();
+  closeBudgetModal();
+}
+
+async function deleteCategory() {
+  if (!activeBudgetCategoryId) return;
+
+  const category = getCategoryById(activeBudgetCategoryId);
+  if (!category || category.locked) return;
+
+  const ok = confirm(
+    `Удалить категорию "${category.name}"? Все старые расходы перейдут в "Без категории".`
+  );
+  if (!ok) return;
+
+  const { error: txError } = await supabaseClient
+    .from("transactions")
+    .update({ category_id: UNCATEGORIZED_ID })
+    .eq("type", "expense")
+    .eq("category_id", category.id);
+
+  if (txError) {
+    alert("Ошибка переноса старых расходов");
+    console.error(txError);
+    return;
+  }
+
+  const { error: budgetDeleteError } = await supabaseClient
+    .from("budget_limits")
+    .delete()
+    .eq("category_id", category.id);
+
+  if (budgetDeleteError) {
+    alert("Ошибка удаления лимита категории");
+    console.error(budgetDeleteError);
+    return;
+  }
+
+  const { error: deleteError } = await supabaseClient
+    .from("categories")
+    .delete()
+    .eq("id", category.id);
+
+  if (deleteError) {
+    alert("Ошибка удаления категории");
+    console.error(deleteError);
+    return;
   }
 
   await loadDataFromSupabase();
@@ -4333,6 +4285,8 @@ closeAccountModalBtn?.addEventListener("click", closeAccountModal);
 cancelAccountModalBtn?.addEventListener("click", closeAccountModal);
 saveAccountModalBtn?.addEventListener("click", saveAccountModal);
 deleteAccountModalBtn?.addEventListener("click", deleteAccountModalAction);
+
+deleteCategoryBtn?.addEventListener("click", deleteCategory);
 
 accountModal?.addEventListener("click", (event) => {
   if (event.target === accountModal) {
