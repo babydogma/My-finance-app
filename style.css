@@ -4637,3 +4637,761 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     padding: 9px 10px 9px 12px;
   }
 }
+
+/* =========================================================
+   36. ANALYTICS — WALLET STYLE OVERRIDE
+   ВСТАВИТЬ В САМЫЙ КОНЕЦ style.css
+   ========================================================= */
+
+#analyticsView {
+  padding-bottom: 236px;
+}
+
+#analyticsView .section {
+  margin-top: 18px;
+}
+
+#analyticsView .analytics-hub-head__title {
+  font-size: 34px;
+  line-height: 0.95;
+  font-weight: 950;
+  letter-spacing: -0.07em;
+  color: #f7f9ff;
+}
+
+#analyticsView .analytics-hub-head__subtitle {
+  color: rgba(255,255,255,0.42);
+  font-size: 12px;
+  font-weight: 760;
+  letter-spacing: -0.02em;
+}
+
+#analyticsView .analytics-mode-switch {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  width: 100%;
+  padding: 6px;
+  border-radius: 30px;
+  background:
+    linear-gradient(180deg, rgba(30, 33, 42, 0.88) 0%, rgba(22, 25, 34, 0.92) 100%);
+  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow:
+    0 16px 34px rgba(0,0,0,0.28),
+    inset 0 1px 0 rgba(255,255,255,0.03);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+#analyticsView .analytics-mode-switch__btn {
+  min-width: 0;
+  width: 100%;
+  height: 54px;
+  padding: 0 12px;
+  border: none;
+  border-radius: 24px;
+  background: transparent;
+  color: rgba(238,241,247,0.74);
+  font-size: 16px;
+  font-weight: 860;
+  letter-spacing: -0.03em;
+  transition:
+    background 0.16s ease,
+    color 0.16s ease,
+    transform 0.16s ease,
+    box-shadow 0.16s ease;
+}
+
+#analyticsView .analytics-mode-switch__btn:active {
+  transform: scale(0.985);
+}
+
+#analyticsView .analytics-mode-switch__btn.is-active {
+  background:
+    linear-gradient(180deg, rgba(111, 156, 255, 0.18) 0%, rgba(111, 156, 255, 0.11) 100%);
+  color: #f4f8ff;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.05),
+    0 0 22px rgba(111,156,255,0.1);
+}
+
+#analyticsView .analytics-overview-section,
+#analyticsView .analytics-expenses-section,
+#analyticsView .analytics-safes-section {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* ---------- ОБЩИЙ ВИЗУАЛ КАРТОЧЕК В СТИЛЕ КОШЕЛЬКА ---------- */
+
+#analyticsView .analytics-overview-balance-card,
+#analyticsView .analytics-overview-mini-card,
+#analyticsView .analytics-overview-mandatory-card,
+#analyticsView .analytics-expenses-hero,
+#analyticsView .analytics-safes-interest-card,
+#analyticsView .analytics-safe-list .list-card,
+#analyticsView .analytics-expense-category-row {
+  position: relative;
+  overflow: hidden;
+  border-radius: 28px;
+  border: 1px solid rgba(255,255,255,0.06);
+  background:
+    linear-gradient(180deg, rgba(50, 54, 69, 0.985) 0%, rgba(39, 43, 57, 0.995) 100%);
+  box-shadow:
+    0 14px 34px rgba(0,0,0,0.24),
+    0 0 20px rgba(111,156,255,0.03),
+    inset 0 1px 0 rgba(255,255,255,0.03);
+}
+
+#analyticsView .analytics-overview-balance-card::before,
+#analyticsView .analytics-overview-mini-card::before,
+#analyticsView .analytics-overview-mandatory-card::before,
+#analyticsView .analytics-expenses-hero::before,
+#analyticsView .analytics-safes-interest-card::before,
+#analyticsView .analytics-safe-list .list-card::before,
+#analyticsView .analytics-expense-category-row::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.018) 0%, rgba(255,255,255,0) 40%);
+  pointer-events: none;
+}
+
+/* ---------- OVERVIEW ---------- */
+
+#analyticsView .analytics-overview-balance-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  margin-top: 2px;
+  padding: 18px 18px 16px;
+  border-radius: 30px;
+  background:
+    radial-gradient(circle at top center, rgba(111, 156, 255, 0.13), transparent 34%),
+    linear-gradient(180deg, rgba(28, 32, 43, 0.98) 0%, rgba(18, 21, 30, 1) 100%);
+}
+
+#analyticsView .analytics-overview-balance-card__head {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+#analyticsView .analytics-overview-balance-card__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: rgba(255,255,255,0.6);
+  font-size: 14px;
+  font-weight: 820;
+  letter-spacing: -0.02em;
+}
+
+#analyticsView .analytics-overview-balance-card__value {
+  margin: 0;
+  width: 100%;
+  text-align: center;
+  white-space: nowrap;
+  font-size: clamp(44px, 8vw, 62px);
+  line-height: 0.92;
+  font-weight: 940;
+  letter-spacing: -0.065em;
+  color: #f8faff;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.02);
+}
+
+#analyticsView .analytics-overview-balance-card__subline {
+  margin-top: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: rgba(255,255,255,0.66);
+  font-size: 14px;
+  font-weight: 780;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  text-align: center;
+  flex-wrap: wrap;
+}
+
+#analyticsView .analytics-overview-balance-card__subline strong {
+  color: #f3f7ff;
+  font-weight: 860;
+}
+
+#analyticsView .analytics-overview-dual-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+#analyticsView .analytics-overview-mini-card {
+  min-height: 92px;
+  padding: 12px 13px;
+  border-radius: 24px;
+}
+
+#analyticsView .analytics-overview-mini-card__label {
+  margin: 0 0 8px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  color: rgba(255,255,255,0.56);
+  font-size: 12px;
+  font-weight: 790;
+  line-height: 1.08;
+}
+
+#analyticsView .analytics-overview-mini-card__value {
+  font-size: 22px;
+  font-weight: 910;
+  line-height: 0.95;
+  letter-spacing: -0.05em;
+  color: #f7f9ff;
+}
+
+#analyticsView .analytics-overview-mini-card__status {
+  min-height: 30px;
+  padding: 0 11px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.11) 0%, rgba(255,255,255,0.06) 100%);
+  color: rgba(255,255,255,0.86);
+  font-size: 11px;
+  font-weight: 830;
+  white-space: nowrap;
+}
+
+#analyticsView .analytics-overview-mini-card--save .analytics-overview-mini-card__value {
+  margin-top: 8px;
+}
+
+#analyticsView .analytics-overview-mini-card__hint {
+  margin-top: 8px;
+  color: rgba(255,255,255,0.54);
+  font-size: 11.5px;
+  font-weight: 740;
+  line-height: 1.18;
+}
+
+/* ---------- ОБЯЗАТЕЛЬСТВА ---------- */
+
+#analyticsView .analytics-overview-mandatory-card {
+  padding: 14px;
+}
+
+#analyticsView .analytics-overview-mandatory-card__main {
+  padding: 14px 15px;
+  border-radius: 22px;
+  margin-bottom: 10px;
+  background:
+    linear-gradient(180deg, rgba(45,49,61,0.98) 0%, rgba(34,37,47,1) 100%);
+  border: 1px solid rgba(255,255,255,0.045);
+}
+
+#analyticsView .analytics-overview-mandatory-card__main-label {
+  margin: 0 0 8px;
+  color: rgba(255,255,255,0.56);
+  font-size: 12px;
+  font-weight: 790;
+}
+
+#analyticsView .analytics-overview-mandatory-card__main-value {
+  font-size: 28px;
+  font-weight: 920;
+  line-height: 0.92;
+  letter-spacing: -0.06em;
+  background: linear-gradient(180deg, #ff6c7e 0%, #ff9aa5 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+#analyticsView .analytics-overview-mandatory-card__rows {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+#analyticsView .analytics-overview-mandatory-card__row {
+  min-height: 48px;
+  padding: 0 12px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background:
+    linear-gradient(180deg, rgba(45,49,61,0.98) 0%, rgba(34,37,47,1) 100%);
+  border: 1px solid rgba(255,255,255,0.045);
+}
+
+#analyticsView .analytics-overview-mandatory-card__row span {
+  color: rgba(255,255,255,0.56);
+  font-size: 12px;
+  font-weight: 780;
+}
+
+#analyticsView .analytics-overview-mandatory-card__row strong {
+  color: #f7f9ff;
+  font-size: 18px;
+  font-weight: 900;
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+}
+
+#analyticsView .analytics-overview-mandatory-card__footer {
+  min-height: 58px;
+  padding: 9px 10px 9px 12px;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background:
+    linear-gradient(180deg, rgba(45,49,61,0.98) 0%, rgba(34,37,47,1) 100%);
+  border: 1px solid rgba(255,255,255,0.045);
+}
+
+#analyticsView .analytics-overview-mandatory-card__footer-left {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+#analyticsView .analytics-overview-mandatory-card__footer-left span {
+  color: rgba(255,255,255,0.56);
+  font-size: 11.5px;
+  font-weight: 780;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+#analyticsView .analytics-overview-mandatory-card__footer-left strong {
+  color: #f7f9ff;
+  font-size: 17px;
+  font-weight: 900;
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+}
+
+#analyticsView .analytics-overview-mandatory-card__btn {
+  min-width: 108px;
+  height: 40px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.11) 0%, rgba(255,255,255,0.06) 100%);
+  color: #eef3ff;
+  font-size: 13px;
+  font-weight: 830;
+}
+
+/* ---------- FAQ ---------- */
+
+#analyticsView .faq-chip {
+  width: 22px;
+  height: 22px;
+  min-width: 22px;
+  border: none;
+  border-radius: 50%;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.11) 0%, rgba(255,255,255,0.06) 100%);
+  color: rgba(255,255,255,0.78);
+  font-size: 11px;
+  font-weight: 900;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.05),
+    0 4px 10px rgba(0,0,0,0.12);
+}
+
+/* ---------- РАСХОДЫ ---------- */
+
+#analyticsView .analytics-section-head {
+  margin-bottom: 12px;
+}
+
+#analyticsView .analytics-section-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 920;
+  letter-spacing: -0.05em;
+  color: #f7f9ff;
+}
+
+#analyticsView .analytics-expenses-hero {
+  padding: 16px;
+  border-radius: 30px;
+  background:
+    radial-gradient(circle at top center, rgba(111,156,255,0.08), transparent 34%),
+    linear-gradient(180deg, rgba(50,54,69,0.985) 0%, rgba(39,43,57,0.995) 100%);
+}
+
+#analyticsView .analytics-expenses-hero--with-ring {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 184px;
+  gap: 14px;
+  align-items: center;
+}
+
+#analyticsView .analytics-expenses-hero__label {
+  margin: 0 0 10px;
+  color: rgba(255,255,255,0.56);
+  font-size: 13px;
+  font-weight: 790;
+}
+
+#analyticsView .analytics-expenses-hero__value {
+  margin: 0 0 8px;
+  font-size: 36px;
+  font-weight: 940;
+  line-height: 0.92;
+  letter-spacing: -0.06em;
+  color: #f7f9ff;
+  white-space: nowrap;
+}
+
+#analyticsView .analytics-expenses-hero__note {
+  color: rgba(255,255,255,0.42);
+  font-size: 12px;
+  font-weight: 740;
+}
+
+#analyticsView .analytics-expenses-ring-card {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#analyticsView .analytics-expenses-ring {
+  position: relative;
+  width: 184px;
+  height: 184px;
+  border-radius: 50%;
+  background: conic-gradient(from -90deg, rgba(255,255,255,0.08) 0deg 360deg);
+  box-shadow:
+    0 0 24px rgba(111,156,255,0.05),
+    inset 0 1px 0 rgba(255,255,255,0.03);
+}
+
+#analyticsView .analytics-expenses-ring::before {
+  content: "";
+  position: absolute;
+  inset: 20px;
+  border-radius: 50%;
+  background:
+    linear-gradient(180deg, rgba(28,32,43,0.98) 0%, rgba(18,21,30,1) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.04),
+    0 10px 18px rgba(0,0,0,0.14);
+}
+
+#analyticsView .analytics-expenses-ring__inner {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  z-index: 1;
+  padding: 26px;
+}
+
+#analyticsView .analytics-expenses-ring__center-value {
+  margin: 0 0 6px;
+  font-size: 30px;
+  font-weight: 940;
+  line-height: 0.92;
+  letter-spacing: -0.06em;
+  color: #f7f9ff;
+}
+
+#analyticsView .analytics-expenses-ring__center-label {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 760;
+  color: rgba(255,255,255,0.52);
+  line-height: 1.1;
+}
+
+#analyticsView .analytics-expenses-categories {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+#analyticsView .analytics-expense-category-row {
+  min-height: 78px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  border-radius: 24px;
+}
+
+#analyticsView .analytics-expense-category-row__left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+#analyticsView .analytics-expense-category-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+  box-shadow: 0 0 10px currentColor;
+}
+
+#analyticsView .analytics-expense-category-meta {
+  display: grid;
+  row-gap: 3px;
+  min-width: 0;
+}
+
+#analyticsView .analytics-expense-category-meta__name {
+  color: #f7f9ff;
+  font-size: 15px;
+  font-weight: 820;
+  line-height: 1.05;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#analyticsView .analytics-expense-category-meta__sub {
+  color: rgba(255,255,255,0.42);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+#analyticsView .analytics-expense-category-value {
+  text-align: right;
+  white-space: nowrap;
+}
+
+#analyticsView .analytics-expense-category-value__amount {
+  font-size: 20px;
+  font-weight: 920;
+  line-height: 0.95;
+  letter-spacing: -0.05em;
+}
+
+/* ---------- НАКОПЛЕНИЯ ---------- */
+
+#analyticsView .analytics-safes-interest-card {
+  min-height: 60px;
+  padding: 11px 14px;
+  border-radius: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background:
+    radial-gradient(circle at top center, rgba(0,229,204,0.08), transparent 40%),
+    linear-gradient(180deg, rgba(50,54,69,0.985) 0%, rgba(39,43,57,0.995) 100%);
+}
+
+#analyticsView .analytics-safes-interest-card__label {
+  color: rgba(255,255,255,0.56);
+  font-size: 13px;
+  font-weight: 790;
+}
+
+#analyticsView .analytics-safes-interest-card__value {
+  font-size: 24px;
+  font-weight: 920;
+  line-height: 0.95;
+  letter-spacing: -0.045em;
+  background: linear-gradient(180deg, #00e5cc 0%, #00b8a9 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 0 14px rgba(0,229,204,0.08);
+}
+
+#analyticsView .analytics-safe-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+#analyticsView .analytics-safe-list .list-card {
+  min-height: 76px;
+  padding: 12px 14px;
+  border-radius: 24px;
+}
+
+#analyticsView .analytics-safe-list .list-title {
+  font-size: 16px;
+  font-weight: 820;
+  letter-spacing: -0.025em;
+}
+
+#analyticsView .analytics-safe-list .list-subtitle {
+  font-size: 11px;
+  font-weight: 680;
+  color: rgba(255,255,255,0.42);
+}
+
+#analyticsView .analytics-safe-list .list-value {
+  font-size: 18px;
+  font-weight: 880;
+  letter-spacing: -0.04em;
+}
+
+/* ---------- MOBILE ---------- */
+
+@media (max-width: 420px) {
+  #analyticsView .analytics-hub-head__title {
+    font-size: 30px;
+  }
+
+  #analyticsView .analytics-hub-head__subtitle {
+    font-size: 11px;
+  }
+
+  #analyticsView .analytics-mode-switch {
+    border-radius: 26px;
+  }
+
+  #analyticsView .analytics-mode-switch__btn {
+    height: 48px;
+    font-size: 14px;
+  }
+
+  #analyticsView .analytics-overview-balance-card,
+  #analyticsView .analytics-overview-mini-card,
+  #analyticsView .analytics-overview-mandatory-card,
+  #analyticsView .analytics-expenses-hero,
+  #analyticsView .analytics-safes-interest-card,
+  #analyticsView .analytics-safe-list .list-card,
+  #analyticsView .analytics-expense-category-row {
+    border-radius: 24px;
+  }
+
+  #analyticsView .analytics-overview-balance-card {
+    padding: 16px 14px 15px;
+  }
+
+  #analyticsView .analytics-overview-balance-card__value {
+    font-size: clamp(40px, 10vw, 54px);
+  }
+
+  #analyticsView .analytics-overview-balance-card__subline {
+    margin-top: 12px;
+    font-size: 13px;
+  }
+
+  #analyticsView .analytics-overview-dual-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  #analyticsView .analytics-overview-mini-card {
+    min-height: 86px;
+    padding: 11px 12px;
+  }
+
+  #analyticsView .analytics-overview-mini-card__value {
+    font-size: 20px;
+  }
+
+  #analyticsView .analytics-overview-mandatory-card {
+    padding: 12px;
+  }
+
+  #analyticsView .analytics-overview-mandatory-card__main {
+    padding: 12px 13px;
+    border-radius: 20px;
+  }
+
+  #analyticsView .analytics-overview-mandatory-card__main-value {
+    font-size: 24px;
+  }
+
+  #analyticsView .analytics-overview-mandatory-card__footer {
+    min-height: 56px;
+  }
+
+  #analyticsView .analytics-expenses-hero--with-ring {
+    grid-template-columns: minmax(0, 1fr) 148px;
+    gap: 10px;
+  }
+
+  #analyticsView .analytics-expenses-hero {
+    padding: 14px;
+  }
+
+  #analyticsView .analytics-expenses-hero__value {
+    font-size: 32px;
+  }
+
+  #analyticsView .analytics-expenses-ring {
+    width: 148px;
+    height: 148px;
+  }
+
+  #analyticsView .analytics-expenses-ring::before {
+    inset: 16px;
+  }
+
+  #analyticsView .analytics-expenses-ring__inner {
+    padding: 20px;
+  }
+
+  #analyticsView .analytics-expenses-ring__center-value {
+    font-size: 24px;
+  }
+
+  #analyticsView .analytics-expense-category-row {
+    min-height: 72px;
+    padding: 11px 12px;
+  }
+
+  #analyticsView .analytics-expense-category-value__amount {
+    font-size: 18px;
+  }
+
+  #analyticsView .analytics-safes-interest-card {
+    min-height: 54px;
+    padding: 10px 12px;
+  }
+
+  #analyticsView .analytics-safes-interest-card__value {
+    font-size: 20px;
+  }
+
+  #analyticsView .analytics-safe-list .list-card {
+    min-height: 70px;
+    padding: 10px 12px;
+  }
+
+  #analyticsView .analytics-safe-list .list-title {
+    font-size: 15px;
+  }
+
+  #analyticsView .analytics-safe-list .list-value {
+    font-size: 16px;
+  }
+}
