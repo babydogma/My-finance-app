@@ -244,30 +244,16 @@
 
     <div class="analytics-overview-balance-card__value" id="analyticsTotalBalanceValue">0 ₽</div>
 
-    <div class="analytics-overview-balance-card__subline">
-      <span>Свободно: <strong id="analyticsFreeMoneyValue">0 ₽</strong></span>
-      <button class="faq-chip" type="button" data-faq-key="free_money" aria-label="Что это?">❔</button>
-    </div>
-  </div>
+    <div class="analytics-overview-balance-card__metrics">
+      <div class="analytics-overview-balance-card__metric">
+        <span>Свободно: <strong id="analyticsFreeMoneyValue">0 ₽</strong></span>
+        <button class="faq-chip" type="button" data-faq-key="free_money" aria-label="Что это?">❔</button>
+      </div>
 
-  <div class="analytics-overview-dual-grid">
-    <div class="analytics-overview-mini-card analytics-overview-mini-card--protected">
-      <div class="analytics-overview-mini-card__label">
-        Защищённые деньги
+      <div class="analytics-overview-balance-card__metric">
+        <span>Защищённые: <strong id="analyticsProtectedMoneyValue">0 ₽</strong></span>
         <button class="faq-chip" type="button" data-faq-key="protected_money" aria-label="Что это?">❔</button>
       </div>
-      <div class="analytics-overview-mini-card__value" id="analyticsProtectedMoneyValue">0 ₽</div>
-    </div>
-
-    <div class="analytics-overview-mini-card analytics-overview-mini-card--save">
-      <div class="analytics-overview-mini-card__label">
-        Можно отложить
-        <button class="faq-chip" type="button" data-faq-key="can_save_now" aria-label="Что это?">❔</button>
-      </div>
-
-      <div class="analytics-overview-mini-card__status" id="analyticsCanSaveNowStatus">—</div>
-      <div class="analytics-overview-mini-card__value" id="analyticsCanSaveNowValue">0 ₽</div>
-      <div class="analytics-overview-mini-card__hint" id="analyticsCanSaveNowHint">—</div>
     </div>
   </div>
 
@@ -302,6 +288,20 @@
         Платежи
       </button>
     </div>
+  </div>
+
+  <div class="analytics-overview-mini-card analytics-overview-mini-card--save analytics-overview-mini-card--save-bottom">
+    <div class="analytics-overview-mini-card__top">
+      <div class="analytics-overview-mini-card__label">
+        <span>Можно отложить</span>
+        <button class="faq-chip" type="button" data-faq-key="can_save_now" aria-label="Что это?">❔</button>
+      </div>
+
+      <div class="analytics-overview-mini-card__status" id="analyticsCanSaveNowStatus">—</div>
+    </div>
+
+    <div class="analytics-overview-mini-card__value" id="analyticsCanSaveNowValue">0 ₽</div>
+    <div class="analytics-overview-mini-card__hint" id="analyticsCanSaveNowHint">—</div>
   </div>
 </section>
 
