@@ -67,11 +67,6 @@ const deleteAccountModalBtn = document.getElementById("deleteAccountModalBtn");
   const analyticsRangeToInput = document.getElementById("analyticsRangeToInput");
   const analyticsSelectedPeriodLabel = document.getElementById("analyticsSelectedPeriodLabel");
   
-  const analyticsFiltersModal = document.getElementById("analyticsFiltersModal");
-const openAnalyticsFiltersBtn = document.getElementById("openAnalyticsFiltersBtn");
-const closeAnalyticsFiltersBtn = document.getElementById("closeAnalyticsFiltersBtn");
-  
-  
   const mandatoryPaymentsModal = document.getElementById("mandatoryPaymentsModal");
   const openMandatoryPaymentsModalBtn = document.getElementById("openMandatoryPaymentsModalBtn");
   const closeMandatoryPaymentsModalBtn = document.getElementById("closeMandatoryPaymentsModalBtn");
@@ -1757,7 +1752,7 @@ function renderAnalyticsOverview() {
 }
 
 function renderAnalyticsExpensesByCategory() {
-  const expenseTransactions = getFilteredAnalyticsTransactions().filter((item) => item.type === "expense");
+  const expenseTransactions = getAnalyticsFilteredTransactions().filter((item) => item.type === "expense");
   const totalExpense = roundToTwo(expenseTransactions.reduce((sum, item) => sum + item.amount, 0));
 
   analyticsExpenseValue.textContent = formatMoney(totalExpense);
@@ -3318,7 +3313,6 @@ function getAccountRoleFlags(role) {
   analyticsTabSafesBtn.classList.toggle("is-active", isSafes);
 
   if (isOverview) renderAnalyticsOverview();
-  if (isCategories) renderAnalyticsCategoryBreakdown();
   if (isExpenses) renderAnalyticsExpensesByCategory();
   if (isSafes) renderAnalyticsSafes();
 }
