@@ -234,82 +234,76 @@
   </div>
 
   <section class="section analytics-overview-section" id="analyticsOverviewSection">
-
-    <div class="analytics-overview-money-board">
-      <div class="analytics-overview-money-board__total">
-        <div class="analytics-overview-money-board__label">
-          Общий баланс
-          <button class="faq-chip" type="button" data-faq-key="total_balance" aria-label="Что это?">❔</button>
-        </div>
-        <div class="analytics-overview-money-board__value" id="analyticsTotalBalanceValue">0 ₽</div>
-      </div>
-
-      <div class="analytics-overview-money-board__split">
-        <div class="analytics-overview-money-chip">
-          <div class="analytics-overview-money-chip__label">
-            Свободные деньги
-            <button class="faq-chip" type="button" data-faq-key="free_money" aria-label="Что это?">❔</button>
-          </div>
-          <div class="analytics-overview-money-chip__value" id="analyticsFreeMoneyValue">0 ₽</div>
-        </div>
-
-        <div class="analytics-overview-money-chip">
-          <div class="analytics-overview-money-chip__label">
-            Защищённые деньги
-            <button class="faq-chip" type="button" data-faq-key="protected_money" aria-label="Что это?">❔</button>
-          </div>
-          <div class="analytics-overview-money-chip__value" id="analyticsProtectedMoneyValue">0 ₽</div>
-        </div>
+  <div class="analytics-overview-balance-card">
+    <div class="analytics-overview-balance-card__head">
+      <div class="analytics-overview-balance-card__label">
+        Баланс
+        <button class="faq-chip" type="button" data-faq-key="total_balance" aria-label="Что это?">❔</button>
       </div>
     </div>
 
-    <div class="analytics-overview-mandatory-card">
-      <div class="analytics-overview-mandatory-card__main">
-        <div class="analytics-overview-mandatory-card__main-label">К вычету из свободных</div>
-        <div class="analytics-overview-mandatory-card__main-value" id="analyticsPendingMandatoryValue">0 ₽</div>
-      </div>
-      
-    <div class="analytics-overview-save-card">
-  <div class="analytics-overview-save-card__top">
-    <div class="analytics-overview-save-card__label">
-      Можно отложить
-      <button class="faq-chip" type="button" data-faq-key="can_save_now" aria-label="Что это?">❔</button>
+    <div class="analytics-overview-balance-card__value" id="analyticsTotalBalanceValue">0 ₽</div>
+
+    <div class="analytics-overview-balance-card__subline">
+      <span>Свободно: <strong id="analyticsFreeMoneyValue">0 ₽</strong></span>
+      <button class="faq-chip" type="button" data-faq-key="free_money" aria-label="Что это?">❔</button>
     </div>
-    <div class="analytics-overview-save-card__status" id="analyticsCanSaveNowStatus">—</div>
   </div>
 
-  <div class="analytics-overview-save-card__value" id="analyticsCanSaveNowValue">0 ₽</div>
-  <div class="analytics-overview-save-card__hint" id="analyticsCanSaveNowHint">—</div>
-</div>
+  <div class="analytics-overview-dual-grid">
+    <div class="analytics-overview-mini-card analytics-overview-mini-card--protected">
+      <div class="analytics-overview-mini-card__label">
+        Защищённые деньги
+        <button class="faq-chip" type="button" data-faq-key="protected_money" aria-label="Что это?">❔</button>
+      </div>
+      <div class="analytics-overview-mini-card__value" id="analyticsProtectedMoneyValue">0 ₽</div>
+    </div>
 
-      <div class="analytics-overview-mandatory-card__rows">
-        <div class="analytics-overview-mandatory-card__row">
-          <span>Обязательные всего</span>
-          <strong id="analyticsMandatoryTotalValue">0 ₽</strong>
-        </div>
-
-        <div class="analytics-overview-mandatory-card__row">
-          <span>Покрыто накоплениями</span>
-          <strong id="analyticsMandatoryCoveredValue">0 ₽</strong>
-        </div>
+    <div class="analytics-overview-mini-card analytics-overview-mini-card--save">
+      <div class="analytics-overview-mini-card__label">
+        Можно отложить
+        <button class="faq-chip" type="button" data-faq-key="can_save_now" aria-label="Что это?">❔</button>
       </div>
 
-      <div class="analytics-overview-mandatory-card__footer">
-        <div class="analytics-overview-mandatory-card__footer-left">
-          <span>
-            Остаток лимитов
-            <button class="faq-chip" type="button" data-faq-key="remaining_limits" aria-label="Что это?">❔</button>
-          </span>
-          <strong id="analyticsRemainingBudgetsValue">0 ₽</strong>
-        </div>
-        
+      <div class="analytics-overview-mini-card__status" id="analyticsCanSaveNowStatus">—</div>
+      <div class="analytics-overview-mini-card__value" id="analyticsCanSaveNowValue">0 ₽</div>
+      <div class="analytics-overview-mini-card__hint" id="analyticsCanSaveNowHint">—</div>
+    </div>
+  </div>
 
-        <button class="analytics-overview-mandatory-card__btn" type="button" id="openMandatoryPaymentsModalBtn">
-          Платежи
-        </button>
+  <div class="analytics-overview-mandatory-card analytics-overview-mandatory-card--compact">
+    <div class="analytics-overview-mandatory-card__main">
+      <div class="analytics-overview-mandatory-card__main-label">К вычету из свободных</div>
+      <div class="analytics-overview-mandatory-card__main-value" id="analyticsPendingMandatoryValue">0 ₽</div>
+    </div>
+
+    <div class="analytics-overview-mandatory-card__rows">
+      <div class="analytics-overview-mandatory-card__row">
+        <span>Обязательные всего</span>
+        <strong id="analyticsMandatoryTotalValue">0 ₽</strong>
+      </div>
+
+      <div class="analytics-overview-mandatory-card__row">
+        <span>Покрыто накоплениями</span>
+        <strong id="analyticsMandatoryCoveredValue">0 ₽</strong>
       </div>
     </div>
-  </section>
+
+    <div class="analytics-overview-mandatory-card__footer">
+      <div class="analytics-overview-mandatory-card__footer-left">
+        <span>
+          Остаток лимитов
+          <button class="faq-chip" type="button" data-faq-key="remaining_limits" aria-label="Что это?">❔</button>
+        </span>
+        <strong id="analyticsRemainingBudgetsValue">0 ₽</strong>
+      </div>
+
+      <button class="analytics-overview-mandatory-card__btn" type="button" id="openMandatoryPaymentsModalBtn">
+        Платежи
+      </button>
+    </div>
+  </div>
+</section>
 
   <section class="section hidden" id="analyticsExpensesSection">
   <div class="section-head analytics-section-head">
