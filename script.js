@@ -2068,21 +2068,39 @@ function closeFaqModal() {
 function animateCurrencyValue(el, value, options = {}) {
   if (!el) return;
 
-  const duration = options.duration || 700;
-  const startValue = 0;
-  const endValue = Number(value) || 0;
+  const endValue = roundToTwo(Number(value) || 0);
+  const duration = options.duration || 1450;
+  const decimals = options.decimals ?? 2;
+
+  const prevRaw = Number(el.dataset.animatedValue || 0);
+  const startValue = Number.isFinite(prevRaw) ? prevRaw : 0;
+
+  if (Math.abs(endValue - startValue) < 0.009) {
+    el.textContent = formatMoney(endValue);
+    el.dataset.animatedValue = String(endValue);
+    return;
+  }
+
   const startTime = performance.now();
+
+  const easeOutExpoSoft = (t) => {
+    if (t >= 1) return 1;
+    return 1 - Math.pow(2, -8 * t);
+  };
 
   function frame(now) {
     const progress = Math.min((now - startTime) / duration, 1);
-    const eased = 1 - Math.pow(1 - progress, 3);
-    const current = roundToTwo(startValue + (endValue - startValue) * eased);
-    el.textContent = formatMoney(current);
+    const eased = easeOutExpoSoft(progress);
+    const current = startValue + (endValue - startValue) * eased;
+    const rounded = Number(current.toFixed(decimals));
+
+    el.textContent = formatMoney(rounded);
 
     if (progress < 1) {
       requestAnimationFrame(frame);
     } else {
       el.textContent = formatMoney(endValue);
+      el.dataset.animatedValue = String(endValue);
     }
   }
 
@@ -3597,16 +3615,43 @@ function getAccountRoleFlags(role) {
   function renderBalance() {
   const balance = calculateBalance();
   const freeMoney = getFreeMoneyTotal();
+  const balanceSection = document.querySelector(".balance");
+  const balanceLabelEl = document.querySelector(".balance-label");
 
-  balanceEl.textContent = formatMoney(balance);
+  animateCurrencyValue(balanceEl, balance, { duration: 1650, decimals: 2 });
+  animateCurrencyValue(balanceFreeMoneyValueEl, freeMoney, { duration: 1250, decimals: 2 });
+
+  if (balanceFreeMoneyValueEl) {
+    const originalRender = balanceFreeMoneyValueEl.textContent;
+    const observer = new MutationObserver(() => {
+      const current = balanceFreeMoneyValueEl.textContent.replace(/^.*?:\s*/, "");
+      balanceFreeMoneyValueEl.textContent = `Свободно: ${current}`;
+    });
+
+    observer.observe(balanceFreeMoneyValueEl, {
+      childList: true,
+      characterData: true,
+      subtree: true,
+    });
+
+    setTimeout(() => observer.disconnect(), 1800);
+  }
 
   if (accountsTotalEl) {
     accountsTotalEl.textContent = "";
   }
 
-  if (balanceFreeMoneyValueEl) {
-    balanceFreeMoneyValueEl.textContent = `Свободно: ${formatMoney(freeMoney)}`;
-  }
+  balanceSection?.classList.remove("balance--enter");
+  balanceLabelEl?.classList.remove("balance-label--enter");
+  balanceEl?.classList.remove("balance-amount--enter");
+  balanceFreeMoneyValueEl?.classList.remove("balance-subline--enter");
+
+  requestAnimationFrame(() => {
+    balanceSection?.classList.add("balance--enter");
+    balanceLabelEl?.classList.add("balance-label--enter");
+    balanceEl?.classList.add("balance-amount--enter");
+    balanceFreeMoneyValueEl?.classList.add("balance-subline--enter");
+  });
 }
 
   function renderAccounts() {
