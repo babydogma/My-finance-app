@@ -709,6 +709,122 @@ button {
 }
 
 /* =========================================================
+   TRANSACTION MODAL — EXPENSE / INCOME / TRANSFER
+   ========================================================= */
+
+#transactionModal .modal-sheet {
+  border-radius: 30px 30px 22px 22px;
+  background:
+    radial-gradient(circle at top center, rgba(111, 156, 255, 0.12), transparent 34%),
+    linear-gradient(180deg, rgba(18, 21, 30, 0.99) 0%, rgba(11, 14, 22, 1) 100%);
+  border: 1px solid rgba(255,255,255,0.07);
+  box-shadow:
+    0 -16px 48px rgba(0, 0, 0, 0.46),
+    0 0 26px rgba(111,156,255,0.06),
+    inset 0 1px 0 rgba(255,255,255,0.03);
+}
+
+#transactionModal .modal-title {
+  margin-bottom: 18px;
+  font-size: 32px;
+  line-height: 0.96;
+  font-weight: 930;
+  letter-spacing: -0.06em;
+  color: #f7f9ff;
+}
+
+#transactionModal .field {
+  margin-bottom: 14px;
+}
+
+#transactionModal .input,
+#transactionModal .select {
+  height: 58px;
+  padding: 0 18px;
+  border-radius: 22px;
+  border: 1px solid rgba(255,255,255,0.055);
+  background:
+    linear-gradient(180deg, rgba(32, 36, 48, 0.94) 0%, rgba(18, 21, 30, 1) 100%);
+  color: #f7f8fb;
+  font-size: 17px;
+  font-weight: 800;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.03),
+    0 8px 18px rgba(0,0,0,0.16);
+}
+
+#transactionModal .input::placeholder {
+  color: rgba(255,255,255,0.42);
+}
+
+#transactionModal #commentInput {
+  font-weight: 760;
+}
+
+#transactionModal .modal-actions {
+  margin-top: 16px;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+#transactionModal .modal-actions .btn-danger {
+  grid-column: 1 / -1;
+}
+
+#transactionModal .btn-secondary,
+#transactionModal .btn-primary,
+#transactionModal .btn-danger {
+  height: 58px;
+  border-radius: 22px;
+  font-size: 17px;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+}
+
+#transactionModal .btn-secondary {
+  background:
+    linear-gradient(180deg, rgba(44, 47, 58, 0.96) 0%, rgba(24, 28, 38, 0.98) 100%);
+  color: #eef3ff;
+  border: 1px solid rgba(255,255,255,0.05);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.03),
+    0 8px 18px rgba(0,0,0,0.16);
+}
+
+#transactionModal .btn-primary {
+  background:
+    radial-gradient(circle at 30% 30%, rgba(255,255,255,0.14), transparent 42%),
+    linear-gradient(180deg, rgba(114, 160, 255, 1) 0%, rgba(92, 144, 255, 1) 100%);
+  color: #fff;
+  box-shadow: 0 14px 30px rgba(111, 156, 255, 0.24);
+}
+
+#transactionModal .btn-danger {
+  background:
+    linear-gradient(180deg, rgba(120, 55, 67, 0.62) 0%, rgba(93, 43, 52, 0.72) 100%);
+  color: #ff7f86;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.03),
+    0 8px 18px rgba(70, 20, 28, 0.18);
+}
+
+@media (max-width: 420px) {
+  #transactionModal .modal-title {
+    font-size: 28px;
+  }
+
+  #transactionModal .input,
+  #transactionModal .select,
+  #transactionModal .btn-secondary,
+  #transactionModal .btn-primary,
+  #transactionModal .btn-danger {
+    height: 54px;
+    border-radius: 20px;
+    font-size: 16px;
+  }
+}
+
+/* =========================================================
    9. BOTTOM NAV
    ========================================================= */
 
