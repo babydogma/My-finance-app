@@ -3305,3 +3305,114 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     max-width: 250px;
   }
 }
+
+/* =========================================================
+   MANDATORY PAYMENTS — FINAL FIX
+   ========================================================= */
+
+.mandatory-payments-footer {
+  display: flex;
+  justify-content: center;
+}
+
+#openMandatoryPaymentEditorBtn {
+  min-width: 220px;
+}
+
+.mandatory-payment-card {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  touch-action: manipulation;
+}
+
+.mandatory-payment-card[data-paid="false"] {
+  border-color: rgba(190, 92, 108, 0.18);
+  box-shadow:
+    0 10px 22px rgba(0,0,0,0.16),
+    0 0 18px rgba(190, 92, 108, 0.07),
+    inset 0 1px 0 rgba(255,255,255,0.03);
+}
+
+.mandatory-payment-card[data-paid="false"]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(190, 92, 108, 0.055) 0%, rgba(190, 92, 108, 0.02) 100%);
+  pointer-events: none;
+}
+
+.mandatory-payment-card[data-paid="true"] {
+  border-color: rgba(92, 180, 122, 0.2);
+  box-shadow:
+    0 10px 22px rgba(0,0,0,0.16),
+    0 0 18px rgba(92, 180, 122, 0.08),
+    inset 0 1px 0 rgba(255,255,255,0.03);
+}
+
+.mandatory-payment-card[data-paid="true"]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(92, 180, 122, 0.08) 0%, rgba(92, 180, 122, 0.03) 100%);
+  pointer-events: none;
+}
+
+.mandatory-payment-card__status.is-unpaid {
+  color: rgba(255, 178, 186, 0.94);
+  text-shadow: 0 0 12px rgba(190, 92, 108, 0.14);
+}
+
+.mandatory-payment-card__status.is-paid {
+  color: rgba(158, 234, 185, 0.95);
+  text-shadow: 0 0 12px rgba(92, 180, 122, 0.15);
+}
+
+.mandatory-payment-card--hold-pay .mandatory-payment-card__progress {
+  opacity: 1;
+  left: 0;
+  right: auto;
+  background: linear-gradient(90deg, rgba(76, 166, 108, 0.28) 0%, rgba(76, 166, 108, 0.18) 100%);
+  animation: mandatoryHoldPay 1.35s linear forwards;
+}
+
+.mandatory-payment-card--hold-unpay .mandatory-payment-card__progress {
+  opacity: 1;
+  left: auto;
+  right: 0;
+  background: linear-gradient(270deg, rgba(190, 92, 108, 0.24) 0%, rgba(190, 92, 108, 0.14) 100%);
+  animation: mandatoryHoldUnpay 1.35s linear forwards;
+}
+
+#mandatoryPaymentEditorModal {
+  z-index: 145;
+}
+
+#mandatoryPaymentEditorModal .modal-sheet,
+#mandatoryPaymentBucketPickerModal .modal-sheet {
+  border-radius: 30px 30px 22px 22px;
+  background:
+    radial-gradient(circle at top center, rgba(111, 156, 255, 0.1), transparent 34%),
+    linear-gradient(180deg, rgba(29, 31, 40, 0.99) 0%, rgba(21, 24, 32, 1) 100%);
+  box-shadow:
+    0 -16px 48px rgba(0, 0, 0, 0.46),
+    0 0 24px rgba(111,156,255,0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.mandatory-editor-actions {
+  grid-template-columns: 1fr;
+}
+
+.mandatory-editor-actions .btn-danger,
+.mandatory-editor-actions .btn-primary {
+  width: 100%;
+}
+
+.mandatory-linked-safe-btn {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  text-align: left;
+  cursor: pointer;
+}
