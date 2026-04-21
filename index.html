@@ -740,53 +740,6 @@
         Закрыть
       </button>
     </div>
-    
-    <div class="modal hidden" id="mandatoryPaymentEditorModal">
-  <div class="modal-sheet">
-    <div class="modal-handle"></div>
-
-    <div class="section-head">
-      <h3 class="modal-title" id="mandatoryPaymentEditorTitle" style="margin:0; text-align:left;">
-        Новый платёж
-      </h3>
-      <button class="manager-back-btn" type="button" id="closeMandatoryPaymentEditorModalBtn">
-        Закрыть
-      </button>
-    </div>
-
-    <div class="manager-card mandatory-editor-card">
-      <div class="field">
-        <input class="input" id="mandatoryPaymentTitleInput" type="text" placeholder="Например: Квартира" />
-      </div>
-
-      <div class="field">
-        <input class="input" id="mandatoryPaymentAmountInput" type="number" placeholder="Сумма" />
-      </div>
-
-      <div class="field">
-        <input class="input" id="mandatoryPaymentDueDayInput" type="date" />
-      </div>
-
-      <div class="field">
-        <select class="select" id="mandatoryPaymentLinkedSafeSelect">
-          <option value="">Без привязки к накоплению</option>
-        </select>
-      </div>
-
-      <div class="modal-actions modal-actions--triple mandatory-editor-actions">
-        <button class="btn btn-danger hidden" type="button" id="deleteMandatoryPaymentBtn">
-          Удалить
-        </button>
-        <button class="btn btn-secondary" type="button" id="resetMandatoryPaymentBtn">
-          Очистить
-        </button>
-        <button class="btn btn-primary" type="button" id="addMandatoryPaymentBtn">
-          Добавить платёж
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
 
     <div class="section-note" style="margin-bottom:12px;">
       Эти платежи учитываются в расчёте “Можно отложить сейчас”
@@ -795,12 +748,117 @@
     <div class="list" id="mandatoryPaymentsList"></div>
 
     <div class="mandatory-payments-footer" style="margin-top:12px;">
-  <button class="btn btn-primary manager-add-btn" type="button" id="openMandatoryPaymentEditorBtn">
-    Добавить платёж
-  </button>
+      <button class="btn btn-primary manager-add-btn" type="button" id="openMandatoryPaymentEditorBtn">
+        Добавить платёж
+      </button>
+    </div>
+  </div>
 </div>
 
+<div class="modal hidden" id="mandatoryPaymentEditorModal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
 
+    <div class="section-head">
+      <h3
+        class="modal-title"
+        id="mandatoryPaymentEditorTitle"
+        style="margin:0; text-align:left;"
+      >
+        Новый платёж
+      </h3>
+
+      <button
+        class="manager-back-btn"
+        type="button"
+        id="closeMandatoryPaymentEditorModalBtn"
+      >
+        Закрыть
+      </button>
+    </div>
+
+    <div class="manager-card mandatory-editor-card">
+      <div class="field">
+        <input
+          class="input"
+          id="mandatoryPaymentTitleInput"
+          type="text"
+          placeholder="Например: Квартира"
+        />
+      </div>
+
+      <div class="field">
+        <input
+          class="input"
+          id="mandatoryPaymentAmountInput"
+          type="number"
+          placeholder="Сумма"
+        />
+      </div>
+
+      <div class="field">
+        <input
+          class="input"
+          id="mandatoryPaymentDueDayInput"
+          type="date"
+        />
+      </div>
+
+      <div class="field">
+        <select class="select" id="mandatoryPaymentAccountSelect">
+          <option value="">Без привязки</option>
+        </select>
+      </div>
+
+      <div class="field hidden" id="mandatoryPaymentLinkedSafeField">
+        <button
+          class="input mandatory-linked-safe-btn"
+          type="button"
+          id="openMandatoryPaymentBucketPickerBtn"
+        >
+          Выбрать накопление
+        </button>
+
+        <select class="select hidden" id="mandatoryPaymentLinkedSafeSelect">
+          <option value="">Без привязки к накоплению</option>
+        </select>
+      </div>
+
+      <div class="modal-actions mandatory-editor-actions">
+        <button
+          class="btn btn-danger hidden"
+          type="button"
+          id="deleteMandatoryPaymentBtn"
+        >
+          Удалить
+        </button>
+
+        <button
+          class="btn btn-primary"
+          type="button"
+          id="addMandatoryPaymentBtn"
+        >
+          Добавить платёж
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal hidden" id="mandatoryPaymentBucketPickerModal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+
+    <div class="section-head">
+      <h3 class="modal-title" style="margin:0; text-align:left;">Выбор накопления</h3>
+      <button class="manager-back-btn" type="button" id="closeMandatoryPaymentBucketPickerModalBtn">
+        Закрыть
+      </button>
+    </div>
+
+    <div class="list" id="mandatoryPaymentBucketPickerList"></div>
+  </div>
+</div>
 
 <div class="modal hidden" id="faqModal">
   <div class="modal-sheet faq-sheet">
