@@ -3870,7 +3870,7 @@ function getAccountRoleFlags(role) {
       freshCard?.classList.remove("list-card--fresh-sticker");
       justCreatedTransactionId = null;
       shouldScrollToFreshTransaction = false;
-    }, 3600);
+    }, 4700);
   } else if (justCreatedTransactionId) {
     justCreatedTransactionId = null;
     shouldScrollToFreshTransaction = false;
