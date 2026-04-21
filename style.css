@@ -539,12 +539,12 @@ button {
 
 #transactionsList .list-card--fresh-sticker {
   transform-origin: 18% 14%;
-  will-change: transform, opacity;
-  animation: freshStickerSettleStage 1.78s cubic-bezier(0.14, 0.84, 0.16, 1) both;
+  will-change: transform, opacity, box-shadow;
+  animation: freshStickerSettleStage 1.56s cubic-bezier(0.16, 0.84, 0.18, 1) both;
   box-shadow:
-    0 14px 28px rgba(0, 0, 0, 0.2),
-    0 0 14px rgba(111, 156, 255, 0.05),
-    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    0 18px 34px rgba(0, 0, 0, 0.24),
+    0 0 22px rgba(111, 156, 255, 0.07),
+    inset 0 1px 0 rgba(255, 255, 255, 0.045);
 }
 
 #transactionsList .list-card--fresh-sticker::after {
@@ -555,16 +555,16 @@ button {
     linear-gradient(
       90deg,
       rgba(255,255,255,0) 0%,
-      rgba(255,255,255,0.014) 42%,
-      rgba(255,255,255,0.032) 50%,
-      rgba(255,255,255,0.014) 58%,
+      rgba(255,255,255,0.03) 42%,
+      rgba(255,255,255,0.065) 50%,
+      rgba(255,255,255,0.03) 58%,
       rgba(255,255,255,0) 100%
     );
   transform: translate3d(-118%, 0, 0);
   opacity: 0;
   pointer-events: none;
   will-change: transform, opacity;
-  animation: freshStickerSweepStage 1.7s cubic-bezier(0.14, 0.84, 0.16, 1) 1.46s forwards;
+  animation: freshStickerSweepStage 1.44s cubic-bezier(0.16, 0.84, 0.18, 1) 1.22s forwards;
 }
 
 #transactionsList .list-card--fresh-sticker .list-title,
@@ -572,25 +572,25 @@ button {
 #transactionsList .list-card--fresh-sticker .list-value,
 #transactionsList .list-card--fresh-sticker .list-caption {
   will-change: transform, opacity;
-  animation: freshStickerContentIn 1.08s cubic-bezier(0.16, 0.82, 0.18, 1) both;
+  animation: freshStickerContentIn 0.92s cubic-bezier(0.18, 0.82, 0.2, 1) both;
 }
 
 @keyframes freshStickerSettleStage {
   0% {
-    opacity: 0.26;
-    transform: translate3d(0, 30px, 0) scale(1.082) rotate(-1.45deg);
+    opacity: 0.22;
+    transform: translate3d(0, 26px, 0) scale(1.07) rotate(-1.15deg);
   }
-  26% {
-    opacity: 0.62;
-    transform: translate3d(0, 18px, 0) scale(1.058) rotate(-0.94deg);
+  22% {
+    opacity: 0.58;
+    transform: translate3d(0, 16px, 0) scale(1.05) rotate(-0.74deg);
   }
-  52% {
+  48% {
     opacity: 0.9;
-    transform: translate3d(0, 8px, 0) scale(1.028) rotate(-0.38deg);
+    transform: translate3d(0, 7px, 0) scale(1.024) rotate(-0.28deg);
   }
-  76% {
+  72% {
     opacity: 1;
-    transform: translate3d(0, 2px, 0) scale(1.008) rotate(-0.08deg);
+    transform: translate3d(0, -1px, 0) scale(1.006) rotate(-0.04deg);
   }
   100% {
     opacity: 1;
@@ -603,11 +603,11 @@ button {
     transform: translate3d(-118%, 0, 0);
     opacity: 0;
   }
-  18% {
-    opacity: 0.18;
+  20% {
+    opacity: 0.22;
   }
-  34% {
-    opacity: 0.48;
+  42% {
+    opacity: 0.62;
   }
   100% {
     transform: translate3d(118%, 0, 0);
@@ -618,7 +618,7 @@ button {
 @keyframes freshStickerContentIn {
   0% {
     opacity: 0;
-    transform: translate3d(0, 9px, 0);
+    transform: translate3d(0, 7px, 0);
   }
   100% {
     opacity: 1;
@@ -2865,13 +2865,13 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   }
   
     #transactionsList .list-card--fresh-sticker {
-    animation-duration: 1.46s;
-  }
+  animation-duration: 1.34s;
+}
 
-  #transactionsList .list-card--fresh-sticker::after {
-    animation-duration: 1.5s;
-    animation-delay: 1.28s;
-  }
+#transactionsList .list-card--fresh-sticker::after {
+  animation-duration: 1.28s;
+  animation-delay: 1.08s;
+}
 }
 
 /* =========================================================
