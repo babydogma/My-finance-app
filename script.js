@@ -81,9 +81,13 @@ const mandatoryPaymentTitleInput = document.getElementById("mandatoryPaymentTitl
 const mandatoryPaymentAmountInput = document.getElementById("mandatoryPaymentAmountInput");
 const mandatoryPaymentDueDayInput = document.getElementById("mandatoryPaymentDueDayInput");
 const mandatoryPaymentLinkedSafeSelect = document.getElementById("mandatoryPaymentLinkedSafeSelect");
+const mandatoryPaymentAccountSelect = document.getElementById("mandatoryPaymentAccountSelect");
+const mandatoryPaymentBucketPickerModal = document.getElementById("mandatoryPaymentBucketPickerModal");
+const mandatoryPaymentBucketPickerList = document.getElementById("mandatoryPaymentBucketPickerList");
+const closeMandatoryPaymentBucketPickerModalBtn = document.getElementById("closeMandatoryPaymentBucketPickerModalBtn");
 const addMandatoryPaymentBtn = document.getElementById("addMandatoryPaymentBtn");
 const deleteMandatoryPaymentBtn = document.getElementById("deleteMandatoryPaymentBtn");
-const resetMandatoryPaymentBtn = document.getElementById("resetMandatoryPaymentBtn");
+
 
   const modalTitle = modal?.querySelector(".modal-title");
 
@@ -220,6 +224,7 @@ let activeSafeBucketAmountId = null;
 let activeAccountId = null;
 let activeMandatoryPaymentId = null;
 let mandatoryLongPressTimer = null;
+let mandatoryLongPressVisualTimer = null;
 let mandatoryLongPressTriggered = false;
 
   const UNCATEGORIZED_ID = "uncategorized";
@@ -742,7 +747,8 @@ const toIsSafes = isVaultAccountId(toAccountSelect?.value);
       title: String(item.title || "").trim(),
       amount: roundToTwo(Number(item.amount) || 0),
       due_day: Math.min(31, Math.max(1, Number(item.due_day) || 1)),
-      linked_safe_bucket_id: item.linked_safe_bucket_id || "",
+      linked_account_id: item.linked_account_id || "",
+linked_safe_bucket_id: item.linked_safe_bucket_id || "",
       enabled: item.enabled !== false,
       last_paid_period: item.last_paid_period || "",
     }));
@@ -939,13 +945,60 @@ async function toggleMandatoryPaymentPaid(paymentId) {
   const currentMonthKey = getCurrentMonthKey();
   const isPaid = item.last_paid_period === currentMonthKey;
 
-  item.last_paid_period = isPaid ? "" : currentMonthKey;
+  if (!isPaid) {
+    const transactionOk = await createMandatoryPaymentExpense(item);
+    if (!transactionOk) return false;
+    item.last_paid_period = currentMonthKey;
+  } else {
+    item.last_paid_period = "";
+  }
 
   const ok = await saveMandatoryPaymentsToMeta();
   if (!ok) return false;
 
+  await loadDataFromSupabase();
   renderMandatoryPaymentsModal();
   renderAll();
+  return true;
+}
+
+async function createMandatoryPaymentExpense(item) {
+  const accountId = item.linked_account_id || "";
+  if (!accountId) return true;
+
+  const account = getAccountById(accountId);
+  if (!account) return true;
+
+  const createdAt = new Date().toISOString();
+
+  const transaction = {
+    id: crypto.randomUUID(),
+    type: "expense",
+    title: item.title || "Обязательный платёж",
+    amount: roundToTwo(Number(item.amount) || 0),
+    account_id: account.id,
+    account: account.name,
+    category_id: UNCATEGORIZED_ID,
+    from_account_id: null,
+    to_account_id: null,
+    from_account: null,
+    to_account: null,
+    from_safe_bucket_id: isVaultAccountId(account.id) ? (item.linked_safe_bucket_id || null) : null,
+    to_safe_bucket_id: null,
+    created_at: createdAt,
+    time_label: getCurrentTime(),
+  };
+
+  const { error } = await supabaseClient
+    .from("transactions")
+    .insert(transaction);
+
+  if (error) {
+    alert("Ошибка списания обязательного платежа");
+    console.error(error);
+    return false;
+  }
+
   return true;
 }
 
@@ -962,18 +1015,26 @@ function startMandatoryPaymentLongPress(card, item) {
     "mandatory-payment-card--hold-unpay"
   );
 
-  card.classList.add(
-    isPaid ? "mandatory-payment-card--hold-unpay" : "mandatory-payment-card--hold-pay"
-  );
+  window.clearTimeout(mandatoryLongPressVisualTimer);
+  window.clearTimeout(mandatoryLongPressTimer);
+
+  mandatoryLongPressVisualTimer = window.setTimeout(() => {
+    card.classList.add(
+      isPaid ? "mandatory-payment-card--hold-unpay" : "mandatory-payment-card--hold-pay"
+    );
+  }, 200);
 
   mandatoryLongPressTimer = window.setTimeout(async () => {
     mandatoryLongPressTriggered = true;
     await toggleMandatoryPaymentPaid(item.id);
-  }, 1350);
+  }, 1550);
 }
 
 function cancelMandatoryPaymentLongPress(card) {
+  window.clearTimeout(mandatoryLongPressVisualTimer);
   window.clearTimeout(mandatoryLongPressTimer);
+
+  mandatoryLongPressVisualTimer = null;
   mandatoryLongPressTimer = null;
 
   if (card) {
@@ -1012,7 +1073,6 @@ function bindMandatoryPaymentPress(card, item) {
     if (event.pointerType === "mouse" && event.button !== 0) return;
     event.preventDefault();
     stopNativeSelection();
-    startMandatoryPaymentLongPress(card, item);
   });
 
   card.addEventListener("pointerup", (event) => {
@@ -1126,7 +1186,8 @@ async function saveMandatoryPayment() {
   const title = mandatoryPaymentTitleInput.value.trim();
   const amount = Number(String(mandatoryPaymentAmountInput.value).replace(",", "."));
   const dueDateValue = mandatoryPaymentDueDayInput.value;
-  const linkedSafeBucketId = mandatoryPaymentLinkedSafeSelect?.value || "";
+  const linkedAccountId = mandatoryPaymentAccountSelect?.value || "";
+const linkedSafeBucketId = mandatoryPaymentLinkedSafeSelect?.value || "";
 
   if (!title) {
     alert("Введи название платежа");
@@ -1152,14 +1213,16 @@ async function saveMandatoryPayment() {
     target.title = title;
     target.amount = roundToTwo(amount);
     target.due_day = dueDay;
-    target.linked_safe_bucket_id = linkedSafeBucketId;
+    target.linked_account_id = linkedAccountId;
+target.linked_safe_bucket_id = linkedSafeBucketId;
   } else {
     state.mandatoryPayments.push({
       id: crypto.randomUUID(),
       title,
       amount: roundToTwo(amount),
       due_day: dueDay,
-      linked_safe_bucket_id: linkedSafeBucketId,
+      linked_account_id: linkedAccountId,
+linked_safe_bucket_id: linkedSafeBucketId,
       enabled: true,
       last_paid_period: "",
     });
@@ -4167,7 +4230,6 @@ openMandatoryPaymentEditorBtn?.addEventListener("click", () => {
 
 addMandatoryPaymentBtn?.addEventListener("click", saveMandatoryPayment);
 deleteMandatoryPaymentBtn?.addEventListener("click", deleteMandatoryPaymentFromEditor);
-resetMandatoryPaymentBtn?.addEventListener("click", resetMandatoryPaymentForm);
 closeMandatoryPaymentEditorModalBtn?.addEventListener("click", closeMandatoryPaymentEditorModal);
 addSafeBucketBtn?.addEventListener("click", addSafeBucket);
 closeSafeBucketAmountModalBtn?.addEventListener("click", closeSafeBucketAmountModal);
