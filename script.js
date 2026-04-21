@@ -827,12 +827,32 @@ function syncMandatoryPaymentLinkedSafeField() {
     if (openMandatoryPaymentBucketPickerBtn) {
       openMandatoryPaymentBucketPickerBtn.textContent = "Выбрать накопление";
     }
+    return;
+  }
+
+  if (openMandatoryPaymentBucketPickerBtn) {
+    const currentBucketName =
+      getSafeBucketName(mandatoryPaymentLinkedSafeSelect?.value || "") || "Выбрать накопление";
+    openMandatoryPaymentBucketPickerBtn.textContent = currentBucketName;
   }
 }
 
 function renderMandatoryPaymentBucketPicker() {
   if (!mandatoryPaymentBucketPickerList) return;
   mandatoryPaymentBucketPickerList.innerHTML = "";
+
+  if (!state.safeBuckets.length) {
+    const empty = document.createElement("div");
+    empty.className = "list-card";
+    empty.innerHTML = `
+      <div class="list-body">
+        <h3 class="list-title">Накоплений пока нет</h3>
+        <p class="list-subtitle">Сначала создай накопление</p>
+      </div>
+    `;
+    mandatoryPaymentBucketPickerList.appendChild(empty);
+    return;
+  }
 
   state.safeBuckets.forEach((bucket) => {
     const row = document.createElement("button");
@@ -849,9 +869,11 @@ function renderMandatoryPaymentBucketPicker() {
       if (mandatoryPaymentLinkedSafeSelect) {
         mandatoryPaymentLinkedSafeSelect.value = bucket.id;
       }
+
       if (openMandatoryPaymentBucketPickerBtn) {
         openMandatoryPaymentBucketPickerBtn.textContent = bucket.name;
       }
+
       mandatoryPaymentBucketPickerModal?.classList.add("hidden");
     });
 
@@ -983,9 +1005,17 @@ function openMandatoryPaymentEditor(paymentId) {
   mandatoryPaymentAmountInput.value = String(Number(item.amount) || 0).replace(".", ",");
   mandatoryPaymentDueDayInput.value = buildDateFromDueDay(item.due_day);
 
+  fillMandatoryPaymentAccountSelect(item.linked_account_id || "");
+  fillMandatoryPaymentSafeSelect(item.linked_safe_bucket_id || "");
+  syncMandatoryPaymentLinkedSafeField();
+
   if (mandatoryPaymentLinkedSafeSelect) {
-    fillMandatoryPaymentSafeSelect(item.linked_safe_bucket_id || "");
     mandatoryPaymentLinkedSafeSelect.value = item.linked_safe_bucket_id || "";
+  }
+
+  if (openMandatoryPaymentBucketPickerBtn) {
+    openMandatoryPaymentBucketPickerBtn.textContent =
+      getSafeBucketName(item.linked_safe_bucket_id || "") || "Выбрать накопление";
   }
 
   if (mandatoryPaymentEditorTitle) {
@@ -995,19 +1025,10 @@ function openMandatoryPaymentEditor(paymentId) {
   if (addMandatoryPaymentBtn) {
     addMandatoryPaymentBtn.textContent = "Сохранить платёж";
   }
-  
-  fillMandatoryPaymentAccountSelect(item.linked_account_id || "");
-fillMandatoryPaymentSafeSelect(item.linked_safe_bucket_id || "");
-syncMandatoryPaymentLinkedSafeField();
-
-if (openMandatoryPaymentBucketPickerBtn) {
-  openMandatoryPaymentBucketPickerBtn.textContent =
-    getSafeBucketName(item.linked_safe_bucket_id || "") || "Выбрать накопление";
-}
 
   deleteMandatoryPaymentBtn?.classList.remove("hidden");
 
-  openMandatoryPaymentEditorModal();
+  mandatoryPaymentEditorModal?.classList.remove("hidden");
   mandatoryPaymentTitleInput.focus();
 }
 
@@ -1049,7 +1070,10 @@ async function createMandatoryPaymentExpense(item) {
   const account = getAccountById(accountId);
   if (!account) return true;
 
-  const createdAt = new Date().toISOString();
+  if (isVaultAccountId(account.id) && !item.linked_safe_bucket_id) {
+    alert("Для списания из накоплений нужно выбрать конкретное накопление");
+    return false;
+  }
 
   const transaction = {
     id: crypto.randomUUID(),
@@ -1065,7 +1089,7 @@ async function createMandatoryPaymentExpense(item) {
     to_account: null,
     from_safe_bucket_id: isVaultAccountId(account.id) ? (item.linked_safe_bucket_id || null) : null,
     to_safe_bucket_id: null,
-    created_at: createdAt,
+    created_at: new Date().toISOString(),
     time_label: getCurrentTime(),
   };
 
@@ -1153,6 +1177,7 @@ function bindMandatoryPaymentPress(card, item) {
     if (event.pointerType === "mouse" && event.button !== 0) return;
     event.preventDefault();
     stopNativeSelection();
+    startMandatoryPaymentLongPress(card, item);
   });
 
   card.addEventListener("pointerup", (event) => {
@@ -1178,12 +1203,16 @@ function bindMandatoryPaymentPress(card, item) {
   });
 }
 
-function openMandatoryPaymentsModal() {
-  fillMandatoryPaymentSafeSelect();
-  resetMandatoryPaymentForm();
-  renderMandatoryPaymentsModal();
-  mandatoryPaymentsModal.classList.remove("hidden");
-  document.body.style.overflow = "hidden";
+function openMandatoryPaymentEditorModal() {
+  fillMandatoryPaymentAccountSelect("");
+  fillMandatoryPaymentSafeSelect("");
+  syncMandatoryPaymentLinkedSafeField();
+
+  if (openMandatoryPaymentBucketPickerBtn) {
+    openMandatoryPaymentBucketPickerBtn.textContent = "Выбрать накопление";
+  }
+
+  mandatoryPaymentEditorModal?.classList.remove("hidden");
 }
 
 function closeMandatoryPaymentsModal() {
@@ -1267,7 +1296,7 @@ async function saveMandatoryPayment() {
   const amount = Number(String(mandatoryPaymentAmountInput.value).replace(",", "."));
   const dueDateValue = mandatoryPaymentDueDayInput.value;
   const linkedAccountId = mandatoryPaymentAccountSelect?.value || "";
-const linkedSafeBucketId = mandatoryPaymentLinkedSafeSelect?.value || "";
+  const linkedSafeBucketId = mandatoryPaymentLinkedSafeSelect?.value || "";
 
   if (!title) {
     alert("Введи название платежа");
@@ -1284,6 +1313,11 @@ const linkedSafeBucketId = mandatoryPaymentLinkedSafeSelect?.value || "";
     return;
   }
 
+  if (isVaultAccountId(linkedAccountId) && !linkedSafeBucketId) {
+    alert("Выбери накопление");
+    return;
+  }
+
   const dueDay = new Date(`${dueDateValue}T00:00:00`).getDate();
 
   if (activeMandatoryPaymentId) {
@@ -1294,7 +1328,7 @@ const linkedSafeBucketId = mandatoryPaymentLinkedSafeSelect?.value || "";
     target.amount = roundToTwo(amount);
     target.due_day = dueDay;
     target.linked_account_id = linkedAccountId;
-target.linked_safe_bucket_id = linkedSafeBucketId;
+    target.linked_safe_bucket_id = linkedSafeBucketId;
   } else {
     state.mandatoryPayments.push({
       id: crypto.randomUUID(),
@@ -1302,7 +1336,7 @@ target.linked_safe_bucket_id = linkedSafeBucketId;
       amount: roundToTwo(amount),
       due_day: dueDay,
       linked_account_id: linkedAccountId,
-linked_safe_bucket_id: linkedSafeBucketId,
+      linked_safe_bucket_id: linkedSafeBucketId,
       enabled: true,
       last_paid_period: "",
     });
@@ -1312,8 +1346,8 @@ linked_safe_bucket_id: linkedSafeBucketId,
   if (!ok) return;
 
   renderMandatoryPaymentsModal();
-renderAll();
-closeMandatoryPaymentEditorModal();
+  renderAll();
+  closeMandatoryPaymentEditorModal();
 }
 
 async function deleteMandatoryPaymentFromEditor() {
@@ -4184,6 +4218,9 @@ mandatoryPaymentAccountSelect?.addEventListener("change", () => {
 });
 
 openMandatoryPaymentBucketPickerBtn?.addEventListener("click", () => {
+  const accountId = mandatoryPaymentAccountSelect?.value || "";
+  if (!isVaultAccountId(accountId)) return;
+
   renderMandatoryPaymentBucketPicker();
   mandatoryPaymentBucketPickerModal?.classList.remove("hidden");
 });
@@ -4323,7 +4360,14 @@ faqModal?.addEventListener("click", (event) => {
 closeMandatoryPaymentsModalBtn?.addEventListener("click", closeMandatoryPaymentsModal);
 openMandatoryPaymentEditorBtn?.addEventListener("click", () => {
   resetMandatoryPaymentForm();
-  fillMandatoryPaymentSafeSelect();
+  fillMandatoryPaymentAccountSelect("");
+  fillMandatoryPaymentSafeSelect("");
+  syncMandatoryPaymentLinkedSafeField();
+
+  if (openMandatoryPaymentBucketPickerBtn) {
+    openMandatoryPaymentBucketPickerBtn.textContent = "Выбрать накопление";
+  }
+
   openMandatoryPaymentEditorModal();
 });
 
