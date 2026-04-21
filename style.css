@@ -2945,149 +2945,41 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 /* =========================================================
-   MANDATORY PAYMENTS MODAL — CLEAN ROWS + LONG PRESS
+   MANDATORY PAYMENTS — FINAL CLEAN
    ========================================================= */
+
+.mandatory-payments-footer {
+  display: flex;
+  justify-content: center;
+}
+
+#openMandatoryPaymentEditorBtn {
+  min-width: 220px;
+}
 
 .mandatory-payment-card {
   position: relative;
   overflow: hidden;
-  text-align: left;
   width: 100%;
-  border: 1px solid rgba(255,255,255,0.05);
-  background:
-    linear-gradient(180deg, rgba(60, 66, 84, 0.28) 0%, rgba(31, 36, 50, 0.18) 100%);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-}
-
-.mandatory-payment-card__progress {
-  position: absolute;
-  inset: 0;
-  width: 0%;
-  pointer-events: none;
-  z-index: 0;
-  opacity: 0;
-}
-
-.mandatory-payment-card > *:not(.mandatory-payment-card__progress) {
-  position: relative;
-  z-index: 1;
-}
-
-.mandatory-payment-card__status-wrap {
-  min-width: 88px;
-}
-
-.mandatory-payment-card__status {
-  margin: 0;
-  font-size: 11px;
-  font-weight: 820;
-  letter-spacing: -0.02em;
-  white-space: nowrap;
-}
-
-.mandatory-payment-card__status.is-paid {
-  color: rgba(158, 234, 185, 0.92);
-}
-
-.mandatory-payment-card__status.is-unpaid {
-  color: rgba(255,255,255,0.46);
-}
-
-.mandatory-payment-card--paid {
-  border-color: rgba(92, 180, 122, 0.18);
-  box-shadow:
-    0 10px 22px rgba(0,0,0,0.16),
-    0 0 16px rgba(92, 180, 122, 0.06),
-    inset 0 1px 0 rgba(255,255,255,0.03);
-}
-
-.mandatory-payment-card--paid::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(92, 180, 122, 0.08) 0%, rgba(92, 180, 122, 0.03) 100%);
-  pointer-events: none;
-}
-
-.mandatory-payment-card--hold-pay .mandatory-payment-card__progress {
-  opacity: 1;
-  left: 0;
-  right: auto;
-  background: linear-gradient(90deg, rgba(76, 166, 108, 0.28) 0%, rgba(76, 166, 108, 0.18) 100%);
-  animation: mandatoryHoldPay 1.35s linear forwards;
-}
-
-.mandatory-payment-card--hold-unpay .mandatory-payment-card__progress {
-  opacity: 1;
-  left: auto;
-  right: 0;
-  background: linear-gradient(270deg, rgba(190, 92, 108, 0.22) 0%, rgba(190, 92, 108, 0.14) 100%);
-  animation: mandatoryHoldUnpay 1.35s linear forwards;
-}
-
-@keyframes mandatoryHoldPay {
-  from { width: 0%; }
-  to { width: 100%; }
-}
-
-@keyframes mandatoryHoldUnpay {
-  from { width: 0%; }
-  to { width: 100%; }
-}
-
-.mandatory-editor-card .modal-actions {
-  margin-top: 10px;
-}
-
-.mandatory-editor-actions {
-  grid-template-columns: 1fr 1fr 1fr;
-}
-
-@media (max-width: 420px) {
-  .mandatory-payment-card__status-wrap {
-    min-width: 74px;
-  }
-
-  .mandatory-payment-card__status {
-    font-size: 10px;
-  }
-
-  .mandatory-editor-actions {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .mandatory-editor-actions #deleteMandatoryPaymentBtn {
-    grid-column: 1 / -1;
-  }
-}
-
-/* =========================================================
-   MANDATORY PAYMENTS — STATUS COLORS + LONG PRESS + EDITOR MODAL
-   ========================================================= */
-
-.mandatory-payment-card {
-  position: relative;
-  overflow: hidden;
   text-align: left;
-  width: 100%;
-  border: 1px solid rgba(255,255,255,0.05);
-  background:
-    linear-gradient(180deg, rgba(60, 66, 84, 0.28) 0%, rgba(31, 36, 50, 0.18) 100%);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  user-select: none;
   -webkit-user-select: none;
+  user-select: none;
   -webkit-touch-callout: none;
+  touch-action: pan-y;
+  border: 1px solid rgba(255,255,255,0.05);
+  background:
+    linear-gradient(180deg, rgba(60, 66, 84, 0.28) 0%, rgba(31, 36, 50, 0.18) 100%);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 .mandatory-payment-card__progress {
   position: absolute;
   inset: 0;
   width: 0%;
+  opacity: 0;
   pointer-events: none;
   z-index: 0;
-  opacity: 0;
 }
 
 .mandatory-payment-card > *:not(.mandatory-payment-card__progress) {
@@ -3107,15 +2999,11 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   white-space: nowrap;
 }
 
-.mandatory-payment-card .list-subtitle {
-  transition: color 0.18s ease;
-}
-
 .mandatory-payment-card[data-paid="false"] {
-  border-color: rgba(190, 92, 108, 0.16);
+  border-color: rgba(190, 92, 108, 0.18);
   box-shadow:
     0 10px 22px rgba(0,0,0,0.16),
-    0 0 16px rgba(190, 92, 108, 0.05),
+    0 0 18px rgba(190, 92, 108, 0.07),
     inset 0 1px 0 rgba(255,255,255,0.03);
 }
 
@@ -3128,15 +3016,15 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .mandatory-payment-card[data-paid="false"] .mandatory-payment-card__status.is-unpaid {
-  color: rgba(255, 178, 186, 0.9);
-  text-shadow: 0 0 12px rgba(190, 92, 108, 0.12);
+  color: rgba(255, 178, 186, 0.94);
+  text-shadow: 0 0 12px rgba(190, 92, 108, 0.14);
 }
 
 .mandatory-payment-card[data-paid="true"] {
-  border-color: rgba(92, 180, 122, 0.18);
+  border-color: rgba(92, 180, 122, 0.2);
   box-shadow:
     0 10px 22px rgba(0,0,0,0.16),
-    0 0 16px rgba(92, 180, 122, 0.06),
+    0 0 18px rgba(92, 180, 122, 0.08),
     inset 0 1px 0 rgba(255,255,255,0.03);
 }
 
@@ -3149,8 +3037,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .mandatory-payment-card[data-paid="true"] .mandatory-payment-card__status.is-paid {
-  color: rgba(158, 234, 185, 0.94);
-  text-shadow: 0 0 12px rgba(92, 180, 122, 0.14);
+  color: rgba(158, 234, 185, 0.95);
+  text-shadow: 0 0 12px rgba(92, 180, 122, 0.15);
 }
 
 .mandatory-payment-card--hold-pay .mandatory-payment-card__progress {
@@ -3179,25 +3067,94 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   to { width: 100%; }
 }
 
-.mandatory-payments-footer {
-  display: flex;
-  justify-content: flex-start;
-}
-
-#openMandatoryPaymentEditorBtn {
-  min-width: 182px;
-}
+/* ---- editor modal in wallet style ---- */
 
 #mandatoryPaymentEditorModal {
   z-index: 145;
 }
 
-.mandatory-editor-card .modal-actions {
+#mandatoryPaymentEditorModal .modal-sheet,
+#mandatoryPaymentBucketPickerModal .modal-sheet {
+  border-radius: 30px 30px 22px 22px;
+  background:
+    radial-gradient(circle at top center, rgba(111, 156, 255, 0.12), transparent 34%),
+    linear-gradient(180deg, rgba(18, 21, 30, 0.99) 0%, rgba(11, 14, 22, 1) 100%);
+  border: 1px solid rgba(255,255,255,0.07);
+  box-shadow:
+    0 -16px 48px rgba(0, 0, 0, 0.46),
+    0 0 26px rgba(111,156,255,0.06),
+    inset 0 1px 0 rgba(255,255,255,0.03);
+}
+
+#mandatoryPaymentEditorModal .manager-card {
+  padding: 14px;
+  border-radius: 28px;
+  border: 1px solid rgba(255,255,255,0.06);
+  background:
+    linear-gradient(180deg, rgba(50, 54, 69, 0.985) 0%, rgba(39, 43, 57, 0.995) 100%);
+  box-shadow:
+    0 14px 34px rgba(0, 0, 0, 0.24),
+    0 0 18px rgba(111, 156, 255, 0.03),
+    inset 0 1px 0 rgba(255,255,255,0.03);
+}
+
+#mandatoryPaymentEditorModal .input,
+#mandatoryPaymentEditorModal .select,
+#mandatoryPaymentEditorModal .mandatory-linked-safe-btn {
+  height: 58px;
+  border-radius: 22px;
+  padding: 0 18px;
+  background:
+    linear-gradient(180deg, rgba(28, 32, 43, 0.98) 0%, rgba(18, 21, 30, 1) 100%);
+  border: 1px solid rgba(255,255,255,0.055);
+  color: #f7f8fb;
+  font-size: 17px;
+  font-weight: 800;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.03),
+    0 8px 18px rgba(0,0,0,0.16);
+}
+
+#mandatoryPaymentEditorModal .mandatory-linked-safe-btn {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  text-align: left;
+  cursor: pointer;
+}
+
+#mandatoryPaymentEditorModal .modal-actions {
   margin-top: 10px;
 }
 
 .mandatory-editor-actions {
-  grid-template-columns: 1fr 1fr 1fr;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.mandatory-editor-actions .btn-danger,
+.mandatory-editor-actions .btn-primary {
+  width: 100%;
+  height: 58px;
+  border-radius: 22px;
+}
+
+#mandatoryPaymentEditorModal .btn-danger {
+  background:
+    linear-gradient(180deg, rgba(120, 55, 67, 0.62) 0%, rgba(93, 43, 52, 0.72) 100%);
+  color: #ff7f86;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.03),
+    0 8px 18px rgba(70, 20, 28, 0.18);
+}
+
+#mandatoryPaymentEditorModal .btn-primary {
+  background:
+    radial-gradient(circle at 30% 30%, rgba(255,255,255,0.14), transparent 42%),
+    linear-gradient(180deg, rgba(114, 160, 255, 1) 0%, rgba(92, 144, 255, 1) 100%);
+  color: #fff;
+  box-shadow: 0 14px 30px rgba(111, 156, 255, 0.24);
 }
 
 @media (max-width: 420px) {
@@ -3209,210 +3166,18 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     font-size: 10px;
   }
 
-  .mandatory-editor-actions {
-    grid-template-columns: 1fr 1fr;
-  }
-
-  .mandatory-editor-actions #deleteMandatoryPaymentBtn {
-    grid-column: 1 / -1;
-  }
-}
-
-/* =========================================================
-   MANDATORY PAYMENTS — FINAL POLISH
-   ========================================================= */
-
-.mandatory-payments-footer {
-  display: flex;
-  justify-content: center;
-}
-
-#openMandatoryPaymentEditorBtn {
-  min-width: 220px;
-}
-
-.mandatory-payment-card {
-  -webkit-user-select: none;
-  user-select: none;
-  -webkit-touch-callout: none;
-  touch-action: manipulation;
-}
-
-.mandatory-payment-card[data-paid="false"] {
-  border-color: rgba(190, 92, 108, 0.18);
-  box-shadow:
-    0 10px 22px rgba(0,0,0,0.16),
-    0 0 18px rgba(190, 92, 108, 0.07),
-    inset 0 1px 0 rgba(255,255,255,0.03);
-}
-
-.mandatory-payment-card[data-paid="true"] {
-  border-color: rgba(92, 180, 122, 0.2);
-  box-shadow:
-    0 10px 22px rgba(0,0,0,0.16),
-    0 0 18px rgba(92, 180, 122, 0.08),
-    inset 0 1px 0 rgba(255,255,255,0.03);
-}
-
-.mandatory-payment-card__status.is-unpaid {
-  color: rgba(255, 178, 186, 0.94);
-  text-shadow: 0 0 12px rgba(190, 92, 108, 0.14);
-}
-
-.mandatory-payment-card__status.is-paid {
-  color: rgba(158, 234, 185, 0.95);
-  text-shadow: 0 0 12px rgba(92, 180, 122, 0.15);
-}
-
-.mandatory-payment-card--hold-pay .mandatory-payment-card__progress {
-  animation: mandatoryHoldPay 1.35s linear forwards;
-}
-
-.mandatory-payment-card--hold-unpay .mandatory-payment-card__progress {
-  animation: mandatoryHoldUnpay 1.35s linear forwards;
-}
-
-#mandatoryPaymentEditorModal .modal-sheet {
-  border-radius: 30px 30px 22px 22px;
-  background:
-    radial-gradient(circle at top center, rgba(111, 156, 255, 0.1), transparent 34%),
-    linear-gradient(180deg, rgba(29, 31, 40, 0.99) 0%, rgba(21, 24, 32, 1) 100%);
-  box-shadow:
-    0 -16px 48px rgba(0, 0, 0, 0.46),
-    0 0 24px rgba(111,156,255,0.05),
-    inset 0 1px 0 rgba(255, 255, 255, 0.03);
-}
-
-.mandatory-editor-actions {
-  grid-template-columns: 1fr 1fr;
-}
-
-.mandatory-editor-actions .btn-danger {
-  grid-column: 1 / -1;
-}
-
-.mandatory-linked-safe-btn {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  text-align: left;
-  cursor: pointer;
-}
-
-@media (max-width: 420px) {
   #openMandatoryPaymentEditorBtn {
     width: 100%;
     max-width: 250px;
   }
-}
 
-/* =========================================================
-   MANDATORY PAYMENTS — FINAL FIX
-   ========================================================= */
-
-.mandatory-payments-footer {
-  display: flex;
-  justify-content: center;
-}
-
-#openMandatoryPaymentEditorBtn {
-  min-width: 220px;
-}
-
-.mandatory-payment-card {
-  -webkit-user-select: none;
-  user-select: none;
-  -webkit-touch-callout: none;
-  touch-action: manipulation;
-}
-
-.mandatory-payment-card[data-paid="false"] {
-  border-color: rgba(190, 92, 108, 0.18);
-  box-shadow:
-    0 10px 22px rgba(0,0,0,0.16),
-    0 0 18px rgba(190, 92, 108, 0.07),
-    inset 0 1px 0 rgba(255,255,255,0.03);
-}
-
-.mandatory-payment-card[data-paid="false"]::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(190, 92, 108, 0.055) 0%, rgba(190, 92, 108, 0.02) 100%);
-  pointer-events: none;
-}
-
-.mandatory-payment-card[data-paid="true"] {
-  border-color: rgba(92, 180, 122, 0.2);
-  box-shadow:
-    0 10px 22px rgba(0,0,0,0.16),
-    0 0 18px rgba(92, 180, 122, 0.08),
-    inset 0 1px 0 rgba(255,255,255,0.03);
-}
-
-.mandatory-payment-card[data-paid="true"]::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(92, 180, 122, 0.08) 0%, rgba(92, 180, 122, 0.03) 100%);
-  pointer-events: none;
-}
-
-.mandatory-payment-card__status.is-unpaid {
-  color: rgba(255, 178, 186, 0.94);
-  text-shadow: 0 0 12px rgba(190, 92, 108, 0.14);
-}
-
-.mandatory-payment-card__status.is-paid {
-  color: rgba(158, 234, 185, 0.95);
-  text-shadow: 0 0 12px rgba(92, 180, 122, 0.15);
-}
-
-.mandatory-payment-card--hold-pay .mandatory-payment-card__progress {
-  opacity: 1;
-  left: 0;
-  right: auto;
-  background: linear-gradient(90deg, rgba(76, 166, 108, 0.28) 0%, rgba(76, 166, 108, 0.18) 100%);
-  animation: mandatoryHoldPay 1.35s linear forwards;
-}
-
-.mandatory-payment-card--hold-unpay .mandatory-payment-card__progress {
-  opacity: 1;
-  left: auto;
-  right: 0;
-  background: linear-gradient(270deg, rgba(190, 92, 108, 0.24) 0%, rgba(190, 92, 108, 0.14) 100%);
-  animation: mandatoryHoldUnpay 1.35s linear forwards;
-}
-
-#mandatoryPaymentEditorModal {
-  z-index: 145;
-}
-
-#mandatoryPaymentEditorModal .modal-sheet,
-#mandatoryPaymentBucketPickerModal .modal-sheet {
-  border-radius: 30px 30px 22px 22px;
-  background:
-    radial-gradient(circle at top center, rgba(111, 156, 255, 0.1), transparent 34%),
-    linear-gradient(180deg, rgba(29, 31, 40, 0.99) 0%, rgba(21, 24, 32, 1) 100%);
-  box-shadow:
-    0 -16px 48px rgba(0, 0, 0, 0.46),
-    0 0 24px rgba(111,156,255,0.05),
-    inset 0 1px 0 rgba(255, 255, 255, 0.03);
-}
-
-.mandatory-editor-actions {
-  grid-template-columns: 1fr;
-}
-
-.mandatory-editor-actions .btn-danger,
-.mandatory-editor-actions .btn-primary {
-  width: 100%;
-}
-
-.mandatory-linked-safe-btn {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  text-align: left;
-  cursor: pointer;
+  #mandatoryPaymentEditorModal .input,
+  #mandatoryPaymentEditorModal .select,
+  #mandatoryPaymentEditorModal .mandatory-linked-safe-btn,
+  .mandatory-editor-actions .btn-danger,
+  .mandatory-editor-actions .btn-primary {
+    height: 54px;
+    border-radius: 20px;
+    font-size: 16px;
+  }
 }
