@@ -3858,19 +3858,19 @@ function getAccountRoleFlags(role) {
 
   if (freshCard) {
     if (shouldScrollToFreshTransaction) {
-  requestAnimationFrame(() => {
+  window.setTimeout(() => {
     freshCard.scrollIntoView({
-      behavior: "auto",
+      behavior: "smooth",
       block: "nearest",
     });
-  });
+  }, 240);
 }
 
     window.setTimeout(() => {
       freshCard?.classList.remove("list-card--fresh-sticker");
       justCreatedTransactionId = null;
       shouldScrollToFreshTransaction = false;
-    }, 4700);
+    }, 4300);
   } else if (justCreatedTransactionId) {
     justCreatedTransactionId = null;
     shouldScrollToFreshTransaction = false;
