@@ -3858,13 +3858,13 @@ function getAccountRoleFlags(role) {
 
   if (freshCard) {
     if (shouldScrollToFreshTransaction) {
-      requestAnimationFrame(() => {
-        freshCard.scrollIntoView({
-          behavior: "smooth",
-          block: "center",
-        });
-      });
-    }
+  requestAnimationFrame(() => {
+    freshCard.scrollIntoView({
+      behavior: "auto",
+      block: "nearest",
+    });
+  });
+}
 
     window.setTimeout(() => {
       freshCard?.classList.remove("list-card--fresh-sticker");
