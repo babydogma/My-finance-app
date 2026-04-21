@@ -233,6 +233,7 @@ let mandatoryPressStartY = 0;
 let mandatoryPressMoved = false;
 let mandatoryLongPressTriggered = false;
 let justCreatedTransactionId = null;
+let shouldScrollToFreshTransaction = false;
 
   const UNCATEGORIZED_ID = "uncategorized";
 
@@ -3842,27 +3843,37 @@ function getAccountRoleFlags(role) {
     return;
   }
 
-  let animatedFreshCard = false;
+  let freshCard = null;
 
   latestTransactions.forEach((transaction) => {
     const card = createTransactionCard(transaction);
 
-    if (!animatedFreshCard && justCreatedTransactionId && transaction.id === justCreatedTransactionId) {
+    if (!freshCard && justCreatedTransactionId && transaction.id === justCreatedTransactionId) {
       card.classList.add("list-card--fresh-sticker");
-      animatedFreshCard = true;
+      freshCard = card;
     }
 
     transactionsListEl.appendChild(card);
   });
 
-  if (animatedFreshCard) {
+  if (freshCard) {
+    if (shouldScrollToFreshTransaction) {
+      requestAnimationFrame(() => {
+        freshCard.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+      });
+    }
+
     window.setTimeout(() => {
-      const freshCard = transactionsListEl.querySelector(".list-card--fresh-sticker");
       freshCard?.classList.remove("list-card--fresh-sticker");
       justCreatedTransactionId = null;
-    }, 1200);
+      shouldScrollToFreshTransaction = false;
+    }, 1900);
   } else if (justCreatedTransactionId) {
     justCreatedTransactionId = null;
+    shouldScrollToFreshTransaction = false;
   }
 }
 
@@ -4033,40 +4044,42 @@ function getAccountRoleFlags(role) {
 }
 
   async function saveTransaction() {
-    const transaction = buildTransactionFromForm();
-    if (!transaction) return;
+  const transaction = buildTransactionFromForm();
+  if (!transaction) return;
 
-    if (editingTransactionId) {
-  const { error } = await supabaseClient
-    .from("transactions")
-    .update(transaction)
-    .eq("id", editingTransactionId);
+  if (editingTransactionId) {
+    const { error } = await supabaseClient
+      .from("transactions")
+      .update(transaction)
+      .eq("id", editingTransactionId);
 
-  if (error) {
-    alert("Ошибка обновления операции");
-    console.error(error);
-    return;
+    if (error) {
+      alert("Ошибка обновления операции");
+      console.error(error);
+      return;
+    }
+
+    justCreatedTransactionId = null;
+    shouldScrollToFreshTransaction = false;
+  } else {
+    const { error } = await supabaseClient
+      .from("transactions")
+      .insert(transaction);
+
+    if (error) {
+      alert("Ошибка сохранения операции");
+      console.error(error);
+      return;
+    }
+
+    justCreatedTransactionId = transaction.id;
+    shouldScrollToFreshTransaction = true;
   }
 
-  justCreatedTransactionId = null;
-} else {
-  const { error } = await supabaseClient
-    .from("transactions")
-    .insert(transaction);
-
-  if (error) {
-    alert("Ошибка сохранения операции");
-    console.error(error);
-    return;
-  }
-
-  justCreatedTransactionId = transaction.id;
+  closeModal();
+  await loadDataFromSupabase();
+  renderAll();
 }
-
-    await loadDataFromSupabase();
-    renderAll();
-    closeModal();
-  }
 
   async function deleteTransaction() {
     if (!editingTransactionId) return;
