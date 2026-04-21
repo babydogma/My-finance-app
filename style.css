@@ -3061,3 +3061,159 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     grid-column: 1 / -1;
   }
 }
+
+/* =========================================================
+   MANDATORY PAYMENTS — STATUS COLORS + LONG PRESS + EDITOR MODAL
+   ========================================================= */
+
+.mandatory-payment-card {
+  position: relative;
+  overflow: hidden;
+  text-align: left;
+  width: 100%;
+  border: 1px solid rgba(255,255,255,0.05);
+  background:
+    linear-gradient(180deg, rgba(60, 66, 84, 0.28) 0%, rgba(31, 36, 50, 0.18) 100%);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.mandatory-payment-card__progress {
+  position: absolute;
+  inset: 0;
+  width: 0%;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0;
+}
+
+.mandatory-payment-card > *:not(.mandatory-payment-card__progress) {
+  position: relative;
+  z-index: 1;
+}
+
+.mandatory-payment-card__status-wrap {
+  min-width: 90px;
+}
+
+.mandatory-payment-card__status {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 820;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+.mandatory-payment-card .list-subtitle {
+  transition: color 0.18s ease;
+}
+
+.mandatory-payment-card[data-paid="false"] {
+  border-color: rgba(190, 92, 108, 0.16);
+  box-shadow:
+    0 10px 22px rgba(0,0,0,0.16),
+    0 0 16px rgba(190, 92, 108, 0.05),
+    inset 0 1px 0 rgba(255,255,255,0.03);
+}
+
+.mandatory-payment-card[data-paid="false"]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(190, 92, 108, 0.055) 0%, rgba(190, 92, 108, 0.02) 100%);
+  pointer-events: none;
+}
+
+.mandatory-payment-card[data-paid="false"] .mandatory-payment-card__status.is-unpaid {
+  color: rgba(255, 178, 186, 0.9);
+  text-shadow: 0 0 12px rgba(190, 92, 108, 0.12);
+}
+
+.mandatory-payment-card[data-paid="true"] {
+  border-color: rgba(92, 180, 122, 0.18);
+  box-shadow:
+    0 10px 22px rgba(0,0,0,0.16),
+    0 0 16px rgba(92, 180, 122, 0.06),
+    inset 0 1px 0 rgba(255,255,255,0.03);
+}
+
+.mandatory-payment-card[data-paid="true"]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(92, 180, 122, 0.08) 0%, rgba(92, 180, 122, 0.03) 100%);
+  pointer-events: none;
+}
+
+.mandatory-payment-card[data-paid="true"] .mandatory-payment-card__status.is-paid {
+  color: rgba(158, 234, 185, 0.94);
+  text-shadow: 0 0 12px rgba(92, 180, 122, 0.14);
+}
+
+.mandatory-payment-card--hold-pay .mandatory-payment-card__progress {
+  opacity: 1;
+  left: 0;
+  right: auto;
+  background: linear-gradient(90deg, rgba(76, 166, 108, 0.28) 0%, rgba(76, 166, 108, 0.18) 100%);
+  animation: mandatoryHoldPay 1.35s linear forwards;
+}
+
+.mandatory-payment-card--hold-unpay .mandatory-payment-card__progress {
+  opacity: 1;
+  left: auto;
+  right: 0;
+  background: linear-gradient(270deg, rgba(190, 92, 108, 0.24) 0%, rgba(190, 92, 108, 0.14) 100%);
+  animation: mandatoryHoldUnpay 1.35s linear forwards;
+}
+
+@keyframes mandatoryHoldPay {
+  from { width: 0%; }
+  to { width: 100%; }
+}
+
+@keyframes mandatoryHoldUnpay {
+  from { width: 0%; }
+  to { width: 100%; }
+}
+
+.mandatory-payments-footer {
+  display: flex;
+  justify-content: flex-start;
+}
+
+#openMandatoryPaymentEditorBtn {
+  min-width: 182px;
+}
+
+#mandatoryPaymentEditorModal {
+  z-index: 145;
+}
+
+.mandatory-editor-card .modal-actions {
+  margin-top: 10px;
+}
+
+.mandatory-editor-actions {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+@media (max-width: 420px) {
+  .mandatory-payment-card__status-wrap {
+    min-width: 78px;
+  }
+
+  .mandatory-payment-card__status {
+    font-size: 10px;
+  }
+
+  .mandatory-editor-actions {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .mandatory-editor-actions #deleteMandatoryPaymentBtn {
+    grid-column: 1 / -1;
+  }
+}
