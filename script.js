@@ -76,6 +76,8 @@ const mandatoryPaymentAmountInput = document.getElementById("mandatoryPaymentAmo
 const mandatoryPaymentDueDayInput = document.getElementById("mandatoryPaymentDueDayInput");
 const mandatoryPaymentLinkedSafeSelect = document.getElementById("mandatoryPaymentLinkedSafeSelect");
 const addMandatoryPaymentBtn = document.getElementById("addMandatoryPaymentBtn");
+const deleteMandatoryPaymentBtn = document.getElementById("deleteMandatoryPaymentBtn");
+const resetMandatoryPaymentBtn = document.getElementById("resetMandatoryPaymentBtn");
 
   const modalTitle = modal?.querySelector(".modal-title");
 
@@ -210,6 +212,9 @@ let activeBudgetCategoryId = null;
 let activeAnalyticsCategoryId = null;
 let activeSafeBucketAmountId = null;
 let activeAccountId = null;
+let activeMandatoryPaymentId = null;
+let mandatoryLongPressTimer = null;
+let mandatoryLongPressTriggered = false;
 
   const UNCATEGORIZED_ID = "uncategorized";
 
@@ -854,9 +859,133 @@ function getMandatoryPaymentsCoverageStats(monthKey = getCurrentMonthKey()) {
   };
 }
 
+function resetMandatoryPaymentForm() {
+  activeMandatoryPaymentId = null;
+
+  mandatoryPaymentTitleInput.value = "";
+  mandatoryPaymentAmountInput.value = "";
+  mandatoryPaymentDueDayInput.value = "";
+  if (mandatoryPaymentLinkedSafeSelect) {
+    mandatoryPaymentLinkedSafeSelect.value = "";
+  }
+
+  if (addMandatoryPaymentBtn) {
+    addMandatoryPaymentBtn.textContent = "Добавить платёж";
+  }
+
+  deleteMandatoryPaymentBtn?.classList.add("hidden");
+}
+
+function openMandatoryPaymentEditor(paymentId) {
+  const item = state.mandatoryPayments.find((entry) => entry.id === paymentId);
+  if (!item) return;
+
+  activeMandatoryPaymentId = paymentId;
+
+  mandatoryPaymentTitleInput.value = item.title || "";
+  mandatoryPaymentAmountInput.value = String(Number(item.amount) || 0).replace(".", ",");
+  mandatoryPaymentDueDayInput.value = buildDateFromDueDay(item.due_day);
+  if (mandatoryPaymentLinkedSafeSelect) {
+    mandatoryPaymentLinkedSafeSelect.value = item.linked_safe_bucket_id || "";
+  }
+
+  if (addMandatoryPaymentBtn) {
+    addMandatoryPaymentBtn.textContent = "Сохранить платёж";
+  }
+
+  deleteMandatoryPaymentBtn?.classList.remove("hidden");
+
+  mandatoryPaymentTitleInput.focus();
+}
+
+function buildDateFromDueDay(dueDay) {
+  const currentMonth = getCurrentMonthValue();
+  const [year, month] = currentMonth.split("-");
+  const safeDay = String(Math.min(31, Math.max(1, Number(dueDay) || 1))).padStart(2, "0");
+  return `${year}-${month}-${safeDay}`;
+}
+
+async function toggleMandatoryPaymentPaid(paymentId) {
+  const item = state.mandatoryPayments.find((entry) => entry.id === paymentId);
+  if (!item) return false;
+
+  const currentMonthKey = getCurrentMonthKey();
+  const isPaid = item.last_paid_period === currentMonthKey;
+
+  item.last_paid_period = isPaid ? "" : currentMonthKey;
+
+  const ok = await saveMandatoryPaymentsToMeta();
+  if (!ok) return false;
+
+  renderMandatoryPaymentsModal();
+  renderAll();
+  return true;
+}
+
+function startMandatoryPaymentLongPress(card, item) {
+  if (!card || !item) return;
+
+  const currentMonthKey = getCurrentMonthKey();
+  const isPaid = item.last_paid_period === currentMonthKey;
+
+  mandatoryLongPressTriggered = false;
+
+  card.classList.remove(
+    "mandatory-payment-card--hold-pay",
+    "mandatory-payment-card--hold-unpay"
+  );
+
+  card.classList.add(
+    isPaid ? "mandatory-payment-card--hold-unpay" : "mandatory-payment-card--hold-pay"
+  );
+
+  mandatoryLongPressTimer = window.setTimeout(async () => {
+    mandatoryLongPressTriggered = true;
+    await toggleMandatoryPaymentPaid(item.id);
+  }, 1350);
+}
+
+function cancelMandatoryPaymentLongPress(card) {
+  window.clearTimeout(mandatoryLongPressTimer);
+  mandatoryLongPressTimer = null;
+
+  if (card) {
+    card.classList.remove(
+      "mandatory-payment-card--hold-pay",
+      "mandatory-payment-card--hold-unpay"
+    );
+  }
+}
+
+function bindMandatoryPaymentPress(card, item) {
+  if (!card || !item) return;
+
+  card.addEventListener("pointerdown", (event) => {
+    if (event.pointerType === "mouse" && event.button !== 0) return;
+    startMandatoryPaymentLongPress(card, item);
+  });
+
+  card.addEventListener("pointerup", () => {
+    const triggered = mandatoryLongPressTriggered;
+    cancelMandatoryPaymentLongPress(card);
+
+    if (!triggered) {
+      openMandatoryPaymentEditor(item.id);
+    }
+  });
+
+  card.addEventListener("pointerleave", () => {
+    cancelMandatoryPaymentLongPress(card);
+  });
+
+  card.addEventListener("pointercancel", () => {
+    cancelMandatoryPaymentLongPress(card);
+  });
+}
+
 function openMandatoryPaymentsModal() {
   fillMandatoryPaymentSafeSelect();
-  mandatoryPaymentDueDayInput.value = mandatoryPaymentDueDayInput.value || getTodayDateValue();
+  resetMandatoryPaymentForm();
   renderMandatoryPaymentsModal();
   mandatoryPaymentsModal.classList.remove("hidden");
   document.body.style.overflow = "hidden";
@@ -865,12 +994,7 @@ function openMandatoryPaymentsModal() {
 function closeMandatoryPaymentsModal() {
   mandatoryPaymentsModal.classList.add("hidden");
   document.body.style.overflow = "";
-  mandatoryPaymentTitleInput.value = "";
-  mandatoryPaymentAmountInput.value = "";
-  mandatoryPaymentDueDayInput.value = "";
-  if (mandatoryPaymentLinkedSafeSelect) {
-    mandatoryPaymentLinkedSafeSelect.value = "";
-  }
+  resetMandatoryPaymentForm();
 }
 
 function renderMandatoryPaymentsModal() {
@@ -913,81 +1037,39 @@ function renderMandatoryPaymentsModal() {
         ? `накопление: ${linkedSafeName} • покрыто ${formatMoney(covered)}`
         : "без привязки к накоплению";
 
-      const card = document.createElement("div");
-      card.className = "list-card";
+      const card = document.createElement("button");
+      card.type = "button";
+      card.className = `list-card list-card--clickable mandatory-payment-card${isPaid ? " mandatory-payment-card--paid" : ""}`;
+      card.dataset.mandatoryId = item.id;
+      card.dataset.paid = String(isPaid);
+
       card.innerHTML = `
-  <div class="list-body">
-    <div class="list-title-row">
-      <h3 class="list-title">${escapeHtml(item.title)}</h3>
-    </div>
-    <p class="list-subtitle">
-      ${formatMoney(item.amount)} • до ${String(item.due_day).padStart(2, "0")} числа • ${coverageText} • ${isPaid ? "Оплачен" : "Не оплачен"}
-    </p>
-  </div>
+        <div class="mandatory-payment-card__progress"></div>
 
-  <div class="category-manager-actions">
-  <button
-    class="icon-action-btn icon-action-btn--toggle ${isPaid ? "is-active" : ""}"
-    type="button"
-    data-toggle-mandatory-id="${item.id}"
-    aria-label="${isPaid ? "Снять оплату" : "Отметить как оплаченный"}"
-    title="${isPaid ? "Снять оплату" : "Отметить как оплаченный"}"
-  >
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M5 12.5 9.2 16.5 19 7.5" />
-    </svg>
-  </button>
+        <div class="list-body">
+          <div class="list-title-row">
+            <h3 class="list-title">${escapeHtml(item.title)}</h3>
+          </div>
+          <p class="list-subtitle">
+            ${formatMoney(item.amount)} • до ${String(item.due_day).padStart(2, "0")} числа • ${coverageText}
+          </p>
+        </div>
 
-  <button
-    class="icon-action-btn icon-action-btn--danger"
-    type="button"
-    data-delete-mandatory-id="${item.id}"
-    aria-label="Удалить платёж"
-    title="Удалить платёж"
-  >
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-      <path d="M5 7h14" />
-      <path d="M9 7V5h6v2" />
-      <path d="M8 7l1 12h6l1-12" />
-      <path d="M10 11v5M14 11v5" />
-    </svg>
-  </button>
-</div>
+        <div class="list-right mandatory-payment-card__status-wrap">
+          <p class="mandatory-payment-card__status ${isPaid ? "is-paid" : "is-unpaid"}">
+            ${isPaid ? "Оплачен" : "Не оплачен"}
+          </p>
+        </div>
       `;
 
-      card.querySelector("[data-toggle-mandatory-id]")?.addEventListener("click", async () => {
-        const target = state.mandatoryPayments.find((entry) => entry.id === item.id);
-        if (!target) return;
-
-        target.last_paid_period = isPaid ? "" : currentMonthKey;
-
-        const ok = await saveMandatoryPaymentsToMeta();
-        if (!ok) return;
-
-        renderMandatoryPaymentsModal();
-        renderAll();
-      });
-
-      card.querySelector("[data-delete-mandatory-id]")?.addEventListener("click", async () => {
-        const ok = confirm(`Удалить обязательный платёж "${item.title}"?`);
-        if (!ok) return;
-
-        state.mandatoryPayments = state.mandatoryPayments.filter((entry) => entry.id !== item.id);
-
-        const saved = await saveMandatoryPaymentsToMeta();
-        if (!saved) return;
-
-        renderMandatoryPaymentsModal();
-        renderAll();
-      });
-
+      bindMandatoryPaymentPress(card, item);
       mandatoryPaymentsList.appendChild(card);
     });
 }
 
-  async function addMandatoryPayment() {
+async function saveMandatoryPayment() {
   const title = mandatoryPaymentTitleInput.value.trim();
-  const amount = Number(mandatoryPaymentAmountInput.value);
+  const amount = Number(String(mandatoryPaymentAmountInput.value).replace(",", "."));
   const dueDateValue = mandatoryPaymentDueDayInput.value;
   const linkedSafeBucketId = mandatoryPaymentLinkedSafeSelect?.value || "";
 
@@ -1008,26 +1090,51 @@ function renderMandatoryPaymentsModal() {
 
   const dueDay = new Date(`${dueDateValue}T00:00:00`).getDate();
 
-  state.mandatoryPayments.push({
-    id: crypto.randomUUID(),
-    title,
-    amount: roundToTwo(amount),
-    due_day: dueDay,
-    linked_safe_bucket_id: linkedSafeBucketId,
-    enabled: true,
-    last_paid_period: "",
-  });
+  if (activeMandatoryPaymentId) {
+    const target = state.mandatoryPayments.find((entry) => entry.id === activeMandatoryPaymentId);
+    if (!target) return;
+
+    target.title = title;
+    target.amount = roundToTwo(amount);
+    target.due_day = dueDay;
+    target.linked_safe_bucket_id = linkedSafeBucketId;
+  } else {
+    state.mandatoryPayments.push({
+      id: crypto.randomUUID(),
+      title,
+      amount: roundToTwo(amount),
+      due_day: dueDay,
+      linked_safe_bucket_id: linkedSafeBucketId,
+      enabled: true,
+      last_paid_period: "",
+    });
+  }
 
   const ok = await saveMandatoryPaymentsToMeta();
   if (!ok) return;
 
-  mandatoryPaymentTitleInput.value = "";
-  mandatoryPaymentAmountInput.value = "";
-  mandatoryPaymentDueDayInput.value = "";
-  if (mandatoryPaymentLinkedSafeSelect) {
-    mandatoryPaymentLinkedSafeSelect.value = "";
-  }
+  resetMandatoryPaymentForm();
+  renderMandatoryPaymentsModal();
+  renderAll();
+}
 
+async function deleteMandatoryPaymentFromEditor() {
+  if (!activeMandatoryPaymentId) return;
+
+  const target = state.mandatoryPayments.find((entry) => entry.id === activeMandatoryPaymentId);
+  if (!target) return;
+
+  const ok = confirm(`Удалить обязательный платёж "${target.title}"?`);
+  if (!ok) return;
+
+  state.mandatoryPayments = state.mandatoryPayments.filter(
+    (entry) => entry.id !== activeMandatoryPaymentId
+  );
+
+  const saved = await saveMandatoryPaymentsToMeta();
+  if (!saved) return;
+
+  resetMandatoryPaymentForm();
   renderMandatoryPaymentsModal();
   renderAll();
 }
@@ -3997,7 +4104,9 @@ faqModal?.addEventListener("click", (event) => {
   closeSafeBucketsModalBtn?.addEventListener("click", closeSafeBucketsModal);
   openMandatoryPaymentsModalBtn?.addEventListener("click", openMandatoryPaymentsModal);
 closeMandatoryPaymentsModalBtn?.addEventListener("click", closeMandatoryPaymentsModal);
-addMandatoryPaymentBtn?.addEventListener("click", addMandatoryPayment);
+addMandatoryPaymentBtn?.addEventListener("click", saveMandatoryPayment);
+deleteMandatoryPaymentBtn?.addEventListener("click", deleteMandatoryPaymentFromEditor);
+resetMandatoryPaymentBtn?.addEventListener("click", resetMandatoryPaymentForm);
 addSafeBucketBtn?.addEventListener("click", addSafeBucket);
 closeSafeBucketAmountModalBtn?.addEventListener("click", closeSafeBucketAmountModal);
 cancelSafeBucketAmountBtn?.addEventListener("click", closeSafeBucketAmountModal);
