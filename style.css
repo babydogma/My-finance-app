@@ -537,6 +537,40 @@ button {
   -webkit-backdrop-filter: blur(10px);
 }
 
+#transactionsList .list-card--delete-telegram,
+#operationsTransactionsList .list-card--delete-telegram,
+#analyticsCategoryTransactionsList .list-card--delete-telegram {
+  pointer-events: none;
+  transform-origin: center top;
+  animation: telegramDeleteCollapse 0.26s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes telegramDeleteCollapse {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+    max-height: 96px;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-top: 12px;
+    padding-bottom: 12px;
+  }
+  35% {
+    opacity: 0.92;
+    transform: scale(0.985);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.94);
+    max-height: 0;
+    margin-top: 0;
+    margin-bottom: -12px;
+    padding-top: 0;
+    padding-bottom: 0;
+    border-width: 0;
+  }
+}
+
 #transactionsList .list-card--fresh-sticker {
   transform-origin: 18% 14%;
   will-change: transform, opacity;
@@ -2829,6 +2863,12 @@ input[type="date"]::-webkit-calendar-picker-indicator {
    #transactionsList .list-card--fresh-sticker {
   animation-duration: 1.16s;
 }
+
+  #transactionsList .list-card--delete-telegram,
+  #operationsTransactionsList .list-card--delete-telegram,
+  #analyticsCategoryTransactionsList .list-card--delete-telegram {
+    animation-duration: 0.24s;
+  }
 }
 
 /* =========================================================
