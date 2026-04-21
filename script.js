@@ -233,6 +233,8 @@ let mandatoryPressStartY = 0;
 let mandatoryPressMoved = false;
 let mandatoryLongPressTriggered = false;
 let justCreatedTransactionId = null;
+const MODAL_ANIMATION_MS = 320;
+const modalCloseTimers = new WeakMap();
 
   const UNCATEGORIZED_ID = "uncategorized";
 
@@ -991,16 +993,17 @@ function resetMandatoryPaymentForm() {
 }
 
 function closeMandatoryPaymentEditorModal() {
-  mandatoryPaymentEditorModal?.classList.add("hidden");
-  mandatoryPaymentBucketPickerModal?.classList.add("hidden");
+  closeAnimatedModal(mandatoryPaymentBucketPickerModal, { keepBodyLocked: true });
+closeAnimatedModal(
+  mandatoryPaymentEditorModal,
+  { keepBodyLocked: Boolean(mandatoryPaymentsModal && !mandatoryPaymentsModal.classList.contains("hidden")) }
+);
 
-  if (mandatoryPaymentsModal && !mandatoryPaymentsModal.classList.contains("hidden")) {
-    document.body.style.overflow = "hidden";
-  } else {
-    document.body.style.overflow = "";
-  }
+if (mandatoryPaymentsModal && !mandatoryPaymentsModal.classList.contains("hidden")) {
+  document.body.style.overflow = "hidden";
+}
 
-  resetMandatoryPaymentForm();
+resetMandatoryPaymentForm();
 }
 
 function openMandatoryPaymentEditor(paymentId) {
@@ -1240,22 +1243,21 @@ function bindMandatoryPaymentPress(card, item) {
 }
 
 function openMandatoryPaymentEditorModal() {
-  mandatoryPaymentEditorModal?.classList.remove("hidden");
-  document.body.style.overflow = "hidden";
+  openAnimatedModal(mandatoryPaymentEditorModal);
+document.body.style.overflow = "hidden";
 }
 
 function closeMandatoryPaymentsModal() {
-  mandatoryPaymentsModal?.classList.add("hidden");
-  mandatoryPaymentEditorModal?.classList.add("hidden");
-  mandatoryPaymentBucketPickerModal?.classList.add("hidden");
-  document.body.style.overflow = "";
-  resetMandatoryPaymentForm();
+  closeAnimatedModal(mandatoryPaymentBucketPickerModal, { keepBodyLocked: true });
+closeAnimatedModal(mandatoryPaymentEditorModal, { keepBodyLocked: true });
+closeAnimatedModal(mandatoryPaymentsModal);
+resetMandatoryPaymentForm();
 }
 
 function openMandatoryPaymentsModal() {
   renderMandatoryPaymentsModal();
-  mandatoryPaymentsModal?.classList.remove("hidden");
-  document.body.style.overflow = "hidden";
+  openAnimatedModal(mandatoryPaymentsModal);
+document.body.style.overflow = "hidden";
 }
 
 function renderMandatoryPaymentsModal() {
@@ -1876,14 +1878,13 @@ function updateAnalyticsWheelDraftFromScroll() {
 
 
 function openAnalyticsFiltersModal() {
-  analyticsFiltersModal?.classList.remove("hidden");
-  document.body.style.overflow = "hidden";
+  openAnimatedModal(analyticsFiltersModal);
+document.body.style.overflow = "hidden";
 }
 
 function closeAnalyticsFiltersModal() {
-  analyticsFiltersModal?.classList.add("hidden");
-  closeAnalyticsMonthWheel();
-  document.body.style.overflow = "";
+  closeAnimatedModal(analyticsFiltersModal);
+closeAnalyticsMonthWheel();
 }
 
   function getAnalyticsPeriodLabel() {
@@ -2047,6 +2048,50 @@ function buildFaqFormulaText(faqKey) {
   return "Формула недоступна для этого показателя.";
 }
 
+function openAnimatedModal(modalEl) {
+  if (!modalEl) return;
+
+  const existingTimer = modalCloseTimers.get(modalEl);
+  if (existingTimer) {
+    clearTimeout(existingTimer);
+    modalCloseTimers.delete(modalEl);
+  }
+
+  modalEl.classList.remove("hidden", "is-closing");
+
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      modalEl.classList.add("is-visible");
+    });
+  });
+}
+
+function closeAnimatedModal(modalEl, options = {}) {
+  if (!modalEl) return;
+
+  const { keepBodyLocked = false } = options;
+
+  if (modalEl.classList.contains("hidden")) {
+    if (!keepBodyLocked) document.body.style.overflow = "";
+    return;
+  }
+
+  modalEl.classList.remove("is-visible");
+  modalEl.classList.add("is-closing");
+
+  const timer = window.setTimeout(() => {
+    modalEl.classList.add("hidden");
+    modalEl.classList.remove("is-closing");
+    modalCloseTimers.delete(modalEl);
+
+    if (!keepBodyLocked) {
+      document.body.style.overflow = "";
+    }
+  }, MODAL_ANIMATION_MS);
+
+  modalCloseTimers.set(modalEl, timer);
+}
+
 function openFaqModal(faqKey) {
   const meta = FAQ_META[faqKey];
   if (!meta || !faqModal) return;
@@ -2055,15 +2100,14 @@ function openFaqModal(faqKey) {
   faqModalText.textContent = meta.text;
   faqModalFormula.textContent = buildFaqFormulaText(faqKey);
 
-  faqModal.classList.remove("hidden");
-  document.body.style.overflow = "hidden";
+  openAnimatedModal(faqModal);
+document.body.style.overflow = "hidden";
 }
 
 function closeFaqModal() {
   if (!faqModal) return;
 
-  faqModal.classList.add("hidden");
-  document.body.style.overflow = "";
+  closeAnimatedModal(faqModal);
 }
 
 function animateCurrencyValue(el, value, options = {}) {
@@ -2546,14 +2590,12 @@ function openBudgetModal(categoryId) {
     deleteCategoryBtn.classList.toggle("hidden", Boolean(category.locked));
   }
 
-  budgetModal.classList.remove("hidden");
-  document.body.style.overflow = "hidden";
-}
+  openAnimatedModal(budgetModal);
+document.body.style.overflow = "hidden";
 
 function closeBudgetModal() {
-  budgetModal.classList.add("hidden");
-  document.body.style.overflow = "";
-  activeBudgetCategoryId = null;
+  closeAnimatedModal(budgetModal);
+activeBudgetCategoryId = null;
   budgetCategoryNameInput.value = "";
   budgetCategoryRequiredInput.checked = false;
   budgetAmountInput.value = "";
@@ -2602,8 +2644,8 @@ function openCreateAccountModal() {
   deleteAccountModalBtn?.classList.add("hidden");
   syncAccountPrimaryControls();
 
-  accountModal.classList.remove("hidden");
-  document.body.style.overflow = "hidden";
+  openAnimatedModal(accountModal);
+document.body.style.overflow = "hidden";
 }
 
 function openAccountModal(accountId) {
@@ -2620,16 +2662,15 @@ function openAccountModal(accountId) {
   deleteAccountModalBtn?.classList.remove("hidden");
   syncAccountPrimaryControls();
 
-  accountModal.classList.remove("hidden");
-  document.body.style.overflow = "hidden";
+  openAnimatedModal(accountModal);
+document.body.style.overflow = "hidden";
 }
 
 function closeAccountModal() {
   if (!accountModal) return;
 
-  accountModal.classList.add("hidden");
-  document.body.style.overflow = "";
-  activeAccountId = null;
+  closeAnimatedModal(accountModal);
+activeAccountId = null;
 
   accountNameInput.value = "";
   accountRoleSelect.value = "spend";
@@ -2785,16 +2826,15 @@ function openSafeBucketsModal() {
   safeBucketsModalTitle.textContent = getSafeAccountName() || "Накопления";
   renderSafeBucketsModal();
 
-  safeBucketsModal.classList.remove("hidden");
-  document.body.style.overflow = "hidden";
+  openAnimatedModal(safeBucketsModal);
+document.body.style.overflow = "hidden";
 }
 
 function closeSafeBucketsModal() {
   if (!safeBucketsModal) return;
 
-  safeBucketsModal.classList.add("hidden");
-  document.body.style.overflow = "";
-  newSafeBucketNameInput.value = "";
+  closeAnimatedModal(safeBucketsModal);
+newSafeBucketNameInput.value = "";
 }
 
 function openSafeBucketAmountModal(bucketId) {
@@ -2814,18 +2854,20 @@ function openSafeBucketAmountModal(bucketId) {
     deleteSafeBucketBtn.classList.toggle("hidden", Boolean(bucket.is_locked));
   }
 
-  safeBucketAmountModal.classList.remove("hidden");
+  openAnimatedModal(safeBucketAmountModal);
+window.setTimeout(() => {
   safeBucketAmountInput.focus();
   safeBucketAmountInput.select();
+}, 120);
 }
 
 function closeSafeBucketAmountModal() {
   if (!safeBucketAmountModal) return;
 
-  safeBucketAmountModal.classList.add("hidden");
-  activeSafeBucketAmountId = null;
-  safeBucketNameInput.value = "";
-  safeBucketAmountInput.value = "";
+  closeAnimatedModal(safeBucketAmountModal);
+activeSafeBucketAmountId = null;
+safeBucketNameInput.value = "";
+safeBucketAmountInput.value = "";
 
   if (deleteSafeBucketBtn) {
     deleteSafeBucketBtn.classList.add("hidden");
@@ -2838,14 +2880,16 @@ function openSafeInterestRateModal() {
   safeInterestRateCurrentValue.textContent = `Сейчас: ${formatPercentLabel(annualRate)}`;
   safeInterestRateInput.value = String(roundToTwo(annualRate * 100)).replace(".", ",");
 
-  safeInterestRateModal.classList.remove("hidden");
+  openAnimatedModal(safeInterestRateModal);
+window.setTimeout(() => {
   safeInterestRateInput.focus();
   safeInterestRateInput.select();
+}, 120);
 }
 
 function closeSafeInterestRateModal() {
-  safeInterestRateModal.classList.add("hidden");
-  safeInterestRateInput.value = "";
+  closeAnimatedModal(safeInterestRateModal);
+safeInterestRateInput.value = "";
 }
 
 async function saveSafeInterestRate() {
@@ -3118,14 +3162,13 @@ async function deleteSafeBucketFromModal() {
       });
     }
 
-    analyticsCategoryModal.classList.remove("hidden");
-    document.body.style.overflow = "hidden";
+    openAnimatedModal(analyticsCategoryModal);
+document.body.style.overflow = "hidden";
   }
 
   function closeAnalyticsCategoryModal() {
-    analyticsCategoryModal.classList.add("hidden");
-    activeAnalyticsCategoryId = null;
-    document.body.style.overflow = "";
+    closeAnimatedModal(analyticsCategoryModal);
+activeAnalyticsCategoryId = null;
   }
 
   function resetForm() {
@@ -3223,9 +3266,8 @@ toAccountSelect.value = cashFallbackId;
   updateTransferSafeFields();
 }
 
-    modal.classList.remove("hidden");
-    document.body.style.overflow = "hidden";
-  }
+    openAnimatedModal(modal);
+document.body.style.overflow = "hidden";
 
   function openEditModal(transactionId) {
     const transaction = state.transactions.find((item) => item.id === transactionId);
@@ -3320,10 +3362,8 @@ toAccountSelect.value = transaction.to_account_id || "";
   }
 
   function closeModal() {
-    modal.classList.add("hidden");
-    document.body.style.overflow = "";
-    editingTransactionId = null;
-  }
+    closeAnimatedModal(modal);
+editingTransactionId = null;
 
   function getAccountBalance(accountNameOrId) {
   const account =
@@ -4476,16 +4516,16 @@ openMandatoryPaymentBucketPickerBtn?.addEventListener("click", () => {
   if (!isVaultAccountId(accountId)) return;
 
   renderMandatoryPaymentBucketPicker();
-  mandatoryPaymentBucketPickerModal?.classList.remove("hidden");
+  openAnimatedModal(mandatoryPaymentBucketPickerModal);
 });
 
 closeMandatoryPaymentBucketPickerModalBtn?.addEventListener("click", () => {
-  mandatoryPaymentBucketPickerModal?.classList.add("hidden");
+  closeAnimatedModal(mandatoryPaymentBucketPickerModal, { keepBodyLocked: true });
 });
 
 mandatoryPaymentBucketPickerModal?.addEventListener("click", (event) => {
   if (event.target === mandatoryPaymentBucketPickerModal) {
-    mandatoryPaymentBucketPickerModal.classList.add("hidden");
+    closeAnimatedModal(mandatoryPaymentBucketPickerModal, { keepBodyLocked: true });
   }
 });
 
