@@ -3857,20 +3857,12 @@ function getAccountRoleFlags(role) {
   });
 
   if (freshCard) {
-    if (shouldScrollToFreshTransaction) {
-  window.setTimeout(() => {
-    freshCard.scrollIntoView({
-      behavior: "smooth",
-      block: "nearest",
-    });
-  }, 240);
-}
 
     window.setTimeout(() => {
       freshCard?.classList.remove("list-card--fresh-sticker");
       justCreatedTransactionId = null;
       shouldScrollToFreshTransaction = false;
-    }, 4300);
+    }, 2200);
   } else if (justCreatedTransactionId) {
     justCreatedTransactionId = null;
     shouldScrollToFreshTransaction = false;
