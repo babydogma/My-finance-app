@@ -1213,21 +1213,22 @@ function bindMandatoryPaymentPress(card, item) {
 }
 
 function openMandatoryPaymentEditorModal() {
-  fillMandatoryPaymentAccountSelect("");
-  fillMandatoryPaymentSafeSelect("");
-  syncMandatoryPaymentLinkedSafeField();
-
-  if (openMandatoryPaymentBucketPickerBtn) {
-    openMandatoryPaymentBucketPickerBtn.textContent = "Выбрать накопление";
-  }
-
   mandatoryPaymentEditorModal?.classList.remove("hidden");
+  document.body.style.overflow = "hidden";
 }
 
 function closeMandatoryPaymentsModal() {
-  mandatoryPaymentsModal.classList.add("hidden");
+  mandatoryPaymentsModal?.classList.add("hidden");
+  mandatoryPaymentEditorModal?.classList.add("hidden");
+  mandatoryPaymentBucketPickerModal?.classList.add("hidden");
   document.body.style.overflow = "";
   resetMandatoryPaymentForm();
+}
+
+function openMandatoryPaymentsModal() {
+  renderMandatoryPaymentsModal();
+  mandatoryPaymentsModal?.classList.remove("hidden");
+  document.body.style.overflow = "hidden";
 }
 
 function renderMandatoryPaymentsModal() {
@@ -4369,6 +4370,14 @@ faqModal?.addEventListener("click", (event) => {
 closeMandatoryPaymentsModalBtn?.addEventListener("click", closeMandatoryPaymentsModal);
 openMandatoryPaymentEditorBtn?.addEventListener("click", () => {
   resetMandatoryPaymentForm();
+  fillMandatoryPaymentAccountSelect("");
+  fillMandatoryPaymentSafeSelect("");
+  syncMandatoryPaymentLinkedSafeField();
+
+  if (openMandatoryPaymentBucketPickerBtn) {
+    openMandatoryPaymentBucketPickerBtn.textContent = "Выбрать накопление";
+  }
+
   openMandatoryPaymentEditorModal();
 });
 
