@@ -210,6 +210,7 @@ const operationsRangeToInput = document.getElementById("operationsRangeToInput")
   let analyticsSelectedMonth = getCurrentMonthValue();
   let analyticsRangeStart = "";
   let analyticsRangeEnd = "";
+  let analyticsOperationType = "all";
   
   let analyticsTab = "overview";
   
@@ -985,15 +986,16 @@ function resetMandatoryPaymentForm() {
   deleteMandatoryPaymentBtn?.classList.add("hidden");
 }
 
-function openMandatoryPaymentEditorModal() {
-  mandatoryPaymentEditorModal?.classList.remove("hidden");
-  document.body.style.overflow = "hidden";
-}
-
 function closeMandatoryPaymentEditorModal() {
   mandatoryPaymentEditorModal?.classList.add("hidden");
   mandatoryPaymentBucketPickerModal?.classList.add("hidden");
-  document.body.style.overflow = "hidden";
+
+  if (mandatoryPaymentsModal && !mandatoryPaymentsModal.classList.contains("hidden")) {
+    document.body.style.overflow = "hidden";
+  } else {
+    document.body.style.overflow = "";
+  }
+
   resetMandatoryPaymentForm();
 }
 
@@ -4367,9 +4369,6 @@ faqModal?.addEventListener("click", (event) => {
 closeMandatoryPaymentsModalBtn?.addEventListener("click", closeMandatoryPaymentsModal);
 openMandatoryPaymentEditorBtn?.addEventListener("click", () => {
   resetMandatoryPaymentForm();
-  fillMandatoryPaymentAccountSelect("");
-  fillMandatoryPaymentSafeSelect("");
-  syncMandatoryPaymentLinkedSafeField();
   openMandatoryPaymentEditorModal();
 });
 
