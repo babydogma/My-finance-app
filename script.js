@@ -233,7 +233,6 @@ let mandatoryPressStartY = 0;
 let mandatoryPressMoved = false;
 let mandatoryLongPressTriggered = false;
 let justCreatedTransactionId = null;
-let shouldScrollToFreshTransaction = false;
 
   const UNCATEGORIZED_ID = "uncategorized";
 
