@@ -543,32 +543,8 @@ button {
   position: relative;
   overflow: hidden;
   pointer-events: none;
-  will-change: transform, opacity, filter, max-height, padding, margin, border-width;
-  max-height: 96px;
-  animation:
-    telegramDeleteDust 0.7s cubic-bezier(0.22, 0.8, 0.22, 1) forwards,
-    telegramDeleteCollapseFlow 0.86s cubic-bezier(0.22, 0.8, 0.22, 1) forwards;
-}
-
-#transactionsList .list-card--delete-telegram::before,
-#operationsTransactionsList .list-card--delete-telegram::before,
-#analyticsCategoryTransactionsList .list-card--delete-telegram::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background:
-    linear-gradient(
-      90deg,
-      rgba(255,255,255,0) 0%,
-      rgba(255,255,255,0.018) 18%,
-      rgba(255,255,255,0.045) 42%,
-      rgba(255,255,255,0.018) 70%,
-      rgba(255,255,255,0) 100%
-    );
-  opacity: 0;
-  transform: translate3d(0, 0, 0);
-  pointer-events: none;
-  animation: telegramDeleteShatter 0.7s cubic-bezier(0.22, 0.8, 0.22, 1) forwards;
+  will-change: transform, opacity;
+  animation: telegramDeleteDustCard 0.68s cubic-bezier(0.22, 0.8, 0.22, 1) forwards;
 }
 
 #transactionsList .list-card--delete-telegram::after,
@@ -588,7 +564,7 @@ button {
     radial-gradient(circle at 68% 38%, rgba(255,255,255,0.16) 0 1.2px, transparent 1.9px),
     radial-gradient(circle at 79% 58%, rgba(255,255,255,0.12) 0 1.05px, transparent 1.7px),
     radial-gradient(circle at 88% 30%, rgba(255,255,255,0.16) 0 1.2px, transparent 1.9px);
-  animation: telegramDeleteDustParticles 0.7s cubic-bezier(0.22, 0.8, 0.22, 1) forwards;
+  animation: telegramDeleteDustParticles 0.68s cubic-bezier(0.22, 0.8, 0.22, 1) forwards;
 }
 
 #transactionsList .list-card--delete-telegram .list-body,
@@ -597,20 +573,27 @@ button {
 #operationsTransactionsList .list-card--delete-telegram .list-right,
 #analyticsCategoryTransactionsList .list-card--delete-telegram .list-body,
 #analyticsCategoryTransactionsList .list-card--delete-telegram .list-right {
-  will-change: transform, opacity, filter;
-  animation: telegramDeleteDustContent 0.7s cubic-bezier(0.22, 0.8, 0.22, 1) forwards;
+  will-change: transform, opacity;
+  animation: telegramDeleteDustContent 0.68s cubic-bezier(0.22, 0.8, 0.22, 1) forwards;
 }
 
-@keyframes telegramDeleteDust {
+#transactionsList .list-card--reflow,
+#operationsTransactionsList .list-card--reflow,
+#analyticsCategoryTransactionsList .list-card--reflow {
+  transition: transform 0.42s cubic-bezier(0.22, 0.8, 0.22, 1);
+  will-change: transform;
+}
+
+@keyframes telegramDeleteDustCard {
   0% {
     opacity: 1;
     transform: translate3d(0, 0, 0) scale(1);
   }
-  26% {
+  22% {
     opacity: 0.98;
     transform: translate3d(-1px, 0, 0) scale(0.998);
   }
-  62% {
+  58% {
     opacity: 0.42;
     transform: translate3d(8px, -1px, 0) scale(0.992);
   }
@@ -620,66 +603,18 @@ button {
   }
 }
 
-@keyframes telegramDeleteCollapseFlow {
-  0% {
-    max-height: 96px;
-    padding-top: 12px;
-    padding-bottom: 12px;
-    margin-top: 0;
-    margin-bottom: 0;
-    border-width: 1px;
-  }
-  58% {
-    max-height: 96px;
-    padding-top: 12px;
-    padding-bottom: 12px;
-    margin-top: 0;
-    margin-bottom: 0;
-    border-width: 1px;
-  }
-  100% {
-    max-height: 0;
-    padding-top: 0;
-    padding-bottom: 0;
-    margin-top: 0;
-    margin-bottom: 0;
-    border-width: 0;
-  }
-}
-
 @keyframes telegramDeleteDustContent {
   0% {
     opacity: 1;
     transform: translate3d(0, 0, 0);
-    filter: blur(0);
   }
-  32% {
-    opacity: 0.9;
+  30% {
+    opacity: 0.88;
     transform: translate3d(3px, -1px, 0);
-    filter: blur(0.35px);
   }
   100% {
     opacity: 0;
-    transform: translate3d(14px, -2px, 0);
-    filter: blur(1.8px);
-  }
-}
-
-@keyframes telegramDeleteShatter {
-  0% {
-    opacity: 0;
-    transform: translate3d(0, 0, 0) scaleX(1);
-  }
-  26% {
-    opacity: 0.16;
-  }
-  58% {
-    opacity: 0.3;
-    transform: translate3d(8px, -1px, 0) scaleX(1.02);
-  }
-  100% {
-    opacity: 0;
-    transform: translate3d(18px, -2px, 0) scaleX(1.05);
+    transform: translate3d(15px, -2px, 0);
   }
 }
 
@@ -688,11 +623,11 @@ button {
     opacity: 0;
     transform: translate3d(0, 0, 0) scale(0.98);
   }
-  22% {
+  20% {
     opacity: 0.14;
   }
   54% {
-    opacity: 0.4;
+    opacity: 0.42;
   }
   100% {
     opacity: 0;
@@ -2994,22 +2929,25 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
   #transactionsList .list-card--delete-telegram,
-#operationsTransactionsList .list-card--delete-telegram,
-#analyticsCategoryTransactionsList .list-card--delete-telegram,
-#transactionsList .list-card--delete-telegram::before,
-#operationsTransactionsList .list-card--delete-telegram::before,
-#analyticsCategoryTransactionsList .list-card--delete-telegram::before,
-#transactionsList .list-card--delete-telegram::after,
-#operationsTransactionsList .list-card--delete-telegram::after,
-#analyticsCategoryTransactionsList .list-card--delete-telegram::after,
-#transactionsList .list-card--delete-telegram .list-body,
-#transactionsList .list-card--delete-telegram .list-right,
-#operationsTransactionsList .list-card--delete-telegram .list-body,
-#operationsTransactionsList .list-card--delete-telegram .list-right,
-#analyticsCategoryTransactionsList .list-card--delete-telegram .list-body,
-#analyticsCategoryTransactionsList .list-card--delete-telegram .list-right {
-  animation-duration: 0.76s;
-}
+  #operationsTransactionsList .list-card--delete-telegram,
+  #analyticsCategoryTransactionsList .list-card--delete-telegram,
+  #transactionsList .list-card--delete-telegram::after,
+  #operationsTransactionsList .list-card--delete-telegram::after,
+  #analyticsCategoryTransactionsList .list-card--delete-telegram::after,
+  #transactionsList .list-card--delete-telegram .list-body,
+  #transactionsList .list-card--delete-telegram .list-right,
+  #operationsTransactionsList .list-card--delete-telegram .list-body,
+  #operationsTransactionsList .list-card--delete-telegram .list-right,
+  #analyticsCategoryTransactionsList .list-card--delete-telegram .list-body,
+  #analyticsCategoryTransactionsList .list-card--delete-telegram .list-right {
+    animation-duration: 0.76s;
+  }
+
+  #transactionsList .list-card--reflow,
+  #operationsTransactionsList .list-card--reflow,
+  #analyticsCategoryTransactionsList .list-card--reflow {
+    transition-duration: 0.46s;
+  }
 }
 
 /* =========================================================
