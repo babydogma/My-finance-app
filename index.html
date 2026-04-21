@@ -747,29 +747,35 @@
 
     <div class="list" id="mandatoryPaymentsList"></div>
 
-    <div class="manager-card" style="margin-top:12px;">
-      <div class="field">
-        <input class="input" id="mandatoryPaymentTitleInput" type="text" placeholder="Например: Квартира" />
-      </div>
+    <div class="manager-card mandatory-editor-card" style="margin-top:12px;">
+  <div class="field">
+    <input class="input" id="mandatoryPaymentTitleInput" type="text" placeholder="Например: Квартира" />
+  </div>
 
-      <div class="field">
-        <input class="input" id="mandatoryPaymentAmountInput" type="number" placeholder="Сумма" />
-      </div>
+  <div class="field">
+    <input class="input" id="mandatoryPaymentAmountInput" type="number" placeholder="Сумма" />
+  </div>
 
-      <div class="field">
-  <input class="input" id="mandatoryPaymentDueDayInput" type="date" />
-</div>
+  <div class="field">
+    <input class="input" id="mandatoryPaymentDueDayInput" type="date" />
+  </div>
 
-<div class="field">
-  <select class="select" id="mandatoryPaymentLinkedSafeSelect">
-    <option value="">Без привязки к накоплению</option>
-  </select>
-</div>
+  <div class="field">
+    <select class="select" id="mandatoryPaymentLinkedSafeSelect">
+      <option value="">Без привязки к накоплению</option>
+    </select>
+  </div>
 
-<button class="btn btn-primary manager-add-btn" type="button" id="addMandatoryPaymentBtn">
-  Добавить платёж
-</button>
-    </div>
+  <div class="modal-actions modal-actions--triple mandatory-editor-actions">
+    <button class="btn btn-danger hidden" type="button" id="deleteMandatoryPaymentBtn">
+      Удалить
+    </button>
+    <button class="btn btn-secondary" type="button" id="resetMandatoryPaymentBtn">
+      Очистить
+    </button>
+    <button class="btn btn-primary" type="button" id="addMandatoryPaymentBtn">
+      Добавить платёж
+    </button>
   </div>
 </div>
 
