@@ -2107,6 +2107,48 @@ function animateCurrencyValue(el, value, options = {}) {
   requestAnimationFrame(frame);
 }
 
+function animateLabeledCurrencyValue(el, prefix, value, options = {}) {
+  if (!el) return;
+
+  const endValue = roundToTwo(Number(value) || 0);
+  const duration = options.duration || 1250;
+  const decimals = options.decimals ?? 2;
+
+  const prevRaw = Number(el.dataset.animatedValue || 0);
+  const startValue = Number.isFinite(prevRaw) ? prevRaw : 0;
+
+  if (Math.abs(endValue - startValue) < 0.009) {
+    el.textContent = `${prefix}${formatMoney(endValue)}`;
+    el.dataset.animatedValue = String(endValue);
+    return;
+  }
+
+  const startTime = performance.now();
+
+  const easeOutExpoSoft = (t) => {
+    if (t >= 1) return 1;
+    return 1 - Math.pow(2, -8 * t);
+  };
+
+  function frame(now) {
+    const progress = Math.min((now - startTime) / duration, 1);
+    const eased = easeOutExpoSoft(progress);
+    const current = startValue + (endValue - startValue) * eased;
+    const rounded = Number(current.toFixed(decimals));
+
+    el.textContent = `${prefix}${formatMoney(rounded)}`;
+
+    if (progress < 1) {
+      requestAnimationFrame(frame);
+    } else {
+      el.textContent = `${prefix}${formatMoney(endValue)}`;
+      el.dataset.animatedValue = String(endValue);
+    }
+  }
+
+  requestAnimationFrame(frame);
+}
+
 function getAnalyticsOverviewSummary() {
   const totalBalance = roundToTwo(calculateBalance());
   const freeMoney = roundToTwo(getFreeMoneyTotal());
@@ -3619,23 +3661,10 @@ function getAccountRoleFlags(role) {
   const balanceLabelEl = document.querySelector(".balance-label");
 
   animateCurrencyValue(balanceEl, balance, { duration: 1650, decimals: 2 });
-  animateCurrencyValue(balanceFreeMoneyValueEl, freeMoney, { duration: 1250, decimals: 2 });
-
-  if (balanceFreeMoneyValueEl) {
-    const originalRender = balanceFreeMoneyValueEl.textContent;
-    const observer = new MutationObserver(() => {
-      const current = balanceFreeMoneyValueEl.textContent.replace(/^.*?:\s*/, "");
-      balanceFreeMoneyValueEl.textContent = `Свободно: ${current}`;
-    });
-
-    observer.observe(balanceFreeMoneyValueEl, {
-      childList: true,
-      characterData: true,
-      subtree: true,
-    });
-
-    setTimeout(() => observer.disconnect(), 1800);
-  }
+  animateLabeledCurrencyValue(balanceFreeMoneyValueEl, "Свободно: ", freeMoney, {
+    duration: 1250,
+    decimals: 2,
+  });
 
   if (accountsTotalEl) {
     accountsTotalEl.textContent = "";
