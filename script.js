@@ -228,6 +228,9 @@ let activeAccountId = null;
 let activeMandatoryPaymentId = null;
 let mandatoryLongPressTimer = null;
 let mandatoryLongPressVisualTimer = null;
+let mandatoryPressStartX = 0;
+let mandatoryPressStartY = 0;
+let mandatoryPressMoved = false;
 let mandatoryLongPressTriggered = false;
 
   const UNCATEGORIZED_ID = "uncategorized";
@@ -1115,13 +1118,16 @@ async function createMandatoryPaymentExpense(item) {
   return true;
 }
 
-function startMandatoryPaymentLongPress(card, item) {
+function startMandatoryPaymentLongPress(card, item, startX = 0, startY = 0) {
   if (!card || !item) return;
 
   const currentMonthKey = getCurrentMonthKey();
   const isPaid = item.last_paid_period === currentMonthKey;
 
   mandatoryLongPressTriggered = false;
+  mandatoryPressMoved = false;
+  mandatoryPressStartX = startX;
+  mandatoryPressStartY = startY;
 
   card.classList.remove(
     "mandatory-payment-card--hold-pay",
@@ -1132,12 +1138,16 @@ function startMandatoryPaymentLongPress(card, item) {
   window.clearTimeout(mandatoryLongPressTimer);
 
   mandatoryLongPressVisualTimer = window.setTimeout(() => {
+    if (mandatoryPressMoved) return;
+
     card.classList.add(
       isPaid ? "mandatory-payment-card--hold-unpay" : "mandatory-payment-card--hold-pay"
     );
   }, 200);
 
   mandatoryLongPressTimer = window.setTimeout(async () => {
+    if (mandatoryPressMoved) return;
+
     mandatoryLongPressTriggered = true;
     await toggleMandatoryPaymentPaid(item.id);
   }, 1550);
@@ -1149,6 +1159,7 @@ function cancelMandatoryPaymentLongPress(card) {
 
   mandatoryLongPressVisualTimer = null;
   mandatoryLongPressTimer = null;
+  mandatoryPressMoved = false;
 
   if (card) {
     card.classList.remove(
@@ -1170,6 +1181,11 @@ function bindMandatoryPaymentPress(card, item) {
     }
   };
 
+  const cancelBecauseScroll = () => {
+    mandatoryPressMoved = true;
+    cancelMandatoryPaymentLongPress(card);
+  };
+
   card.addEventListener("contextmenu", (event) => {
     event.preventDefault();
   });
@@ -1184,30 +1200,40 @@ function bindMandatoryPaymentPress(card, item) {
 
   card.addEventListener("pointerdown", (event) => {
     if (event.pointerType === "mouse" && event.button !== 0) return;
-    event.preventDefault();
+
     stopNativeSelection();
-    startMandatoryPaymentLongPress(card, item);
+    startMandatoryPaymentLongPress(card, item, event.clientX, event.clientY);
   });
 
-  card.addEventListener("pointerup", (event) => {
-    event.preventDefault();
+  card.addEventListener("pointermove", (event) => {
+    const dx = Math.abs(event.clientX - mandatoryPressStartX);
+    const dy = Math.abs(event.clientY - mandatoryPressStartY);
+
+    if (dx > 10 || dy > 10) {
+      cancelBecauseScroll();
+    }
+  });
+
+  card.addEventListener("pointerup", () => {
     stopNativeSelection();
 
     const triggered = mandatoryLongPressTriggered;
+    const moved = mandatoryPressMoved;
+
     cancelMandatoryPaymentLongPress(card);
 
-    if (!triggered) {
+    if (!triggered && !moved) {
       openMandatoryPaymentEditor(item.id);
     }
   });
 
   card.addEventListener("pointerleave", () => {
-    cancelMandatoryPaymentLongPress(card);
+    cancelBecauseScroll();
     stopNativeSelection();
   });
 
   card.addEventListener("pointercancel", () => {
-    cancelMandatoryPaymentLongPress(card);
+    cancelBecauseScroll();
     stopNativeSelection();
   });
 }
