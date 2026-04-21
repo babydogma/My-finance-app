@@ -3760,7 +3760,8 @@ function getAccountRoleFlags(role) {
 
   function createTransactionCard(transaction) {
   const card = document.createElement("div");
-  card.className = "list-card list-card--clickable";
+card.className = "list-card list-card--clickable";
+card.dataset.transactionId = transaction.id;
 
   let subtitle = "";
   let signedAmount = "";
@@ -3823,6 +3824,30 @@ function getAccountRoleFlags(role) {
 
   card.addEventListener("click", () => openEditModal(transaction.id));
   return card;
+}
+
+function animateTransactionDelete(transactionId) {
+  return new Promise((resolve) => {
+    if (!transactionId) {
+      resolve();
+      return;
+    }
+
+    const cards = document.querySelectorAll(`[data-transaction-id="${transactionId}"]`);
+
+    if (!cards.length) {
+      resolve();
+      return;
+    }
+
+    cards.forEach((card) => {
+      card.classList.add("list-card--delete-telegram");
+    });
+
+    window.setTimeout(() => {
+      resolve();
+    }, 260);
+  });
 }
 
   function renderTransactions() {
@@ -4074,26 +4099,34 @@ function getAccountRoleFlags(role) {
 }
 
   async function deleteTransaction() {
-    if (!editingTransactionId) return;
+  if (!editingTransactionId) return;
 
-    const ok = confirm("Удалить эту операцию?");
-    if (!ok) return;
+  const transactionId = editingTransactionId;
+  const ok = confirm("Удалить эту операцию?");
+  if (!ok) return;
 
-    const { error } = await supabaseClient
-      .from("transactions")
-      .delete()
-      .eq("id", editingTransactionId);
+  closeModal();
 
-    if (error) {
-      alert("Ошибка удаления операции");
-      console.error(error);
-      return;
-    }
+  await animateTransactionDelete(transactionId);
 
+  const { error } = await supabaseClient
+    .from("transactions")
+    .delete()
+    .eq("id", transactionId);
+
+  if (error) {
+    alert("Ошибка удаления операции");
+    console.error(error);
     await loadDataFromSupabase();
     renderAll();
-    closeModal();
+    return;
   }
+
+  state.transactions = state.transactions.filter((item) => item.id !== transactionId);
+  editingTransactionId = null;
+
+  renderAll();
+}
 
   /* =========================================================
      10. CATEGORIES / BUDGETS CRUD
