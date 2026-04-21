@@ -2591,11 +2591,12 @@ function openBudgetModal(categoryId) {
   }
 
   openAnimatedModal(budgetModal);
-document.body.style.overflow = "hidden";
+  document.body.style.overflow = "hidden";
+}
 
 function closeBudgetModal() {
   closeAnimatedModal(budgetModal);
-activeBudgetCategoryId = null;
+  activeBudgetCategoryId = null;
   budgetCategoryNameInput.value = "";
   budgetCategoryRequiredInput.checked = false;
   budgetAmountInput.value = "";
@@ -3195,175 +3196,177 @@ activeAnalyticsCategoryId = null;
 }
 
   function openModal(mode) {
-    currentMode = mode;
-    editingTransactionId = null;
-    deleteTransactionBtn.classList.add("hidden");
+  currentMode = mode;
+  editingTransactionId = null;
+  deleteTransactionBtn.classList.add("hidden");
 
-    resetForm();
+  resetForm();
 
-    if (mode === "expense") {
-      modalTitle.textContent = "Добавить расход";
-      saveBtn.textContent = "Сохранить расход";
+  if (mode === "expense") {
+    modalTitle.textContent = "Добавить расход";
+    saveBtn.textContent = "Сохранить расход";
 
-      categoryField.classList.remove("hidden");
-      accountField.classList.remove("hidden");
-      fromAccountField.classList.add("hidden");
-      toAccountField.classList.add("hidden");
+    categoryField.classList.remove("hidden");
+    accountField.classList.remove("hidden");
+    fromAccountField.classList.add("hidden");
+    toAccountField.classList.add("hidden");
 
-      fillExpenseCategorySelect();
-      fillAccountSelect(accountSelect, "Выбери счёт");
+    fillExpenseCategorySelect();
+    fillAccountSelect(accountSelect, "Выбери счёт");
 
-const defaultExpenseAccountId =
-  getPrimarySpendAccountId() || getSpendableAccounts()[0]?.id || "";
+    const defaultExpenseAccountId =
+      getPrimarySpendAccountId() || getSpendableAccounts()[0]?.id || "";
 
-accountSelect.value = defaultExpenseAccountId;
-    } else if (mode === "income") {
-      modalTitle.textContent = "Добавить доход";
-      saveBtn.textContent = "Сохранить доход";
+    accountSelect.value = defaultExpenseAccountId;
+  } else if (mode === "income") {
+    modalTitle.textContent = "Добавить доход";
+    saveBtn.textContent = "Сохранить доход";
 
-      categoryField.classList.add("hidden");
-      accountField.classList.remove("hidden");
-      fromAccountField.classList.add("hidden");
-      toAccountField.classList.add("hidden");
+    categoryField.classList.add("hidden");
+    accountField.classList.remove("hidden");
+    fromAccountField.classList.add("hidden");
+    toAccountField.classList.add("hidden");
 
-      fillAccountSelect(accountSelect, "Выбери счёт");
+    fillAccountSelect(accountSelect, "Выбери счёт");
 
-const defaultIncomeAccountId =
-  getPrimarySpendAccountId() || getSpendableAccounts()[0]?.id || "";
+    const defaultIncomeAccountId =
+      getPrimarySpendAccountId() || getSpendableAccounts()[0]?.id || "";
 
-accountSelect.value = defaultIncomeAccountId;
-   } else if (mode === "transfer") {
-  modalTitle.textContent = "Сделать перевод";
-  saveBtn.textContent = "Сохранить перевод";
+    accountSelect.value = defaultIncomeAccountId;
+  } else if (mode === "transfer") {
+    modalTitle.textContent = "Сделать перевод";
+    saveBtn.textContent = "Сохранить перевод";
 
-  categoryField.classList.add("hidden");
-  accountField.classList.add("hidden");
-  fromAccountField.classList.remove("hidden");
-  toAccountField.classList.remove("hidden");
+    categoryField.classList.add("hidden");
+    accountField.classList.add("hidden");
+    fromAccountField.classList.remove("hidden");
+    toAccountField.classList.remove("hidden");
 
-  fillAccountSelect(fromAccountSelect, "С какого счёта");
-fillAccountSelect(toAccountSelect, "На какой счёт");
+    fillAccountSelect(fromAccountSelect, "С какого счёта");
+    fillAccountSelect(toAccountSelect, "На какой счёт");
 
-const defaultFromAccountId =
-  getPrimarySpendAccountId() || getSpendableAccounts()[0]?.id || "";
+    const defaultFromAccountId =
+      getPrimarySpendAccountId() || getSpendableAccounts()[0]?.id || "";
 
-const cashFallbackId =
-  getCashAccountId() ||
-  getSpendableAccounts().find((account) => account.id !== defaultFromAccountId)?.id ||
-  "";
+    const cashFallbackId =
+      getCashAccountId() ||
+      getSpendableAccounts().find((account) => account.id !== defaultFromAccountId)?.id ||
+      "";
 
-fromAccountSelect.value = defaultFromAccountId;
-fillAccountSelect(toAccountSelect, "На какой счёт", cashFallbackId, {
-  excludeId: defaultFromAccountId,
-});
-toAccountSelect.value = cashFallbackId;
+    fromAccountSelect.value = defaultFromAccountId;
+    fillAccountSelect(toAccountSelect, "На какой счёт", cashFallbackId, {
+      excludeId: defaultFromAccountId,
+    });
+    toAccountSelect.value = cashFallbackId;
 
-  fromSafeBucketField.classList.add("hidden");
-  toSafeBucketField.classList.add("hidden");
+    fromSafeBucketField.classList.add("hidden");
+    toSafeBucketField.classList.add("hidden");
 
-  fillSafeBucketSelect(fromSafeBucketSelect, "Из какого накопления");
-  fillSafeBucketSelect(toSafeBucketSelect, "В какое накопление");
-  updateTransferSafeFields();
+    fillSafeBucketSelect(fromSafeBucketSelect, "Из какого накопления");
+    fillSafeBucketSelect(toSafeBucketSelect, "В какое накопление");
+    updateTransferSafeFields();
+  }
+
+  openAnimatedModal(modal);
+  document.body.style.overflow = "hidden";
 }
 
-    openAnimatedModal(modal);
-document.body.style.overflow = "hidden";
+function openEditModal(transactionId) {
+  const transaction = state.transactions.find((item) => item.id === transactionId);
+  if (!transaction) return;
 
-  function openEditModal(transactionId) {
-    const transaction = state.transactions.find((item) => item.id === transactionId);
-    if (!transaction) return;
+  editingTransactionId = transaction.id;
+  currentMode = transaction.type;
+  deleteTransactionBtn.classList.remove("hidden");
 
-    editingTransactionId = transaction.id;
-    currentMode = transaction.type;
-    deleteTransactionBtn.classList.remove("hidden");
+  resetForm();
 
-    resetForm();
+  if (transaction.type === "expense") {
+    modalTitle.textContent = "Редактировать расход";
+    saveBtn.textContent = "Сохранить";
 
-    if (transaction.type === "expense") {
-      modalTitle.textContent = "Редактировать расход";
-      saveBtn.textContent = "Сохранить";
+    categoryField.classList.remove("hidden");
+    accountField.classList.remove("hidden");
+    fromAccountField.classList.add("hidden");
+    toAccountField.classList.add("hidden");
 
-      categoryField.classList.remove("hidden");
-      accountField.classList.remove("hidden");
-      fromAccountField.classList.add("hidden");
-      toAccountField.classList.add("hidden");
+    fillExpenseCategorySelect(transaction.category_id || UNCATEGORIZED_ID);
 
-      fillExpenseCategorySelect(transaction.category_id || UNCATEGORIZED_ID);
+    amountInput.value = transaction.amount;
+    dateInput.value = transaction.created_at
+      ? String(transaction.created_at).slice(0, 10)
+      : getTodayDateValue();
+    fillAccountSelect(accountSelect, "Выбери счёт", transaction.account_id);
+    accountSelect.value = transaction.account_id || "";
+    commentInput.value = transaction.title === "Новая трата" ? "" : transaction.title;
+  } else if (transaction.type === "income") {
+    modalTitle.textContent = "Редактировать доход";
+    saveBtn.textContent = "Сохранить";
 
-      amountInput.value = transaction.amount;
-      dateInput.value = transaction.created_at
-        ? String(transaction.created_at).slice(0, 10)
-        : getTodayDateValue();
-      fillAccountSelect(accountSelect, "Выбери счёт", transaction.account_id);
-accountSelect.value = transaction.account_id || "";
-      commentInput.value = transaction.title === "Новая трата" ? "" : transaction.title;
-    } else if (transaction.type === "income") {
-      modalTitle.textContent = "Редактировать доход";
-      saveBtn.textContent = "Сохранить";
+    categoryField.classList.add("hidden");
+    accountField.classList.remove("hidden");
+    fromAccountField.classList.add("hidden");
+    toAccountField.classList.add("hidden");
 
-      categoryField.classList.add("hidden");
-      accountField.classList.remove("hidden");
-      fromAccountField.classList.add("hidden");
-      toAccountField.classList.add("hidden");
+    amountInput.value = transaction.amount;
+    dateInput.value = transaction.created_at
+      ? String(transaction.created_at).slice(0, 10)
+      : getTodayDateValue();
+    fillAccountSelect(accountSelect, "Выбери счёт", transaction.account_id);
+    accountSelect.value = transaction.account_id || "";
+    commentInput.value = transaction.title === "Новый доход" ? "" : transaction.title;
+  } else if (transaction.type === "transfer") {
+    modalTitle.textContent = "Редактировать перевод";
+    saveBtn.textContent = "Сохранить";
 
-      amountInput.value = transaction.amount;
-      dateInput.value = transaction.created_at
-        ? String(transaction.created_at).slice(0, 10)
-        : getTodayDateValue();
-      fillAccountSelect(accountSelect, "Выбери счёт", transaction.account_id);
-accountSelect.value = transaction.account_id || "";
-      commentInput.value = transaction.title === "Новый доход" ? "" : transaction.title;
-      
-    } else if (transaction.type === "transfer") {
-  modalTitle.textContent = "Редактировать перевод";
-  saveBtn.textContent = "Сохранить";
+    categoryField.classList.add("hidden");
+    accountField.classList.add("hidden");
+    fromAccountField.classList.remove("hidden");
+    toAccountField.classList.remove("hidden");
 
-  categoryField.classList.add("hidden");
-  accountField.classList.add("hidden");
-  fromAccountField.classList.remove("hidden");
-  toAccountField.classList.remove("hidden");
+    amountInput.value = transaction.amount;
+    dateInput.value = transaction.created_at
+      ? String(transaction.created_at).slice(0, 10)
+      : getTodayDateValue();
 
-  amountInput.value = transaction.amount;
-  dateInput.value = transaction.created_at
-    ? String(transaction.created_at).slice(0, 10)
-    : getTodayDateValue();
-  fillAccountSelect(fromAccountSelect, "С какого счёта", transaction.from_account_id);
-fillAccountSelect(toAccountSelect, "На какой счёт", transaction.to_account_id, {
-  excludeId: transaction.from_account_id,
-});
+    fillAccountSelect(fromAccountSelect, "С какого счёта", transaction.from_account_id);
+    fillAccountSelect(toAccountSelect, "На какой счёт", transaction.to_account_id, {
+      excludeId: transaction.from_account_id,
+    });
 
-fromAccountSelect.value = transaction.from_account_id || "";
-toAccountSelect.value = transaction.to_account_id || "";
-  commentInput.value = transaction.title === "Перевод" ? "" : transaction.title;
+    fromAccountSelect.value = transaction.from_account_id || "";
+    toAccountSelect.value = transaction.to_account_id || "";
+    commentInput.value = transaction.title === "Перевод" ? "" : transaction.title;
 
-  fillSafeBucketSelect(
-    fromSafeBucketSelect,
-    "Из какого накопления",
-    transaction.from_safe_bucket_id || ""
-  );
-  fillSafeBucketSelect(
-    toSafeBucketSelect,
-    "В какое накопление",
-    transaction.to_safe_bucket_id || ""
-  );
-  updateTransferSafeFields();
+    fillSafeBucketSelect(
+      fromSafeBucketSelect,
+      "Из какого накопления",
+      transaction.from_safe_bucket_id || ""
+    );
+    fillSafeBucketSelect(
+      toSafeBucketSelect,
+      "В какое накопление",
+      transaction.to_safe_bucket_id || ""
+    );
+    updateTransferSafeFields();
 
-  if (transaction.from_safe_bucket_id) {
-    fromSafeBucketSelect.value = transaction.from_safe_bucket_id;
+    if (transaction.from_safe_bucket_id) {
+      fromSafeBucketSelect.value = transaction.from_safe_bucket_id;
+    }
+
+    if (transaction.to_safe_bucket_id) {
+      toSafeBucketSelect.value = transaction.to_safe_bucket_id;
+    }
   }
 
-  if (transaction.to_safe_bucket_id) {
-    toSafeBucketSelect.value = transaction.to_safe_bucket_id;
-  }
+  openAnimatedModal(modal);
+  document.body.style.overflow = "hidden";
 }
 
-    modal.classList.remove("hidden");
-    document.body.style.overflow = "hidden";
-  }
-
-  function closeModal() {
-    closeAnimatedModal(modal);
-editingTransactionId = null;
+function closeModal() {
+  closeAnimatedModal(modal);
+  editingTransactionId = null;
+}
 
   function getAccountBalance(accountNameOrId) {
   const account =
@@ -3993,11 +3996,9 @@ function animateTransactionDelete(transactionId) {
     window.setTimeout(() => {
       freshCard?.classList.remove("list-card--fresh-sticker");
       justCreatedTransactionId = null;
-      shouldScrollToFreshTransaction = false;
     }, 2200);
   } else if (justCreatedTransactionId) {
     justCreatedTransactionId = null;
-    shouldScrollToFreshTransaction = false;
   }
 }
 
@@ -4184,7 +4185,6 @@ function animateTransactionDelete(transactionId) {
     }
 
     justCreatedTransactionId = null;
-    shouldScrollToFreshTransaction = false;
   } else {
     const { error } = await supabaseClient
       .from("transactions")
@@ -4197,7 +4197,6 @@ function animateTransactionDelete(transactionId) {
     }
 
     justCreatedTransactionId = transaction.id;
-    shouldScrollToFreshTransaction = true;
   }
 
   closeModal();
