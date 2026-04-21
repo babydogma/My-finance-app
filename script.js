@@ -2084,25 +2084,24 @@ function animateCurrencyValue(el, value, options = {}) {
 
   const startTime = performance.now();
 
-  const easeOutExpoSoft = (t) => {
-    if (t >= 1) return 1;
-    return 1 - Math.pow(2, -8 * t);
-  };
+  const easeOutSoftStop = (t) => {
+  const inv = 1 - t;
+  return 1 - inv * inv * inv * inv;
+};
 
   function frame(now) {
     const progress = Math.min((now - startTime) / duration, 1);
-    const eased = easeOutExpoSoft(progress);
+    const eased = easeOutSoftStop(progress);
     const current = startValue + (endValue - startValue) * eased;
     const rounded = Number(current.toFixed(decimals));
 
     el.textContent = formatMoney(rounded);
 
     if (progress < 1) {
-      requestAnimationFrame(frame);
-    } else {
-      el.textContent = formatMoney(endValue);
-      el.dataset.animatedValue = String(endValue);
-    }
+  requestAnimationFrame(frame);
+} else {
+  el.dataset.animatedValue = String(endValue);
+}
   }
 
   requestAnimationFrame(frame);
@@ -2126,25 +2125,24 @@ function animateLabeledCurrencyValue(el, prefix, value, options = {}) {
 
   const startTime = performance.now();
 
-  const easeOutExpoSoft = (t) => {
-    if (t >= 1) return 1;
-    return 1 - Math.pow(2, -8 * t);
-  };
+  const easeOutSoftStop = (t) => {
+  const inv = 1 - t;
+  return 1 - inv * inv * inv * inv;
+};
 
   function frame(now) {
     const progress = Math.min((now - startTime) / duration, 1);
-    const eased = easeOutExpoSoft(progress);
+    const eased = easeOutSoftStop(progress);
     const current = startValue + (endValue - startValue) * eased;
     const rounded = Number(current.toFixed(decimals));
 
     el.textContent = `${prefix}${formatMoney(rounded)}`;
 
     if (progress < 1) {
-      requestAnimationFrame(frame);
-    } else {
-      el.textContent = `${prefix}${formatMoney(endValue)}`;
-      el.dataset.animatedValue = String(endValue);
-    }
+  requestAnimationFrame(frame);
+} else {
+  el.dataset.animatedValue = String(endValue);
+}
   }
 
   requestAnimationFrame(frame);
@@ -3661,11 +3659,11 @@ function getAccountRoleFlags(role) {
   const balanceSection = document.querySelector(".balance");
   const balanceLabelEl = document.querySelector(".balance-label");
 
-  animateCurrencyValue(balanceEl, balance, { duration: 1650, decimals: 2 });
-  animateLabeledCurrencyValue(balanceFreeMoneyValueEl, "Свободно: ", freeMoney, {
-    duration: 1250,
-    decimals: 2,
-  });
+  animateCurrencyValue(balanceEl, balance, { duration: 1850, decimals: 2 });
+animateLabeledCurrencyValue(balanceFreeMoneyValueEl, "Свободно: ", freeMoney, {
+  duration: 1450,
+  decimals: 2,
+});
 
   if (accountsTotalEl) {
     accountsTotalEl.textContent = "";
