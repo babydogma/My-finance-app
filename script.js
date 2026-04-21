@@ -232,6 +232,7 @@ let mandatoryPressStartX = 0;
 let mandatoryPressStartY = 0;
 let mandatoryPressMoved = false;
 let mandatoryLongPressTriggered = false;
+let justCreatedTransactionId = null;
 
   const UNCATEGORIZED_ID = "uncategorized";
 
@@ -3824,27 +3825,46 @@ function getAccountRoleFlags(role) {
 }
 
   function renderTransactions() {
-    transactionsListEl.innerHTML = "";
+  transactionsListEl.innerHTML = "";
 
-    const latestTransactions = sortTransactionsByLatest(state.transactions).slice(0, 5);
+  const latestTransactions = sortTransactionsByLatest(state.transactions).slice(0, 5);
 
-    if (latestTransactions.length === 0) {
-      const empty = document.createElement("div");
-      empty.className = "list-card";
-      empty.innerHTML = `
-        <div class="list-body">
-          <h3 class="list-title">Операций пока нет</h3>
-          <p class="list-subtitle">Добавь первую операцию через кнопки сверху</p>
-        </div>
-      `;
-      transactionsListEl.appendChild(empty);
-      return;
+  if (latestTransactions.length === 0) {
+    const empty = document.createElement("div");
+    empty.className = "list-card";
+    empty.innerHTML = `
+      <div class="list-body">
+        <h3 class="list-title">Операций пока нет</h3>
+        <p class="list-subtitle">Добавь первую операцию через кнопки сверху</p>
+      </div>
+    `;
+    transactionsListEl.appendChild(empty);
+    return;
+  }
+
+  let animatedFreshCard = false;
+
+  latestTransactions.forEach((transaction) => {
+    const card = createTransactionCard(transaction);
+
+    if (!animatedFreshCard && justCreatedTransactionId && transaction.id === justCreatedTransactionId) {
+      card.classList.add("list-card--fresh-sticker");
+      animatedFreshCard = true;
     }
 
-    latestTransactions.forEach((transaction) => {
-      transactionsListEl.appendChild(createTransactionCard(transaction));
-    });
+    transactionsListEl.appendChild(card);
+  });
+
+  if (animatedFreshCard) {
+    window.setTimeout(() => {
+      const freshCard = transactionsListEl.querySelector(".list-card--fresh-sticker");
+      freshCard?.classList.remove("list-card--fresh-sticker");
+      justCreatedTransactionId = null;
+    }, 1200);
+  } else if (justCreatedTransactionId) {
+    justCreatedTransactionId = null;
   }
+}
 
   function renderAnalytics() {
   const isOverview = analyticsTab === "overview";
@@ -4017,27 +4037,31 @@ function getAccountRoleFlags(role) {
     if (!transaction) return;
 
     if (editingTransactionId) {
-      const { error } = await supabaseClient
-        .from("transactions")
-        .update(transaction)
-        .eq("id", editingTransactionId);
+  const { error } = await supabaseClient
+    .from("transactions")
+    .update(transaction)
+    .eq("id", editingTransactionId);
 
-      if (error) {
-        alert("Ошибка обновления операции");
-        console.error(error);
-        return;
-      }
-    } else {
-      const { error } = await supabaseClient
-        .from("transactions")
-        .insert(transaction);
+  if (error) {
+    alert("Ошибка обновления операции");
+    console.error(error);
+    return;
+  }
 
-      if (error) {
-        alert("Ошибка сохранения операции");
-        console.error(error);
-        return;
-      }
-    }
+  justCreatedTransactionId = null;
+} else {
+  const { error } = await supabaseClient
+    .from("transactions")
+    .insert(transaction);
+
+  if (error) {
+    alert("Ошибка сохранения операции");
+    console.error(error);
+    return;
+  }
+
+  justCreatedTransactionId = transaction.id;
+}
 
     await loadDataFromSupabase();
     renderAll();
