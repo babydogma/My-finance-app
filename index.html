@@ -235,13 +235,6 @@
 
   <section class="section analytics-overview-section" id="analyticsOverviewSection">
   <div class="analytics-overview-balance-card">
-    <div class="analytics-overview-balance-card__head">
-      <div class="analytics-overview-balance-card__label">
-        Баланс
-        <button class="faq-chip" type="button" data-faq-key="total_balance" aria-label="Что это?">❔</button>
-      </div>
-    </div>
-
     <div class="analytics-overview-balance-card__value" id="analyticsTotalBalanceValue">0 ₽</div>
 
     <div class="analytics-overview-balance-card__metrics">
@@ -258,6 +251,16 @@
   </div>
 
   <div class="analytics-overview-mandatory-card analytics-overview-mandatory-card--compact">
+    <div class="analytics-overview-mandatory-card__top">
+      <div class="analytics-overview-mandatory-card__top-title">
+        Обязательства
+      </div>
+
+      <button class="analytics-overview-mandatory-card__btn" type="button" id="openMandatoryPaymentsModalBtn">
+        Платежи
+      </button>
+    </div>
+
     <div class="analytics-overview-mandatory-card__main">
       <div class="analytics-overview-mandatory-card__main-label">К вычету из свободных</div>
       <div class="analytics-overview-mandatory-card__main-value" id="analyticsPendingMandatoryValue">0 ₽</div>
@@ -273,20 +276,14 @@
         <span>Покрыто накоплениями</span>
         <strong id="analyticsMandatoryCoveredValue">0 ₽</strong>
       </div>
-    </div>
 
-    <div class="analytics-overview-mandatory-card__footer">
-      <div class="analytics-overview-mandatory-card__footer-left">
+      <div class="analytics-overview-mandatory-card__row analytics-overview-mandatory-card__row--limits">
         <span>
           Остаток лимитов
           <button class="faq-chip" type="button" data-faq-key="remaining_limits" aria-label="Что это?">❔</button>
         </span>
         <strong id="analyticsRemainingBudgetsValue">0 ₽</strong>
       </div>
-
-      <button class="analytics-overview-mandatory-card__btn" type="button" id="openMandatoryPaymentsModalBtn">
-        Платежи
-      </button>
     </div>
   </div>
 
