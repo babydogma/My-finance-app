@@ -3846,7 +3846,7 @@ function animateTransactionDelete(transactionId) {
 
     window.setTimeout(() => {
       resolve();
-    }, 260);
+    }, 560);
   });
 }
 
