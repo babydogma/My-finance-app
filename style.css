@@ -537,6 +537,83 @@ button {
   -webkit-backdrop-filter: blur(10px);
 }
 
+#transactionsList .list-card--fresh-sticker {
+  transform-origin: 18% 14%;
+  animation: freshStickerSettle 0.52s cubic-bezier(0.2, 0.85, 0.2, 1) both;
+  box-shadow:
+    0 16px 34px rgba(0, 0, 0, 0.22),
+    0 0 22px rgba(111, 156, 255, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+#transactionsList .list-card--fresh-sticker::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(255,255,255,0) 0%,
+      rgba(255,255,255,0.045) 42%,
+      rgba(255,255,255,0.085) 50%,
+      rgba(255,255,255,0.045) 58%,
+      rgba(255,255,255,0) 100%
+    );
+  transform: translateX(-118%);
+  pointer-events: none;
+  animation: freshStickerSweep 0.78s cubic-bezier(0.2, 0.85, 0.2, 1) 0.18s forwards;
+}
+
+#transactionsList .list-card--fresh-sticker .list-title,
+#transactionsList .list-card--fresh-sticker .list-subtitle,
+#transactionsList .list-card--fresh-sticker .list-value,
+#transactionsList .list-card--fresh-sticker .list-caption {
+  animation: freshStickerContentIn 0.46s ease-out both;
+}
+
+@keyframes freshStickerSettle {
+  0% {
+    opacity: 0.68;
+    transform: translateY(12px) scale(1.035) rotate(-0.9deg);
+    filter: blur(4px);
+  }
+  55% {
+    opacity: 1;
+    transform: translateY(-2px) scale(1.01) rotate(-0.18deg);
+    filter: blur(0);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1) rotate(0deg);
+    filter: blur(0);
+  }
+}
+
+@keyframes freshStickerSweep {
+  0% {
+    transform: translateX(-118%);
+    opacity: 0;
+  }
+  18% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(118%);
+    opacity: 0;
+  }
+}
+
+@keyframes freshStickerContentIn {
+  0% {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 #transactionsList .list-title,
 #operationsTransactionsList .list-title,
 #analyticsCategoryTransactionsList .list-title,
@@ -888,6 +965,14 @@ button {
     border-radius: 20px;
     font-size: 16px;
   }
+}
+
+#transactionsList .list-card--fresh-sticker {
+  animation-duration: 0.46s;
+}
+
+#transactionsList .list-card--fresh-sticker::after {
+  animation-duration: 0.7s;
 }
 
 /* =========================================================
