@@ -539,7 +539,7 @@ button {
 
 #transactionsList .list-card--fresh-sticker {
   transform-origin: 18% 14%;
-  animation: freshStickerSettle 0.92s cubic-bezier(0.2, 0.85, 0.2, 1) both;
+  animation: freshStickerSettleStage 1.18s cubic-bezier(0.18, 0.86, 0.18, 1) both;
   box-shadow:
     0 16px 34px rgba(0, 0, 0, 0.22),
     0 0 22px rgba(111, 156, 255, 0.08),
@@ -554,37 +554,43 @@ button {
     linear-gradient(
       90deg,
       rgba(255,255,255,0) 0%,
-      rgba(255,255,255,0.038) 42%,
-      rgba(255,255,255,0.072) 50%,
-      rgba(255,255,255,0.038) 58%,
+      rgba(255,255,255,0.028) 42%,
+      rgba(255,255,255,0.058) 50%,
+      rgba(255,255,255,0.028) 58%,
       rgba(255,255,255,0) 100%
     );
   transform: translateX(-118%);
+  opacity: 0;
   pointer-events: none;
-  animation: freshStickerSweep 1.15s cubic-bezier(0.2, 0.85, 0.2, 1) 0.28s forwards;
+  animation: freshStickerSweepStage 1.28s cubic-bezier(0.18, 0.86, 0.18, 1) 1.02s forwards;
 }
 
 #transactionsList .list-card--fresh-sticker .list-title,
 #transactionsList .list-card--fresh-sticker .list-subtitle,
 #transactionsList .list-card--fresh-sticker .list-value,
 #transactionsList .list-card--fresh-sticker .list-caption {
-  animation: freshStickerContentIn 0.46s ease-out both;
+  animation: freshStickerContentIn 0.82s cubic-bezier(0.2, 0.82, 0.2, 1) both;
 }
 
-@keyframes freshStickerSettle {
+@keyframes freshStickerSettleStage {
   0% {
-    opacity: 0.58;
-    transform: translateY(18px) scale(1.05) rotate(-1deg);
-    filter: blur(6px);
+    opacity: 0.34;
+    transform: translateY(26px) scale(1.075) rotate(-1.35deg);
+    filter: blur(8px);
   }
-  42% {
-    opacity: 1;
-    transform: translateY(2px) scale(1.022) rotate(-0.35deg);
-    filter: blur(1px);
+  32% {
+    opacity: 0.82;
+    transform: translateY(12px) scale(1.045) rotate(-0.72deg);
+    filter: blur(3px);
   }
-  72% {
+  62% {
     opacity: 1;
-    transform: translateY(-1px) scale(1.006) rotate(-0.08deg);
+    transform: translateY(3px) scale(1.015) rotate(-0.18deg);
+    filter: blur(0.6px);
+  }
+  82% {
+    opacity: 1;
+    transform: translateY(-1px) scale(1.004) rotate(-0.04deg);
     filter: blur(0);
   }
   100% {
@@ -594,12 +600,15 @@ button {
   }
 }
 
-@keyframes freshStickerSweep {
+@keyframes freshStickerSweepStage {
   0% {
     transform: translateX(-118%);
     opacity: 0;
   }
-  22% {
+  12% {
+    opacity: 0.4;
+  }
+  26% {
     opacity: 1;
   }
   100% {
@@ -611,11 +620,13 @@ button {
 @keyframes freshStickerContentIn {
   0% {
     opacity: 0;
-    transform: translateY(4px);
+    transform: translateY(7px);
+    filter: blur(2px);
   }
   100% {
     opacity: 1;
     transform: translateY(0);
+    filter: blur(0);
   }
 }
 
@@ -973,11 +984,12 @@ button {
 }
 
 #transactionsList .list-card--fresh-sticker {
-  animation-duration: 0.82s;
+  animation-duration: 1.02s;
 }
 
 #transactionsList .list-card--fresh-sticker::after {
-  animation-duration: 1s;
+  animation-duration: 1.14s;
+  animation-delay: 0.9s;
 }
 
 /* =========================================================
