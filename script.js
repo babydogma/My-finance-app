@@ -67,10 +67,16 @@ const deleteAccountModalBtn = document.getElementById("deleteAccountModalBtn");
   const analyticsRangeToInput = document.getElementById("analyticsRangeToInput");
   const analyticsSelectedPeriodLabel = document.getElementById("analyticsSelectedPeriodLabel");
   
-  const mandatoryPaymentsModal = document.getElementById("mandatoryPaymentsModal");
-  const openMandatoryPaymentsModalBtn = document.getElementById("openMandatoryPaymentsModalBtn");
-  const closeMandatoryPaymentsModalBtn = document.getElementById("closeMandatoryPaymentsModalBtn");
-  const mandatoryPaymentsList = document.getElementById("mandatoryPaymentsList");
+const mandatoryPaymentsModal = document.getElementById("mandatoryPaymentsModal");
+const openMandatoryPaymentsModalBtn = document.getElementById("openMandatoryPaymentsModalBtn");
+const closeMandatoryPaymentsModalBtn = document.getElementById("closeMandatoryPaymentsModalBtn");
+const mandatoryPaymentsList = document.getElementById("mandatoryPaymentsList");
+const openMandatoryPaymentEditorBtn = document.getElementById("openMandatoryPaymentEditorBtn");
+
+const mandatoryPaymentEditorModal = document.getElementById("mandatoryPaymentEditorModal");
+const mandatoryPaymentEditorTitle = document.getElementById("mandatoryPaymentEditorTitle");
+const closeMandatoryPaymentEditorModalBtn = document.getElementById("closeMandatoryPaymentEditorModalBtn");
+
 const mandatoryPaymentTitleInput = document.getElementById("mandatoryPaymentTitleInput");
 const mandatoryPaymentAmountInput = document.getElementById("mandatoryPaymentAmountInput");
 const mandatoryPaymentDueDayInput = document.getElementById("mandatoryPaymentDueDayInput");
@@ -869,11 +875,25 @@ function resetMandatoryPaymentForm() {
     mandatoryPaymentLinkedSafeSelect.value = "";
   }
 
+  if (mandatoryPaymentEditorTitle) {
+    mandatoryPaymentEditorTitle.textContent = "Новый платёж";
+  }
+
   if (addMandatoryPaymentBtn) {
     addMandatoryPaymentBtn.textContent = "Добавить платёж";
   }
 
   deleteMandatoryPaymentBtn?.classList.add("hidden");
+}
+
+function openMandatoryPaymentEditorModal() {
+  fillMandatoryPaymentSafeSelect();
+  mandatoryPaymentEditorModal?.classList.remove("hidden");
+}
+
+function closeMandatoryPaymentEditorModal() {
+  mandatoryPaymentEditorModal?.classList.add("hidden");
+  resetMandatoryPaymentForm();
 }
 
 function openMandatoryPaymentEditor(paymentId) {
@@ -885,8 +905,14 @@ function openMandatoryPaymentEditor(paymentId) {
   mandatoryPaymentTitleInput.value = item.title || "";
   mandatoryPaymentAmountInput.value = String(Number(item.amount) || 0).replace(".", ",");
   mandatoryPaymentDueDayInput.value = buildDateFromDueDay(item.due_day);
+
   if (mandatoryPaymentLinkedSafeSelect) {
+    fillMandatoryPaymentSafeSelect(item.linked_safe_bucket_id || "");
     mandatoryPaymentLinkedSafeSelect.value = item.linked_safe_bucket_id || "";
+  }
+
+  if (mandatoryPaymentEditorTitle) {
+    mandatoryPaymentEditorTitle.textContent = "Редактирование платежа";
   }
 
   if (addMandatoryPaymentBtn) {
@@ -895,6 +921,7 @@ function openMandatoryPaymentEditor(paymentId) {
 
   deleteMandatoryPaymentBtn?.classList.remove("hidden");
 
+  openMandatoryPaymentEditorModal();
   mandatoryPaymentTitleInput.focus();
 }
 
@@ -960,12 +987,38 @@ function cancelMandatoryPaymentLongPress(card) {
 function bindMandatoryPaymentPress(card, item) {
   if (!card || !item) return;
 
+  const stopNativeSelection = () => {
+    if (window.getSelection) {
+      const selection = window.getSelection();
+      if (selection && selection.removeAllRanges) {
+        selection.removeAllRanges();
+      }
+    }
+  };
+
+  card.addEventListener("contextmenu", (event) => {
+    event.preventDefault();
+  });
+
+  card.addEventListener("selectstart", (event) => {
+    event.preventDefault();
+  });
+
+  card.addEventListener("dragstart", (event) => {
+    event.preventDefault();
+  });
+
   card.addEventListener("pointerdown", (event) => {
     if (event.pointerType === "mouse" && event.button !== 0) return;
+    event.preventDefault();
+    stopNativeSelection();
     startMandatoryPaymentLongPress(card, item);
   });
 
-  card.addEventListener("pointerup", () => {
+  card.addEventListener("pointerup", (event) => {
+    event.preventDefault();
+    stopNativeSelection();
+
     const triggered = mandatoryLongPressTriggered;
     cancelMandatoryPaymentLongPress(card);
 
@@ -976,10 +1029,12 @@ function bindMandatoryPaymentPress(card, item) {
 
   card.addEventListener("pointerleave", () => {
     cancelMandatoryPaymentLongPress(card);
+    stopNativeSelection();
   });
 
   card.addEventListener("pointercancel", () => {
     cancelMandatoryPaymentLongPress(card);
+    stopNativeSelection();
   });
 }
 
@@ -1113,9 +1168,9 @@ async function saveMandatoryPayment() {
   const ok = await saveMandatoryPaymentsToMeta();
   if (!ok) return;
 
-  resetMandatoryPaymentForm();
   renderMandatoryPaymentsModal();
-  renderAll();
+renderAll();
+closeMandatoryPaymentEditorModal();
 }
 
 async function deleteMandatoryPaymentFromEditor() {
@@ -1134,9 +1189,9 @@ async function deleteMandatoryPaymentFromEditor() {
   const saved = await saveMandatoryPaymentsToMeta();
   if (!saved) return;
 
-  resetMandatoryPaymentForm();
   renderMandatoryPaymentsModal();
-  renderAll();
+renderAll();
+closeMandatoryPaymentEditorModal();
 }
 
   /* =========================================================
@@ -4104,9 +4159,16 @@ faqModal?.addEventListener("click", (event) => {
   closeSafeBucketsModalBtn?.addEventListener("click", closeSafeBucketsModal);
   openMandatoryPaymentsModalBtn?.addEventListener("click", openMandatoryPaymentsModal);
 closeMandatoryPaymentsModalBtn?.addEventListener("click", closeMandatoryPaymentsModal);
+openMandatoryPaymentEditorBtn?.addEventListener("click", () => {
+  resetMandatoryPaymentForm();
+  fillMandatoryPaymentSafeSelect();
+  openMandatoryPaymentEditorModal();
+});
+
 addMandatoryPaymentBtn?.addEventListener("click", saveMandatoryPayment);
 deleteMandatoryPaymentBtn?.addEventListener("click", deleteMandatoryPaymentFromEditor);
 resetMandatoryPaymentBtn?.addEventListener("click", resetMandatoryPaymentForm);
+closeMandatoryPaymentEditorModalBtn?.addEventListener("click", closeMandatoryPaymentEditorModal);
 addSafeBucketBtn?.addEventListener("click", addSafeBucket);
 closeSafeBucketAmountModalBtn?.addEventListener("click", closeSafeBucketAmountModal);
 cancelSafeBucketAmountBtn?.addEventListener("click", closeSafeBucketAmountModal);
@@ -4129,6 +4191,10 @@ safeInterestRateModal?.addEventListener("click", (event) => {
   });
   mandatoryPaymentsModal?.addEventListener("click", (event) => {
   if (event.target === mandatoryPaymentsModal) closeMandatoryPaymentsModal();
+});
+
+mandatoryPaymentEditorModal?.addEventListener("click", (event) => {
+  if (event.target === mandatoryPaymentEditorModal) closeMandatoryPaymentEditorModal();
 });
   
   safeBucketsModal?.addEventListener("click", (event) => {
@@ -4198,6 +4264,11 @@ safeInterestRateModal?.addEventListener("click", (event) => {
     closeMandatoryPaymentsModal();
     return;
   }
+  
+  if (mandatoryPaymentEditorModal && !mandatoryPaymentEditorModal.classList.contains("hidden")) {
+  closeMandatoryPaymentEditorModal();
+  return;
+}
 
   if (faqModal && !faqModal.classList.contains("hidden")) {
     closeFaqModal();
