@@ -2929,14 +2929,16 @@ function renderSafeBucketsModal() {
   const unassignedBalance = getUnassignedSafeBalance();
 
   safeBucketsModalTotalLabel.textContent = `Общий баланс: ${formatMoney(totalSafeBalance)}`;
+
   if (safeBucketsRateValue) {
     safeBucketsRateValue.textContent = formatPercentLabel(getSafeInterestAnnualRate());
   }
+
   safeBucketsUnassignedValue.textContent =
     Math.abs(unassignedBalance) < 0.009 ? formatMoney(0) : formatMoney(unassignedBalance);
 
   safeBucketsUnassignedCard?.classList.toggle(
-    "safe-buckets-summary--danger",
+    "safe-buckets-wallet-row--danger",
     Math.abs(unassignedBalance) > 0.009
   );
 
@@ -2944,10 +2946,12 @@ function renderSafeBucketsModal() {
 
   if (!state.safeBuckets.length) {
     const empty = document.createElement("div");
-    empty.className = "safe-bucket-empty";
+    empty.className = "list-card";
     empty.innerHTML = `
-      <div class="safe-bucket-empty__title">Накоплений пока нет</div>
-      <div class="safe-bucket-empty__text">Добавь первое накопление ниже</div>
+      <div class="list-body">
+        <h3 class="list-title">Накоплений пока нет</h3>
+        <p class="list-subtitle">Добавь первое накопление ниже</p>
+      </div>
     `;
     safeBucketsList.appendChild(empty);
     return;
@@ -2959,20 +2963,20 @@ function renderSafeBucketsModal() {
 
     const card = document.createElement("button");
     card.type = "button";
-    card.className = `safe-bucket-row${isLocked ? " safe-bucket-row--system" : ""}`;
+    card.className = "list-card list-card--clickable safe-buckets-wallet-row";
     card.dataset.safeBucketOpenId = bucket.id;
 
     card.innerHTML = `
-      <div class="safe-bucket-row__left">
-        <div class="safe-bucket-row__text">
-          <div class="safe-bucket-row__title">${escapeHtml(bucket.name)}</div>
-          <div class="safe-bucket-row__meta">
-            ${isLocked ? "Системное накопление" : "Накопление"}
-          </div>
+      <div class="list-body">
+        <div class="list-title-row">
+          <h3 class="list-title">${escapeHtml(bucket.name)}</h3>
         </div>
+        <p class="list-subtitle">${isLocked ? "Системное накопление" : "Накопление"}</p>
       </div>
 
-      <div class="safe-bucket-row__amount">${formatMoney(balance)}</div>
+      <div class="list-right">
+        <p class="list-value">${formatMoney(balance)}</p>
+      </div>
     `;
 
     card.addEventListener("click", () => {
@@ -2991,11 +2995,27 @@ async function addSafeBucket() {
     return;
   }
 
+  const duplicate = state.safeBuckets.find(
+    (bucket) => String(bucket.name || "").trim().toLowerCase() === name.toLowerCase()
+  );
+
+  if (duplicate) {
+    alert("Такое накопление уже есть");
+    return;
+  }
+
+  const nextSortOrder =
+    (state.safeBuckets.reduce((max, bucket) => Math.max(max, Number(bucket.sort_order) || 0), 0) || 0) + 1;
+
   const newSafeBucket = {
+    id: crypto.randomUUID(),
     name,
     icon: "",
+    bucket_kind: "custom",
+    include_in_free_money: false,
+    is_protected: false,
     is_locked: false,
-    sort_order: state.safeBuckets.length + 1,
+    sort_order: nextSortOrder,
   };
 
   const { error } = await supabaseClient
