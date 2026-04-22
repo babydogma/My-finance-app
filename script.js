@@ -2824,11 +2824,18 @@ async function deleteAccountModalAction() {
 function openSafeBucketsModal() {
   if (!safeBucketsModal) return;
 
-  safeBucketsModalTitle.textContent = getSafeAccountName() || "Накопления";
-  renderSafeBucketsModal();
+  try {
+    if (safeBucketsModalTitle) {
+      safeBucketsModalTitle.textContent = getSafeAccountName() || "Накопления";
+    }
 
-  openAnimatedModal(safeBucketsModal);
-document.body.style.overflow = "hidden";
+    renderSafeBucketsModal();
+    openAnimatedModal(safeBucketsModal);
+    document.body.style.overflow = "hidden";
+  } catch (error) {
+    console.error("safeBucketsModal open error:", error);
+    alert("Ошибка открытия накоплений. Смотри console.");
+  }
 }
 
 function closeSafeBucketsModal() {
@@ -2928,19 +2935,25 @@ function renderSafeBucketsModal() {
   const totalSafeBalance = getAccountBalance(getSafeAccountId());
   const unassignedBalance = getUnassignedSafeBalance();
 
-  safeBucketsModalTotalLabel.textContent = `Общий баланс: ${formatMoney(totalSafeBalance)}`;
+  if (safeBucketsModalTotalLabel) {
+    safeBucketsModalTotalLabel.textContent = `Общий баланс: ${formatMoney(totalSafeBalance)}`;
+  }
 
   if (safeBucketsRateValue) {
     safeBucketsRateValue.textContent = formatPercentLabel(getSafeInterestAnnualRate());
   }
 
-  safeBucketsUnassignedValue.textContent =
-    Math.abs(unassignedBalance) < 0.009 ? formatMoney(0) : formatMoney(unassignedBalance);
+  if (safeBucketsUnassignedValue) {
+    safeBucketsUnassignedValue.textContent =
+      Math.abs(unassignedBalance) < 0.009 ? formatMoney(0) : formatMoney(unassignedBalance);
+  }
 
-  safeBucketsUnassignedCard?.classList.toggle(
-    "safe-buckets-wallet-row--danger",
-    Math.abs(unassignedBalance) > 0.009
-  );
+  if (safeBucketsUnassignedCard) {
+    safeBucketsUnassignedCard.classList.toggle(
+      "safe-buckets-wallet-row--danger",
+      Math.abs(unassignedBalance) > 0.009
+    );
+  }
 
   safeBucketsList.innerHTML = "";
 
@@ -2957,38 +2970,41 @@ function renderSafeBucketsModal() {
     return;
   }
 
-  state.safeBuckets.forEach((bucket) => {
-    const balance = getSafeBucketBalance(bucket.id);
-    const isLocked = Boolean(bucket.is_locked);
+  state.safeBuckets
+    .slice()
+    .sort((a, b) => (Number(a.sort_order) || 0) - (Number(b.sort_order) || 0))
+    .forEach((bucket) => {
+      const balance = getSafeBucketBalance(bucket.id);
+      const isLocked = Boolean(bucket.is_locked);
 
-    const card = document.createElement("button");
-    card.type = "button";
-    card.className = "list-card list-card--clickable safe-buckets-wallet-row";
-    card.dataset.safeBucketOpenId = bucket.id;
+      const card = document.createElement("button");
+      card.type = "button";
+      card.className = "list-card list-card--clickable safe-buckets-wallet-row";
+      card.dataset.safeBucketOpenId = bucket.id;
 
-    card.innerHTML = `
-      <div class="list-body">
-        <div class="list-title-row">
-          <h3 class="list-title">${escapeHtml(bucket.name)}</h3>
+      card.innerHTML = `
+        <div class="list-body">
+          <div class="list-title-row">
+            <h3 class="list-title">${escapeHtml(bucket.name)}</h3>
+          </div>
+          <p class="list-subtitle">${isLocked ? "Системное накопление" : "Накопление"}</p>
         </div>
-        <p class="list-subtitle">${isLocked ? "Системное накопление" : "Накопление"}</p>
-      </div>
 
-      <div class="list-right">
-        <p class="list-value">${formatMoney(balance)}</p>
-      </div>
-    `;
+        <div class="list-right">
+          <p class="list-value">${formatMoney(balance)}</p>
+        </div>
+      `;
 
-    card.addEventListener("click", () => {
-      openSafeBucketAmountModal(bucket.id);
+      card.addEventListener("click", () => {
+        openSafeBucketAmountModal(bucket.id);
+      });
+
+      safeBucketsList.appendChild(card);
     });
-
-    safeBucketsList.appendChild(card);
-  });
 }
 
 async function addSafeBucket() {
-  const name = newSafeBucketNameInput.value.trim();
+  const name = newSafeBucketNameInput?.value.trim();
 
   if (!name) {
     alert("Введите название накопления");
@@ -3008,12 +3024,8 @@ async function addSafeBucket() {
     (state.safeBuckets.reduce((max, bucket) => Math.max(max, Number(bucket.sort_order) || 0), 0) || 0) + 1;
 
   const newSafeBucket = {
-    id: crypto.randomUUID(),
     name,
     icon: "",
-    bucket_kind: "custom",
-    include_in_free_money: false,
-    is_protected: false,
     is_locked: false,
     sort_order: nextSortOrder,
   };
@@ -3022,13 +3034,15 @@ async function addSafeBucket() {
     .from("safe_buckets")
     .insert(newSafeBucket);
 
-  if (error) {
-    alert("Ошибка добавления накопления");
+    if (error) {
+    alert(`Ошибка добавления накопления: ${error.message || "unknown error"}`);
     console.error(error);
     return;
   }
 
-  newSafeBucketNameInput.value = "";
+  if (newSafeBucketNameInput) {
+    newSafeBucketNameInput.value = "";
+  }
 
   await loadDataFromSupabase();
   renderAll();
@@ -4479,7 +4493,17 @@ async function deleteCategory() {
   state.categories = categories || [];
   state.transactions = transactions || [];
   state.budgetLimits = budgetLimits || [];
-  state.safeBuckets = safeBuckets || [];
+    state.safeBuckets = (safeBuckets || []).map((bucket, index) => ({
+    ...bucket,
+    id: bucket.id || `safe-bucket-${index + 1}`,
+    name: bucket.name || "Накопление",
+    icon: bucket.icon || "",
+    bucket_kind: bucket.bucket_kind || "custom",
+    include_in_free_money: Boolean(bucket.include_in_free_money),
+    is_protected: Boolean(bucket.is_protected),
+    is_locked: Boolean(bucket.is_locked),
+    sort_order: Number(bucket.sort_order) || index + 1,
+  }));
   state.appMeta = appMeta || [];
   state.mandatoryPayments = parseMandatoryPaymentsFromMeta();
 
