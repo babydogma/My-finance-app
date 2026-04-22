@@ -563,57 +563,61 @@
   </div>
 </div>
   
-  <div class="modal-handle"></div>
+<div class="modal hidden" id="safeBucketsModal">
+  <div class="modal-sheet safe-buckets-sheet">
+    <div class="modal-handle"></div>
 
-<div class="section-head">
-  <div>
-    <h3 class="modal-title safe-buckets-title" id="safeBucketsModalTitle" style="margin:0; text-align:left;">
-      Сейфы Яндекса
-    </h3>
-    <div class="safe-buckets-total" id="safeBucketsModalTotalLabel">Общий баланс: 0 ₽</div>
-  </div>
-
-  <button class="manager-back-btn" type="button" id="closeSafeBucketsModalBtn">
-    Закрыть
-  </button>
-</div>
-
-<div class="list safe-buckets-wallet-list">
-  <button class="list-card list-card--clickable safe-buckets-wallet-row" type="button" id="safeBucketsRateBtn">
-    <div class="list-body">
-      <div class="list-title-row">
-        <h3 class="list-title">Годовой процент</h3>
+    <div class="section-head">
+      <div>
+        <h3 class="modal-title safe-buckets-title" id="safeBucketsModalTitle" style="margin:0; text-align:left;">
+          Сейфы Яндекса
+        </h3>
+        <div class="safe-buckets-total" id="safeBucketsModalTotalLabel">Общий баланс: 0 ₽</div>
       </div>
-      <p class="list-subtitle">Процент на остаток накоплений</p>
-    </div>
-    <div class="list-right">
-      <p class="list-value" id="safeBucketsRateValue">12%</p>
-    </div>
-  </button>
 
-  <div class="list-card safe-buckets-wallet-row safe-buckets-wallet-row--summary" id="safeBucketsUnassignedCard">
-    <div class="list-body">
-      <div class="list-title-row">
-        <h3 class="list-title">Не распределено</h3>
+      <button class="manager-back-btn" type="button" id="closeSafeBucketsModalBtn">
+        Закрыть
+      </button>
+    </div>
+
+    <div class="list safe-buckets-wallet-list">
+      <button class="list-card list-card--clickable safe-buckets-wallet-row" type="button" id="safeBucketsRateBtn">
+        <div class="list-body">
+          <div class="list-title-row">
+            <h3 class="list-title">Годовой процент</h3>
+          </div>
+          <p class="list-subtitle">Процент на остаток накоплений</p>
+        </div>
+        <div class="list-right">
+          <p class="list-value" id="safeBucketsRateValue">12%</p>
+        </div>
+      </button>
+
+      <div class="list-card safe-buckets-wallet-row safe-buckets-wallet-row--summary" id="safeBucketsUnassignedCard">
+        <div class="list-body">
+          <div class="list-title-row">
+            <h3 class="list-title">Не распределено</h3>
+          </div>
+          <p class="list-subtitle">Свободный остаток внутри накопительного счёта</p>
+        </div>
+        <div class="list-right">
+          <p class="list-value" id="safeBucketsUnassignedValue">0 ₽</p>
+        </div>
       </div>
-      <p class="list-subtitle">Свободный остаток внутри накопительного счёта</p>
     </div>
-    <div class="list-right">
-      <p class="list-value" id="safeBucketsUnassignedValue">0 ₽</p>
+
+    <div class="list safe-buckets-list safe-buckets-list--wallet" id="safeBucketsList"></div>
+
+    <div class="manager-card safe-buckets-create-card">
+      <div class="field">
+        <input class="input" id="newSafeBucketNameInput" type="text" placeholder="Название накопления" />
+      </div>
+
+      <button class="btn btn-primary safe-buckets-create-btn" type="button" id="addSafeBucketBtn">
+        Добавить накопление
+      </button>
     </div>
   </div>
-</div>
-
-<div class="list safe-buckets-list safe-buckets-list--wallet" id="safeBucketsList"></div>
-
-<div class="manager-card safe-buckets-create-card">
-  <div class="field">
-    <input class="input" id="newSafeBucketNameInput" type="text" placeholder="Название накопления" />
-  </div>
-
-  <button class="btn btn-primary safe-buckets-create-btn" type="button" id="addSafeBucketBtn">
-    Добавить накопление
-  </button>
 </div>
 
 <div class="modal hidden" id="safeBucketAmountModal">
