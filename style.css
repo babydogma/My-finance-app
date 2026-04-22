@@ -2423,113 +2423,161 @@ button {
   color: #dfe4ee;
 }
 
-.safe-buckets-sheet {
-  width: min(480px, 100%);
-  max-height: calc(100vh - 18px);
-  padding: 14px 14px calc(22px + env(safe-area-inset-bottom, 0px));
+#safeBucketsModal .modal-sheet {
   border-radius: 30px 30px 22px 22px;
+  background:
+    radial-gradient(circle at top center, rgba(111, 156, 255, 0.12), transparent 34%),
+    linear-gradient(180deg, rgba(18, 21, 30, 0.99) 0%, rgba(11, 14, 22, 1) 100%);
+  border: 1px solid rgba(255,255,255,0.07);
+  box-shadow:
+    0 -16px 48px rgba(0, 0, 0, 0.46),
+    0 0 26px rgba(111,156,255,0.06),
+    inset 0 1px 0 rgba(255,255,255,0.03);
+  width: min(480px, 100%);
+  max-height: calc(100vh - 24px);
+  padding: 20px 16px calc(22px + env(safe-area-inset-bottom, 0px));
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
 }
 
-.safe-buckets-header {
-  display: flex;
-  align-items: flex-start;
+#safeBucketsModal .section-head {
+  align-items: center;
   justify-content: space-between;
-  gap: 14px;
+  gap: 12px;
   margin-bottom: 16px;
 }
 
-.safe-buckets-title {
-  font-size: 24px;
-  line-height: 1.02;
-  font-weight: 900;
-  letter-spacing: -0.04em;
+#safeBucketsModal .safe-buckets-title {
+  margin: 0;
+  font-size: 32px;
+  line-height: 0.96;
+  font-weight: 930;
+  letter-spacing: -0.06em;
+  color: #f7f9ff;
 }
 
-.safe-buckets-total {
-  margin-top: 6px;
+#safeBucketsModal .safe-buckets-total {
+  margin-top: 8px;
+  color: rgba(255,255,255,0.58);
   font-size: 14px;
-  line-height: 1.25;
   font-weight: 760;
-  color: rgba(255, 255, 255, 0.74);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
 }
 
-.safe-buckets-sheet .section-head {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 14px;
-}
-
-.safe-buckets-sheet .manager-back-btn {
-  flex: 0 0 auto;
-  min-width: 132px;
+#safeBucketsModal .manager-back-btn {
+  min-width: 124px;
   height: 54px;
+  padding: 0 18px;
+  border: 1px solid rgba(255,255,255,0.05);
   border-radius: 999px;
+  background:
+    linear-gradient(180deg, rgba(44, 47, 58, 0.96) 0%, rgba(24, 28, 38, 0.98) 100%);
+  color: #eef3ff;
+  font-size: 16px;
+  font-weight: 860;
+  letter-spacing: -0.03em;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.03),
+    0 8px 18px rgba(0,0,0,0.16);
 }
 
-.safe-buckets-wallet-list,
-.safe-buckets-list--wallet {
+#safeBucketsModal .safe-buckets-wallet-list,
+#safeBucketsModal .safe-buckets-list--wallet {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-.safe-buckets-wallet-row {
-  width: 100%;
-  min-height: 84px;
-  padding: 14px 16px;
-  text-align: left;
-  border-radius: 26px;
+#safeBucketsModal .safe-buckets-wallet-row {
+  min-height: 78px;
+  padding: 12px 14px;
+  border-radius: 22px;
+  background:
+    linear-gradient(180deg, rgba(60, 66, 84, 0.28) 0%, rgba(31, 36, 50, 0.18) 100%);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
-.safe-buckets-wallet-row .list-title {
-  font-size: 17px;
-  line-height: 1.08;
-  font-weight: 860;
-  letter-spacing: -0.03em;
+#safeBucketsModal .safe-buckets-wallet-row .list-title {
+  font-size: 16px;
+  font-weight: 760;
+  letter-spacing: -0.025em;
 }
 
-.safe-buckets-wallet-row .list-subtitle {
-  margin-top: 4px;
+#safeBucketsModal .safe-buckets-wallet-row .list-subtitle {
   font-size: 11px;
-  line-height: 1.2;
-  font-weight: 720;
-  color: rgba(255,255,255,0.38);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  font-weight: 620;
+  color: rgba(255, 255, 255, 0.42);
 }
 
-.safe-buckets-wallet-row .list-value {
-  min-width: 118px;
-  padding: 12px 15px;
-  border-radius: 18px;
-  background: rgba(111, 156, 255, 0.12);
+#safeBucketsModal .safe-buckets-wallet-row .list-value {
+  min-width: 108px;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: #f3f6ff;
+  font-size: 15.5px;
+  font-weight: 820;
+  letter-spacing: -0.03em;
+  text-align: right;
+}
+
+#safeBucketsModal .safe-buckets-wallet-row--danger .list-value {
+  color: #ff8f87;
+}
+
+#safeBucketsModal .safe-buckets-create-card {
+  margin-top: 16px;
+  padding: 14px;
+  border-radius: 28px;
+  border: 1px solid rgba(255,255,255,0.06);
+  background:
+    linear-gradient(180deg, rgba(50, 54, 69, 0.985) 0%, rgba(39, 43, 57, 0.995) 100%);
+  box-shadow:
+    0 14px 34px rgba(0, 0, 0, 0.24),
+    0 0 18px rgba(111, 156, 255, 0.03),
+    inset 0 1px 0 rgba(255,255,255,0.03);
+}
+
+#safeBucketsModal .safe-buckets-create-card .field {
+  margin-bottom: 12px;
+}
+
+#safeBucketsModal .safe-buckets-create-card .input {
+  height: 58px;
+  padding: 0 18px;
+  border-radius: 22px;
+  border: 1px solid rgba(255,255,255,0.055);
+  background:
+    linear-gradient(180deg, rgba(28, 32, 43, 0.98) 0%, rgba(18, 21, 30, 1) 100%);
   color: #f7f8fb;
-  font-size: 15px;
+  font-size: 17px;
+  font-weight: 800;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.03),
+    0 8px 18px rgba(0,0,0,0.16);
+}
+
+#safeBucketsModal .safe-buckets-create-card .input::placeholder {
+  color: rgba(255,255,255,0.42);
+}
+
+#safeBucketsModal .safe-buckets-create-btn {
+  width: 100%;
+  height: 58px;
+  border: none;
+  border-radius: 22px;
+  font-size: 17px;
   font-weight: 900;
-  line-height: 1;
-  text-align: center;
-  white-space: nowrap;
-  box-shadow:
-    0 0 0 1px rgba(255,255,255,0.025) inset,
-    0 6px 18px rgba(0, 0, 0, 0.12);
-}
-
-.safe-buckets-wallet-row--summary .list-value {
-  background: rgba(111, 156, 255, 0.1);
-}
-
-.safe-buckets-wallet-row--danger .list-value {
-  background: rgba(255, 114, 104, 0.14);
-  color: #ffaaa3;
-  box-shadow:
-    0 0 0 1px rgba(255, 170, 163, 0.05) inset,
-    0 6px 18px rgba(78, 16, 16, 0.14);
+  letter-spacing: -0.03em;
+  background:
+    radial-gradient(circle at 30% 30%, rgba(255,255,255,0.14), transparent 42%),
+    linear-gradient(180deg, rgba(114, 160, 255, 1) 0%, rgba(92, 144, 255, 1) 100%);
+  color: #fff;
+  box-shadow: 0 14px 30px rgba(111, 156, 255, 0.24);
 }
 
 .safe-buckets-create-card {
@@ -2750,22 +2798,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     width: 16px;
     height: 16px;
   }
-  
-  .safe-buckets-wallet-row .list-title {
-  font-size: 17px;
-}
-
-.safe-buckets-wallet-row .list-value {
-  min-width: 92px;
-  font-size: 14px;
-  padding: 9px 12px;
-}
-
-.safe-buckets-create-btn {
-  height: 54px;
-  border-radius: 20px;
-  font-size: 16px;
-}
 
   .analytics-mode-switch {
     border-radius: 26px;
@@ -2991,77 +3023,46 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     font-size: 13px;
     padding: 13px 14px;
   }
-
-  .safe-buckets-title {
-    font-size: 24px;
-  }
-
-  .safe-buckets-total {
-    font-size: 15px;
-  }
-
-  .safe-buckets-rate-row__value,
-  .safe-buckets-summary__value,
-  .safe-bucket-row__amount {
-    min-width: 92px;
-    font-size: 14px;
-    padding: 9px 12px;
-  }
-
-  .safe-bucket-row__title {
-    font-size: 17px;
-  }
-
-  .safe-bucket-row__icon {
-    width: 40px;
-    height: 40px;
-    flex-basis: 40px;
-  }
   
-    .safe-buckets-sheet {
-    padding: 12px 12px calc(26px + env(safe-area-inset-bottom, 0px));
-  }
+  #safeBucketsModal .safe-buckets-title {
+  font-size: 28px;
+}
 
-  .safe-buckets-title {
-    font-size: 21px;
-  }
+#safeBucketsModal .safe-buckets-total {
+  font-size: 13px;
+}
 
-  .safe-buckets-total {
-    font-size: 13px;
-  }
+#safeBucketsModal .manager-back-btn {
+  min-width: 112px;
+  height: 50px;
+  font-size: 15px;
+}
 
-  .safe-buckets-sheet .manager-back-btn {
-    min-width: 118px;
-    height: 50px;
-  }
+#safeBucketsModal .safe-buckets-wallet-row {
+  min-height: 72px;
+  padding: 11px 12px;
+  border-radius: 20px;
+}
 
-  .safe-buckets-wallet-row {
-    min-height: 80px;
-    padding: 13px 14px;
-    border-radius: 24px;
-  }
+#safeBucketsModal .safe-buckets-wallet-row .list-title {
+  font-size: 15px;
+}
 
-  .safe-buckets-wallet-row .list-title {
-    font-size: 16px;
-  }
+#safeBucketsModal .safe-buckets-wallet-row .list-subtitle {
+  font-size: 10.5px;
+}
 
-  .safe-buckets-wallet-row .list-value {
-    min-width: 104px;
-    font-size: 14px;
-    padding: 11px 13px;
-    border-radius: 16px;
-  }
+#safeBucketsModal .safe-buckets-wallet-row .list-value {
+  min-width: 96px;
+  font-size: 15px;
+}
 
-  .safe-buckets-create-card .input {
-    height: 58px;
-    border-radius: 18px;
-  }
-
-  .safe-buckets-create-btn {
-    min-height: 54px;
-    border-radius: 20px;
-    font-size: 16px;
-  }
+#safeBucketsModal .safe-buckets-create-card .input,
+#safeBucketsModal .safe-buckets-create-btn {
+  height: 54px;
+  border-radius: 20px;
+  font-size: 16px;
+}
   
    #transactionsList .list-card--fresh-sticker {
   animation-duration: 1.16s;
