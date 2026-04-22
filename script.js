@@ -3025,7 +3025,6 @@ async function addSafeBucket() {
 
   const newSafeBucket = {
     name,
-    icon: "",
     is_locked: false,
     sort_order: nextSortOrder,
   };
