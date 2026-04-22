@@ -2424,7 +2424,13 @@ button {
 }
 
 .safe-buckets-sheet {
-  padding: 18px 16px 18px;
+  width: min(480px, 100%);
+  max-height: calc(100vh - 18px);
+  padding: 14px 14px calc(22px + env(safe-area-inset-bottom, 0px));
+  border-radius: 30px 30px 22px 22px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
 }
 
 .safe-buckets-header {
@@ -2436,19 +2442,33 @@ button {
 }
 
 .safe-buckets-title {
-  margin: 0;
-  text-align: left;
-  font-size: 28px;
+  font-size: 24px;
+  line-height: 1.02;
   font-weight: 900;
-  letter-spacing: -0.05em;
+  letter-spacing: -0.04em;
 }
 
 .safe-buckets-total {
-  margin-top: 10px;
-  color: rgba(255, 255, 255, 0.78);
-  font-size: 17px;
-  font-weight: 820;
-  letter-spacing: -0.03em;
+  margin-top: 6px;
+  font-size: 14px;
+  line-height: 1.25;
+  font-weight: 760;
+  color: rgba(255, 255, 255, 0.74);
+}
+
+.safe-buckets-sheet .section-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.safe-buckets-sheet .manager-back-btn {
+  flex: 0 0 auto;
+  min-width: 132px;
+  height: 54px;
+  border-radius: 999px;
 }
 
 .safe-buckets-wallet-list,
@@ -2460,26 +2480,34 @@ button {
 
 .safe-buckets-wallet-row {
   width: 100%;
+  min-height: 84px;
+  padding: 14px 16px;
   text-align: left;
-  border-radius: 24px;
+  border-radius: 26px;
 }
 
 .safe-buckets-wallet-row .list-title {
-  font-size: 18px;
-  font-weight: 840;
+  font-size: 17px;
+  line-height: 1.08;
+  font-weight: 860;
   letter-spacing: -0.03em;
 }
 
 .safe-buckets-wallet-row .list-subtitle {
-  font-size: 11.5px;
-  font-weight: 680;
-  color: rgba(255,255,255,0.42);
+  margin-top: 4px;
+  font-size: 11px;
+  line-height: 1.2;
+  font-weight: 720;
+  color: rgba(255,255,255,0.38);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .safe-buckets-wallet-row .list-value {
-  min-width: 104px;
-  padding: 10px 14px;
-  border-radius: 16px;
+  min-width: 118px;
+  padding: 12px 15px;
+  border-radius: 18px;
   background: rgba(111, 156, 255, 0.12);
   color: #f7f8fb;
   font-size: 15px;
@@ -2487,6 +2515,9 @@ button {
   line-height: 1;
   text-align: center;
   white-space: nowrap;
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.025) inset,
+    0 6px 18px rgba(0, 0, 0, 0.12);
 }
 
 .safe-buckets-wallet-row--summary .list-value {
@@ -2496,12 +2527,15 @@ button {
 .safe-buckets-wallet-row--danger .list-value {
   background: rgba(255, 114, 104, 0.14);
   color: #ffaaa3;
+  box-shadow:
+    0 0 0 1px rgba(255, 170, 163, 0.05) inset,
+    0 6px 18px rgba(78, 16, 16, 0.14);
 }
 
 .safe-buckets-create-card {
   margin-top: 16px;
   padding: 14px;
-  border-radius: 24px;
+  border-radius: 26px;
   background:
     linear-gradient(180deg, rgba(50, 54, 69, 0.985) 0%, rgba(39, 43, 57, 0.995) 100%);
   border: 1px solid rgba(255,255,255,0.06);
@@ -2509,6 +2543,25 @@ button {
     0 14px 34px rgba(0, 0, 0, 0.24),
     0 0 18px rgba(111, 156, 255, 0.03),
     inset 0 1px 0 rgba(255,255,255,0.03);
+}
+
+.safe-buckets-create-card .field {
+  margin-bottom: 12px;
+}
+
+.safe-buckets-create-card .input {
+  height: 62px;
+  border-radius: 20px;
+}
+
+.safe-buckets-create-btn {
+  width: 100%;
+  min-height: 58px;
+  border-radius: 22px;
+  font-size: 17px;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  margin-top: 0;
 }
 
 .safe-buckets-create-btn {
@@ -2963,6 +3016,51 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     width: 40px;
     height: 40px;
     flex-basis: 40px;
+  }
+  
+    .safe-buckets-sheet {
+    padding: 12px 12px calc(26px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .safe-buckets-title {
+    font-size: 21px;
+  }
+
+  .safe-buckets-total {
+    font-size: 13px;
+  }
+
+  .safe-buckets-sheet .manager-back-btn {
+    min-width: 118px;
+    height: 50px;
+  }
+
+  .safe-buckets-wallet-row {
+    min-height: 80px;
+    padding: 13px 14px;
+    border-radius: 24px;
+  }
+
+  .safe-buckets-wallet-row .list-title {
+    font-size: 16px;
+  }
+
+  .safe-buckets-wallet-row .list-value {
+    min-width: 104px;
+    font-size: 14px;
+    padding: 11px 13px;
+    border-radius: 16px;
+  }
+
+  .safe-buckets-create-card .input {
+    height: 58px;
+    border-radius: 18px;
+  }
+
+  .safe-buckets-create-btn {
+    min-height: 54px;
+    border-radius: 20px;
+    font-size: 16px;
   }
   
    #transactionsList .list-card--fresh-sticker {
