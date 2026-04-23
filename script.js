@@ -127,16 +127,6 @@ const openMandatoryPaymentBucketPickerBtn = document.getElementById("openMandato
   const addSafeBucketBtn = document.getElementById("addSafeBucketBtn");
   
   const safeBucketAmountModal = document.getElementById("safeBucketAmountModal");
-  
-  const safeBucketsRateBtn = document.getElementById("safeBucketsRateBtn");
-  const safeBucketsRateValue = document.getElementById("safeBucketsRateValue");
-  
-  const safeInterestRateModal = document.getElementById("safeInterestRateModal");
-  const safeInterestRateCurrentValue = document.getElementById("safeInterestRateCurrentValue");
-  const safeInterestRateInput = document.getElementById("safeInterestRateInput");
-  const closeSafeInterestRateModalBtn = document.getElementById("closeSafeInterestRateModalBtn");
-  const cancelSafeInterestRateBtn = document.getElementById("cancelSafeInterestRateBtn");
-  const saveSafeInterestRateBtn = document.getElementById("saveSafeInterestRateBtn");
 
   const safeBucketAmountModalTitle = document.getElementById("safeBucketAmountModalTitle");
 const safeBucketAmountCurrentValue = document.getElementById("safeBucketAmountCurrentValue");
@@ -2912,53 +2902,6 @@ function closeSafeBucketAmountModal() {
   }
 }
 
-function openSafeInterestRateModal() {
-  const annualRate = getSafeInterestAnnualRate();
-
-  safeInterestRateCurrentValue.textContent = `Сейчас: ${formatPercentLabel(annualRate)}`;
-  safeInterestRateInput.value = String(roundToTwo(annualRate * 100)).replace(".", ",");
-
-  openAnimatedModal(safeInterestRateModal);
-window.setTimeout(() => {
-  safeInterestRateInput.focus();
-  safeInterestRateInput.select();
-}, 120);
-}
-
-function closeSafeInterestRateModal() {
-  closeAnimatedModal(safeInterestRateModal);
-safeInterestRateInput.value = "";
-}
-
-async function saveSafeInterestRate() {
-  const normalized = safeInterestRateInput.value.replace(/\s/g, "").replace(",", ".");
-  const percentValue = Number(normalized);
-
-  if (Number.isNaN(percentValue) || percentValue < 0) {
-    alert("Введи корректный процент");
-    return;
-  }
-
-  const decimalRate = roundToTwo(percentValue / 100);
-
-  const { error } = await supabaseClient
-    .from("app_meta")
-    .upsert({
-      key: "safe_interest_annual_rate",
-      value: String(decimalRate),
-    });
-
-  if (error) {
-    alert("Ошибка сохранения годового процента");
-    console.error(error);
-    return;
-  }
-
-  await loadDataFromSupabase();
-  renderSafeBucketsModal();
-  closeSafeInterestRateModal();
-}
-
 function renderSafeBucketsModal() {
   if (!safeBucketsList) return;
 
@@ -4772,10 +4715,6 @@ closeSafeBucketAmountModalBtn?.addEventListener("click", closeSafeBucketAmountMo
 cancelSafeBucketAmountBtn?.addEventListener("click", closeSafeBucketAmountModal);
 saveSafeBucketAmountBtn?.addEventListener("click", saveSafeBucketAmount);
 deleteSafeBucketBtn?.addEventListener("click", deleteSafeBucketFromModal);
-safeBucketsRateBtn?.addEventListener("click", openSafeInterestRateModal);
-closeSafeInterestRateModalBtn?.addEventListener("click", closeSafeInterestRateModal);
-cancelSafeInterestRateBtn?.addEventListener("click", closeSafeInterestRateModal);
-saveSafeInterestRateBtn?.addEventListener("click", saveSafeInterestRate);
 safeInterestRateModal?.addEventListener("click", (event) => {
   if (event.target === safeInterestRateModal) closeSafeInterestRateModal();
 });
