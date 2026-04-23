@@ -127,6 +127,16 @@ const openMandatoryPaymentBucketPickerBtn = document.getElementById("openMandato
   const addSafeBucketBtn = document.getElementById("addSafeBucketBtn");
   
   const safeBucketAmountModal = document.getElementById("safeBucketAmountModal");
+  
+  const safeBucketsRateBtn = document.getElementById("safeBucketsRateBtn");
+const safeBucketsRateValue = document.getElementById("safeBucketsRateValue");
+
+const safeInterestRateModal = document.getElementById("safeInterestRateModal");
+const safeInterestRateCurrentValue = document.getElementById("safeInterestRateCurrentValue");
+const safeInterestRateInput = document.getElementById("safeInterestRateInput");
+const closeSafeInterestRateModalBtn = document.getElementById("closeSafeInterestRateModalBtn");
+const cancelSafeInterestRateBtn = document.getElementById("cancelSafeInterestRateBtn");
+const saveSafeInterestRateBtn = document.getElementById("saveSafeInterestRateBtn");
 
   const safeBucketAmountModalTitle = document.getElementById("safeBucketAmountModalTitle");
 const safeBucketAmountCurrentValue = document.getElementById("safeBucketAmountCurrentValue");
