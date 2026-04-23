@@ -141,6 +141,7 @@ const openMandatoryPaymentBucketPickerBtn = document.getElementById("openMandato
   const safeBucketAmountModalTitle = document.getElementById("safeBucketAmountModalTitle");
 const safeBucketAmountCurrentValue = document.getElementById("safeBucketAmountCurrentValue");
 const safeBucketNameInput = document.getElementById("safeBucketNameInput");
+const safeBucketInterestInput = document.getElementById("safeBucketInterestInput");
 const safeBucketAmountInput = document.getElementById("safeBucketAmountInput");
 const closeSafeBucketAmountModalBtn = document.getElementById("closeSafeBucketAmountModalBtn");
 const cancelSafeBucketAmountBtn = document.getElementById("cancelSafeBucketAmountBtn");
@@ -386,6 +387,31 @@ function getSafeInterestAnnualRate() {
     return raw;
   }
   return 0.12;
+}
+
+function getSafeBucketInterestRatesMap() {
+  const raw = getAppMetaValue("safe_bucket_interest_rates");
+  if (!raw) return {};
+
+  try {
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return {};
+    return parsed;
+  } catch (error) {
+    console.error("Ошибка safe_bucket_interest_rates", error);
+    return {};
+  }
+}
+
+function getSafeBucketInterestAnnualRate(bucketId) {
+  const map = getSafeBucketInterestRatesMap();
+  const raw = Number(map[bucketId]);
+
+  if (Number.isFinite(raw) && raw >= 0) {
+    return raw;
+  }
+
+  return getSafeInterestAnnualRate();
 }
 
 function formatPercentLabel(rateDecimal) {
@@ -2852,10 +2878,12 @@ function openSafeBucketAmountModal(bucketId) {
   activeSafeBucketAmountId = bucketId;
 
   const balance = getSafeBucketBalance(bucketId);
+  const annualRate = getSafeBucketInterestAnnualRate(bucketId);
 
   safeBucketAmountModalTitle.textContent = bucket.name;
   safeBucketAmountCurrentValue.textContent = `Сейчас: ${formatMoney(balance)}`;
   safeBucketNameInput.value = bucket.name || "";
+  safeBucketInterestInput.value = String(roundToTwo(annualRate * 100)).replace(".", ",");
   safeBucketAmountInput.value = String(balance).replace(".", ",");
 
   if (deleteSafeBucketBtn) {
@@ -2863,19 +2891,21 @@ function openSafeBucketAmountModal(bucketId) {
   }
 
   openAnimatedModal(safeBucketAmountModal);
-window.setTimeout(() => {
-  safeBucketAmountInput.focus();
-  safeBucketAmountInput.select();
-}, 120);
+
+  window.setTimeout(() => {
+    safeBucketNameInput.focus();
+    safeBucketNameInput.select();
+  }, 120);
 }
 
 function closeSafeBucketAmountModal() {
   if (!safeBucketAmountModal) return;
 
   closeAnimatedModal(safeBucketAmountModal);
-activeSafeBucketAmountId = null;
-safeBucketNameInput.value = "";
-safeBucketAmountInput.value = "";
+  activeSafeBucketAmountId = null;
+  safeBucketNameInput.value = "";
+  safeBucketInterestInput.value = "";
+  safeBucketAmountInput.value = "";
 
   if (deleteSafeBucketBtn) {
     deleteSafeBucketBtn.classList.add("hidden");
@@ -2937,10 +2967,6 @@ function renderSafeBucketsModal() {
 
   if (safeBucketsModalTotalLabel) {
     safeBucketsModalTotalLabel.textContent = `Общий баланс: ${formatMoney(totalSafeBalance)}`;
-  }
-
-  if (safeBucketsRateValue) {
-    safeBucketsRateValue.textContent = formatPercentLabel(getSafeInterestAnnualRate());
   }
 
   if (safeBucketsUnassignedValue) {
@@ -3049,16 +3075,34 @@ async function saveSafeBucketAmount() {
   if (!activeSafeBucketAmountId) return;
 
   const nextName = safeBucketNameInput.value.trim();
-  const normalized = safeBucketAmountInput.value.replace(/\s/g, "").replace(",", ".");
-  const nextAmount = Number(normalized);
+  const interestRaw = safeBucketInterestInput.value.replace(/\s/g, "").replace(",", ".");
+  const amountRaw = safeBucketAmountInput.value.replace(/\s/g, "").replace(",", ".");
+
+  const nextInterestPercent = Number(interestRaw);
+  const nextAmount = Number(amountRaw);
 
   if (!nextName) {
     alert("Введи название накопления");
     return;
   }
 
+  if (Number.isNaN(nextInterestPercent) || nextInterestPercent < 0) {
+    alert("Введи корректный годовой процент");
+    return;
+  }
+
   if (Number.isNaN(nextAmount) || nextAmount < 0) {
     alert("Введи корректную сумму");
+    return;
+  }
+
+  const duplicate = state.safeBuckets.find((bucket) => {
+    if (bucket.id === activeSafeBucketAmountId) return false;
+    return String(bucket.name || "").trim().toLowerCase() === nextName.toLowerCase();
+  });
+
+  if (duplicate) {
+    alert("Накопление с таким названием уже существует");
     return;
   }
 
@@ -3072,6 +3116,22 @@ async function saveSafeBucketAmount() {
   if (updateBucketError) {
     alert("Ошибка сохранения накопления");
     console.error(updateBucketError);
+    return;
+  }
+
+  const interestMap = getSafeBucketInterestRatesMap();
+  interestMap[activeSafeBucketAmountId] = roundToTwo(nextInterestPercent / 100);
+
+  const { error: interestError } = await supabaseClient
+    .from("app_meta")
+    .upsert({
+      key: "safe_bucket_interest_rates",
+      value: JSON.stringify(interestMap),
+    });
+
+  if (interestError) {
+    alert("Ошибка сохранения процента накопления");
+    console.error(interestError);
     return;
   }
 
@@ -3630,9 +3690,6 @@ function getAccountRoleFlags(role) {
   }
 
   async function applySafeInterestIfNeeded() {
-  const annualRate = getSafeInterestAnnualRate();
-  const dailyRate = annualRate / 365;
-
   const today = new Date();
   const todayString = getDateOnlyString(today);
 
@@ -3671,9 +3728,12 @@ function getAccountRoleFlags(role) {
 
     for (const bucket of state.safeBuckets) {
       const bucketBalance = getSafeBucketBalance(bucket.id);
+      const annualRate = getSafeBucketInterestAnnualRate(bucket.id);
 
       if (bucketBalance <= 0) continue;
+      if (annualRate <= 0) continue;
 
+      const dailyRate = annualRate / 365;
       const interestAmount = roundToTwo(bucketBalance * dailyRate);
 
       if (interestAmount <= 0) continue;
