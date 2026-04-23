@@ -201,6 +201,25 @@ const closeOperationsFiltersBtn = document.getElementById("closeOperationsFilter
 const operationsRangeFromInput = document.getElementById("operationsRangeFromInput");
 const operationsRangeToInput = document.getElementById("operationsRangeToInput");
 
+function bindDigitsOnly(input) {
+  if (!input) return;
+
+  const sanitize = () => {
+    input.value = String(input.value || "").replace(/\D+/g, "");
+  };
+
+  input.addEventListener("input", sanitize);
+  input.addEventListener("paste", () => {
+    requestAnimationFrame(sanitize);
+  });
+  input.addEventListener("blur", sanitize);
+}
+
+bindDigitsOnly(amountInput);
+bindDigitsOnly(budgetAmountInput);
+bindDigitsOnly(mandatoryPaymentAmountInput);
+bindDigitsOnly(safeBucketAmountInput);
+
   /* =========================================================
      02. UI STATE
      ========================================================= */
