@@ -3935,3 +3935,150 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     font-size: 16px;
   }
 }
+
+/* ===== SAFE BUCKETS MODAL — QUICK FIX ===== */
+
+#safeBucketsModal .safe-buckets-wallet-list,
+#safeBucketsModal .safe-buckets-list--wallet {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+}
+
+#safeBucketsModal .safe-buckets-list--wallet {
+  margin-top: 14px !important;
+}
+
+#safeBucketsModal .safe-buckets-wallet-row {
+  min-height: 78px;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  border-radius: 24px;
+}
+
+#safeBucketsModal .safe-buckets-wallet-row .list-body {
+  display: flex !important;
+  align-items: center !important;
+  min-height: 78px;
+  flex: 1;
+}
+
+#safeBucketsModal .safe-buckets-wallet-row .list-title-row {
+  margin: 0 !important;
+  width: 100%;
+}
+
+#safeBucketsModal .safe-buckets-wallet-row .list-title {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 820;
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#safeBucketsModal .safe-buckets-wallet-row .list-subtitle {
+  display: none !important;
+}
+
+#safeBucketsModal .safe-buckets-wallet-row .list-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-height: 78px;
+  min-width: 118px;
+  padding-left: 12px;
+}
+
+#safeBucketsModal .safe-buckets-wallet-row .list-value {
+  font-size: 16px;
+  font-weight: 860;
+  line-height: 1;
+  white-space: nowrap;
+  text-align: right;
+}
+
+#safeBucketsModal .safe-buckets-wallet-row--danger .list-value {
+  color: #ff8f87;
+}
+
+/* нижний блок — ближе к стилю Баланса */
+#safeBucketsModal .safe-buckets-create-card {
+  margin-top: 18px;
+  padding: 18px 16px 16px;
+  border-radius: 30px;
+  border: 1px solid rgba(255,255,255,0.07);
+  background:
+    radial-gradient(circle at top center, rgba(111, 156, 255, 0.13), transparent 34%),
+    linear-gradient(180deg, rgba(28, 32, 43, 0.98) 0%, rgba(18, 21, 30, 1) 100%);
+  box-shadow:
+    0 18px 40px rgba(0, 0, 0, 0.28),
+    0 0 26px rgba(111, 156, 255, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+#safeBucketsModal .safe-buckets-create-card .field {
+  margin-bottom: 14px;
+}
+
+#safeBucketsModal .safe-buckets-create-card .input {
+  height: 60px;
+  border-radius: 22px;
+  background:
+    linear-gradient(180deg, rgba(34, 38, 49, 0.98) 0%, rgba(19, 22, 31, 1) 100%);
+}
+
+#safeBucketsModal .safe-buckets-create-btn {
+  width: 100%;
+  height: 58px;
+  border-radius: 22px;
+  font-size: 17px;
+  font-weight: 900;
+}
+
+/* если хочешь пока временно скрыть верхний "Годовой процент" до правки html/js */
+#safeBucketsRateBtn {
+  display: none !important;
+}
+
+@media (max-width: 420px) {
+  #safeBucketsModal .safe-buckets-wallet-list,
+  #safeBucketsModal .safe-buckets-list--wallet {
+    gap: 12px;
+  }
+
+  #safeBucketsModal .safe-buckets-list--wallet {
+    margin-top: 12px !important;
+  }
+
+  #safeBucketsModal .safe-buckets-wallet-row {
+    min-height: 72px;
+    padding: 0 14px;
+    border-radius: 22px;
+  }
+
+  #safeBucketsModal .safe-buckets-wallet-row .list-body,
+  #safeBucketsModal .safe-buckets-wallet-row .list-right {
+    min-height: 72px;
+  }
+
+  #safeBucketsModal .safe-buckets-wallet-row .list-title {
+    font-size: 16px;
+  }
+
+  #safeBucketsModal .safe-buckets-create-card {
+    padding: 16px 14px 14px;
+    border-radius: 26px;
+  }
+
+  #safeBucketsModal .safe-buckets-create-card .input,
+  #safeBucketsModal .safe-buckets-create-btn {
+    height: 54px;
+    border-radius: 20px;
+    font-size: 16px;
+  }
+}
