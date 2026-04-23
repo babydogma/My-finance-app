@@ -2963,7 +2963,6 @@ function renderSafeBucketsModal() {
     empty.innerHTML = `
       <div class="list-body">
         <h3 class="list-title">Накоплений пока нет</h3>
-        <p class="list-subtitle">Добавь первое накопление ниже</p>
       </div>
     `;
     safeBucketsList.appendChild(empty);
@@ -2975,11 +2974,10 @@ function renderSafeBucketsModal() {
     .sort((a, b) => (Number(a.sort_order) || 0) - (Number(b.sort_order) || 0))
     .forEach((bucket) => {
       const balance = getSafeBucketBalance(bucket.id);
-      const isLocked = Boolean(bucket.is_locked);
 
       const card = document.createElement("button");
       card.type = "button";
-      card.className = "list-card list-card--clickable safe-buckets-wallet-row";
+      card.className = "list-card list-card--clickable safe-buckets-wallet-row safe-buckets-wallet-row--editable";
       card.dataset.safeBucketOpenId = bucket.id;
 
       card.innerHTML = `
@@ -2987,7 +2985,6 @@ function renderSafeBucketsModal() {
           <div class="list-title-row">
             <h3 class="list-title">${escapeHtml(bucket.name)}</h3>
           </div>
-          <p class="list-subtitle">${isLocked ? "Системное накопление" : "Накопление"}</p>
         </div>
 
         <div class="list-right">
