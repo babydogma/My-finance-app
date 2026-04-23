@@ -138,10 +138,7 @@ button {
 .analytics-expenses-hero,
 .analytics-safes-interest-card,
 .analytics-safe-list .list-card,
-.analytics-expense-category-row,
-.safe-buckets-rate-row,
-.safe-buckets-summary,
-.safe-bucket-row {
+.analytics-expense-category-row {
   position: relative;
   overflow: hidden;
   border-radius: var(--radius-card);
@@ -164,10 +161,7 @@ button {
 .analytics-expenses-hero::before,
 .analytics-safes-interest-card::before,
 .analytics-safe-list .list-card::before,
-.analytics-expense-category-row::before,
-.safe-buckets-rate-row::before,
-.safe-buckets-summary::before,
-.safe-bucket-row::before {
+.analytics-expense-category-row::before {
   content: "";
   position: absolute;
   inset: 0;
@@ -4039,11 +4033,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   border-radius: 22px;
   font-size: 17px;
   font-weight: 900;
-}
-
-/* если хочешь пока временно скрыть верхний "Годовой процент" до правки html/js */
-#safeBucketsRateBtn {
-  display: none !important;
 }
 
 @media (max-width: 420px) {
