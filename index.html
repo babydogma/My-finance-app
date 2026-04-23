@@ -428,7 +428,15 @@
     <h3 class="modal-title">Добавить операцию</h3>
 
     <div class="field">
-  <input class="input" id="amountInput" type="number" placeholder="Сумма" />
+  <input
+  class="input"
+  id="amountInput"
+  type="text"
+  inputmode="numeric"
+  pattern="[0-9]*"
+  autocomplete="off"
+  placeholder="Сумма"
+/>
 </div>
 
 <div class="field">
@@ -508,7 +516,15 @@
 </div>
 
     <div class="field">
-      <input class="input" id="budgetAmountInput" type="number" placeholder="Лимит на месяц" />
+      <input
+  class="input"
+  id="budgetAmountInput"
+  type="text"
+  inputmode="numeric"
+  pattern="[0-9]*"
+  autocomplete="off"
+  placeholder="Лимит на месяц"
+/>
     </div>
 
     
@@ -645,12 +661,14 @@
 
     <div class="field">
       <input
-        class="input safe-bucket-amount-input"
-        id="safeBucketAmountInput"
-        type="text"
-        inputmode="decimal"
-        placeholder="Введите новую сумму"
-      />
+  class="input safe-bucket-amount-input"
+  id="safeBucketAmountInput"
+  type="text"
+  inputmode="numeric"
+  pattern="[0-9]*"
+  autocomplete="off"
+  placeholder="Введите новую сумму"
+/>
     </div>
 
     <div class="modal-actions modal-actions--triple safe-bucket-amount-actions">
@@ -752,7 +770,15 @@
       </div>
 
       <div class="field">
-        <input class="input" id="mandatoryPaymentAmountInput" type="number" placeholder="Сумма" />
+        <input
+  class="input"
+  id="mandatoryPaymentAmountInput"
+  type="text"
+  inputmode="numeric"
+  pattern="[0-9]*"
+  autocomplete="off"
+  placeholder="Сумма"
+/>
       </div>
 
       <div class="field">
