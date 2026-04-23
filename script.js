@@ -234,7 +234,7 @@ let mandatoryPressStartY = 0;
 let mandatoryPressMoved = false;
 let mandatoryLongPressTriggered = false;
 let justCreatedTransactionId = null;
-const MODAL_ANIMATION_MS = 320;
+const MODAL_ANIMATION_MS = 420;
 const modalCloseTimers = new WeakMap();
 
   const UNCATEGORIZED_ID = "uncategorized";
