@@ -201,11 +201,23 @@ const closeOperationsFiltersBtn = document.getElementById("closeOperationsFilter
 const operationsRangeFromInput = document.getElementById("operationsRangeFromInput");
 const operationsRangeToInput = document.getElementById("operationsRangeToInput");
 
-function bindDigitsOnly(input) {
+function bindMoneyInput(input) {
   if (!input) return;
 
   const sanitize = () => {
-    input.value = String(input.value || "").replace(/\D+/g, "");
+    let value = String(input.value || "");
+
+    value = value.replace(/\./g, ",");
+    value = value.replace(/[^0-9,]/g, "");
+
+    const firstCommaIndex = value.indexOf(",");
+    if (firstCommaIndex !== -1) {
+      value =
+        value.slice(0, firstCommaIndex + 1) +
+        value.slice(firstCommaIndex + 1).replace(/,/g, "");
+    }
+
+    input.value = value;
   };
 
   input.addEventListener("input", sanitize);
@@ -215,10 +227,16 @@ function bindDigitsOnly(input) {
   input.addEventListener("blur", sanitize);
 }
 
-bindDigitsOnly(amountInput);
-bindDigitsOnly(budgetAmountInput);
-bindDigitsOnly(mandatoryPaymentAmountInput);
-bindDigitsOnly(safeBucketAmountInput);
+bindMoneyInput(amountInput);
+bindMoneyInput(budgetAmountInput);
+bindMoneyInput(mandatoryPaymentAmountInput);
+bindMoneyInput(safeBucketAmountInput);
+
+function parseMoneyInputValue(value) {
+  const normalized = String(value || "").trim().replace(/\s/g, "").replace(",", ".");
+  const parsed = Number(normalized);
+  return Number.isFinite(parsed) ? parsed : NaN;
+}
 
   /* =========================================================
      02. UI STATE
