@@ -5343,18 +5343,26 @@ function renderAnalyticsExpensesPremium() {
     analyticsExpensesPeriodNote.textContent = getAnalyticsExpensesPeriodTextPremium();
   }
 
-  updateAnalyticsExpenseFilterButtonsPremium();
+updateAnalyticsExpenseFilterButtonsPremium();
 renderAnalyticsExpensesCategoriesPremium(items, total);
 renderAnalyticsExpensesRingPremium(items, total);
 renderAnalyticsExpensesMonthStripPremium();
+}
 
-setTimeout(() => {
-  renderAnalyticsExpensesRingPremium(items, total);
-}, 0);
+function forceRenderAnalyticsExpensesPremium() {
+  renderAnalyticsExpensesPremium();
 
-setTimeout(() => {
-  renderAnalyticsExpensesRingPremium(items, total);
-}, 80);
+  requestAnimationFrame(() => {
+    renderAnalyticsExpensesPremium();
+  });
+
+  setTimeout(() => {
+    renderAnalyticsExpensesPremium();
+  }, 80);
+
+  setTimeout(() => {
+    renderAnalyticsExpensesPremium();
+  }, 180);
 }
 
 function renderAnalyticsExpenseCategoryPickerPremium() {
@@ -5397,17 +5405,17 @@ function renderAnalyticsExpenseCategoryPickerPremium() {
     `;
 
     button.addEventListener("click", () => {
-      analyticsExpenseCategoryFilter = category.id;
-      closeAnalyticsPremiumModal(analyticsExpenseCategoryPickerModal);
-      renderAnalyticsExpensesPremium();
-    });
+  analyticsExpenseCategoryFilter = category.id;
+  closeAnalyticsPremiumModal(analyticsExpenseCategoryPickerModal);
+  forceRenderAnalyticsExpensesPremium();
+});
 
     analyticsExpenseCategoryPickerList.appendChild(button);
   });
 }
 
 analyticsTabExpensesBtn?.addEventListener("click", () => {
-  requestAnimationFrame(renderAnalyticsExpensesPremium);
+  requestAnimationFrame(forceRenderAnalyticsExpensesPremium);
 });
 
 analyticsExpenseMonthFilterBtn?.addEventListener("click", () => {
@@ -5436,32 +5444,32 @@ analyticsExpenseCategoryPickerModal?.addEventListener("click", (event) => {
 
 analyticsPeriodButtons.forEach((button) => {
   button.addEventListener("click", () => {
-    requestAnimationFrame(renderAnalyticsExpensesPremium);
+    requestAnimationFrame(forceRenderAnalyticsExpensesPremium);
   });
 });
 
 analyticsMonthApplyBtn?.addEventListener("click", () => {
   setTimeout(() => {
     analyticsSelectedMonth = normalizeAnalyticsMonthValuePremium(analyticsSelectedMonth);
-    renderAnalyticsExpensesPremium();
+    forceRenderAnalyticsExpensesPremium();
   }, 0);
 });
 
 analyticsMonthResetBtn?.addEventListener("click", () => {
   setTimeout(() => {
     analyticsSelectedMonth = normalizeAnalyticsMonthValuePremium(getCurrentMonthValue());
-    renderAnalyticsExpensesPremium();
+    forceRenderAnalyticsExpensesPremium();
   }, 0);
 });
 
 analyticsRangeFromInput?.addEventListener("change", () => {
-  requestAnimationFrame(renderAnalyticsExpensesPremium);
+  requestAnimationFrame(forceRenderAnalyticsExpensesPremium);
 });
 
 analyticsRangeToInput?.addEventListener("change", () => {
-  requestAnimationFrame(renderAnalyticsExpensesPremium);
+  requestAnimationFrame(forceRenderAnalyticsExpensesPremium);
 });
 
-requestAnimationFrame(renderAnalyticsExpensesPremium);
+requestAnimationFrame(forceRenderAnalyticsExpensesPremium);
   
 });
