@@ -357,14 +357,67 @@
 <div class="analytics-expenses-total-note" id="analyticsExpensesPeriodNotePremium">за период</div>
   </div>
 
-  <div class="analytics-expenses-ring-zone">
+  <div class="analytics-expenses-ring-zone analytics-expenses-ring-zone--with-rail">
+  <div class="analytics-expenses-ring-layout">
     <div class="analytics-expenses-ring" id="analyticsExpensesRingPremium">
-  <div class="analytics-expenses-ring__inner">
-    <div class="analytics-expenses-ring__center-value" id="analyticsExpensesRingCenterValuePremium">0%</div>
-    <div class="analytics-expenses-ring__center-label" id="analyticsExpensesRingCenterLabelPremium">Расходы</div>
+      <div class="analytics-expenses-ring__inner">
+        <div class="analytics-expenses-ring__center-value" id="analyticsExpensesRingCenterValuePremium">0%</div>
+        <div class="analytics-expenses-ring__center-label" id="analyticsExpensesRingCenterLabelPremium">Расходы</div>
+      </div>
+    </div>
+
+    <div class="analytics-period-rail" aria-label="Быстрый выбор периода">
+      <button
+        class="history-filter-btn analytics-period-rail__btn"
+        type="button"
+        data-analytics-period="today"
+        aria-label="Сегодня"
+        title="Сегодня"
+      >
+        <svg class="analytics-period-rail__icon" viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="12" cy="12" r="8.25"></circle>
+          <circle cx="12" cy="12" r="2.1"></circle>
+          <path d="M12 3.75V6.2"></path>
+          <path d="M12 17.8v2.45"></path>
+          <path d="M3.75 12H6.2"></path>
+          <path d="M17.8 12h2.45"></path>
+        </svg>
+      </button>
+
+      <button
+        class="history-filter-btn analytics-period-rail__btn"
+        type="button"
+        data-analytics-period="7"
+        aria-label="Неделя"
+        title="Неделя"
+      >
+        <svg class="analytics-period-rail__icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M5.5 15.7C6.9 10.8 10.1 8.3 14 8.3c2.1 0 3.7.58 4.9 1.55"></path>
+          <path d="M17.7 6.4l1.7 3.65-3.9.9"></path>
+          <text x="8.05" y="17.05">7</text>
+        </svg>
+      </button>
+
+      <button
+        class="analytics-period-rail__btn analytics-period-rail__btn--range"
+        type="button"
+        id="analyticsRailRangeBtn"
+        aria-label="Период"
+        title="Период"
+      >
+        <svg class="analytics-period-rail__icon" viewBox="0 0 24 24" aria-hidden="true">
+          <circle cx="6.2" cy="12" r="2.65"></circle>
+          <path d="M8.85 12h6.3"></path>
+          <circle cx="17.8" cy="12" r="2.65"></circle>
+          <path d="M6.2 7.2v-2"></path>
+          <path d="M17.8 7.2v-2"></path>
+          <path d="M6.2 18.8v-2"></path>
+          <path d="M17.8 18.8v-2"></path>
+        </svg>
+      </button>
+    </div>
   </div>
 </div>
-  </div>
 
   <div class="analytics-expenses-month-strip" id="analyticsExpensesMonthStrip"></div>
 
