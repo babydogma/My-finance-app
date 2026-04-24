@@ -5019,6 +5019,24 @@ function getAnalyticsExpenseFilteredTransactionsPremium() {
   });
 }
 
+function getAnalyticsExpenseColor(categoryId) {
+  const allCategoryIds = [
+    ...state.categories.map((category) => category.id),
+    UNCATEGORIZED_ID,
+  ];
+
+  const uniqueIds = Array.from(new Set(allCategoryIds));
+  const index = uniqueIds.indexOf(categoryId);
+
+  if (index >= 0) {
+    return ANALYTICS_EXPENSE_COLORS[index % ANALYTICS_EXPENSE_COLORS.length];
+  }
+
+  return ANALYTICS_EXPENSE_COLORS[
+    getAnalyticsColorHash(categoryId) % ANALYTICS_EXPENSE_COLORS.length
+  ];
+}
+
 function getAnalyticsExpenseItemsPremium(expenseTransactions) {
   const byCategory = new Map();
 
@@ -5030,26 +5048,20 @@ function getAnalyticsExpenseItemsPremium(expenseTransactions) {
       categoryId,
       name: getCategoryName(categoryId),
       amount: 0,
+      color: getAnalyticsExpenseColor(categoryId),
     };
 
     current.amount += amount;
     byCategory.set(categoryId, current);
   });
 
-  const items = Array.from(byCategory.values())
+  return Array.from(byCategory.values())
     .map((item) => ({
       ...item,
       amount: roundToTwo(item.amount),
     }))
     .filter((item) => item.amount > 0)
     .sort((a, b) => b.amount - a.amount);
-
-  const colorMap = buildAnalyticsExpenseColorMap(items);
-
-  return items.map((item) => ({
-    ...item,
-    color: colorMap.get(item.categoryId) || ANALYTICS_EXPENSE_COLORS[0],
-  }));
 }
 
 function renderAnalyticsExpensesRingPremium(items, total) {
