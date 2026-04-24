@@ -4994,24 +4994,23 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   overflow: hidden !important;
 }
 
-/* базовый слой карточки */
-#mandatoryPaymentsModal #mandatoryPaymentsList .mandatory-payment-card::before {
-  z-index: 0 !important;
-}
-
-/* вот это и есть заливка при удержании */
+/* сама заливка удержания */
 #mandatoryPaymentsModal #mandatoryPaymentsList .mandatory-payment-card__progress {
+  display: block !important;
   position: absolute !important;
-  inset: 0 auto 0 0 !important;
+  top: 0 !important;
+  bottom: 0 !important;
   width: 0% !important;
   height: 100% !important;
   opacity: 0 !important;
   pointer-events: none !important;
   z-index: 1 !important;
   border-radius: inherit !important;
+  transform: translateZ(0) !important;
+  will-change: width, opacity !important;
 }
 
-/* весь контент поверх заливки */
+/* контент всегда поверх заливки */
 #mandatoryPaymentsModal #mandatoryPaymentsList .mandatory-payment-card .list-body,
 #mandatoryPaymentsModal #mandatoryPaymentsList .mandatory-payment-card .list-right,
 #mandatoryPaymentsModal #mandatoryPaymentsList .mandatory-payment-card .mandatory-payment-card__status-wrap {
@@ -5027,14 +5026,14 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   background:
     linear-gradient(
       90deg,
-      rgba(74, 216, 140, 0.34) 0%,
-      rgba(74, 216, 140, 0.22) 58%,
+      rgba(74, 216, 140, 0.36) 0%,
+      rgba(74, 216, 140, 0.24) 58%,
       rgba(74, 216, 140, 0.08) 100%
     ) !important;
   box-shadow:
-    0 0 22px rgba(74, 216, 140, 0.16),
-    inset 0 1px 0 rgba(255, 255, 255, 0.035) !important;
-  animation: mandatoryHoldPay 1.35s linear forwards !important;
+    0 0 24px rgba(74, 216, 140, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
+  animation: mandatoryHoldPayFill 1.35s linear forwards !important;
 }
 
 /* удержание оплаченного платежа → красная заливка справа налево */
@@ -5045,17 +5044,17 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   background:
     linear-gradient(
       270deg,
-      rgba(255, 114, 104, 0.32) 0%,
-      rgba(255, 114, 104, 0.2) 58%,
+      rgba(255, 114, 104, 0.34) 0%,
+      rgba(255, 114, 104, 0.22) 58%,
       rgba(255, 114, 104, 0.08) 100%
     ) !important;
   box-shadow:
-    0 0 22px rgba(255, 114, 104, 0.14),
-    inset 0 1px 0 rgba(255, 255, 255, 0.035) !important;
-  animation: mandatoryHoldUnpay 1.35s linear forwards !important;
+    0 0 24px rgba(255, 114, 104, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
+  animation: mandatoryHoldUnpayFill 1.35s linear forwards !important;
 }
 
-/* после оплаты карточка остаётся в стиле кошелька, но с лёгким зелёным намёком */
+/* лёгкий статусный намёк, но не полная заливка карточки */
 #mandatoryPaymentsModal #mandatoryPaymentsList .mandatory-payment-card[data-paid="true"] {
   border-color: rgba(74, 216, 140, 0.16) !important;
   box-shadow:
@@ -5064,11 +5063,43 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     inset 0 1px 0 rgba(255, 255, 255, 0.03) !important;
 }
 
-/* неоплаченная — лёгкий красный намёк, без полной красной заливки */
 #mandatoryPaymentsModal #mandatoryPaymentsList .mandatory-payment-card[data-paid="false"] {
   border-color: rgba(255, 114, 104, 0.14) !important;
   box-shadow:
     var(--shadow-card),
     0 0 18px rgba(255, 114, 104, 0.045),
     inset 0 1px 0 rgba(255, 255, 255, 0.03) !important;
+}
+
+/* ВОТ ЭТОГО НЕ ХВАТАЛО */
+@keyframes mandatoryHoldPayFill {
+  0% {
+    width: 0%;
+    opacity: 0;
+  }
+
+  6% {
+    opacity: 1;
+  }
+
+  100% {
+    width: 100%;
+    opacity: 1;
+  }
+}
+
+@keyframes mandatoryHoldUnpayFill {
+  0% {
+    width: 0%;
+    opacity: 0;
+  }
+
+  6% {
+    opacity: 1;
+  }
+
+  100% {
+    width: 100%;
+    opacity: 1;
+  }
 }
