@@ -227,16 +227,19 @@ function bindMoneyInput(input) {
   input.addEventListener("blur", sanitize);
 }
 
+function parseMoneyInputValue(value) {
+  const normalized = String(value || "")
+    .trim()
+    .replace(/\s/g, "")
+    .replace(",", ".");
+  const parsed = Number(normalized);
+  return Number.isFinite(parsed) ? parsed : NaN;
+}
+
 bindMoneyInput(amountInput);
 bindMoneyInput(budgetAmountInput);
 bindMoneyInput(mandatoryPaymentAmountInput);
 bindMoneyInput(safeBucketAmountInput);
-
-function parseMoneyInputValue(value) {
-  const normalized = String(value || "").trim().replace(/\s/g, "").replace(",", ".");
-  const parsed = Number(normalized);
-  return Number.isFinite(parsed) ? parsed : NaN;
-}
 
   /* =========================================================
      02. UI STATE
@@ -1076,7 +1079,7 @@ function openMandatoryPaymentEditor(paymentId) {
   activeMandatoryPaymentId = paymentId;
 
   mandatoryPaymentTitleInput.value = item.title || "";
-  mandatoryPaymentAmountInput.value = String(Number(item.amount) || 0);
+  mandatoryPaymentAmountInput.value = String(Number(item.amount) || 0).replace(".", ",");
   mandatoryPaymentDueDayInput.value = buildDateFromDueDay(item.due_day);
 
   fillMandatoryPaymentAccountSelect(item.linked_account_id || "");
@@ -1395,7 +1398,7 @@ function renderMandatoryPaymentsModal() {
 
 async function saveMandatoryPayment() {
   const title = mandatoryPaymentTitleInput.value.trim();
-  const amount = Number(String(mandatoryPaymentAmountInput.value).replace(",", "."));
+  const amount = parseMoneyInputValue(mandatoryPaymentAmountInput.value);
   const dueDateValue = mandatoryPaymentDueDayInput.value;
   const linkedAccountId = mandatoryPaymentAccountSelect?.value || "";
   const linkedSafeBucketId = mandatoryPaymentLinkedSafeSelect?.value || "";
@@ -2647,7 +2650,7 @@ function openBudgetModal(categoryId) {
   budgetModalTitle.textContent = category.name || "Категория";
   budgetCategoryNameInput.value = category.name || "";
   budgetCategoryRequiredInput.checked = Boolean(category.is_required);
-  budgetAmountInput.value = existing ? Number(existing.monthly_limit) : "";
+  budgetAmountInput.value = existing ? String(Number(existing.monthly_limit) || 0).replace(".", ",") : "";
 
   if (deleteCategoryBtn) {
     deleteCategoryBtn.classList.toggle("hidden", Boolean(category.locked));
@@ -3066,10 +3069,8 @@ async function saveSafeBucketAmount() {
 
   const nextName = safeBucketNameInput.value.trim();
   const interestRaw = safeBucketInterestInput.value.replace(/\s/g, "").replace(",", ".");
-  const amountRaw = safeBucketAmountInput.value.replace(/\s/g, "").replace(",", ".");
-
-  const nextInterestPercent = Number(interestRaw);
-  const nextAmount = Number(amountRaw);
+const nextInterestPercent = Number(interestRaw);
+const nextAmount = parseMoneyInputValue(safeBucketAmountInput.value);
 
   if (!nextName) {
     alert("Введи название накопления");
@@ -3372,7 +3373,7 @@ function openEditModal(transactionId) {
 
     fillExpenseCategorySelect(transaction.category_id || UNCATEGORIZED_ID);
 
-    amountInput.value = transaction.amount;
+    amountInput.value = String(transaction.amount).replace(".", ",");
     dateInput.value = transaction.created_at
       ? String(transaction.created_at).slice(0, 10)
       : getTodayDateValue();
@@ -3388,7 +3389,7 @@ function openEditModal(transactionId) {
     fromAccountField.classList.add("hidden");
     toAccountField.classList.add("hidden");
 
-    amountInput.value = transaction.amount;
+    amountInput.value = String(transaction.amount).replace(".", ",");
     dateInput.value = transaction.created_at
       ? String(transaction.created_at).slice(0, 10)
       : getTodayDateValue();
@@ -3404,7 +3405,7 @@ function openEditModal(transactionId) {
     fromAccountField.classList.remove("hidden");
     toAccountField.classList.remove("hidden");
 
-    amountInput.value = transaction.amount;
+    amountInput.value = String(transaction.amount).replace(".", ",");
     dateInput.value = transaction.created_at
       ? String(transaction.created_at).slice(0, 10)
       : getTodayDateValue();
@@ -4104,7 +4105,7 @@ function animateTransactionDelete(transactionId) {
      09. TRANSACTIONS CRUD
      ========================================================= */
   function buildTransactionFromForm() {
-  const amount = Number(amountInput.value.trim());
+  const amount = parseMoneyInputValue(amountInput.value);
   const comment = commentInput.value.trim();
 
   if (!amount || amount <= 0) {
@@ -4370,7 +4371,7 @@ async function saveBudgetLimit() {
   const nextName = budgetCategoryNameInput.value.trim();
   const isRequired = Boolean(budgetCategoryRequiredInput.checked);
   const amountRaw = budgetAmountInput.value.trim();
-  const amount = amountRaw === "" ? 0 : Number(amountRaw);
+const amount = amountRaw === "" ? 0 : parseMoneyInputValue(amountRaw);
 
   if (!nextName) {
     alert("Введи название категории");
