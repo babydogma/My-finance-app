@@ -3943,51 +3943,12 @@ input[type="date"]::-webkit-calendar-picker-indicator {
    ========================================================= */
 
 .analytics-expenses-screen {
-  margin-top: 14px;
+  margin-top: 10px;
   padding-top: 0;
 }
 
-.analytics-expenses-filter-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  padding: 0;
-  margin: 0 0 18px;
-}
-
-.analytics-expenses-chip {
-  min-width: 0;
-  height: 42px;
-  padding: 0 14px;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.115);
-  background:
-    linear-gradient(180deg, rgba(21, 22, 28, 0.98) 0%, rgba(13, 14, 18, 0.98) 100%);
-  color: rgba(248, 249, 255, 0.94);
-  font-size: 16px;
-  font-weight: 880;
-  letter-spacing: -0.045em;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.045),
-    0 10px 22px rgba(0, 0, 0, 0.18);
-}
-
-.analytics-expenses-chip::after {
-  content: "▾";
-  margin-left: 7px;
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.78);
-}
-
-.analytics-expenses-chip:active {
-  transform: scale(0.985);
-}
-
 .analytics-expenses-total-block {
-  margin-top: 4px;
+  margin-top: 0;
   margin-bottom: 10px;
 }
 
@@ -4275,51 +4236,4 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   font-weight: 760;
   letter-spacing: -0.03em;
   color: rgba(255, 255, 255, 0.46);
-}
-
-.analytics-expense-category-picker-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.analytics-expense-category-picker-item {
-  width: 100%;
-  min-height: 54px;
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: 18px;
-  padding: 0 15px;
-  background:
-    linear-gradient(180deg, rgba(45, 48, 60, 0.7) 0%, rgba(31, 34, 44, 0.74) 100%);
-  color: #f7f8fb;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  text-align: left;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.035),
-    0 8px 18px rgba(0, 0, 0, 0.14);
-}
-
-.analytics-expense-category-picker-item span {
-  min-width: 0;
-  font-size: 16px;
-  font-weight: 820;
-  letter-spacing: -0.035em;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.analytics-expense-category-picker-item strong {
-  color: #6DD36F;
-  font-size: 17px;
-  font-weight: 900;
-}
-
-.analytics-expense-category-picker-item.is-active {
-  border-color: rgba(109, 211, 111, 0.32);
-  background:
-    linear-gradient(180deg, rgba(63, 87, 69, 0.72) 0%, rgba(35, 49, 39, 0.78) 100%);
 }
