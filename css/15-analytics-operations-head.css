@@ -94,6 +94,10 @@
   -webkit-backdrop-filter: blur(18px);
 }
 
+.analytics-mode-switch--two {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .analytics-mode-switch__btn {
   min-width: 0;
   width: 100%;
