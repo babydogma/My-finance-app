@@ -71,6 +71,7 @@ const mandatoryPaymentsModal = document.getElementById("mandatoryPaymentsModal")
 const openMandatoryPaymentsModalBtn = document.getElementById("openMandatoryPaymentsModalBtn");
 const closeMandatoryPaymentsModalBtn = document.getElementById("closeMandatoryPaymentsModalBtn");
 const mandatoryPaymentsList = document.getElementById("mandatoryPaymentsList");
+const mandatoryPaymentsMonthStrip = document.getElementById("mandatoryPaymentsMonthStrip");
 const openMandatoryPaymentEditorBtn = document.getElementById("openMandatoryPaymentEditorBtn");
 
 const mandatoryPaymentEditorModal = document.getElementById("mandatoryPaymentEditorModal");
@@ -335,6 +336,7 @@ bindMoneyInput(safeBucketAmountInput);
      ========================================================= */
   let currentMode = "expense";
   let editingTransactionId = null;
+  let mandatoryPaymentsSelectedMonth = getCurrentMonthValue();
 
   let analyticsFilterPeriod = "month";
   let analyticsSelectedMonth = getCurrentMonthValue();
@@ -1597,6 +1599,68 @@ closeMandatoryPaymentEditorModal();
     const month = String(now.getMonth() + 1).padStart(2, "0");
     return `${year}-${month}`;
   }
+  
+  function getMandatoryPaymentsMonthLabel(monthKey) {
+  const [year, month] = String(monthKey).split("-").map(Number);
+  const date = new Date(year, month - 1, 1);
+
+  return date.toLocaleDateString("ru-RU", {
+    month: "short",
+  }).replace(".", "");
+}
+
+function getMandatoryPaymentsMonthItems() {
+  const current = getCurrentMonthValue();
+  const [year, month] = current.split("-").map(Number);
+  const baseDate = new Date(year, month - 1, 1);
+
+  const items = [];
+
+  for (let index = -3; index <= 3; index += 1) {
+    const date = new Date(baseDate.getFullYear(), baseDate.getMonth() + index, 1);
+    const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+
+    items.push({
+      key,
+      label: getMandatoryPaymentsMonthLabel(key),
+      isCurrent: key === current,
+    });
+  }
+
+  return items;
+}
+
+function renderMandatoryPaymentsMonthStrip() {
+  if (!mandatoryPaymentsMonthStrip) return;
+
+  const items = getMandatoryPaymentsMonthItems();
+
+  mandatoryPaymentsMonthStrip.innerHTML = "";
+
+  items.forEach((item) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = `mandatory-payments-month-chip${
+      item.key === mandatoryPaymentsSelectedMonth ? " is-active" : ""
+    }`;
+
+    button.innerHTML = `
+      <span>${item.label}</span>
+      ${item.isCurrent ? "<small>сейчас</small>" : ""}
+    `;
+
+    button.addEventListener("click", () => {
+      mandatoryPaymentsSelectedMonth = item.key;
+      renderMandatoryPaymentsMonthStrip();
+
+      if (typeof renderMandatoryPaymentsList === "function") {
+        renderMandatoryPaymentsList();
+      }
+    });
+
+    mandatoryPaymentsMonthStrip.appendChild(button);
+  });
+}
 
   function formatDateRangeLabel(fromValue, toValue) {
     if (!fromValue || !toValue) return "";
