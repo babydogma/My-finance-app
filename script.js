@@ -269,6 +269,38 @@ const analyticsMandatoryTotalValue = document.getElementById("analyticsMandatory
 const analyticsMandatoryCoveredValue = document.getElementById("analyticsMandatoryCoveredValue");
 const analyticsRemainingBudgetsValue = document.getElementById("analyticsRemainingBudgetsValue");
 
+const walletMandatoryValueEls = [
+  analyticsPendingMandatoryValue,
+  analyticsMandatoryTotalValue,
+  analyticsMandatoryCoveredValue,
+  analyticsRemainingBudgetsValue,
+].filter(Boolean);
+
+function forceWalletMandatoryValuesPaint() {
+  walletMandatoryValueEls.forEach((valueEl) => {
+    valueEl.style.transform = "translateZ(0) scale(1.0001)";
+    valueEl.offsetHeight;
+    valueEl.style.transform = "translateZ(0)";
+  });
+}
+
+const walletMandatoryValuesObserver = new MutationObserver(() => {
+  requestAnimationFrame(forceWalletMandatoryValuesPaint);
+});
+
+walletMandatoryValueEls.forEach((valueEl) => {
+  walletMandatoryValuesObserver.observe(valueEl, {
+    childList: true,
+    characterData: true,
+    subtree: true,
+  });
+});
+
+requestAnimationFrame(forceWalletMandatoryValuesPaint);
+setTimeout(forceWalletMandatoryValuesPaint, 80);
+setTimeout(forceWalletMandatoryValuesPaint, 240);
+setTimeout(forceWalletMandatoryValuesPaint, 600);
+
 const analyticsExpenseValue = document.getElementById("analyticsExpenseValue");
 const analyticsExpensesPeriodNote = document.getElementById("analyticsExpensesPeriodNote");
 const analyticsExpensesCategoriesList = document.getElementById("analyticsExpensesCategoriesList");
