@@ -1,0 +1,45 @@
+/* =========================================================
+   23. HELPERS
+   Small global helpers and utility classes
+   ========================================================= */
+
+input[type="date"] {
+  appearance: none;
+  -webkit-appearance: none;
+  color: var(--text);
+}
+
+input[type="date"]::-webkit-date-and-time-value {
+  text-align: left;
+  color: var(--text);
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: 0.9;
+  cursor: pointer;
+  filter: invert(1) brightness(0.9);
+}
+
+.list-icon--green {
+  background: rgba(64, 140, 98, 0.52) !important;
+}
+
+.list-icon--blue {
+  background: rgba(79, 110, 178, 0.54) !important;
+}
+
+.list-icon--amber {
+  background: rgba(172, 132, 58, 0.56) !important;
+}
+
+.list-icon--red {
+  background: rgba(163, 92, 84, 0.54) !important;
+}
+
+.list-icon--purple {
+  background: rgba(118, 87, 170, 0.56) !important;
+}
+
+.list-icon--neutral {
+  background: rgba(108, 113, 132, 0.5) !important;
+}
