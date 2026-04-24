@@ -900,7 +900,7 @@ const toIsSafes = isVaultAccountId(toAccountSelect?.value);
     return item ? item.value : "";
   }
   
-  function parseMandatoryPaymentsFromMeta() {
+function parseMandatoryPaymentsFromMeta() {
   const raw = getAppMetaValue("mandatory_payments");
   if (!raw) return [];
 
@@ -908,16 +908,38 @@ const toIsSafes = isVaultAccountId(toAccountSelect?.value);
     const parsed = JSON.parse(raw);
     if (!Array.isArray(parsed)) return [];
 
-    return parsed.map((item) => ({
-      id: item.id || crypto.randomUUID(),
-      title: String(item.title || "").trim(),
-      amount: roundToTwo(Number(item.amount) || 0),
-      due_day: Math.min(31, Math.max(1, Number(item.due_day) || 1)),
-      linked_account_id: item.linked_account_id || "",
-linked_safe_bucket_id: item.linked_safe_bucket_id || "",
-      enabled: item.enabled !== false,
-      last_paid_period: item.last_paid_period || "",
-    }));
+    return parsed.map((item) => {
+      const legacyLastPaidPeriod = item.last_paid_period || "";
+
+      const paidPeriods = Array.isArray(item.paid_periods)
+        ? item.paid_periods.filter(Boolean)
+        : [];
+
+      if (legacyLastPaidPeriod && !paidPeriods.includes(legacyLastPaidPeriod)) {
+        paidPeriods.push(legacyLastPaidPeriod);
+      }
+
+      const startPeriod =
+        item.start_period ||
+        item.due_period ||
+        item.period ||
+        getCurrentMonthValue();
+
+      return {
+        id: item.id || crypto.randomUUID(),
+        title: String(item.title || "").trim(),
+        amount: roundToTwo(Number(item.amount) || 0),
+        due_day: Math.min(31, Math.max(1, Number(item.due_day) || 1)),
+        start_period: startPeriod,
+        paid_periods: paidPeriods,
+        linked_account_id: item.linked_account_id || "",
+        linked_safe_bucket_id: item.linked_safe_bucket_id || "",
+        enabled: item.enabled !== false,
+
+        // legacy, чтобы старые данные не развалились
+        last_paid_period: legacyLastPaidPeriod,
+      };
+    });
   } catch (error) {
     console.error("Ошибка mandatory_payments", error);
     return [];
@@ -949,11 +971,60 @@ function getMandatoryPaymentsActiveMonthKey() {
   return mandatoryPaymentsSelectedMonth || getCurrentMonthValue();
 }
 
+function isMandatoryPaymentVisibleInMonth(item, monthKey) {
+  if (item.enabled === false) return false;
+
+  const startPeriod = item.start_period || getCurrentMonthValue();
+
+  return startPeriod <= monthKey;
+}
+
+function getMandatoryPaymentPaidPeriods(item) {
+  if (Array.isArray(item.paid_periods)) {
+    return item.paid_periods.filter(Boolean);
+  }
+
+  return item.last_paid_period ? [item.last_paid_period] : [];
+}
+
+function isMandatoryPaymentPaidInMonth(item, monthKey) {
+  return getMandatoryPaymentPaidPeriods(item).includes(monthKey);
+}
+
+function setMandatoryPaymentPaidInMonth(item, monthKey, isPaid) {
+  const periods = new Set(getMandatoryPaymentPaidPeriods(item));
+
+  if (isPaid) {
+    periods.add(monthKey);
+  } else {
+    periods.delete(monthKey);
+  }
+
+  item.paid_periods = [...periods].sort();
+  item.last_paid_period = item.paid_periods[item.paid_periods.length - 1] || "";
+}
+
+function buildMandatoryPaymentDate(monthKey, dueDay) {
+  const [year, month] = String(monthKey).split("-");
+  const safeDay = String(Math.min(31, Math.max(1, Number(dueDay) || 1))).padStart(2, "0");
+
+  return `${year}-${month}-${safeDay}`;
+}
+
+function buildMandatoryPaymentTransactionCreatedAt(monthKey, dueDay) {
+  const dateKey = buildMandatoryPaymentDate(monthKey, dueDay);
+  return new Date(`${dateKey}T12:00:00`).toISOString();
+}
+
+function getMandatoryPaymentsActiveMonthKey() {
+  return mandatoryPaymentsSelectedMonth || getCurrentMonthValue();
+}
+
 function getMandatoryPaymentsStats(monthKey = getCurrentMonthKey()) {
   const unpaidItems = state.mandatoryPayments.filter((item) => {
-    if (item.enabled === false) return false;
-    return item.last_paid_period !== monthKey;
-  });
+  if (!isMandatoryPaymentVisibleInMonth(item, monthKey)) return false;
+  return !isMandatoryPaymentPaidInMonth(item, monthKey);
+});
 
   const total = unpaidItems.reduce((sum, item) => {
     return sum + (Number(item.amount) || 0);
@@ -1175,7 +1246,10 @@ function openMandatoryPaymentEditor(paymentId) {
 
   mandatoryPaymentTitleInput.value = item.title || "";
   mandatoryPaymentAmountInput.value = String(Number(item.amount) || 0).replace(".", ",");
-  mandatoryPaymentDueDayInput.value = buildDateFromDueDay(item.due_day);
+  mandatoryPaymentDueDayInput.value = buildDateFromDueDay(
+  item.due_day,
+  item.start_period || getMandatoryPaymentsActiveMonthKey()
+);
 
   fillMandatoryPaymentAccountSelect(item.linked_account_id || "");
   fillMandatoryPaymentSafeSelect(item.linked_safe_bucket_id || "");
@@ -1209,26 +1283,24 @@ function openMandatoryPaymentEditor(paymentId) {
   mandatoryPaymentTitleInput.focus();
 }
 
-function buildDateFromDueDay(dueDay) {
-  const activeMonth = getMandatoryPaymentsActiveMonthKey();
-  const [year, month] = activeMonth.split("-");
-  const safeDay = String(Math.min(31, Math.max(1, Number(dueDay) || 1))).padStart(2, "0");
-  return `${year}-${month}-${safeDay}`;
+function buildDateFromDueDay(dueDay, monthKey = getMandatoryPaymentsActiveMonthKey()) {
+  return buildMandatoryPaymentDate(monthKey, dueDay);
 }
 
 async function toggleMandatoryPaymentPaid(paymentId) {
   const item = state.mandatoryPayments.find((entry) => entry.id === paymentId);
   if (!item) return false;
 
-  const currentMonthKey = getMandatoryPaymentsActiveMonthKey();
-  const isPaid = item.last_paid_period === currentMonthKey;
+  const monthKey = getMandatoryPaymentsActiveMonthKey();
+  const isPaid = isMandatoryPaymentPaidInMonth(item, monthKey);
 
   if (!isPaid) {
-    const transactionOk = await createMandatoryPaymentExpense(item);
+    const transactionOk = await createMandatoryPaymentExpense(item, monthKey);
     if (!transactionOk) return false;
-    item.last_paid_period = currentMonthKey;
+
+    setMandatoryPaymentPaidInMonth(item, monthKey, true);
   } else {
-    item.last_paid_period = "";
+    setMandatoryPaymentPaidInMonth(item, monthKey, false);
   }
 
   const ok = await saveMandatoryPaymentsToMeta();
@@ -1240,7 +1312,7 @@ async function toggleMandatoryPaymentPaid(paymentId) {
   return true;
 }
 
-async function createMandatoryPaymentExpense(item) {
+async function createMandatoryPaymentExpense(item, monthKey = getMandatoryPaymentsActiveMonthKey()) {
   const accountId = item.linked_account_id || "";
   if (!accountId) return true;
 
@@ -1266,7 +1338,7 @@ async function createMandatoryPaymentExpense(item) {
     to_account: null,
     from_safe_bucket_id: isVaultAccountId(account.id) ? (item.linked_safe_bucket_id || null) : null,
     to_safe_bucket_id: null,
-    created_at: new Date().toISOString(),
+    created_at: buildMandatoryPaymentTransactionCreatedAt(monthKey, item.due_day),
     time_label: getCurrentTime(),
   };
 
@@ -1287,7 +1359,7 @@ function startMandatoryPaymentLongPress(card, item, startX = 0, startY = 0) {
   if (!card || !item) return;
 
   const currentMonthKey = getMandatoryPaymentsActiveMonthKey();
-  const isPaid = item.last_paid_period === currentMonthKey;
+const isPaid = isMandatoryPaymentPaidInMonth(item, currentMonthKey);
 
   mandatoryLongPressTriggered = false;
   mandatoryPressMoved = false;
@@ -1445,12 +1517,28 @@ function renderMandatoryPaymentsModal() {
 
   const currentMonthKey = getMandatoryPaymentsActiveMonthKey();
 
-  state.mandatoryPayments
-    .slice()
-    .sort((a, b) => a.due_day - b.due_day)
-    .forEach((item) => {
-      const isPaid = item.last_paid_period === currentMonthKey;
+const visiblePayments = state.mandatoryPayments
+  .filter((item) => isMandatoryPaymentVisibleInMonth(item, currentMonthKey));
 
+if (!visiblePayments.length) {
+  const empty = document.createElement("div");
+  empty.className = "list-card";
+  empty.innerHTML = `
+    <div class="list-body">
+      <h3 class="list-title">Платежей в этом месяце нет</h3>
+      <p class="list-subtitle">Добавь платёж с датой в выбранном месяце</p>
+    </div>
+  `;
+  mandatoryPaymentsList.appendChild(empty);
+  return;
+}
+
+visiblePayments
+  .slice()
+  .sort((a, b) => a.due_day - b.due_day)
+  .forEach((item) => {
+    const isPaid = isMandatoryPaymentPaidInMonth(item, currentMonthKey);
+    
       const linkedSafeName = item.linked_safe_bucket_id
         ? getSafeBucketName(item.linked_safe_bucket_id)
         : "";
@@ -1523,6 +1611,7 @@ async function saveMandatoryPayment() {
   }
 
   const dueDay = new Date(`${dueDateValue}T00:00:00`).getDate();
+  const duePeriod = String(dueDateValue).slice(0, 7);
 
   if (activeMandatoryPaymentId) {
     const target = state.mandatoryPayments.find((entry) => entry.id === activeMandatoryPaymentId);
@@ -1531,18 +1620,23 @@ async function saveMandatoryPayment() {
     target.title = title;
     target.amount = roundToTwo(amount);
     target.due_day = dueDay;
-    target.linked_account_id = linkedAccountId;
-    target.linked_safe_bucket_id = linkedSafeBucketId;
+target.start_period = duePeriod;
+target.paid_periods = getMandatoryPaymentPaidPeriods(target).filter((period) => period >= duePeriod);
+target.last_paid_period = target.paid_periods[target.paid_periods.length - 1] || "";
+target.linked_account_id = linkedAccountId;
+target.linked_safe_bucket_id = linkedSafeBucketId;
   } else {
     state.mandatoryPayments.push({
       id: crypto.randomUUID(),
       title,
       amount: roundToTwo(amount),
       due_day: dueDay,
-      linked_account_id: linkedAccountId,
-      linked_safe_bucket_id: linkedSafeBucketId,
-      enabled: true,
-      last_paid_period: "",
+start_period: duePeriod,
+paid_periods: [],
+linked_account_id: linkedAccountId,
+linked_safe_bucket_id: linkedSafeBucketId,
+enabled: true,
+last_paid_period: "",
     });
   }
 
