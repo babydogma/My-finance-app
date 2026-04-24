@@ -4777,3 +4777,210 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     font-size: 10px;
   }
 }
+
+/* =========================================================
+   MANDATORY PAYMENTS MODAL — WALLET LIST FINAL FIX
+   ========================================================= */
+
+#mandatoryPaymentsModal .mandatory-payments-panel {
+  padding: 0 !important;
+  margin-top: 14px !important;
+  border: none !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+}
+
+#mandatoryPaymentsModal #mandatoryPaymentsList {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: visible !important;
+}
+
+#mandatoryPaymentsModal #mandatoryPaymentsList > .list-card,
+#mandatoryPaymentsModal #mandatoryPaymentsList > .mandatory-payment-card {
+  width: 100% !important;
+  min-height: 78px !important;
+  padding: 12px 14px !important;
+  border-radius: 22px !important;
+
+  display: flex !important;
+  align-items: center !important;
+  gap: 13px !important;
+
+  border: 1px solid var(--border) !important;
+  background:
+    linear-gradient(180deg, rgba(60, 66, 84, 0.28) 0%, rgba(31, 36, 50, 0.18) 100%) !important;
+  box-shadow:
+    var(--shadow-card),
+    0 0 18px rgba(111, 156, 255, 0.03),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03) !important;
+
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+
+  overflow: hidden !important;
+  text-align: left !important;
+}
+
+#mandatoryPaymentsModal #mandatoryPaymentsList > .list-card::before,
+#mandatoryPaymentsModal #mandatoryPaymentsList > .mandatory-payment-card::before {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  background: linear-gradient(180deg, rgba(255,255,255,0.018) 0%, rgba(255,255,255,0) 40%) !important;
+  pointer-events: none !important;
+}
+
+/* убираем зелёно-красную заливку всей карточки */
+#mandatoryPaymentsModal #mandatoryPaymentsList .mandatory-payment-card[data-paid="true"],
+#mandatoryPaymentsModal #mandatoryPaymentsList .mandatory-payment-card[data-paid="false"] {
+  border-color: var(--border) !important;
+  background:
+    linear-gradient(180deg, rgba(60, 66, 84, 0.28) 0%, rgba(31, 36, 50, 0.18) 100%) !important;
+  box-shadow:
+    var(--shadow-card),
+    0 0 18px rgba(111, 156, 255, 0.03),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03) !important;
+}
+
+#mandatoryPaymentsModal #mandatoryPaymentsList .mandatory-payment-card__progress {
+  border-radius: inherit !important;
+}
+
+#mandatoryPaymentsModal #mandatoryPaymentsList .list-body {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+#mandatoryPaymentsModal #mandatoryPaymentsList .list-title-row {
+  min-width: 0 !important;
+  margin-bottom: 4px !important;
+}
+
+#mandatoryPaymentsModal #mandatoryPaymentsList .list-title {
+  margin: 0 !important;
+  color: #f5f7fd !important;
+  font-size: 16px !important;
+  font-weight: 760 !important;
+  line-height: 1.08 !important;
+  letter-spacing: -0.025em !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+#mandatoryPaymentsModal #mandatoryPaymentsList .list-subtitle {
+  margin: 0 !important;
+  color: rgba(255, 255, 255, 0.42) !important;
+  font-size: 11px !important;
+  font-weight: 620 !important;
+  line-height: 1.18 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+#mandatoryPaymentsModal #mandatoryPaymentsList .list-right,
+#mandatoryPaymentsModal #mandatoryPaymentsList .mandatory-payment-card__status-wrap {
+  flex: 0 0 auto !important;
+  min-width: 96px !important;
+  margin-left: auto !important;
+  padding-left: 10px !important;
+  text-align: right !important;
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+#mandatoryPaymentsModal #mandatoryPaymentsList .mandatory-payment-card__status {
+  margin: 0 !important;
+  min-height: 30px !important;
+  padding: 0 10px !important;
+  border-radius: 999px !important;
+
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  font-size: 11px !important;
+  font-weight: 860 !important;
+  line-height: 1 !important;
+  letter-spacing: -0.02em !important;
+  white-space: nowrap !important;
+}
+
+#mandatoryPaymentsModal #mandatoryPaymentsList .mandatory-payment-card__status.is-paid {
+  color: #9ee8b8 !important;
+  background: rgba(74, 216, 140, 0.12) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.035) !important;
+  text-shadow: none !important;
+}
+
+#mandatoryPaymentsModal #mandatoryPaymentsList .mandatory-payment-card__status.is-unpaid {
+  color: #ff9dae !important;
+  background: rgba(255, 114, 104, 0.12) !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.035) !important;
+  text-shadow: none !important;
+}
+
+/* кнопка добавления — по центру, не во всю ширину */
+#mandatoryPaymentsModal #openMandatoryPaymentEditorBtn.mandatory-payments-add-btn,
+#mandatoryPaymentsModal #openMandatoryPaymentEditorBtn {
+  width: min(100%, 320px) !important;
+  min-width: 0 !important;
+  height: 58px !important;
+  margin: 14px auto 0 !important;
+  border-radius: 22px !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* чтобы низ кнопки не резался внутри модалки */
+#mandatoryPaymentsModal .modal-sheet {
+  padding-bottom: calc(28px + env(safe-area-inset-bottom, 0px)) !important;
+}
+
+@media (max-width: 420px) {
+  #mandatoryPaymentsModal #mandatoryPaymentsList > .list-card,
+  #mandatoryPaymentsModal #mandatoryPaymentsList > .mandatory-payment-card {
+    min-height: 74px !important;
+    padding: 11px 12px !important;
+    border-radius: 20px !important;
+    gap: 10px !important;
+  }
+
+  #mandatoryPaymentsModal #mandatoryPaymentsList .list-title {
+    font-size: 15px !important;
+  }
+
+  #mandatoryPaymentsModal #mandatoryPaymentsList .list-subtitle {
+    font-size: 10.5px !important;
+  }
+
+  #mandatoryPaymentsModal #mandatoryPaymentsList .list-right,
+  #mandatoryPaymentsModal #mandatoryPaymentsList .mandatory-payment-card__status-wrap {
+    min-width: 82px !important;
+    padding-left: 8px !important;
+  }
+
+  #mandatoryPaymentsModal #mandatoryPaymentsList .mandatory-payment-card__status {
+    min-height: 28px !important;
+    padding: 0 8px !important;
+    font-size: 10px !important;
+  }
+
+  #mandatoryPaymentsModal #openMandatoryPaymentEditorBtn.mandatory-payments-add-btn,
+  #mandatoryPaymentsModal #openMandatoryPaymentEditorBtn {
+    width: min(100%, 300px) !important;
+    height: 54px !important;
+    border-radius: 20px !important;
+  }
+}
