@@ -4127,7 +4127,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .analytics-expenses-total-value {
-  font-size: clamp(42px, 11vw, 56px);
+  font-size: clamp(36px, 9vw, 48px);
   line-height: 0.92;
   font-weight: 950;
   letter-spacing: -0.075em;
@@ -4152,8 +4152,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .analytics-expenses-ring {
-  width: min(210px, 56vw);
-  height: min(210px, 56vw);
+  width: min(190px, 52vw);
+  height: min(190px, 52vw);
   border-radius: 50%;
   position: relative;
   background: var(
@@ -4179,7 +4179,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 .analytics-expenses-ring__inner {
   position: absolute;
-  inset: 30px;
+  inset: 27px;
   border-radius: 50%;
   background: #0b0b0e;
   display: flex;
@@ -4282,7 +4282,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 .analytics-expenses-total-row span,
 .analytics-expenses-total-row strong {
-  font-size: clamp(28px, 8vw, 38px);
+  font-size: clamp(24px, 6.6vw, 32px);
   line-height: 1;
   font-weight: 940;
   letter-spacing: -0.07em;
@@ -4323,16 +4323,16 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .analytics-expense-category-row__icon {
-  width: 52px;
-  height: 52px;
-  flex: 0 0 52px;
+  width: 46px;
+  height: 46px;
+  flex: 0 0 46px;
   border-radius: 50%;
   background: var(--category-color);
   color: rgba(8, 10, 14, 0.92);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 21px;
+  font-size: 18px;
   font-weight: 940;
   letter-spacing: -0.06em;
   box-shadow:
@@ -4355,7 +4355,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 .analytics-expense-category-row__name {
   min-width: 0;
-  font-size: 21px;
+  font-size: 18px;
   line-height: 1.03;
   font-weight: 910;
   letter-spacing: -0.06em;
@@ -4367,7 +4367,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
 .analytics-expense-category-row__amount {
   flex: 0 0 auto;
-  font-size: 21px;
+  font-size: 18px;
   line-height: 1;
   font-weight: 900;
   letter-spacing: -0.055em;
