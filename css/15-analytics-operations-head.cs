@@ -126,6 +126,16 @@
     0 0 22px rgba(111,156,255,0.1);
 }
 
+/* Operations title cleanup */
+
+.operations-screen__title {
+  margin: 0;
+}
+
+.operations-screen__subtitle {
+  margin: 0;
+}
+
 @media (max-width: 420px) {
   .analytics-hub-head__title,
   .operations-screen__title {
