@@ -248,9 +248,8 @@
     </div>
   </section>
 
-  <div class="analytics-mode-switch analytics-mode-switch--wide">
-  <button class="analytics-mode-switch__btn is-active" type="button" id="analyticsTabOverviewBtn">Обзор</button>
-  <button class="analytics-mode-switch__btn" type="button" id="analyticsTabExpensesBtn">Расходы</button>
+  <div class="analytics-mode-switch analytics-mode-switch--wide analytics-mode-switch--two">
+  <button class="analytics-mode-switch__btn is-active" type="button" id="analyticsTabExpensesBtn">Расходы</button>
   <button class="analytics-mode-switch__btn" type="button" id="analyticsTabSafesBtn">Накопления</button>
 </div>
 
@@ -324,38 +323,6 @@
     </div>
   </div>
 
-  <section class="section analytics-overview-section" id="analyticsOverviewSection">
-  <div class="analytics-overview-balance-card">
-    <div class="analytics-overview-balance-card__value" id="analyticsTotalBalanceValue">0 ₽</div>
-
-    <div class="analytics-overview-balance-card__metrics">
-      <div class="analytics-overview-balance-card__metric">
-        <span>Свободно: <strong id="analyticsFreeMoneyValue">0 ₽</strong></span>
-        <button class="faq-chip" type="button" data-faq-key="free_money" aria-label="Что это?">❔</button>
-      </div>
-
-      <div class="analytics-overview-balance-card__metric">
-        <span>Защищённые: <strong id="analyticsProtectedMoneyValue">0 ₽</strong></span>
-        <button class="faq-chip" type="button" data-faq-key="protected_money" aria-label="Что это?">❔</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="analytics-overview-mini-card analytics-overview-mini-card--save analytics-overview-mini-card--save-bottom">
-    <div class="analytics-overview-mini-card__top">
-      <div class="analytics-overview-mini-card__label">
-        <span>Можно отложить</span>
-        <button class="faq-chip" type="button" data-faq-key="can_save_now" aria-label="Что это?">❔</button>
-      </div>
-
-      <div class="analytics-overview-mini-card__status" id="analyticsCanSaveNowStatus">—</div>
-    </div>
-
-    <div class="analytics-overview-mini-card__value" id="analyticsCanSaveNowValue">0 ₽</div>
-    <div class="analytics-overview-mini-card__hint" id="analyticsCanSaveNowHint">—</div>
-  </div>
-</section>
-
   <section class="section hidden analytics-expenses-screen" id="analyticsExpensesSection">
   <div class="analytics-expenses-total-block">
     <div class="analytics-expenses-total-value" id="analyticsExpenseValuePremium">0 ₽</div>
@@ -393,18 +360,32 @@
 </div>
 </section>
 
-  <section class="section hidden" id="analyticsSafesSection">
-    <div class="section-head analytics-section-head">
-      <h2 class="section-title analytics-section-title">Накопления</h2>
+  <section class="section hidden analytics-safes-section" id="analyticsSafesSection">
+  <div class="section-head analytics-section-head">
+    <h2 class="section-title analytics-section-title">Накопления</h2>
+  </div>
+
+  <div class="analytics-overview-mini-card analytics-overview-mini-card--save analytics-overview-mini-card--save-bottom analytics-safes-can-save-card">
+    <div class="analytics-overview-mini-card__top">
+      <div class="analytics-overview-mini-card__label">
+        <span>Можно отложить</span>
+        <button class="faq-chip" type="button" data-faq-key="can_save_now" aria-label="Что это?">❔</button>
+      </div>
+
+      <div class="analytics-overview-mini-card__status" id="analyticsCanSaveNowStatus">—</div>
     </div>
 
-    <div class="analytics-safes-interest-card">
-      <div class="analytics-safes-interest-card__label">Проценты по накоплению</div>
-      <div class="analytics-safes-interest-card__value" id="analyticsInterestValue">0 ₽</div>
-    </div>
+    <div class="analytics-overview-mini-card__value" id="analyticsCanSaveNowValue">0 ₽</div>
+    <div class="analytics-overview-mini-card__hint" id="analyticsCanSaveNowHint">—</div>
+  </div>
 
-    <div class="list analytics-safe-list" id="analyticsSafeList"></div>
-  </section>
+  <div class="analytics-safes-interest-card">
+    <div class="analytics-safes-interest-card__label">Проценты по накоплению</div>
+    <div class="analytics-safes-interest-card__value" id="analyticsInterestValue">0 ₽</div>
+  </div>
+
+  <div class="list analytics-safe-list" id="analyticsSafeList"></div>
+</section>
 </div>
 
 <div id="operationsView" class="hidden">
