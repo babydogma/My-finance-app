@@ -38,31 +38,31 @@
     let analyticsExpenseCategoryFilter = "all";
 
     const ANALYTICS_EXPENSE_COLORS = [
-      "#B878F2",
-      "#FF8A45",
-      "#55C7E8",
-      "#FF5252",
-      "#9BE22D",
-      "#6D9CF8",
-      "#F95FA3",
-      "#4DD6C8",
-      "#F2F2F2",
-      "#FFD166",
-      "#9D7CFF",
-      "#A3E635",
-      "#F97316",
-      "#60A5FA",
-      "#FACC15",
-      "#C084FC",
-      "#2DD4BF",
-      "#FB7185",
-      "#93C5FD",
-      "#BEF264",
-      "#FDBA74",
-      "#E879F9",
-      "#67E8F9",
-      "#FDE68A",
-    ];
+  "#4DA3FF", // bright blue
+  "#FF4D5E", // coral red
+  "#8DFF4A", // acid green
+  "#FFD45A", // warm yellow
+  "#B26BFF", // violet
+  "#35E6D3", // turquoise
+  "#FF8A3D", // orange
+  "#F45BBD", // pink
+  "#E9F2FF", // ice white
+  "#5C7CFF", // electric indigo
+  "#B8FF3D", // lime
+  "#FF6B9A", // rose
+  "#42C8FF", // sky cyan
+  "#FFB13D", // amber
+  "#D66BFF", // purple neon
+  "#52F28A", // mint green
+  "#FF3D9A", // neon magenta
+  "#7DE3FF", // light aqua
+  "#FFE66D", // soft gold
+  "#A78BFA", // lavender
+  "#34D399", // emerald
+  "#FB7185", // salmon
+  "#93C5FD", // pale blue
+  "#FDE68A", // pale yellow
+];
 
     function getPrimaryExpenseValueEl() {
       return analyticsExpenseValuePremium || analyticsExpenseValue;
