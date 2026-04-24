@@ -1,0 +1,46 @@
+/* =========================================================
+   03. LAYOUT
+   App shell, sections, headings
+   ========================================================= */
+
+.app {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 16px 16px 132px;
+}
+
+.section {
+  margin-top: 24px;
+}
+
+.section--manager-top {
+  margin-top: 8px;
+}
+
+.section-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.section-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 920;
+  letter-spacing: -0.05em;
+  color: #f7f9ff;
+}
+
+.section-note {
+  color: rgba(255, 255, 255, 0.46);
+  font-size: 11.5px;
+  font-weight: 760;
+  letter-spacing: -0.02em;
+}
+
+.hidden {
+  display: none !important;
+}
