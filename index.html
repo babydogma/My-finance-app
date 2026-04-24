@@ -67,6 +67,48 @@
 
         <div class="list" id="accountsList"></div>
       </section>
+      
+            <!-- MANDATORY PAYMENTS -->
+      <section class="section wallet-mandatory-section">
+        <div class="section-head wallet-mandatory-head">
+          <h2 class="section-title">Обязательные платежи</h2>
+
+          <button
+            class="btn btn-primary wallet-mandatory-card__btn"
+            type="button"
+            id="openMandatoryPaymentsModalBtn"
+          >
+            Добавить платёж
+          </button>
+        </div>
+
+        <div class="wallet-mandatory-card">
+          <div class="wallet-mandatory-card__main">
+            <div class="wallet-mandatory-card__main-label">К вычету из свободных</div>
+            <div class="wallet-mandatory-card__main-value" id="analyticsPendingMandatoryValue">0 ₽</div>
+          </div>
+
+          <div class="wallet-mandatory-card__rows">
+            <div class="wallet-mandatory-card__row">
+              <span>Обязательные всего</span>
+              <strong id="analyticsMandatoryTotalValue">0 ₽</strong>
+            </div>
+
+            <div class="wallet-mandatory-card__row">
+              <span>Покрыто накоплениями</span>
+              <strong id="analyticsMandatoryCoveredValue">0 ₽</strong>
+            </div>
+
+            <div class="wallet-mandatory-card__row">
+              <span>
+                Остаток лимитов
+                <button class="faq-chip" type="button" data-faq-key="remaining_limits" aria-label="Что это?">❔</button>
+              </span>
+              <strong id="analyticsRemainingBudgetsValue">0 ₽</strong>
+            </div>
+          </div>
+        </div>
+      </section>
 
       <!-- TRANSACTIONS -->
       <section class="section">
@@ -246,43 +288,6 @@
       <div class="analytics-overview-balance-card__metric">
         <span>Защищённые: <strong id="analyticsProtectedMoneyValue">0 ₽</strong></span>
         <button class="faq-chip" type="button" data-faq-key="protected_money" aria-label="Что это?">❔</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="analytics-overview-mandatory-card analytics-overview-mandatory-card--compact">
-    <div class="analytics-overview-mandatory-card__top">
-      <div class="analytics-overview-mandatory-card__top-title">
-        Обязательства
-      </div>
-
-      <button class="analytics-overview-mandatory-card__btn" type="button" id="openMandatoryPaymentsModalBtn">
-        Платежи
-      </button>
-    </div>
-
-    <div class="analytics-overview-mandatory-card__main">
-      <div class="analytics-overview-mandatory-card__main-label">К вычету из свободных</div>
-      <div class="analytics-overview-mandatory-card__main-value" id="analyticsPendingMandatoryValue">0 ₽</div>
-    </div>
-
-    <div class="analytics-overview-mandatory-card__rows">
-      <div class="analytics-overview-mandatory-card__row">
-        <span>Обязательные всего</span>
-        <strong id="analyticsMandatoryTotalValue">0 ₽</strong>
-      </div>
-
-      <div class="analytics-overview-mandatory-card__row">
-        <span>Покрыто накоплениями</span>
-        <strong id="analyticsMandatoryCoveredValue">0 ₽</strong>
-      </div>
-
-      <div class="analytics-overview-mandatory-card__row analytics-overview-mandatory-card__row--limits">
-        <span>
-          Остаток лимитов
-          <button class="faq-chip" type="button" data-faq-key="remaining_limits" aria-label="Что это?">❔</button>
-        </span>
-        <strong id="analyticsRemainingBudgetsValue">0 ₽</strong>
       </div>
     </div>
   </div>
