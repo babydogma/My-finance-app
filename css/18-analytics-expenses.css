@@ -208,7 +208,7 @@
 }
 
 .analytics-period-rail__icon path,
-.analytics-period-rail__icon circle {
+.analytics-period-rail__icon rect {
   fill: none;
   stroke: currentColor;
   stroke-width: 1.85;
@@ -216,12 +216,9 @@
   stroke-linejoin: round;
 }
 
-.analytics-period-rail__icon text {
+.analytics-period-rail__icon circle {
   fill: currentColor;
-  font-size: 9px;
-  font-weight: 950;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
-  letter-spacing: -0.08em;
+  stroke: none;
 }
 
 .analytics-expenses-month-strip {
