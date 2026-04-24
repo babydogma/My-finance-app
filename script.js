@@ -170,6 +170,10 @@ const analyticsExpensesRing = document.getElementById("analyticsExpensesRing");
 const analyticsExpensesRingCenterValue = document.getElementById("analyticsExpensesRingCenterValue");
 const analyticsExpensesRingCenterLabel = document.getElementById("analyticsExpensesRingCenterLabel");
 
+const analyticsExpensesRingPremium = document.getElementById("analyticsExpensesRingPremium");
+const analyticsExpensesRingCenterValuePremium = document.getElementById("analyticsExpensesRingCenterValuePremium");
+const analyticsExpensesRingCenterLabelPremium = document.getElementById("analyticsExpensesRingCenterLabelPremium");
+
 const openAnalyticsFiltersBtn = document.getElementById("openAnalyticsFiltersBtn");
 const closeAnalyticsFiltersBtn = document.getElementById("closeAnalyticsFiltersBtn");
 const analyticsFiltersModal = document.getElementById("analyticsFiltersModal");
@@ -190,6 +194,10 @@ const analyticsRemainingBudgetsValue = document.getElementById("analyticsRemaini
 const analyticsExpenseValue = document.getElementById("analyticsExpenseValue");
 const analyticsExpensesPeriodNote = document.getElementById("analyticsExpensesPeriodNote");
 const analyticsExpensesCategoriesList = document.getElementById("analyticsExpensesCategoriesList");
+
+const analyticsExpenseValuePremium = document.getElementById("analyticsExpenseValuePremium");
+const analyticsExpensesPeriodNotePremium = document.getElementById("analyticsExpensesPeriodNotePremium");
+const analyticsExpensesCategoriesListPremium = document.getElementById("analyticsExpensesCategoriesListPremium");
 
 const analyticsExpensesMonthStrip = document.getElementById("analyticsExpensesMonthStrip");
 const analyticsExpensesTotalRowValue = document.getElementById("analyticsExpensesTotalRowValue");
@@ -2383,12 +2391,12 @@ function renderAnalyticsExpensesByCategory() {
     .sort((a, b) => b.amount - a.amount);
 
   if (!rows.length) {
-    if (analyticsExpensesRing) {
-      analyticsExpensesRing.style.background =
+    if (analyticsExpensesRingPremium){
+      analyticsExpensesRingPremium.style.background =
         "conic-gradient(from -90deg, rgba(255,255,255,0.08) 0deg 360deg)";
     }
 
-    if (analyticsExpensesRingCenterValue) analyticsExpensesRingCenterValue.textContent = "0%";
+    if (analyticsExpensesRingPremiumCenterValue) analyticsExpensesRingCenterValue.textContent = "0%";
     if (analyticsExpensesRingCenterLabel) analyticsExpensesRingCenterLabel.textContent = "Категория";
 
     const empty = document.createElement("div");
