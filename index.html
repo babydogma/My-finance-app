@@ -240,22 +240,6 @@
   <button class="analytics-mode-switch__btn" type="button" id="analyticsTabSafesBtn">Накопления</button>
 </div>
 
-  
-
-      <div class="time-lens-range-card">
-        <div class="time-lens-range-title">Диапазон дат</div>
-
-        <div class="time-lens-range-inputs">
-          <input class="input hidden" type="date" id="analyticsRangeFromInput" />
-          <input class="input hidden" type="date" id="analyticsRangeToInput" />
-        </div>
-
-        <div class="section-note hidden" id="analyticsSelectedPeriodLabel"></div>
-      </div>
-    </div>
-  </div>
-</div>
-
   <section class="section hidden analytics-expenses-screen" id="analyticsExpensesSection">
   <div class="analytics-expenses-total-block">
     <div class="analytics-expenses-total-value" id="analyticsExpenseValuePremium">0 ₽</div>
@@ -334,7 +318,7 @@
   <div class="analytics-range-dock__head">
     <div>
       <div class="analytics-range-dock__kicker">Период</div>
-      <div class="analytics-range-dock__title" id="analyticsRangeDockTitle">Выбери дни</div>
+      <div class="analytics-range-dock__title" id="analyticsRangeDockTitle">апрель 2026 г.</div>
     </div>
 
     <button class="analytics-range-dock__close" type="button" id="analyticsRangeDockCloseBtn">
@@ -343,20 +327,26 @@
   </div>
 
   <div class="analytics-range-dock__summary">
-    <div class="analytics-range-dock__date">
+    <button class="analytics-range-dock__date" type="button" id="analyticsRangeStartBtn">
       <span>с</span>
       <strong id="analyticsRangeDockStartLabel">—</strong>
-    </div>
+    </button>
 
     <div class="analytics-range-dock__arrow">→</div>
 
-    <div class="analytics-range-dock__date">
+    <button class="analytics-range-dock__date" type="button" id="analyticsRangeEndBtn">
       <span>по</span>
       <strong id="analyticsRangeDockEndLabel">—</strong>
-    </div>
+    </button>
   </div>
 
-  <div class="analytics-range-dock__days" id="analyticsRangeDockDays"></div>
+  <div class="analytics-range-number-panel hidden" id="analyticsRangeNumberPanel">
+    <div class="analytics-range-number-panel__title" id="analyticsRangeNumberTitle">
+      Выбери число
+    </div>
+
+    <div class="analytics-range-number-panel__list" id="analyticsRangeNumberList"></div>
+  </div>
 
   <div class="analytics-range-dock__actions">
     <button class="analytics-range-dock__reset" type="button" id="analyticsRangeDockResetBtn">
