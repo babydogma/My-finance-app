@@ -5068,6 +5068,9 @@ function renderAnalyticsExpensesRingPremium(items, total) {
   if (!analyticsExpensesRing) return;
 
   if (!total || total <= 0 || items.length === 0) {
+    analyticsExpensesRing.style.background =
+      "conic-gradient(rgba(255,255,255,0.09) 0deg 360deg)";
+
     analyticsExpensesRing.style.setProperty(
       "--analytics-ring-gradient",
       "conic-gradient(rgba(255,255,255,0.09) 0deg 360deg)"
@@ -5096,10 +5099,10 @@ function renderAnalyticsExpensesRingPremium(items, total) {
     return `${item.color} ${start.toFixed(2)}% ${end.toFixed(2)}%`;
   });
 
-  analyticsExpensesRing.style.setProperty(
-    "--analytics-ring-gradient",
-    `conic-gradient(${gradientParts.join(", ")})`
-  );
+  const gradient = `conic-gradient(${gradientParts.join(", ")})`;
+
+  analyticsExpensesRing.style.background = gradient;
+  analyticsExpensesRing.style.setProperty("--analytics-ring-gradient", gradient);
 
   const topItem = items[0];
   const topPercent = Math.round((topItem.amount / total) * 100);
@@ -5341,9 +5344,17 @@ function renderAnalyticsExpensesPremium() {
   }
 
   updateAnalyticsExpenseFilterButtonsPremium();
+renderAnalyticsExpensesCategoriesPremium(items, total);
+renderAnalyticsExpensesRingPremium(items, total);
+renderAnalyticsExpensesMonthStripPremium();
+
+setTimeout(() => {
   renderAnalyticsExpensesRingPremium(items, total);
-  renderAnalyticsExpensesMonthStripPremium();
-  renderAnalyticsExpensesCategoriesPremium(items, total);
+}, 0);
+
+setTimeout(() => {
+  renderAnalyticsExpensesRingPremium(items, total);
+}, 80);
 }
 
 function renderAnalyticsExpenseCategoryPickerPremium() {
