@@ -1,0 +1,362 @@
+/* =========================================================
+   20. FILTERS / MONTH POPOVER
+   History filters and month wheel picker
+   ========================================================= */
+
+.filters-sheet {
+  padding-bottom: 24px;
+}
+
+.filters-sheet__head {
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.filters-sheet__title {
+  margin: 0 !important;
+  text-align: left !important;
+  font-size: 24px;
+}
+
+.history-filters {
+  position: relative;
+  z-index: 120;
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: stretch;
+  width: 100%;
+  max-width: 430px;
+  margin: 10px auto 0;
+  padding: 14px;
+  border-radius: 30px;
+  background:
+    radial-gradient(circle at top center, rgba(111, 156, 255, 0.08), transparent 42%),
+    linear-gradient(180deg, rgba(22, 25, 34, 0.72) 0%, rgba(16, 19, 28, 0.8) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.055);
+  box-shadow:
+    0 18px 38px rgba(0, 0, 0, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.history-filters--modal {
+  margin-top: 0;
+  max-width: 100%;
+  border-radius: 26px;
+  padding: 12px;
+}
+
+.history-filter-group {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  scrollbar-width: none;
+}
+
+.history-filter-group::-webkit-scrollbar {
+  display: none;
+}
+
+.history-filter-group--primary,
+.history-filter-group--secondary,
+.history-filter-group--inputs {
+  width: 100%;
+  justify-content: center;
+}
+
+.history-filter-group--secondary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  overflow: visible;
+}
+
+.history-filter-group--inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.history-filter-btn {
+  flex: 0 0 auto;
+  height: 44px;
+  padding: 0 16px;
+  border: 1px solid rgba(255, 255, 255, 0.055);
+  border-radius: 18px;
+  background:
+    linear-gradient(180deg, rgba(35, 38, 48, 0.96) 0%, rgba(25, 28, 37, 0.99) 100%);
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 14px;
+  font-weight: 830;
+  letter-spacing: -0.025em;
+  box-shadow:
+    0 8px 18px rgba(0, 0, 0, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  white-space: nowrap;
+}
+
+.history-filter-btn.is-active {
+  background:
+    linear-gradient(180deg, rgba(111, 156, 255, 0.3) 0%, rgba(91, 143, 255, 0.2) 100%);
+  color: #f7f9ff;
+  border-color: rgba(111, 156, 255, 0.22);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 0 18px rgba(111, 156, 255, 0.14);
+}
+
+.history-filter-btn--month {
+  width: 100%;
+  min-width: 0;
+  height: 64px;
+  padding: 0 24px;
+  border-radius: 22px;
+  font-size: 20px;
+  font-weight: 910;
+  letter-spacing: -0.045em;
+  color: #f5f8ff;
+  background:
+    radial-gradient(circle at top center, rgba(111, 156, 255, 0.18), transparent 46%),
+    linear-gradient(180deg, rgba(41, 49, 78, 0.98) 0%, rgba(30, 35, 57, 1) 100%);
+  border: 1px solid rgba(111, 156, 255, 0.18);
+  box-shadow:
+    0 16px 34px rgba(0, 0, 0, 0.24),
+    0 0 24px rgba(111, 156, 255, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.month-filter-wrap {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.analytics-month-popover {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(392px, calc(100% - 4px));
+  z-index: 999;
+}
+
+.analytics-month-popover__panel {
+  padding: 14px;
+  border-radius: 30px;
+  background:
+    linear-gradient(180deg, rgba(18, 21, 29, 0.98) 0%, rgba(14, 17, 25, 1) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 22px 56px rgba(0, 0, 0, 0.36),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.analytics-month-popover__actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.analytics-month-popover__reset {
+  min-width: 132px;
+  height: 56px;
+  padding: 0 24px;
+  border: none;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #f5f7fb;
+  font-size: 17px;
+  font-weight: 820;
+  letter-spacing: -0.03em;
+}
+
+.analytics-month-popover__apply {
+  width: 74px;
+  height: 74px;
+  border: none;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #6ea2ff 0%, #5b8fff 100%);
+  color: #d7ffe3;
+  font-size: 42px;
+  font-weight: 700;
+  line-height: 1;
+  box-shadow:
+    0 14px 30px rgba(91, 143, 255, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+
+.month-wheel {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 10px;
+  width: 100%;
+  height: 234px;
+  padding: 10px 12px;
+  border-radius: 26px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  overflow: hidden;
+}
+
+.month-wheel__column {
+  position: relative;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+  overscroll-behavior: contain;
+  padding: 0 4px;
+}
+
+.month-wheel__column::-webkit-scrollbar {
+  display: none;
+}
+
+.month-wheel__item {
+  width: 100%;
+  height: 56px;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.26);
+  font-size: 18px;
+  font-weight: 760;
+  letter-spacing: -0.03em;
+  text-align: center;
+  scroll-snap-align: center;
+  opacity: 0.62;
+  transform: scale(0.94);
+  transition: color 0.18s ease, opacity 0.18s ease, transform 0.18s ease, font-size 0.18s ease;
+}
+
+.month-wheel__item.is-active {
+  color: #f7f8fb;
+  font-size: 28px;
+  font-weight: 880;
+  opacity: 1;
+  transform: scale(1);
+}
+
+.month-wheel__item--spacer {
+  pointer-events: none;
+}
+
+.month-wheel__center-line {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  top: 50%;
+  height: 56px;
+  transform: translateY(-50%);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.08);
+  pointer-events: none;
+}
+
+.month-wheel__fade {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 52px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.month-wheel__fade--top {
+  top: 0;
+  background: linear-gradient(180deg, rgba(18, 21, 28, 0.94) 0%, rgba(18, 21, 28, 0.08) 72%, rgba(18, 21, 28, 0) 100%);
+}
+
+.month-wheel__fade--bottom {
+  bottom: 0;
+  background: linear-gradient(0deg, rgba(18, 21, 28, 0.98) 0%, rgba(18, 21, 28, 0) 100%);
+}
+
+@media (max-width: 420px) {
+  .history-filters {
+    gap: 10px;
+    padding: 12px;
+    border-radius: 24px;
+    max-width: 100%;
+  }
+
+  .history-filter-group--secondary,
+  .history-filter-group--inputs {
+    gap: 8px;
+  }
+
+  .history-filter-btn {
+    height: 40px;
+    padding: 0 12px;
+    font-size: 12.5px;
+    border-radius: 16px;
+  }
+
+  .history-filter-btn--month {
+    height: 56px;
+    padding: 0 18px;
+    border-radius: 20px;
+    font-size: 18px;
+  }
+
+  .analytics-month-popover {
+    top: calc(100% + 8px);
+    width: min(360px, calc(100% - 4px));
+  }
+
+  .analytics-month-popover__panel {
+    padding: 12px;
+    border-radius: 24px;
+  }
+
+  .analytics-month-popover__reset {
+    min-width: 118px;
+    height: 52px;
+    font-size: 16px;
+  }
+
+  .analytics-month-popover__apply {
+    width: 66px;
+    height: 66px;
+    font-size: 38px;
+  }
+
+  .month-wheel {
+    height: 214px;
+    padding: 8px 10px;
+  }
+
+  .month-wheel__item {
+    height: 52px;
+    font-size: 17px;
+  }
+
+  .month-wheel__item.is-active {
+    font-size: 24px;
+  }
+
+  .month-wheel__center-line {
+    height: 52px;
+    left: 8px;
+    right: 8px;
+  }
+
+  .filters-sheet__title {
+    font-size: 22px;
+  }
+
+  .history-filters--modal {
+    border-radius: 22px;
+    padding: 10px;
+  }
+}
