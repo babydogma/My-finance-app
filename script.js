@@ -191,6 +191,13 @@ const analyticsExpenseValue = document.getElementById("analyticsExpenseValue");
 const analyticsExpensesPeriodNote = document.getElementById("analyticsExpensesPeriodNote");
 const analyticsExpensesCategoriesList = document.getElementById("analyticsExpensesCategoriesList");
 
+const analyticsExpensesMonthStrip = document.getElementById("analyticsExpensesMonthStrip");
+const analyticsExpensesTotalRowValue = document.getElementById("analyticsExpensesTotalRowValue");
+
+const analyticsExpenseCategoryFilterBtn = document.getElementById("analyticsExpenseCategoryFilterBtn");
+const analyticsExpenseMonthFilterBtn = document.getElementById("analyticsExpenseMonthFilterBtn");
+const analyticsExpenseAverageFilterBtn = document.getElementById("analyticsExpenseAverageFilterBtn");
+
 const analyticsInterestValue = document.getElementById("analyticsInterestValue");
 const analyticsSafeList = document.getElementById("analyticsSafeList");
 
@@ -4876,4 +4883,425 @@ mandatoryPaymentEditorModal?.addEventListener("click", (event) => {
   await loadDataFromSupabase();
   renderAll();
   showWalletView();
+  
+  /* =========================================================
+   PREMIUM EXPENSES ANALYTICS VIEW
+   ========================================================= */
+
+const ANALYTICS_EXPENSE_COLORS = [
+  "#6DD36F",
+  "#F2F2F2",
+  "#FF8A13",
+  "#FF5145",
+  "#35AEEA",
+  "#9D7CFF",
+  "#FFD166",
+  "#4DD6C8",
+  "#FF6FAE",
+  "#A3E635",
+  "#F97316",
+  "#60A5FA",
+  "#FACC15",
+  "#C084FC",
+  "#2DD4BF",
+  "#FB7185",
+  "#93C5FD",
+  "#BEF264",
+  "#FDBA74",
+  "#E879F9",
+  "#67E8F9",
+  "#FDE68A",
+  "#86EFAC",
+  "#FCA5A5",
+];
+
+function getAnalyticsColorHash(value) {
+  const text = String(value || "");
+  let hash = 0;
+
+  for (let i = 0; i < text.length; i += 1) {
+    hash = (hash * 31 + text.charCodeAt(i)) >>> 0;
+  }
+
+  return hash;
+}
+
+function buildAnalyticsExpenseColorMap(items) {
+  const usedIndexes = new Set();
+  const map = new Map();
+
+  const stableItems = [...items].sort((a, b) => {
+    return String(a.categoryId).localeCompare(String(b.categoryId), "ru");
+  });
+
+  stableItems.forEach((item) => {
+    const key = item.categoryId || item.name || "unknown";
+    let index = getAnalyticsColorHash(key) % ANALYTICS_EXPENSE_COLORS.length;
+
+    for (let step = 0; step < ANALYTICS_EXPENSE_COLORS.length; step += 1) {
+      const nextIndex = (index + step) % ANALYTICS_EXPENSE_COLORS.length;
+
+      if (!usedIndexes.has(nextIndex)) {
+        index = nextIndex;
+        break;
+      }
+    }
+
+    usedIndexes.add(index);
+    map.set(item.categoryId, ANALYTICS_EXPENSE_COLORS[index]);
+  });
+
+  return map;
+}
+
+function getAnalyticsExpenseFilteredTransactionsPremium() {
+  const transactions = Array.isArray(state.transactions) ? state.transactions : [];
+
+  const filtered = filterTransactionsByPeriod(
+    transactions,
+    analyticsFilterPeriod,
+    analyticsSelectedMonth,
+    analyticsRangeStart,
+    analyticsRangeEnd
+  );
+
+  return filtered.filter((transaction) => transaction.type === "expense");
+}
+
+function getAnalyticsExpenseItemsPremium(expenseTransactions) {
+  const byCategory = new Map();
+
+  expenseTransactions.forEach((transaction) => {
+    const categoryId = transaction.category_id || UNCATEGORIZED_ID;
+    const amount = Number(transaction.amount) || 0;
+
+    const current = byCategory.get(categoryId) || {
+      categoryId,
+      name: getCategoryName(categoryId),
+      amount: 0,
+    };
+
+    current.amount += amount;
+    byCategory.set(categoryId, current);
+  });
+
+  const items = Array.from(byCategory.values())
+    .map((item) => ({
+      ...item,
+      amount: roundToTwo(item.amount),
+    }))
+    .filter((item) => item.amount > 0)
+    .sort((a, b) => b.amount - a.amount);
+
+  const colorMap = buildAnalyticsExpenseColorMap(items);
+
+  return items.map((item) => ({
+    ...item,
+    color: colorMap.get(item.categoryId) || ANALYTICS_EXPENSE_COLORS[0],
+  }));
+}
+
+function renderAnalyticsExpensesRingPremium(items, total) {
+  if (!analyticsExpensesRing) return;
+
+  if (!total || total <= 0 || items.length === 0) {
+    analyticsExpensesRing.style.setProperty(
+      "--analytics-ring-gradient",
+      "conic-gradient(rgba(255,255,255,0.08) 0deg 360deg)"
+    );
+
+    if (analyticsExpensesRingCenterValue) {
+      analyticsExpensesRingCenterValue.textContent = "0%";
+    }
+
+    if (analyticsExpensesRingCenterLabel) {
+      analyticsExpensesRingCenterLabel.textContent = "Нет расходов";
+    }
+
+    return;
+  }
+
+  let cursor = 0;
+
+  const gradientParts = items.map((item) => {
+    const percent = (item.amount / total) * 100;
+    const start = cursor;
+    const end = cursor + percent;
+
+    cursor = end;
+
+    return `${item.color} ${start.toFixed(2)}% ${end.toFixed(2)}%`;
+  });
+
+  analyticsExpensesRing.style.setProperty(
+    "--analytics-ring-gradient",
+    `conic-gradient(${gradientParts.join(", ")})`
+  );
+
+  const topItem = items[0];
+  const topPercent = Math.round((topItem.amount / total) * 100);
+
+  if (analyticsExpensesRingCenterValue) {
+    analyticsExpensesRingCenterValue.textContent = `${topPercent}%`;
+  }
+
+  if (analyticsExpensesRingCenterLabel) {
+    analyticsExpensesRingCenterLabel.textContent = topItem.name;
+  }
+}
+
+function renderAnalyticsExpensesCategoriesPremium(items, total) {
+  if (!analyticsExpensesCategoriesList) return;
+
+  analyticsExpensesCategoriesList.innerHTML = "";
+
+  if (!total || total <= 0 || items.length === 0) {
+    analyticsExpensesCategoriesList.innerHTML = `
+      <div class="analytics-expenses-empty">
+        За выбранный период расходов нет
+      </div>
+    `;
+    return;
+  }
+
+  items.forEach((item) => {
+    const percent = total > 0 ? Math.round((item.amount / total) * 100) : 0;
+
+    const row = document.createElement("button");
+    row.className = "analytics-expense-category-row analytics-expense-category-row--premium";
+    row.type = "button";
+    row.dataset.categoryId = item.categoryId;
+
+    row.innerHTML = `
+      <div class="analytics-expense-category-row__icon" style="--category-color: ${item.color}">
+        <span>${item.name.slice(0, 1).toUpperCase()}</span>
+      </div>
+
+      <div class="analytics-expense-category-row__main">
+        <div class="analytics-expense-category-row__top">
+          <div class="analytics-expense-category-row__name">${item.name}</div>
+          <div class="analytics-expense-category-row__amount">${formatMoney(item.amount)}</div>
+        </div>
+
+        <div class="analytics-expense-category-row__bottom">
+          <div class="analytics-expense-category-row__bar">
+            <div
+              class="analytics-expense-category-row__bar-fill"
+              style="width: ${Math.max(2, percent)}%; background: ${item.color};"
+            ></div>
+          </div>
+
+          <div class="analytics-expense-category-row__percent">${percent}%</div>
+        </div>
+      </div>
+    `;
+
+    row.addEventListener("click", () => {
+      activeAnalyticsCategoryId = item.categoryId;
+
+      if (typeof openAnalyticsCategoryModal === "function") {
+        openAnalyticsCategoryModal(item.categoryId);
+      }
+    });
+
+    analyticsExpensesCategoriesList.appendChild(row);
+  });
+}
+
+function getAnalyticsMonthDateFromValue(value) {
+  const match = String(value || "").match(/^(\d{4})-(\d{2})$/);
+
+  if (!match) {
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth(), 1);
+  }
+
+  return new Date(Number(match[1]), Number(match[2]) - 1, 1);
+}
+
+function getAnalyticsMonthKeyFromDate(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  return `${year}-${month}`;
+}
+
+function getAnalyticsMonthShortLabel(date) {
+  const labels = [
+    "Янв.",
+    "Фев.",
+    "Март",
+    "Апр.",
+    "Май",
+    "Июн.",
+    "Июл.",
+    "Авг.",
+    "Сент.",
+    "Окт.",
+    "Нояб.",
+    "Дек.",
+  ];
+
+  return labels[date.getMonth()];
+}
+
+function renderAnalyticsExpensesMonthStripPremium() {
+  if (!analyticsExpensesMonthStrip) return;
+
+  const baseDate = getAnalyticsMonthDateFromValue(analyticsSelectedMonth);
+  const months = [];
+
+  for (let index = 10; index >= 0; index -= 1) {
+    const date = new Date(baseDate.getFullYear(), baseDate.getMonth() - index, 1);
+    const key = getAnalyticsMonthKeyFromDate(date);
+
+    const monthTransactions = filterTransactionsByPeriod(
+      state.transactions,
+      "month",
+      key,
+      "",
+      ""
+    ).filter((transaction) => transaction.type === "expense");
+
+    const total = monthTransactions.reduce((sum, transaction) => {
+      return sum + (Number(transaction.amount) || 0);
+    }, 0);
+
+    months.push({
+      key,
+      date,
+      total: roundToTwo(total),
+    });
+  }
+
+  const maxTotal = Math.max(...months.map((item) => item.total), 1);
+
+  analyticsExpensesMonthStrip.innerHTML = "";
+
+  months.forEach((item) => {
+    const height = Math.max(4, Math.round((item.total / maxTotal) * 42));
+    const isActive = item.key === analyticsSelectedMonth;
+
+    const button = document.createElement("button");
+    button.className = `analytics-expenses-month-item${isActive ? " is-active" : ""}`;
+    button.type = "button";
+
+    button.innerHTML = `
+      <div class="analytics-expenses-month-item__bar" style="height: ${height}px"></div>
+      <div class="analytics-expenses-month-item__label">${getAnalyticsMonthShortLabel(item.date)}</div>
+    `;
+
+    button.addEventListener("click", () => {
+      analyticsFilterPeriod = "month";
+      analyticsSelectedMonth = item.key;
+
+      analyticsPeriodButtons.forEach((periodButton) => {
+        periodButton.classList.toggle(
+          "is-active",
+          periodButton.dataset.analyticsPeriod === "month"
+        );
+      });
+
+      if (analyticsMonthBtn) {
+        analyticsMonthBtn.textContent = getAnalyticsMonthShortLabel(item.date);
+      }
+
+      renderAnalyticsExpensesPremium();
+    });
+
+    analyticsExpensesMonthStrip.appendChild(button);
+  });
+}
+
+function getAnalyticsExpensesPeriodTextPremium() {
+  if (analyticsFilterPeriod === "today") {
+    return "за сегодня";
+  }
+
+  if (analyticsFilterPeriod === "7") {
+    return "за 7 дней";
+  }
+
+  if (analyticsFilterPeriod === "range") {
+    return "за выбранный период";
+  }
+
+  const date = getAnalyticsMonthDateFromValue(analyticsSelectedMonth);
+  const month = date.toLocaleDateString("ru-RU", {
+    month: "long",
+  });
+
+  return `за ${month}`;
+}
+
+function renderAnalyticsExpensesPremium() {
+  const expenseTransactions = getAnalyticsExpenseFilteredTransactionsPremium();
+  const total = roundToTwo(
+    expenseTransactions.reduce((sum, transaction) => {
+      return sum + (Number(transaction.amount) || 0);
+    }, 0)
+  );
+
+  const items = getAnalyticsExpenseItemsPremium(expenseTransactions);
+
+  if (analyticsExpenseValue) {
+    analyticsExpenseValue.textContent = formatMoney(total);
+  }
+
+  if (analyticsExpensesTotalRowValue) {
+    analyticsExpensesTotalRowValue.textContent = formatMoney(total);
+  }
+
+  if (analyticsExpensesPeriodNote) {
+    analyticsExpensesPeriodNote.textContent = getAnalyticsExpensesPeriodTextPremium();
+  }
+
+  renderAnalyticsExpensesRingPremium(items, total);
+  renderAnalyticsExpensesMonthStripPremium();
+  renderAnalyticsExpensesCategoriesPremium(items, total);
+}
+
+analyticsTabExpensesBtn?.addEventListener("click", () => {
+  requestAnimationFrame(renderAnalyticsExpensesPremium);
+});
+
+analyticsExpenseMonthFilterBtn?.addEventListener("click", () => {
+  openAnalyticsFiltersBtn?.click();
+});
+
+analyticsExpenseCategoryFilterBtn?.addEventListener("click", () => {
+  analyticsExpensesCategoriesList?.scrollIntoView({
+    behavior: "smooth",
+    block: "start",
+  });
+});
+
+analyticsExpenseAverageFilterBtn?.addEventListener("click", () => {
+  analyticsFilterPeriod = "month";
+  renderAnalyticsExpensesPremium();
+});
+
+analyticsPeriodButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    requestAnimationFrame(renderAnalyticsExpensesPremium);
+  });
+});
+
+analyticsMonthApplyBtn?.addEventListener("click", () => {
+  requestAnimationFrame(renderAnalyticsExpensesPremium);
+});
+
+analyticsMonthResetBtn?.addEventListener("click", () => {
+  requestAnimationFrame(renderAnalyticsExpensesPremium);
+});
+
+analyticsRangeFromInput?.addEventListener("change", () => {
+  requestAnimationFrame(renderAnalyticsExpensesPremium);
+});
+
+analyticsRangeToInput?.addEventListener("change", () => {
+  requestAnimationFrame(renderAnalyticsExpensesPremium);
+});
+
+requestAnimationFrame(renderAnalyticsExpensesPremium);
+  
 });
