@@ -381,21 +381,15 @@
 }
 
 .analytics-range-number-panel__list {
-  display: flex;
-  gap: 8px;
-  overflow-x: auto;
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 7px;
   padding: 2px 2px 8px;
-  scrollbar-width: none;
-}
-
-.analytics-range-number-panel__list::-webkit-scrollbar {
-  display: none;
 }
 
 .analytics-range-number-btn {
-  flex: 0 0 auto;
-  width: 44px;
-  height: 44px;
+  width: 100%;
+  height: 40px;
   border: 1px solid rgba(255,255,255,0.055);
   border-radius: 16px;
   background:
