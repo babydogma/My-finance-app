@@ -68,13 +68,13 @@
         <div class="list" id="accountsList"></div>
       </section>
       
-            <!-- MANDATORY PAYMENTS -->
+          <!-- MANDATORY PAYMENTS -->
       <section class="section wallet-mandatory-section">
         <div class="section-head accounts-section-head wallet-mandatory-head">
           <h2 class="section-title">Обязательные платежи</h2>
 
           <button
-            class="icon-action-btn icon-action-btn--primary wallet-mandatory-add-btn"
+            class="icon-action-btn icon-action-btn--primary"
             type="button"
             id="openMandatoryPaymentsModalBtn"
             aria-label="Добавить обязательный платёж"
@@ -86,8 +86,8 @@
           </button>
         </div>
 
-        <div class="list wallet-mandatory-list">
-          <div class="list-card wallet-mandatory-row wallet-mandatory-row--main">
+        <div class="list" id="walletMandatoryList">
+          <div class="list-card wallet-mandatory-card-row">
             <div class="list-body">
               <div class="list-title-row">
                 <h3 class="list-title">К вычету из свободных</h3>
@@ -96,11 +96,11 @@
             </div>
 
             <div class="list-right">
-              <p class="list-value wallet-mandatory-value wallet-mandatory-value--danger" id="analyticsPendingMandatoryValue">0 ₽</p>
+              <p class="list-value list-value--red" id="analyticsPendingMandatoryValue">0 ₽</p>
             </div>
           </div>
 
-          <div class="list-card wallet-mandatory-row">
+          <div class="list-card wallet-mandatory-card-row">
             <div class="list-body">
               <div class="list-title-row">
                 <h3 class="list-title">Обязательные всего</h3>
@@ -108,11 +108,11 @@
             </div>
 
             <div class="list-right">
-              <p class="list-value wallet-mandatory-value" id="analyticsMandatoryTotalValue">0 ₽</p>
+              <p class="list-value" id="analyticsMandatoryTotalValue">0 ₽</p>
             </div>
           </div>
 
-          <div class="list-card wallet-mandatory-row">
+          <div class="list-card wallet-mandatory-card-row">
             <div class="list-body">
               <div class="list-title-row">
                 <h3 class="list-title">Покрыто накоплениями</h3>
@@ -120,11 +120,11 @@
             </div>
 
             <div class="list-right">
-              <p class="list-value wallet-mandatory-value" id="analyticsMandatoryCoveredValue">0 ₽</p>
+              <p class="list-value" id="analyticsMandatoryCoveredValue">0 ₽</p>
             </div>
           </div>
 
-          <div class="list-card wallet-mandatory-row">
+          <div class="list-card wallet-mandatory-card-row">
             <div class="list-body">
               <div class="list-title-row">
                 <h3 class="list-title">Остаток лимитов</h3>
@@ -133,11 +133,13 @@
             </div>
 
             <div class="list-right">
-              <p class="list-value wallet-mandatory-value" id="analyticsRemainingBudgetsValue">0 ₽</p>
+              <p class="list-value" id="analyticsRemainingBudgetsValue">0 ₽</p>
             </div>
           </div>
         </div>
       </section>
+
+      <!-- TRANSACTIONS -->
 
       <!-- TRANSACTIONS -->
       <section class="section">
