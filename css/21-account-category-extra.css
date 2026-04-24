@@ -1,0 +1,86 @@
+/* =========================================================
+   21. ACCOUNT / CATEGORY EXTRA
+   Account primary checkbox and category analytics extra controls
+   ========================================================= */
+
+.account-primary-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 0 14px;
+  margin-top: 2px;
+  border-radius: 18px;
+  background:
+    linear-gradient(180deg, rgba(45, 48, 60, 0.96) 0%, rgba(35, 38, 47, 0.98) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.055);
+  color: #eef3ff;
+  font-size: 14px;
+  font-weight: 760;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.03),
+    0 6px 16px rgba(0, 0, 0, 0.14);
+}
+
+.account-primary-row input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #6f9cff;
+}
+
+.account-primary-note {
+  margin-top: 8px;
+  padding: 0 4px;
+}
+
+.analytics-category-extra-card {
+  margin-bottom: 12px;
+  padding: 10px 12px;
+  border-radius: 18px;
+  background:
+    linear-gradient(180deg, rgba(42, 46, 58, 0.84) 0%, rgba(33, 36, 46, 0.9) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.analytics-category-extra-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.analytics-category-extra-label {
+  color: rgba(255, 255, 255, 0.58);
+  font-size: 13px;
+  font-weight: 760;
+}
+
+.analytics-category-extra-value {
+  min-height: 34px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 999px;
+  background: rgba(111, 156, 255, 0.14);
+  color: #eef3ff;
+  font-size: 13px;
+  font-weight: 820;
+}
+
+.analytics-category-type-btn {
+  min-height: 34px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 820;
+}
+
+.analytics-category-type-btn--required {
+  background: rgba(255, 114, 104, 0.12);
+  color: #ff9a92;
+}
+
+.analytics-category-type-btn--flex {
+  background: rgba(255, 255, 255, 0.06);
+  color: #dfe4ee;
+}
