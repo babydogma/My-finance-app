@@ -231,6 +231,182 @@
   scrollbar-width: none;
 }
 
+/* Range Dock */
+
+.analytics-range-dock {
+  margin: -4px 0 18px;
+  padding: 14px;
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at 18% 0%, rgba(111, 156, 255, 0.12), transparent 38%),
+    linear-gradient(180deg, rgba(28, 33, 46, 0.84) 0%, rgba(13, 16, 24, 0.92) 100%);
+  border: 1px solid rgba(255,255,255,0.06);
+  box-shadow:
+    0 18px 42px rgba(0,0,0,0.26),
+    inset 0 1px 0 rgba(255,255,255,0.035);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.analytics-range-dock.hidden {
+  display: none;
+}
+
+.analytics-range-dock__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+
+.analytics-range-dock__kicker {
+  margin-bottom: 4px;
+  font-size: 11px;
+  font-weight: 820;
+  line-height: 1;
+  letter-spacing: -0.025em;
+  color: rgba(255,255,255,0.42);
+}
+
+.analytics-range-dock__title {
+  font-size: 24px;
+  font-weight: 950;
+  line-height: 0.95;
+  letter-spacing: -0.07em;
+  color: #f8faff;
+}
+
+.analytics-range-dock__close {
+  width: 38px;
+  height: 38px;
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 50%;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.05) 100%);
+  color: rgba(255,255,255,0.78);
+  font-size: 28px;
+  font-weight: 760;
+  line-height: 1;
+}
+
+.analytics-range-dock__summary {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.analytics-range-dock__date {
+  min-height: 58px;
+  padding: 10px 12px;
+  border-radius: 20px;
+  background:
+    linear-gradient(180deg, rgba(45, 51, 68, 0.76) 0%, rgba(24, 28, 39, 0.86) 100%);
+  border: 1px solid rgba(255,255,255,0.055);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.035);
+}
+
+.analytics-range-dock__date span {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 11px;
+  font-weight: 760;
+  color: rgba(255,255,255,0.38);
+}
+
+.analytics-range-dock__date strong {
+  display: block;
+  font-size: 18px;
+  font-weight: 920;
+  line-height: 1;
+  letter-spacing: -0.055em;
+  color: #f8faff;
+  white-space: nowrap;
+}
+
+.analytics-range-dock__arrow {
+  color: rgba(255,255,255,0.36);
+  font-size: 20px;
+  font-weight: 900;
+}
+
+.analytics-range-dock__days {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.analytics-range-dock__day {
+  height: 34px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.045);
+  color: rgba(255,255,255,0.54);
+  font-size: 13px;
+  font-weight: 820;
+  letter-spacing: -0.035em;
+}
+
+.analytics-range-dock__day:active {
+  transform: scale(0.94);
+}
+
+.analytics-range-dock__day.is-start,
+.analytics-range-dock__day.is-end {
+  color: #f8fbff;
+  background:
+    radial-gradient(circle at top center, rgba(255,255,255,0.18), transparent 45%),
+    linear-gradient(180deg, rgba(92, 135, 220, 0.86) 0%, rgba(48, 68, 116, 0.96) 100%);
+  border-color: rgba(111,156,255,0.28);
+  box-shadow:
+    0 0 18px rgba(111,156,255,0.18),
+    inset 0 1px 0 rgba(255,255,255,0.08);
+}
+
+.analytics-range-dock__day.is-between {
+  color: rgba(248,251,255,0.9);
+  background:
+    linear-gradient(180deg, rgba(111,156,255,0.24) 0%, rgba(111,156,255,0.14) 100%);
+  border-color: rgba(111,156,255,0.10);
+}
+
+.analytics-range-dock__actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.analytics-range-dock__reset,
+.analytics-range-dock__apply {
+  height: 48px;
+  border: none;
+  border-radius: 18px;
+  font-size: 15px;
+  font-weight: 860;
+  letter-spacing: -0.035em;
+}
+
+.analytics-range-dock__reset {
+  min-width: 110px;
+  background: rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.72);
+}
+
+.analytics-range-dock__apply {
+  flex: 1;
+  background:
+    linear-gradient(180deg, #6ea2ff 0%, #5b8fff 100%);
+  color: #f8fbff;
+  box-shadow:
+    0 14px 28px rgba(91,143,255,0.20),
+    inset 0 1px 0 rgba(255,255,255,0.16);
+}
+
 .analytics-expenses-month-strip::-webkit-scrollbar {
   display: none;
 }
