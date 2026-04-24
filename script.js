@@ -2543,29 +2543,6 @@ function renderAll() {
 toAccountSelect?.addEventListener("change", updateTransferSafeFields);
 
   openCategoriesManagerBtn?.addEventListener("click", openCategoriesManager);
-  closeCategoriesManagerBtn?.addEventListener("click", closeCategoriesManager);
-  
-document.getElementById("analyticsRailRangeBtn")?.addEventListener("click", () => {
-  openAnalyticsFiltersModal();
-
-  analyticsFilterPeriod = "range";
-  resetAnalyticsExpenseCategoryFilter();
-  closeAnalyticsMonthWheel();
-
-  analyticsRangeFromInput?.classList.remove("hidden");
-  analyticsRangeToInput?.classList.remove("hidden");
-  analyticsSelectedPeriodLabel?.classList.remove("hidden");
-
-  analyticsPeriodButtons.forEach((item) => {
-    item.classList.toggle("is-active", item.dataset.analyticsPeriod === "range");
-  });
-
-  document
-    .getElementById("analyticsRailRangeBtn")
-    ?.classList.add("is-active");
-
-  renderAnalytics();
-});
 
 navWalletBtn?.addEventListener("click", showWalletView);
 navAnalyticsBtn?.addEventListener("click", showAnalyticsView);
@@ -2649,66 +2626,15 @@ faqModal?.addEventListener("click", (event) => {
     ?.classList.toggle("is-active", analyticsFilterPeriod === "range");
 }
 
-function hideAnalyticsRangeInputs() {
-  analyticsRangeFromInput?.classList.add("hidden");
-  analyticsRangeToInput?.classList.add("hidden");
-  analyticsSelectedPeriodLabel?.classList.add("hidden");
-
-  setNativePickerVisibility(analyticsRangeFromInput, false);
-  setNativePickerVisibility(analyticsRangeToInput, false);
-}
-
-function openAnalyticsRangePicker() {
-  const today = getTodayDateValue();
-
-  analyticsFilterPeriod = "range";
-  analyticsRangeStart = analyticsRangeStart || today;
-  analyticsRangeEnd = analyticsRangeEnd || today;
-
-  if (analyticsRangeFromInput) {
-    analyticsRangeFromInput.value = analyticsRangeStart;
-    analyticsRangeFromInput.classList.remove("hidden");
-  }
-
-  if (analyticsRangeToInput) {
-    analyticsRangeToInput.value = analyticsRangeEnd;
-    analyticsRangeToInput.classList.remove("hidden");
-  }
-
-  analyticsSelectedPeriodLabel?.classList.remove("hidden");
-
-  closeAnalyticsMonthWheel();
-
-  setNativePickerVisibility(analyticsRangeFromInput, true);
-  setNativePickerVisibility(analyticsRangeToInput, true);
-
-  syncAnalyticsPeriodButtons();
-  renderAnalytics();
-
-}
-
-function syncAnalyticsPeriodButtons() {
-  analyticsPeriodButtons.forEach((item) => {
-    item.classList.toggle(
-      "is-active",
-      item.dataset.analyticsPeriod === analyticsFilterPeriod
-    );
-  });
-
-  document
-    .getElementById("analyticsRailRangeBtn")
-    ?.classList.toggle("is-active", analyticsFilterPeriod === "range");
-}
-
 function getAnalyticsSelectedMonthParts() {
   const fallback = getCurrentMonthValue();
   const value = analyticsSelectedMonth || fallback;
   const [yearRaw, monthRaw] = value.split("-");
 
-  const year = Number(yearRaw) || new Date().getFullYear();
-  const month = Number(monthRaw) || new Date().getMonth() + 1;
-
-  return { year, month };
+  return {
+    year: Number(yearRaw) || new Date().getFullYear(),
+    month: Number(monthRaw) || new Date().getMonth() + 1,
+  };
 }
 
 function getAnalyticsRangeDateKey(year, month, day) {
@@ -2729,51 +2655,11 @@ function formatAnalyticsRangeDockDate(dateKey) {
   const monthIndex = Number(monthRaw) - 1;
   const day = Number(dayRaw);
 
-  const monthLabels = ["янв", "фев", "мар", "апр", "май", "июн", "июл", "авг", "сен", "окт", "ноя", "дек"];
-  return `${day} ${monthLabels[monthIndex] || ""}`;
-}
+  const monthLabels = [
+    "янв", "фев", "мар", "апр", "май", "июн",
+    "июл", "авг", "сен", "окт", "ноя", "дек",
+  ];
 
-function getDefaultAnalyticsRangeDate() {
-  const today = getTodayDateValue();
-
-  if (isDateInSelectedAnalyticsMonth(today)) {
-    return today;
-  }
-
-  const { year, month } = getAnalyticsSelectedMonthParts();
-  return getAnalyticsRangeDateKey(year, month, 1);
-}
-
-function getAnalyticsSelectedMonthParts() {
-  const fallback = getCurrentMonthValue();
-  const value = analyticsSelectedMonth || fallback;
-  const [yearRaw, monthRaw] = value.split("-");
-
-  const year = Number(yearRaw) || new Date().getFullYear();
-  const month = Number(monthRaw) || new Date().getMonth() + 1;
-
-  return { year, month };
-}
-
-function getAnalyticsRangeDateKey(year, month, day) {
-  return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-}
-
-function isDateInSelectedAnalyticsMonth(dateKey) {
-  if (!dateKey) return false;
-
-  const { year, month } = getAnalyticsSelectedMonthParts();
-  return dateKey.startsWith(`${year}-${String(month).padStart(2, "0")}`);
-}
-
-function formatAnalyticsRangeDockDate(dateKey) {
-  if (!dateKey) return "—";
-
-  const [, monthRaw, dayRaw] = dateKey.split("-");
-  const monthIndex = Number(monthRaw) - 1;
-  const day = Number(dayRaw);
-
-  const monthLabels = ["янв", "фев", "мар", "апр", "май", "июн", "июл", "авг", "сен", "окт", "ноя", "дек"];
   return `${day} ${monthLabels[monthIndex] || ""}`;
 }
 
@@ -2794,6 +2680,10 @@ function closeAnalyticsRangeDock() {
 
   analyticsRangeStartBtn?.classList.remove("is-active");
   analyticsRangeEndBtn?.classList.remove("is-active");
+
+  document
+    .getElementById("analyticsRailRangeBtn")
+    ?.classList.toggle("is-active", analyticsFilterPeriod === "range");
 }
 
 function openAnalyticsRangeDock() {
@@ -2809,11 +2699,23 @@ function openAnalyticsRangeDock() {
 
   analyticsRangeEditingSide = "start";
 
+  closeAnalyticsMonthWheel();
+
   analyticsRangeDock?.classList.remove("hidden");
 
-  closeAnalyticsMonthWheel();
+  document
+    .getElementById("analyticsRailRangeBtn")
+    ?.classList.add("is-active");
+
   renderAnalyticsRangeDock();
   openAnalyticsRangeNumberPicker("start");
+
+  requestAnimationFrame(() => {
+    analyticsRangeDock?.scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+    });
+  });
 }
 
 function resetAnalyticsRangeDock() {
@@ -2831,19 +2733,30 @@ function renderAnalyticsRangeDock() {
   const { year, month } = getAnalyticsSelectedMonthParts();
 
   if (analyticsRangeDockTitle) {
-    analyticsRangeDockTitle.textContent = formatMonthLabel(`${year}-${String(month).padStart(2, "0")}`);
+    analyticsRangeDockTitle.textContent = formatMonthLabel(
+      `${year}-${String(month).padStart(2, "0")}`
+    );
   }
 
   if (analyticsRangeDockStartLabel) {
-    analyticsRangeDockStartLabel.textContent = formatAnalyticsRangeDockDate(analyticsRangeDraftStart);
+    analyticsRangeDockStartLabel.textContent =
+      formatAnalyticsRangeDockDate(analyticsRangeDraftStart);
   }
 
   if (analyticsRangeDockEndLabel) {
-    analyticsRangeDockEndLabel.textContent = formatAnalyticsRangeDockDate(analyticsRangeDraftEnd);
+    analyticsRangeDockEndLabel.textContent =
+      formatAnalyticsRangeDockDate(analyticsRangeDraftEnd);
   }
 
-  analyticsRangeStartBtn?.classList.toggle("is-active", analyticsRangeEditingSide === "start");
-  analyticsRangeEndBtn?.classList.toggle("is-active", analyticsRangeEditingSide === "end");
+  analyticsRangeStartBtn?.classList.toggle(
+    "is-active",
+    analyticsRangeEditingSide === "start"
+  );
+
+  analyticsRangeEndBtn?.classList.toggle(
+    "is-active",
+    analyticsRangeEditingSide === "end"
+  );
 
   renderAnalyticsRangeNumberList();
 }
@@ -2904,41 +2817,15 @@ function renderAnalyticsRangeNumberList() {
         analyticsRangeDraftEnd = nextDate;
 
         if (analyticsRangeDraftEnd < analyticsRangeDraftStart) {
-          const oldStart = analyticsRangeDraftStart;
+          const previousStart = analyticsRangeDraftStart;
           analyticsRangeDraftStart = analyticsRangeDraftEnd;
-          analyticsRangeDraftEnd = oldStart;
+          analyticsRangeDraftEnd = previousStart;
         }
       }
 
       renderAnalyticsRangeDock();
     });
   });
-}
-
-function applyAnalyticsRangeDock() {
-  if (!analyticsRangeDraftStart) {
-    resetAnalyticsRangeDock();
-  }
-
-  analyticsRangeStart = analyticsRangeDraftStart;
-  analyticsRangeEnd = analyticsRangeDraftEnd || analyticsRangeDraftStart;
-  analyticsFilterPeriod = "range";
-
-  if (analyticsRangeFromInput) {
-    analyticsRangeFromInput.value = analyticsRangeStart;
-  }
-
-  if (analyticsRangeToInput) {
-    analyticsRangeToInput.value = analyticsRangeEnd;
-  }
-
-  setNativePickerVisibility(analyticsRangeFromInput, false);
-  setNativePickerVisibility(analyticsRangeToInput, false);
-
-  closeAnalyticsRangeDock();
-  syncAnalyticsPeriodButtons();
-  resetAnalyticsExpenseCategoryFilter();
-  renderAnalytics();
 }
 
 function applyAnalyticsRangeDock() {
@@ -3004,16 +2891,13 @@ analyticsRangeStartBtn?.addEventListener("click", () => {
 analyticsRangeEndBtn?.addEventListener("click", () => {
   openAnalyticsRangeNumberPicker("end");
 });
+
 analyticsRangeDockCloseBtn?.addEventListener("click", closeAnalyticsRangeDock);
 analyticsRangeDockResetBtn?.addEventListener("click", resetAnalyticsRangeDock);
 analyticsRangeDockApplyBtn?.addEventListener("click", applyAnalyticsRangeDock);
 
 analyticsExpensesMonthStrip?.addEventListener("click", () => {
   closeAnalyticsRangeDock();
-});
-
-document.getElementById("analyticsRailRangeBtn")?.addEventListener("click", () => {
-  openAnalyticsRangeDock();
 });
 
   analyticsMonthBtn?.addEventListener("click", (event) => {
@@ -3035,7 +2919,7 @@ document.getElementById("analyticsRailRangeBtn")?.addEventListener("click", () =
 
   analyticsMonthApplyBtn?.addEventListener("click", () => {
   applyAnalyticsMonthWheel();
-  closeAnalyticsFiltersModal();
+  closeAnalyticsMonthWheel();
 });
 
   analyticsRangeFromInput?.addEventListener("change", () => {
