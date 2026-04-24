@@ -317,7 +317,7 @@ bindMoneyInput(safeBucketAmountInput);
   let analyticsRangeStart = "";
   let analyticsRangeEnd = "";
   
-  let analyticsTab = "overview";
+  let analyticsTab = "expenses";
   
 
 
@@ -2537,7 +2537,6 @@ navWalletBtn?.addEventListener("click", showWalletView);
 navAnalyticsBtn?.addEventListener("click", showAnalyticsView);
 navOperationsBtn?.addEventListener("click", showOperationsView);
 
-analyticsTabOverviewBtn?.addEventListener("click", () => setAnalyticsTab("overview"));
 analyticsTabExpensesBtn?.addEventListener("click", () => setAnalyticsTab("expenses"));
 analyticsTabSafesBtn?.addEventListener("click", () => setAnalyticsTab("safes"));
 
