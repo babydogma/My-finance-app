@@ -4994,23 +4994,27 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   overflow: hidden !important;
 }
 
+/* базовый блик карточки должен быть ниже заливки */
+#mandatoryPaymentsModal #mandatoryPaymentsList .mandatory-payment-card::before {
+  z-index: 0 !important;
+}
+
 /* сама заливка удержания */
 #mandatoryPaymentsModal #mandatoryPaymentsList .mandatory-payment-card__progress {
   display: block !important;
   position: absolute !important;
-  top: 0 !important;
-  bottom: 0 !important;
-  width: 0% !important;
+  inset: 0 !important;
+  width: 100% !important;
   height: 100% !important;
-  opacity: 0 !important;
+  opacity: 0;
   pointer-events: none !important;
   z-index: 1 !important;
   border-radius: inherit !important;
-  transform: translateZ(0) !important;
-  will-change: width, opacity !important;
+  transform: scaleX(0) translateZ(0);
+  will-change: transform, opacity;
 }
 
-/* контент всегда поверх заливки */
+/* контент поверх заливки */
 #mandatoryPaymentsModal #mandatoryPaymentsList .mandatory-payment-card .list-body,
 #mandatoryPaymentsModal #mandatoryPaymentsList .mandatory-payment-card .list-right,
 #mandatoryPaymentsModal #mandatoryPaymentsList .mandatory-payment-card .mandatory-payment-card__status-wrap {
@@ -5018,16 +5022,15 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   z-index: 2 !important;
 }
 
-/* удержание неоплаченного платежа → зелёная заливка слева направо */
+/* НЕ ОПЛАЧЕН → удержание → зелёная заливка слева направо */
 #mandatoryPaymentsModal #mandatoryPaymentsList .mandatory-payment-card.mandatory-payment-card--hold-pay .mandatory-payment-card__progress {
-  left: 0 !important;
-  right: auto !important;
-  opacity: 1 !important;
+  opacity: 1;
+  transform-origin: left center;
   background:
     linear-gradient(
       90deg,
-      rgba(74, 216, 140, 0.36) 0%,
-      rgba(74, 216, 140, 0.24) 58%,
+      rgba(74, 216, 140, 0.42) 0%,
+      rgba(74, 216, 140, 0.26) 58%,
       rgba(74, 216, 140, 0.08) 100%
     ) !important;
   box-shadow:
@@ -5036,16 +5039,15 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   animation: mandatoryHoldPayFill 1.35s linear forwards !important;
 }
 
-/* удержание оплаченного платежа → красная заливка справа налево */
+/* ОПЛАЧЕН → удержание → красная заливка справа налево */
 #mandatoryPaymentsModal #mandatoryPaymentsList .mandatory-payment-card.mandatory-payment-card--hold-unpay .mandatory-payment-card__progress {
-  left: auto !important;
-  right: 0 !important;
-  opacity: 1 !important;
+  opacity: 1;
+  transform-origin: right center;
   background:
     linear-gradient(
       270deg,
-      rgba(255, 114, 104, 0.34) 0%,
-      rgba(255, 114, 104, 0.22) 58%,
+      rgba(255, 114, 104, 0.4) 0%,
+      rgba(255, 114, 104, 0.24) 58%,
       rgba(255, 114, 104, 0.08) 100%
     ) !important;
   box-shadow:
@@ -5054,7 +5056,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   animation: mandatoryHoldUnpayFill 1.35s linear forwards !important;
 }
 
-/* лёгкий статусный намёк, но не полная заливка карточки */
+/* лёгкий статусный намёк после состояния */
 #mandatoryPaymentsModal #mandatoryPaymentsList .mandatory-payment-card[data-paid="true"] {
   border-color: rgba(74, 216, 140, 0.16) !important;
   box-shadow:
@@ -5071,11 +5073,10 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     inset 0 1px 0 rgba(255, 255, 255, 0.03) !important;
 }
 
-/* ВОТ ЭТОГО НЕ ХВАТАЛО */
 @keyframes mandatoryHoldPayFill {
   0% {
-    width: 0%;
     opacity: 0;
+    transform: scaleX(0) translateZ(0);
   }
 
   6% {
@@ -5083,15 +5084,15 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   }
 
   100% {
-    width: 100%;
     opacity: 1;
+    transform: scaleX(1) translateZ(0);
   }
 }
 
 @keyframes mandatoryHoldUnpayFill {
   0% {
-    width: 0%;
     opacity: 0;
+    transform: scaleX(0) translateZ(0);
   }
 
   6% {
@@ -5099,7 +5100,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   }
 
   100% {
-    width: 100%;
     opacity: 1;
+    transform: scaleX(1) translateZ(0);
   }
 }
