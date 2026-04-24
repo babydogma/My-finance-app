@@ -253,75 +253,103 @@
   <button class="analytics-mode-switch__btn" type="button" id="analyticsTabSafesBtn">Накопления</button>
 </div>
 
-  <div class="modal hidden" id="analyticsFiltersModal">
-    <div class="modal-sheet filters-sheet">
-      <div class="modal-handle"></div>
+  <div class="modal hidden time-lens-modal" id="analyticsFiltersModal">
+  <div class="modal-sheet filters-sheet time-lens-sheet">
+    <div class="time-lens-glow time-lens-glow--left"></div>
+    <div class="time-lens-glow time-lens-glow--right"></div>
 
-      <div class="section-head filters-sheet__head">
-        <h3 class="modal-title filters-sheet__title">Фильтры аналитики</h3>
-        <button class="manager-back-btn" type="button" id="closeAnalyticsFiltersBtn">Закрыть</button>
+    <div class="time-lens-head">
+      <div>
+        <div class="time-lens-kicker">Срез аналитики</div>
+        <h3 class="time-lens-title">Время</h3>
       </div>
 
-      <div class="history-filters history-filters--modal">
-        <div class="history-filter-group history-filter-group--primary">
-          <div class="month-filter-wrap month-filter-wrap--inline">
+      <button class="time-lens-close" type="button" id="closeAnalyticsFiltersBtn">
+        Закрыть
+      </button>
+    </div>
+
+    <div class="time-lens-stage">
+      <button
+        class="history-filter-btn history-filter-btn--month time-lens-month-orb is-active"
+        type="button"
+        data-analytics-period="month"
+        id="analyticsMonthBtn"
+      >
+        Месяц
+      </button>
+
+      <div class="time-lens-quick-row">
+        <button
+          class="history-filter-btn time-lens-chip time-lens-chip--today"
+          type="button"
+          data-analytics-period="today"
+        >
+          Сегодня
+        </button>
+
+        <button
+          class="history-filter-btn time-lens-chip time-lens-chip--week"
+          type="button"
+          data-analytics-period="7"
+        >
+          7 дней
+        </button>
+
+        <button
+          class="history-filter-btn time-lens-chip time-lens-chip--range"
+          type="button"
+          data-analytics-period="range"
+        >
+          Период
+        </button>
+      </div>
+
+      <div class="analytics-month-popover hidden time-lens-month-wheel" id="analyticsMonthWheelWrap">
+        <div class="analytics-month-popover__panel time-lens-month-panel">
+          <div class="month-wheel" id="analyticsMonthWheelInline">
+            <div class="month-wheel__fade month-wheel__fade--top"></div>
+            <div class="month-wheel__fade month-wheel__fade--bottom"></div>
+            <div class="month-wheel__center-line"></div>
+
+            <div class="month-wheel__column" id="analyticsMonthNamesColumn"></div>
+            <div class="month-wheel__column" id="analyticsMonthYearsColumn"></div>
+          </div>
+
+          <div class="analytics-month-popover__actions time-lens-actions">
             <button
-              class="history-filter-btn history-filter-btn--month is-active"
+              class="analytics-month-popover__reset time-lens-reset"
               type="button"
-              data-analytics-period="month"
-              id="analyticsMonthBtn"
+              id="analyticsMonthResetBtn"
             >
-              Месяц
+              Сброс
+            </button>
+
+            <button
+              class="analytics-month-popover__apply time-lens-apply"
+              type="button"
+              id="analyticsMonthApplyBtn"
+              aria-label="Подтвердить выбор месяца"
+            >
+              ✓
             </button>
           </div>
         </div>
+      </div>
 
-        <div class="analytics-month-popover hidden" id="analyticsMonthWheelWrap">
-          <div class="analytics-month-popover__panel">
-            <div class="month-wheel" id="analyticsMonthWheelInline">
-              <div class="month-wheel__fade month-wheel__fade--top"></div>
-              <div class="month-wheel__fade month-wheel__fade--bottom"></div>
-              <div class="month-wheel__center-line"></div>
+      <div class="time-lens-range-card">
+        <div class="time-lens-range-title">Диапазон дат</div>
 
-              <div class="month-wheel__column" id="analyticsMonthNamesColumn"></div>
-              <div class="month-wheel__column" id="analyticsMonthYearsColumn"></div>
-            </div>
-
-            <div class="analytics-month-popover__actions">
-              <button
-                class="analytics-month-popover__reset"
-                type="button"
-                id="analyticsMonthResetBtn"
-              >
-                Сбросить
-              </button>
-
-              <button
-                class="analytics-month-popover__apply"
-                type="button"
-                id="analyticsMonthApplyBtn"
-                aria-label="Подтвердить выбор месяца"
-              >
-                ✓
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div class="history-filter-group history-filter-group--secondary">
-          <button class="history-filter-btn" type="button" data-analytics-period="today">Сегодня</button>
-          <button class="history-filter-btn" type="button" data-analytics-period="7">7 дней</button>
-          <button class="history-filter-btn" type="button" data-analytics-period="range">Период</button>
-        </div>
-
-        <div class="history-filter-group history-filter-group--inputs">
+        <div class="time-lens-range-inputs">
           <input class="input hidden" type="date" id="analyticsRangeFromInput" />
           <input class="input hidden" type="date" id="analyticsRangeToInput" />
-          <div class="section-note hidden" id="analyticsSelectedPeriodLabel"></div>
         </div>
+
+        <div class="section-note hidden" id="analyticsSelectedPeriodLabel"></div>
       </div>
     </div>
   </div>
+</div>
 
   <section class="section hidden analytics-expenses-screen" id="analyticsExpensesSection">
   <div class="analytics-expenses-total-block">
