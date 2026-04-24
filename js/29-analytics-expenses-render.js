@@ -396,7 +396,7 @@
               <div class="analytics-expense-category-row__bar">
                 <div
                   class="analytics-expense-category-row__bar-fill"
-                  style="width: ${Math.max(2, percent)}%; background: ${item.color};"
+                  style="width: ${Math.max(2, percent)}%; background: ${item.color}; color: ${item.color};"
                 ></div>
               </div>
 
