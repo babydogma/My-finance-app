@@ -534,18 +534,15 @@ button {
 }
 
 .wallet-mandatory-row {
+  position: relative;
   min-height: 72px;
-  padding: 11px 14px;
+  padding: 11px 150px 11px 14px;
   border-radius: 22px;
   background:
     linear-gradient(180deg, rgba(68, 74, 92, 0.34) 0%, rgba(36, 40, 54, 0.22) 100%);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 118px;
-  align-items: center;
-  gap: 12px;
+  display: block;
 }
 
 .wallet-mandatory-row--main {
@@ -569,28 +566,45 @@ button {
 }
 
 .wallet-mandatory-row .list-right {
-  min-width: 0;
-  width: 118px;
-  max-width: 118px;
-  margin-left: 0;
-  padding-left: 0;
-  overflow: hidden;
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  z-index: 2;
+  width: 132px;
+  max-width: 132px;
+  margin: 0;
+  padding: 0;
+  overflow: visible;
   text-align: right;
-  justify-self: end;
+  transform: translate3d(0, -50%, 0);
 }
 
 .wallet-mandatory-value {
   display: block;
-  width: 100%;
-  max-width: 100%;
+  width: 132px;
+  max-width: 132px;
   margin: 0;
   font-size: 15px;
   font-weight: 860;
   line-height: 1;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.045em;
   white-space: nowrap;
   overflow: visible;
   text-align: right;
+  transform: translateZ(0);
+  will-change: contents;
+}
+
+.wallet-mandatory-row .list-body {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.wallet-mandatory-row .list-title-row {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .wallet-mandatory-row .list-body {
