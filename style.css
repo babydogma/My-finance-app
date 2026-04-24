@@ -4984,3 +4984,91 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     border-radius: 20px !important;
   }
 }
+
+/* =========================================================
+   MANDATORY PAYMENTS — RESTORE HOLD PROGRESS
+   ========================================================= */
+
+#mandatoryPaymentsModal #mandatoryPaymentsList .mandatory-payment-card {
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+/* базовый слой карточки */
+#mandatoryPaymentsModal #mandatoryPaymentsList .mandatory-payment-card::before {
+  z-index: 0 !important;
+}
+
+/* вот это и есть заливка при удержании */
+#mandatoryPaymentsModal #mandatoryPaymentsList .mandatory-payment-card__progress {
+  position: absolute !important;
+  inset: 0 auto 0 0 !important;
+  width: 0% !important;
+  height: 100% !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  z-index: 1 !important;
+  border-radius: inherit !important;
+}
+
+/* весь контент поверх заливки */
+#mandatoryPaymentsModal #mandatoryPaymentsList .mandatory-payment-card .list-body,
+#mandatoryPaymentsModal #mandatoryPaymentsList .mandatory-payment-card .list-right,
+#mandatoryPaymentsModal #mandatoryPaymentsList .mandatory-payment-card .mandatory-payment-card__status-wrap {
+  position: relative !important;
+  z-index: 2 !important;
+}
+
+/* удержание неоплаченного платежа → зелёная заливка слева направо */
+#mandatoryPaymentsModal #mandatoryPaymentsList .mandatory-payment-card.mandatory-payment-card--hold-pay .mandatory-payment-card__progress {
+  left: 0 !important;
+  right: auto !important;
+  opacity: 1 !important;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(74, 216, 140, 0.34) 0%,
+      rgba(74, 216, 140, 0.22) 58%,
+      rgba(74, 216, 140, 0.08) 100%
+    ) !important;
+  box-shadow:
+    0 0 22px rgba(74, 216, 140, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.035) !important;
+  animation: mandatoryHoldPay 1.35s linear forwards !important;
+}
+
+/* удержание оплаченного платежа → красная заливка справа налево */
+#mandatoryPaymentsModal #mandatoryPaymentsList .mandatory-payment-card.mandatory-payment-card--hold-unpay .mandatory-payment-card__progress {
+  left: auto !important;
+  right: 0 !important;
+  opacity: 1 !important;
+  background:
+    linear-gradient(
+      270deg,
+      rgba(255, 114, 104, 0.32) 0%,
+      rgba(255, 114, 104, 0.2) 58%,
+      rgba(255, 114, 104, 0.08) 100%
+    ) !important;
+  box-shadow:
+    0 0 22px rgba(255, 114, 104, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.035) !important;
+  animation: mandatoryHoldUnpay 1.35s linear forwards !important;
+}
+
+/* после оплаты карточка остаётся в стиле кошелька, но с лёгким зелёным намёком */
+#mandatoryPaymentsModal #mandatoryPaymentsList .mandatory-payment-card[data-paid="true"] {
+  border-color: rgba(74, 216, 140, 0.16) !important;
+  box-shadow:
+    var(--shadow-card),
+    0 0 18px rgba(74, 216, 140, 0.055),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03) !important;
+}
+
+/* неоплаченная — лёгкий красный намёк, без полной красной заливки */
+#mandatoryPaymentsModal #mandatoryPaymentsList .mandatory-payment-card[data-paid="false"] {
+  border-color: rgba(255, 114, 104, 0.14) !important;
+  box-shadow:
+    var(--shadow-card),
+    0 0 18px rgba(255, 114, 104, 0.045),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03) !important;
+}
