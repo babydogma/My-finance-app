@@ -4901,16 +4901,66 @@ mandatoryPaymentEditorModal?.addEventListener("click", (event) => {
 
 let analyticsExpenseCategoryFilter = "all";
 
+const premiumAnalyticsExpenseValue =
+  document.getElementById("analyticsExpenseValuePremium") ||
+  document.getElementById("analyticsExpenseValue");
+
+const premiumAnalyticsExpensesPeriodNote =
+  document.getElementById("analyticsExpensesPeriodNotePremium") ||
+  document.getElementById("analyticsExpensesPeriodNote");
+
+const premiumAnalyticsExpensesRing =
+  document.getElementById("analyticsExpensesRingPremium") ||
+  document.getElementById("analyticsExpensesRing");
+
+const premiumAnalyticsExpensesRingCenterValue =
+  document.getElementById("analyticsExpensesRingCenterValuePremium") ||
+  document.getElementById("analyticsExpensesRingCenterValue");
+
+const premiumAnalyticsExpensesRingCenterLabel =
+  document.getElementById("analyticsExpensesRingCenterLabelPremium") ||
+  document.getElementById("analyticsExpensesRingCenterLabel");
+
+const premiumAnalyticsExpensesCategoriesList =
+  document.getElementById("analyticsExpensesCategoriesListPremium") ||
+  document.getElementById("analyticsExpensesCategoriesList");
+
+const premiumAnalyticsExpensesMonthStrip =
+  document.getElementById("analyticsExpensesMonthStrip");
+
+const premiumAnalyticsExpensesTotalRowValue =
+  document.getElementById("analyticsExpensesTotalRowValue");
+
+const premiumAnalyticsExpenseCategoryFilterBtn =
+  document.getElementById("analyticsExpenseCategoryFilterBtn");
+
+const premiumAnalyticsExpenseMonthFilterBtn =
+  document.getElementById("analyticsExpenseMonthFilterBtn");
+
+const premiumAnalyticsExpenseCategoryPickerModal =
+  document.getElementById("analyticsExpenseCategoryPickerModal");
+
+const premiumAnalyticsExpenseCategoryPickerList =
+  document.getElementById("analyticsExpenseCategoryPickerList");
+
+const premiumCloseAnalyticsExpenseCategoryPickerBtn =
+  document.getElementById("closeAnalyticsExpenseCategoryPickerBtn");
+
+const PREMIUM_ANALYTICS_MODAL_MS =
+  typeof MODAL_ANIMATION_MS === "number" ? MODAL_ANIMATION_MS : 420;
+
 const ANALYTICS_EXPENSE_COLORS = [
-  "#6DD36F",
-  "#F2F2F2",
-  "#FF8A13",
-  "#FF5145",
-  "#35AEEA",
-  "#9D7CFF",
-  "#FFD166",
+  "#B878F2",
+  "#FF8A45",
+  "#55C7E8",
+  "#FF5252",
+  "#9BE22D",
+  "#6D9CF8",
+  "#F95FA3",
   "#4DD6C8",
-  "#FF6FAE",
+  "#F2F2F2",
+  "#FFD166",
+  "#9D7CFF",
   "#A3E635",
   "#F97316",
   "#60A5FA",
@@ -4924,8 +4974,6 @@ const ANALYTICS_EXPENSE_COLORS = [
   "#E879F9",
   "#67E8F9",
   "#FDE68A",
-  "#86EFAC",
-  "#FCA5A5",
 ];
 
 function normalizeAnalyticsMonthValuePremium(value) {
@@ -4952,32 +5000,18 @@ function getAnalyticsColorHash(value) {
   return hash;
 }
 
-function buildAnalyticsExpenseColorMap(items) {
-  const usedIndexes = new Set();
-  const map = new Map();
+function getAnalyticsExpenseColor(categoryId) {
+  const categoryIds = state.categories.map((category) => category.id);
+  const allCategoryIds = Array.from(new Set([...categoryIds, UNCATEGORIZED_ID]));
+  const index = allCategoryIds.indexOf(categoryId);
 
-  const stableItems = [...items].sort((a, b) => {
-    return String(a.categoryId).localeCompare(String(b.categoryId), "ru");
-  });
+  if (index >= 0) {
+    return ANALYTICS_EXPENSE_COLORS[index % ANALYTICS_EXPENSE_COLORS.length];
+  }
 
-  stableItems.forEach((item) => {
-    const key = item.categoryId || item.name || "unknown";
-    let index = getAnalyticsColorHash(key) % ANALYTICS_EXPENSE_COLORS.length;
-
-    for (let step = 0; step < ANALYTICS_EXPENSE_COLORS.length; step += 1) {
-      const nextIndex = (index + step) % ANALYTICS_EXPENSE_COLORS.length;
-
-      if (!usedIndexes.has(nextIndex)) {
-        index = nextIndex;
-        break;
-      }
-    }
-
-    usedIndexes.add(index);
-    map.set(item.categoryId, ANALYTICS_EXPENSE_COLORS[index]);
-  });
-
-  return map;
+  return ANALYTICS_EXPENSE_COLORS[
+    getAnalyticsColorHash(categoryId) % ANALYTICS_EXPENSE_COLORS.length
+  ];
 }
 
 function openAnalyticsPremiumModal(modalEl) {
@@ -4999,50 +5033,34 @@ function closeAnalyticsPremiumModal(modalEl) {
   setTimeout(() => {
     modalEl.classList.remove("is-closing");
     modalEl.classList.add("hidden");
-  }, MODAL_ANIMATION_MS);
+  }, PREMIUM_ANALYTICS_MODAL_MS);
 }
 
-function getAnalyticsExpenseFilteredTransactionsPremium() {
+function getAnalyticsExpenseBaseTransactionsPremium() {
   const transactions = Array.isArray(state.transactions) ? state.transactions : [];
 
   analyticsSelectedMonth = normalizeAnalyticsMonthValuePremium(analyticsSelectedMonth);
 
-  const filtered = filterTransactionsByPeriod(
+  return filterTransactionsByPeriod(
     transactions,
     analyticsFilterPeriod,
     analyticsSelectedMonth,
     analyticsRangeStart,
     analyticsRangeEnd
-  );
+  ).filter((transaction) => transaction.type === "expense");
+}
 
-  return filtered.filter((transaction) => {
-    if (transaction.type !== "expense") return false;
+function getAnalyticsExpenseFilteredTransactionsPremium() {
+  const expenseTransactions = getAnalyticsExpenseBaseTransactionsPremium();
 
-    if (analyticsExpenseCategoryFilter === "all") {
-      return true;
-    }
+  if (analyticsExpenseCategoryFilter === "all") {
+    return expenseTransactions;
+  }
 
+  return expenseTransactions.filter((transaction) => {
     const categoryId = transaction.category_id || UNCATEGORIZED_ID;
     return categoryId === analyticsExpenseCategoryFilter;
   });
-}
-
-function getAnalyticsExpenseColor(categoryId) {
-  const allCategoryIds = [
-    ...state.categories.map((category) => category.id),
-    UNCATEGORIZED_ID,
-  ];
-
-  const uniqueIds = Array.from(new Set(allCategoryIds));
-  const index = uniqueIds.indexOf(categoryId);
-
-  if (index >= 0) {
-    return ANALYTICS_EXPENSE_COLORS[index % ANALYTICS_EXPENSE_COLORS.length];
-  }
-
-  return ANALYTICS_EXPENSE_COLORS[
-    getAnalyticsColorHash(categoryId) % ANALYTICS_EXPENSE_COLORS.length
-  ];
 }
 
 function getAnalyticsExpenseItemsPremium(expenseTransactions) {
@@ -5073,23 +5091,20 @@ function getAnalyticsExpenseItemsPremium(expenseTransactions) {
 }
 
 function renderAnalyticsExpensesRingPremium(items, total) {
-  if (!analyticsExpensesRing) return;
+  if (!premiumAnalyticsExpensesRing) return;
 
   if (!total || total <= 0 || items.length === 0) {
-    analyticsExpensesRing.style.background =
-      "conic-gradient(rgba(255,255,255,0.09) 0deg 360deg)";
+    const emptyGradient = "conic-gradient(rgba(255,255,255,0.09) 0deg 360deg)";
 
-    analyticsExpensesRing.style.setProperty(
-      "--analytics-ring-gradient",
-      "conic-gradient(rgba(255,255,255,0.09) 0deg 360deg)"
-    );
+    premiumAnalyticsExpensesRing.style.background = emptyGradient;
+    premiumAnalyticsExpensesRing.style.setProperty("--analytics-ring-gradient", emptyGradient);
 
-    if (analyticsExpensesRingCenterValue) {
-      analyticsExpensesRingCenterValue.textContent = "0%";
+    if (premiumAnalyticsExpensesRingCenterValue) {
+      premiumAnalyticsExpensesRingCenterValue.textContent = "0%";
     }
 
-    if (analyticsExpensesRingCenterLabel) {
-      analyticsExpensesRingCenterLabel.textContent = "Нет расходов";
+    if (premiumAnalyticsExpensesRingCenterLabel) {
+      premiumAnalyticsExpensesRingCenterLabel.textContent = "Нет расходов";
     }
 
     return;
@@ -5109,28 +5124,28 @@ function renderAnalyticsExpensesRingPremium(items, total) {
 
   const gradient = `conic-gradient(${gradientParts.join(", ")})`;
 
-  analyticsExpensesRing.style.background = gradient;
-  analyticsExpensesRing.style.setProperty("--analytics-ring-gradient", gradient);
+  premiumAnalyticsExpensesRing.style.background = gradient;
+  premiumAnalyticsExpensesRing.style.setProperty("--analytics-ring-gradient", gradient);
 
   const topItem = items[0];
   const topPercent = Math.round((topItem.amount / total) * 100);
 
-  if (analyticsExpensesRingCenterValue) {
-    analyticsExpensesRingCenterValue.textContent = `${topPercent}%`;
+  if (premiumAnalyticsExpensesRingCenterValue) {
+    premiumAnalyticsExpensesRingCenterValue.textContent = `${topPercent}%`;
   }
 
-  if (analyticsExpensesRingCenterLabel) {
-    analyticsExpensesRingCenterLabel.textContent = topItem.name;
+  if (premiumAnalyticsExpensesRingCenterLabel) {
+    premiumAnalyticsExpensesRingCenterLabel.textContent = topItem.name;
   }
 }
 
 function renderAnalyticsExpensesCategoriesPremium(items, total) {
-  if (!analyticsExpensesCategoriesList) return;
+  if (!premiumAnalyticsExpensesCategoriesList) return;
 
-  analyticsExpensesCategoriesList.innerHTML = "";
+  premiumAnalyticsExpensesCategoriesList.innerHTML = "";
 
   if (!total || total <= 0 || items.length === 0) {
-    analyticsExpensesCategoriesList.innerHTML = `
+    premiumAnalyticsExpensesCategoriesList.innerHTML = `
       <div class="analytics-expenses-empty">
         За выбранный период расходов нет
       </div>
@@ -5178,7 +5193,7 @@ function renderAnalyticsExpensesCategoriesPremium(items, total) {
       }
     });
 
-    analyticsExpensesCategoriesList.appendChild(row);
+    premiumAnalyticsExpensesCategoriesList.appendChild(row);
   });
 }
 
@@ -5237,7 +5252,7 @@ function setAnalyticsExpensesMonthPremium(monthKey) {
 }
 
 function renderAnalyticsExpensesMonthStripPremium() {
-  if (!analyticsExpensesMonthStrip) return;
+  if (!premiumAnalyticsExpensesMonthStrip) return;
 
   const baseDate = getAnalyticsMonthDateFromValue(getCurrentMonthValue());
   const months = [];
@@ -5267,7 +5282,7 @@ function renderAnalyticsExpensesMonthStripPremium() {
 
   const maxTotal = Math.max(...months.map((item) => item.total), 1);
 
-  analyticsExpensesMonthStrip.innerHTML = "";
+  premiumAnalyticsExpensesMonthStrip.innerHTML = "";
 
   months.forEach((item) => {
     const height = Math.max(4, Math.round((item.total / maxTotal) * 34));
@@ -5286,7 +5301,7 @@ function renderAnalyticsExpensesMonthStripPremium() {
       setAnalyticsExpensesMonthPremium(item.key);
     });
 
-    analyticsExpensesMonthStrip.appendChild(button);
+    premiumAnalyticsExpensesMonthStrip.appendChild(button);
   });
 }
 
@@ -5312,69 +5327,68 @@ function getAnalyticsExpensesPeriodTextPremium() {
 }
 
 function updateAnalyticsExpenseFilterButtonsPremium() {
-  if (analyticsExpenseCategoryFilterBtn) {
+  if (premiumAnalyticsExpenseCategoryFilterBtn) {
     if (analyticsExpenseCategoryFilter === "all") {
-      analyticsExpenseCategoryFilterBtn.textContent = "Категории";
+      premiumAnalyticsExpenseCategoryFilterBtn.textContent = "Категории";
     } else {
-      analyticsExpenseCategoryFilterBtn.textContent = getCategoryName(analyticsExpenseCategoryFilter);
+      premiumAnalyticsExpenseCategoryFilterBtn.textContent =
+        getCategoryName(analyticsExpenseCategoryFilter);
     }
   }
 
-  if (analyticsExpenseMonthFilterBtn) {
+  if (premiumAnalyticsExpenseMonthFilterBtn) {
     const date = getAnalyticsMonthDateFromValue(analyticsSelectedMonth);
-    analyticsExpenseMonthFilterBtn.textContent = getAnalyticsMonthShortLabel(date);
+    premiumAnalyticsExpenseMonthFilterBtn.textContent = getAnalyticsMonthShortLabel(date);
   }
 }
 
 function renderAnalyticsExpensesPremium() {
   analyticsSelectedMonth = normalizeAnalyticsMonthValuePremium(analyticsSelectedMonth);
 
-  const expenseTransactions = getAnalyticsExpenseFilteredTransactionsPremium();
+  const baseExpenseTransactions = getAnalyticsExpenseBaseTransactionsPremium();
+  const filteredExpenseTransactions = getAnalyticsExpenseFilteredTransactionsPremium();
 
-  const total = roundToTwo(
-    expenseTransactions.reduce((sum, transaction) => {
+  const totalAll = roundToTwo(
+    baseExpenseTransactions.reduce((sum, transaction) => {
       return sum + (Number(transaction.amount) || 0);
     }, 0)
   );
 
-  const items = getAnalyticsExpenseItemsPremium(expenseTransactions);
+  const totalFiltered = roundToTwo(
+    filteredExpenseTransactions.reduce((sum, transaction) => {
+      return sum + (Number(transaction.amount) || 0);
+    }, 0)
+  );
 
-  if (analyticsExpenseValue) {
-    analyticsExpenseValue.textContent = formatMoney(total);
+  const ringItems = getAnalyticsExpenseItemsPremium(baseExpenseTransactions);
+  const listItems = getAnalyticsExpenseItemsPremium(filteredExpenseTransactions);
+
+  if (premiumAnalyticsExpenseValue) {
+    premiumAnalyticsExpenseValue.textContent =
+      analyticsExpenseCategoryFilter === "all"
+        ? formatMoney(totalAll)
+        : formatMoney(totalFiltered);
   }
 
-  if (analyticsExpensesTotalRowValue) {
-    analyticsExpensesTotalRowValue.textContent = formatMoney(total);
+  if (premiumAnalyticsExpensesTotalRowValue) {
+    premiumAnalyticsExpensesTotalRowValue.textContent =
+      analyticsExpenseCategoryFilter === "all"
+        ? formatMoney(totalAll)
+        : formatMoney(totalFiltered);
   }
 
-  if (analyticsExpensesPeriodNote) {
-    analyticsExpensesPeriodNote.textContent = getAnalyticsExpensesPeriodTextPremium();
+  if (premiumAnalyticsExpensesPeriodNote) {
+    premiumAnalyticsExpensesPeriodNote.textContent = getAnalyticsExpensesPeriodTextPremium();
   }
 
-updateAnalyticsExpenseFilterButtonsPremium();
-renderAnalyticsExpensesCategoriesPremium(items, total);
-renderAnalyticsExpensesRingPremium(items, total);
-renderAnalyticsExpensesMonthStripPremium();
-}
-
-function forceRenderAnalyticsExpensesPremium() {
-  renderAnalyticsExpensesPremium();
-
-  requestAnimationFrame(() => {
-    renderAnalyticsExpensesPremium();
-  });
-
-  setTimeout(() => {
-    renderAnalyticsExpensesPremium();
-  }, 80);
-
-  setTimeout(() => {
-    renderAnalyticsExpensesPremium();
-  }, 180);
+  updateAnalyticsExpenseFilterButtonsPremium();
+  renderAnalyticsExpensesRingPremium(ringItems, totalAll);
+  renderAnalyticsExpensesMonthStripPremium();
+  renderAnalyticsExpensesCategoriesPremium(listItems, analyticsExpenseCategoryFilter === "all" ? totalAll : totalFiltered);
 }
 
 function renderAnalyticsExpenseCategoryPickerPremium() {
-  if (!analyticsExpenseCategoryPickerList) return;
+  if (!premiumAnalyticsExpenseCategoryPickerList) return;
 
   const hasUncategorized = state.transactions.some((transaction) => {
     return transaction.type === "expense" && !transaction.category_id;
@@ -5398,7 +5412,7 @@ function renderAnalyticsExpenseCategoryPickerPremium() {
     });
   }
 
-  analyticsExpenseCategoryPickerList.innerHTML = "";
+  premiumAnalyticsExpenseCategoryPickerList.innerHTML = "";
 
   categories.forEach((category) => {
     const button = document.createElement("button");
@@ -5413,20 +5427,20 @@ function renderAnalyticsExpenseCategoryPickerPremium() {
     `;
 
     button.addEventListener("click", () => {
-  analyticsExpenseCategoryFilter = category.id;
-  closeAnalyticsPremiumModal(analyticsExpenseCategoryPickerModal);
-  forceRenderAnalyticsExpensesPremium();
-});
+      analyticsExpenseCategoryFilter = category.id;
+      closeAnalyticsPremiumModal(premiumAnalyticsExpenseCategoryPickerModal);
+      renderAnalyticsExpensesPremium();
+    });
 
-    analyticsExpenseCategoryPickerList.appendChild(button);
+    premiumAnalyticsExpenseCategoryPickerList.appendChild(button);
   });
 }
 
 analyticsTabExpensesBtn?.addEventListener("click", () => {
-  requestAnimationFrame(forceRenderAnalyticsExpensesPremium);
+  requestAnimationFrame(renderAnalyticsExpensesPremium);
 });
 
-analyticsExpenseMonthFilterBtn?.addEventListener("click", () => {
+premiumAnalyticsExpenseMonthFilterBtn?.addEventListener("click", () => {
   openAnalyticsFiltersBtn?.click();
 
   requestAnimationFrame(() => {
@@ -5435,49 +5449,49 @@ analyticsExpenseMonthFilterBtn?.addEventListener("click", () => {
   });
 });
 
-analyticsExpenseCategoryFilterBtn?.addEventListener("click", () => {
+premiumAnalyticsExpenseCategoryFilterBtn?.addEventListener("click", () => {
   renderAnalyticsExpenseCategoryPickerPremium();
-  openAnalyticsPremiumModal(analyticsExpenseCategoryPickerModal);
+  openAnalyticsPremiumModal(premiumAnalyticsExpenseCategoryPickerModal);
 });
 
-closeAnalyticsExpenseCategoryPickerBtn?.addEventListener("click", () => {
-  closeAnalyticsPremiumModal(analyticsExpenseCategoryPickerModal);
+premiumCloseAnalyticsExpenseCategoryPickerBtn?.addEventListener("click", () => {
+  closeAnalyticsPremiumModal(premiumAnalyticsExpenseCategoryPickerModal);
 });
 
-analyticsExpenseCategoryPickerModal?.addEventListener("click", (event) => {
-  if (event.target === analyticsExpenseCategoryPickerModal) {
-    closeAnalyticsPremiumModal(analyticsExpenseCategoryPickerModal);
+premiumAnalyticsExpenseCategoryPickerModal?.addEventListener("click", (event) => {
+  if (event.target === premiumAnalyticsExpenseCategoryPickerModal) {
+    closeAnalyticsPremiumModal(premiumAnalyticsExpenseCategoryPickerModal);
   }
 });
 
 analyticsPeriodButtons.forEach((button) => {
   button.addEventListener("click", () => {
-    requestAnimationFrame(forceRenderAnalyticsExpensesPremium);
+    requestAnimationFrame(renderAnalyticsExpensesPremium);
   });
 });
 
 analyticsMonthApplyBtn?.addEventListener("click", () => {
   setTimeout(() => {
     analyticsSelectedMonth = normalizeAnalyticsMonthValuePremium(analyticsSelectedMonth);
-    forceRenderAnalyticsExpensesPremium();
+    renderAnalyticsExpensesPremium();
   }, 0);
 });
 
 analyticsMonthResetBtn?.addEventListener("click", () => {
   setTimeout(() => {
     analyticsSelectedMonth = normalizeAnalyticsMonthValuePremium(getCurrentMonthValue());
-    forceRenderAnalyticsExpensesPremium();
+    renderAnalyticsExpensesPremium();
   }, 0);
 });
 
 analyticsRangeFromInput?.addEventListener("change", () => {
-  requestAnimationFrame(forceRenderAnalyticsExpensesPremium);
+  requestAnimationFrame(renderAnalyticsExpensesPremium);
 });
 
 analyticsRangeToInput?.addEventListener("change", () => {
-  requestAnimationFrame(forceRenderAnalyticsExpensesPremium);
+  requestAnimationFrame(renderAnalyticsExpensesPremium);
 });
 
-requestAnimationFrame(forceRenderAnalyticsExpensesPremium);
+requestAnimationFrame(renderAnalyticsExpensesPremium);
   
 });
