@@ -1,0 +1,391 @@
+/* =========================================================
+   18. ANALYTICS EXPENSES
+   Premium expenses analytics screen
+   ========================================================= */
+
+.analytics-section-head {
+  margin-bottom: 12px;
+}
+
+.analytics-section-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 920;
+  letter-spacing: -0.05em;
+  color: #f7f9ff;
+}
+
+.analytics-expenses-screen {
+  margin-top: 10px;
+  padding-top: 0;
+}
+
+.analytics-expenses-total-block {
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+.analytics-expenses-total-value {
+  font-size: clamp(36px, 9vw, 48px);
+  line-height: 0.92;
+  font-weight: 950;
+  letter-spacing: -0.075em;
+  color: #f7f8fb;
+}
+
+.analytics-expenses-total-note {
+  margin-top: 7px;
+  font-size: 16px;
+  line-height: 1.05;
+  font-weight: 800;
+  letter-spacing: -0.045em;
+  color: rgba(235, 232, 255, 0.72);
+}
+
+.analytics-expenses-ring-zone {
+  min-height: 250px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 0 0;
+}
+
+.analytics-expenses-ring {
+  width: min(190px, 52vw);
+  height: min(190px, 52vw);
+  border-radius: 50%;
+  position: relative;
+  background: var(
+    --analytics-ring-gradient,
+    conic-gradient(rgba(255, 255, 255, 0.09) 0deg 360deg)
+  );
+  box-shadow:
+    0 20px 36px rgba(0, 0, 0, 0.22),
+    0 0 28px rgba(109, 211, 111, 0.035);
+}
+
+.analytics-expenses-ring::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  background:
+    radial-gradient(circle at 35% 28%, rgba(255, 255, 255, 0.11), transparent 28%),
+    radial-gradient(circle at 68% 72%, rgba(255, 255, 255, 0.07), transparent 30%);
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+.analytics-expenses-ring__inner {
+  position: absolute;
+  inset: 27px;
+  border-radius: 50%;
+  background: #0b0b0e;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.035),
+    inset 0 12px 28px rgba(0, 0, 0, 0.34);
+}
+
+.analytics-expenses-ring__center-value {
+  font-size: 25px;
+  line-height: 1;
+  font-weight: 920;
+  letter-spacing: -0.06em;
+  color: #f7f8fb;
+}
+
+.analytics-expenses-ring__center-label {
+  max-width: 86px;
+  margin-top: 6px;
+  font-size: 10.5px;
+  line-height: 1.05;
+  font-weight: 780;
+  letter-spacing: -0.025em;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.48);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.analytics-expenses-month-strip {
+  display: flex;
+  align-items: flex-end;
+  gap: 9px;
+  overflow-x: auto;
+  padding: 0 2px 8px;
+  margin: 8px -2px 22px;
+  scrollbar-width: none;
+}
+
+.analytics-expenses-month-strip::-webkit-scrollbar {
+  display: none;
+}
+
+.analytics-expenses-month-item {
+  width: 38px;
+  min-width: 38px;
+  height: 58px;
+  border: none;
+  background: transparent;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 7px;
+}
+
+.analytics-expenses-month-item__bar {
+  width: 30px;
+  min-height: 4px;
+  border-radius: 4px 4px 0 0;
+  background: rgba(255, 255, 255, 0.13);
+  transition:
+    height 0.24s ease,
+    background 0.24s ease,
+    transform 0.24s ease;
+}
+
+.analytics-expenses-month-item__label {
+  width: 100%;
+  font-size: 11px;
+  line-height: 1;
+  font-weight: 820;
+  letter-spacing: -0.04em;
+  color: rgba(255, 255, 255, 0.43);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.analytics-expenses-month-item.is-active .analytics-expenses-month-item__bar {
+  background: #35aeea;
+  box-shadow: 0 0 16px rgba(53, 174, 234, 0.24);
+}
+
+.analytics-expenses-month-item.is-active .analytics-expenses-month-item__label {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.analytics-expenses-total-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.analytics-expenses-total-row span,
+.analytics-expenses-total-row strong {
+  font-size: clamp(24px, 6.6vw, 32px);
+  line-height: 1;
+  font-weight: 940;
+  letter-spacing: -0.07em;
+  color: #f8f8fb;
+}
+
+.analytics-expenses-total-row strong {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.analytics-expenses-categories {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Legacy category row pieces still used by analytics detail rows */
+
+.analytics-expense-category-row__left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.analytics-expense-category-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex: 0 0 auto;
+  box-shadow: 0 0 10px currentColor;
+}
+
+.analytics-expense-category-meta {
+  display: grid;
+  row-gap: 3px;
+  min-width: 0;
+}
+
+.analytics-expense-category-meta__name {
+  color: #f7f9ff;
+  font-size: 15px;
+  font-weight: 820;
+  line-height: 1.05;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.analytics-expense-category-meta__sub {
+  color: rgba(255,255,255,0.42);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.analytics-expense-category-value {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.analytics-expense-category-value__amount {
+  font-size: 20px;
+  font-weight: 920;
+  line-height: 0.95;
+  letter-spacing: -0.05em;
+}
+
+/* Premium category rows */
+
+.analytics-expense-category-row.analytics-expense-category-row--premium {
+  width: 100%;
+  min-height: 70px;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  text-align: left;
+}
+
+.analytics-expense-category-row.analytics-expense-category-row--premium::before {
+  display: none;
+}
+
+.analytics-expense-category-row.analytics-expense-category-row--premium:active {
+  transform: scale(0.992);
+}
+
+.analytics-expense-category-row__icon {
+  width: 46px;
+  height: 46px;
+  flex: 0 0 46px;
+  border-radius: 50%;
+  background: var(--category-color);
+  color: rgba(8, 10, 14, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 940;
+  letter-spacing: -0.06em;
+  box-shadow:
+    0 10px 18px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.32);
+}
+
+.analytics-expense-category-row__main {
+  flex: 1;
+  min-width: 0;
+}
+
+.analytics-expense-category-row__top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.analytics-expense-category-row__name {
+  min-width: 0;
+  font-size: 18px;
+  line-height: 1.03;
+  font-weight: 910;
+  letter-spacing: -0.06em;
+  color: #f7f8fb;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.analytics-expense-category-row__amount {
+  flex: 0 0 auto;
+  font-size: 18px;
+  line-height: 1;
+  font-weight: 900;
+  letter-spacing: -0.055em;
+  color: #f7f8fb;
+  white-space: nowrap;
+}
+
+.analytics-expense-category-row__bottom {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 10px;
+}
+
+.analytics-expense-category-row__bar {
+  height: 5px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+}
+
+.analytics-expense-category-row__bar-fill {
+  height: 100%;
+  border-radius: inherit;
+}
+
+.analytics-expense-category-row__percent {
+  min-width: 34px;
+  text-align: right;
+  font-size: 11.5px;
+  font-weight: 820;
+  letter-spacing: -0.025em;
+  color: rgba(235, 232, 255, 0.58);
+}
+
+.analytics-expenses-empty {
+  padding: 22px 8px;
+  text-align: center;
+  font-size: 15px;
+  font-weight: 760;
+  letter-spacing: -0.03em;
+  color: rgba(255, 255, 255, 0.46);
+}
+
+@media (max-width: 420px) {
+  .analytics-expenses-ring {
+    width: 148px;
+    height: 148px;
+  }
+
+  .analytics-expenses-ring::before {
+    inset: 16px;
+  }
+
+  .analytics-expenses-ring__inner {
+    padding: 20px;
+  }
+
+  .analytics-expenses-ring__center-value {
+    font-size: 24px;
+  }
+
+  .analytics-expense-category-value__amount,
+  .analytics-expense-category-row__amount {
+    font-size: 18px;
+  }
+}
