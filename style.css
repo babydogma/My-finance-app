@@ -5056,21 +5056,28 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   animation: mandatoryHoldUnpayFill 1.35s linear forwards !important;
 }
 
-/* лёгкий статусный намёк после состояния */
-#mandatoryPaymentsModal #mandatoryPaymentsList .mandatory-payment-card[data-paid="true"] {
-  border-color: rgba(74, 216, 140, 0.16) !important;
+/* состояние карточки после удержания:
+   по дефолту красная, после оплаты зелёная */
+#mandatoryPaymentsModal #mandatoryPaymentsList .mandatory-payment-card[data-paid="false"] {
+  border-color: rgba(255, 114, 104, 0.2) !important;
+  background:
+    radial-gradient(circle at 100% 50%, rgba(255, 114, 104, 0.09), transparent 44%),
+    linear-gradient(180deg, rgba(58, 48, 61, 0.52) 0%, rgba(38, 34, 48, 0.38) 100%) !important;
   box-shadow:
     var(--shadow-card),
-    0 0 18px rgba(74, 216, 140, 0.055),
-    inset 0 1px 0 rgba(255, 255, 255, 0.03) !important;
+    0 0 20px rgba(255, 114, 104, 0.07),
+    inset 0 1px 0 rgba(255, 255, 255, 0.035) !important;
 }
 
-#mandatoryPaymentsModal #mandatoryPaymentsList .mandatory-payment-card[data-paid="false"] {
-  border-color: rgba(255, 114, 104, 0.14) !important;
+#mandatoryPaymentsModal #mandatoryPaymentsList .mandatory-payment-card[data-paid="true"] {
+  border-color: rgba(74, 216, 140, 0.2) !important;
+  background:
+    radial-gradient(circle at 100% 50%, rgba(74, 216, 140, 0.11), transparent 44%),
+    linear-gradient(180deg, rgba(42, 62, 58, 0.52) 0%, rgba(28, 42, 43, 0.38) 100%) !important;
   box-shadow:
     var(--shadow-card),
-    0 0 18px rgba(255, 114, 104, 0.045),
-    inset 0 1px 0 rgba(255, 255, 255, 0.03) !important;
+    0 0 20px rgba(74, 216, 140, 0.075),
+    inset 0 1px 0 rgba(255, 255, 255, 0.035) !important;
 }
 
 @keyframes mandatoryHoldPayFill {
