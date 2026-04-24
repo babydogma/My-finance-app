@@ -302,26 +302,40 @@
   </div>
 </section>
 
-  <section class="section hidden" id="analyticsExpensesSection">
-  <div class="section-head analytics-section-head">
-    <h2 class="section-title analytics-section-title">Расходы</h2>
+  <section class="section hidden analytics-expenses-screen" id="analyticsExpensesSection">
+  <div class="analytics-expenses-filter-row">
+    <button class="analytics-expenses-chip" type="button" id="analyticsExpenseCategoryFilterBtn">
+      Категории
+    </button>
+
+    <button class="analytics-expenses-chip" type="button" id="analyticsExpenseMonthFilterBtn">
+      Месяц
+    </button>
+
+    <button class="analytics-expenses-chip" type="button" id="analyticsExpenseAverageFilterBtn">
+      Среднее за 3 мес.
+    </button>
   </div>
 
-  <div class="analytics-expenses-hero analytics-expenses-hero--with-ring">
-    <div class="analytics-expenses-hero__content">
-      <div class="analytics-expenses-hero__label">Общий поток расходов</div>
-      <div class="analytics-expenses-hero__value" id="analyticsExpenseValue">0 ₽</div>
-      <div class="analytics-expenses-hero__note" id="analyticsExpensesPeriodNote">за период</div>
-    </div>
+  <div class="analytics-expenses-total-block">
+    <div class="analytics-expenses-total-value" id="analyticsExpenseValue">0 ₽</div>
+    <div class="analytics-expenses-total-note" id="analyticsExpensesPeriodNote">за период</div>
+  </div>
 
-    <div class="analytics-expenses-ring-card">
-      <div class="analytics-expenses-ring" id="analyticsExpensesRing">
-        <div class="analytics-expenses-ring__inner">
-          <div class="analytics-expenses-ring__center-value" id="analyticsExpensesRingCenterValue">0%</div>
-          <div class="analytics-expenses-ring__center-label" id="analyticsExpensesRingCenterLabel">Категория</div>
-        </div>
+  <div class="analytics-expenses-ring-zone">
+    <div class="analytics-expenses-ring" id="analyticsExpensesRing">
+      <div class="analytics-expenses-ring__inner">
+        <div class="analytics-expenses-ring__center-value" id="analyticsExpensesRingCenterValue">0%</div>
+        <div class="analytics-expenses-ring__center-label" id="analyticsExpensesRingCenterLabel">Расходы</div>
       </div>
     </div>
+  </div>
+
+  <div class="analytics-expenses-month-strip" id="analyticsExpensesMonthStrip"></div>
+
+  <div class="analytics-expenses-total-row">
+    <span>Общий расход</span>
+    <strong id="analyticsExpensesTotalRowValue">0 ₽</strong>
   </div>
 
   <div class="analytics-expenses-categories analytics-expenses-categories--flat" id="analyticsExpensesCategoriesList"></div>
