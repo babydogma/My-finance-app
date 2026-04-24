@@ -1,0 +1,262 @@
+/* =========================================================
+   22. SAFE BUCKETS MODAL
+   Savings buckets wallet-style modal
+   ========================================================= */
+
+#safeBucketsModal .modal-sheet {
+  width: min(480px, 100%);
+  max-height: calc(100vh - 24px);
+  padding: 20px 16px calc(22px + env(safe-area-inset-bottom, 0px));
+  border-radius: 30px 30px 22px 22px;
+  background:
+    radial-gradient(circle at top center, rgba(111, 156, 255, 0.12), transparent 34%),
+    linear-gradient(180deg, rgba(18, 21, 30, 0.99) 0%, rgba(11, 14, 22, 1) 100%);
+  border: 1px solid rgba(255,255,255,0.07);
+  box-shadow:
+    0 -16px 48px rgba(0, 0, 0, 0.46),
+    0 0 26px rgba(111,156,255,0.06),
+    inset 0 1px 0 rgba(255,255,255,0.03);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+#safeBucketsModal .section-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+#safeBucketsModal .section-head > div {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+#safeBucketsModal .safe-buckets-title {
+  margin: 0;
+  font-size: 32px;
+  line-height: 0.94;
+  font-weight: 930;
+  letter-spacing: -0.06em;
+  color: #f7f9ff;
+  text-align: left;
+}
+
+#safeBucketsModal .safe-buckets-total {
+  margin-top: 8px;
+  color: rgba(255,255,255,0.58);
+  font-size: 14px;
+  font-weight: 760;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+#safeBucketsModal .manager-back-btn {
+  flex: 0 0 auto;
+  min-width: 124px;
+  height: 54px;
+  padding: 0 18px;
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg, rgba(44, 47, 58, 0.96) 0%, rgba(24, 28, 38, 0.98) 100%);
+  color: #eef3ff;
+  font-size: 16px;
+  font-weight: 860;
+  letter-spacing: -0.03em;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.03),
+    0 8px 18px rgba(0,0,0,0.16);
+}
+
+#safeBucketsModal .safe-buckets-wallet-list,
+#safeBucketsModal .safe-buckets-list--wallet {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+}
+
+#safeBucketsModal .safe-buckets-list--wallet {
+  margin-top: 14px;
+}
+
+#safeBucketsModal .safe-buckets-wallet-row {
+  min-height: 78px;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  border-radius: 24px;
+  background:
+    linear-gradient(180deg, rgba(60, 66, 84, 0.28) 0%, rgba(31, 36, 50, 0.18) 100%);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+#safeBucketsModal .safe-buckets-wallet-row .list-body {
+  display: flex;
+  align-items: center;
+  min-height: 78px;
+  flex: 1;
+}
+
+#safeBucketsModal .safe-buckets-wallet-row .list-title-row {
+  margin: 0;
+  width: 100%;
+}
+
+#safeBucketsModal .safe-buckets-wallet-row .list-title {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 820;
+  line-height: 1;
+  letter-spacing: -0.025em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#safeBucketsModal .safe-buckets-wallet-row .list-subtitle {
+  display: none;
+}
+
+#safeBucketsModal .safe-buckets-wallet-row .list-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-height: 78px;
+  min-width: 118px;
+  padding-left: 12px;
+}
+
+#safeBucketsModal .safe-buckets-wallet-row .list-value {
+  min-width: 0;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: #f3f6ff;
+  font-size: 16px;
+  font-weight: 860;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  text-align: right;
+  white-space: nowrap;
+}
+
+#safeBucketsModal .safe-buckets-wallet-row--danger .list-value {
+  color: #ff8f87;
+}
+
+#safeBucketsModal .safe-buckets-create-card {
+  margin-top: 18px;
+  padding: 18px 16px 16px;
+  border-radius: 30px;
+  border: 1px solid rgba(255,255,255,0.07);
+  background:
+    radial-gradient(circle at top center, rgba(111, 156, 255, 0.13), transparent 34%),
+    linear-gradient(180deg, rgba(28, 32, 43, 0.98) 0%, rgba(18, 21, 30, 1) 100%);
+  box-shadow:
+    0 18px 40px rgba(0, 0, 0, 0.28),
+    0 0 26px rgba(111, 156, 255, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+#safeBucketsModal .safe-buckets-create-card .field {
+  margin-bottom: 14px;
+}
+
+#safeBucketsModal .safe-buckets-create-card .input {
+  height: 60px;
+  padding: 0 18px;
+  border-radius: 22px;
+  border: 1px solid rgba(255,255,255,0.055);
+  background:
+    linear-gradient(180deg, rgba(34, 38, 49, 0.98) 0%, rgba(19, 22, 31, 1) 100%);
+  color: #f7f8fb;
+  font-size: 17px;
+  font-weight: 800;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.03),
+    0 8px 18px rgba(0,0,0,0.16);
+}
+
+#safeBucketsModal .safe-buckets-create-card .input::placeholder {
+  color: rgba(255,255,255,0.42);
+}
+
+#safeBucketsModal .safe-buckets-create-btn {
+  width: 100%;
+  height: 58px;
+  border: none;
+  border-radius: 22px;
+  font-size: 17px;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  background:
+    radial-gradient(circle at 30% 30%, rgba(255,255,255,0.14), transparent 42%),
+    linear-gradient(180deg, rgba(114, 160, 255, 1) 0%, rgba(92, 144, 255, 1) 100%);
+  color: #fff;
+  box-shadow: 0 14px 30px rgba(111, 156, 255, 0.24);
+}
+
+@media (max-width: 420px) {
+  #safeBucketsModal .safe-buckets-title {
+    font-size: 28px;
+    line-height: 0.94;
+  }
+
+  #safeBucketsModal .safe-buckets-total {
+    font-size: 13px;
+  }
+
+  #safeBucketsModal .manager-back-btn {
+    min-width: 112px;
+    height: 50px;
+    font-size: 15px;
+  }
+
+  #safeBucketsModal .safe-buckets-wallet-list,
+  #safeBucketsModal .safe-buckets-list--wallet {
+    gap: 12px;
+  }
+
+  #safeBucketsModal .safe-buckets-list--wallet {
+    margin-top: 12px;
+  }
+
+  #safeBucketsModal .safe-buckets-wallet-row {
+    min-height: 72px;
+    padding: 0 14px;
+    border-radius: 22px;
+  }
+
+  #safeBucketsModal .safe-buckets-wallet-row .list-body,
+  #safeBucketsModal .safe-buckets-wallet-row .list-right {
+    min-height: 72px;
+  }
+
+  #safeBucketsModal .safe-buckets-wallet-row .list-title {
+    font-size: 16px;
+  }
+
+  #safeBucketsModal .safe-buckets-wallet-row .list-value {
+    min-width: 96px;
+    font-size: 15px;
+  }
+
+  #safeBucketsModal .safe-buckets-create-card {
+    padding: 16px 14px 14px;
+    border-radius: 26px;
+  }
+
+  #safeBucketsModal .safe-buckets-create-card .input,
+  #safeBucketsModal .safe-buckets-create-btn {
+    height: 54px;
+    border-radius: 20px;
+    font-size: 16px;
+  }
+}
