@@ -329,17 +329,17 @@
   </div>
 
   <div class="analytics-expenses-total-block">
-    <div class="analytics-expenses-total-value" id="analyticsExpenseValue">0 ₽</div>
-    <div class="analytics-expenses-total-note" id="analyticsExpensesPeriodNote">за период</div>
+    <div class="analytics-expenses-total-value" id="analyticsExpenseValuePremium">0 ₽</div>
+<div class="analytics-expenses-total-note" id="analyticsExpensesPeriodNotePremium">за период</div>
   </div>
 
   <div class="analytics-expenses-ring-zone">
-    <div class="analytics-expenses-ring" id="analyticsExpensesRing">
-      <div class="analytics-expenses-ring__inner">
-        <div class="analytics-expenses-ring__center-value" id="analyticsExpensesRingCenterValue">0%</div>
-        <div class="analytics-expenses-ring__center-label" id="analyticsExpensesRingCenterLabel">Расходы</div>
-      </div>
-    </div>
+    <div class="analytics-expenses-ring" id="analyticsExpensesRingPremium">
+  <div class="analytics-expenses-ring__inner">
+    <div class="analytics-expenses-ring__center-value" id="analyticsExpensesRingCenterValuePremium">0%</div>
+    <div class="analytics-expenses-ring__center-label" id="analyticsExpensesRingCenterLabelPremium">Расходы</div>
+  </div>
+</div>
   </div>
 
   <div class="analytics-expenses-month-strip" id="analyticsExpensesMonthStrip"></div>
@@ -349,7 +349,19 @@
     <strong id="analyticsExpensesTotalRowValue">0 ₽</strong>
   </div>
 
-  <div class="analytics-expenses-categories analytics-expenses-categories--flat" id="analyticsExpensesCategoriesList"></div>
+  <div class="analytics-expenses-categories analytics-expenses-categories--flat" id="analyticsExpensesCategoriesListPremium"></div>
+  
+  <div class="hidden" aria-hidden="true">
+  <div id="analyticsExpenseValue">0 ₽</div>
+  <div id="analyticsExpensesPeriodNote">за период</div>
+
+  <div id="analyticsExpensesRing">
+    <div id="analyticsExpensesRingCenterValue">0%</div>
+    <div id="analyticsExpensesRingCenterLabel">Расходы</div>
+  </div>
+
+  <div id="analyticsExpensesCategoriesList"></div>
+</div>
 </section>
 
   <section class="section hidden" id="analyticsSafesSection">
