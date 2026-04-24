@@ -15,28 +15,42 @@
     renderAnalyticsExpensesByCategory,
     renderAnalyticsSafes,
   }) {
-    function renderAnalytics() {
-      const analyticsTab = getAnalyticsTab();
+    function normalizeAnalyticsTab(tab) {
+      return tab === "safes" ? "safes" : "expenses";
+    }
 
-      const isOverview = analyticsTab === "overview";
+    function renderAnalytics() {
+      const rawTab = getAnalyticsTab();
+      const analyticsTab = normalizeAnalyticsTab(rawTab);
+
+      if (rawTab !== analyticsTab) {
+        setAnalyticsTabValue(analyticsTab);
+      }
+
       const isExpenses = analyticsTab === "expenses";
       const isSafes = analyticsTab === "safes";
 
-      analyticsOverviewSection?.classList.toggle("hidden", !isOverview);
+      analyticsOverviewSection?.classList.add("hidden");
       analyticsExpensesSection?.classList.toggle("hidden", !isExpenses);
       analyticsSafesSection?.classList.toggle("hidden", !isSafes);
 
-      analyticsTabOverviewBtn?.classList.toggle("is-active", isOverview);
+      analyticsTabOverviewBtn?.classList.add("hidden");
       analyticsTabExpensesBtn?.classList.toggle("is-active", isExpenses);
       analyticsTabSafesBtn?.classList.toggle("is-active", isSafes);
 
-      if (isOverview) renderAnalyticsOverview();
+      /*
+        Обзор как экран удалён, но его расчёты нужны:
+        - "Можно отложить" теперь живёт в Накоплениях
+        - значения должны обновляться при каждом рендере аналитики
+      */
+      renderAnalyticsOverview();
+
       if (isExpenses) renderAnalyticsExpensesByCategory();
       if (isSafes) renderAnalyticsSafes();
     }
 
     function setAnalyticsTab(nextTab) {
-      setAnalyticsTabValue(nextTab);
+      setAnalyticsTabValue(normalizeAnalyticsTab(nextTab));
       renderAnalytics();
     }
 
