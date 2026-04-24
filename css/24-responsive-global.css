@@ -1,0 +1,230 @@
+/* =========================================================
+   24. RESPONSIVE GLOBAL
+   Only global leftovers, not component-specific media
+   ========================================================= */
+
+@media (max-width: 420px) {
+  .app {
+    padding: 14px 12px 128px;
+  }
+
+  .section {
+    margin-top: 22px;
+  }
+
+  .section-head {
+    margin-bottom: 10px;
+  }
+
+  .section-title {
+    font-size: 18px;
+  }
+
+  .section-note {
+    font-size: 10.5px;
+  }
+
+  .balance {
+    padding: 16px 14px 15px;
+    border-radius: 28px;
+  }
+
+  .balance-label {
+    font-size: 13px;
+    margin-bottom: 9px;
+  }
+
+  .balance-amount {
+    font-size: clamp(40px, 10vw, 54px);
+  }
+
+  .balance-subline {
+    margin-top: 12px;
+    font-size: 13px;
+  }
+
+  .actions {
+    gap: 8px;
+    margin-top: 16px;
+  }
+
+  .action-card {
+    min-height: 80px;
+    padding: 9px 6px;
+    border-radius: 22px;
+  }
+
+  .action-icon {
+    width: 26px;
+    height: 26px;
+    border-radius: 9px;
+    font-size: 12px;
+  }
+
+  .action-label {
+    font-size: 10.5px;
+  }
+
+  .list {
+    gap: 10px;
+  }
+
+  .list-card {
+    min-height: 70px;
+    padding: 11px 12px;
+    border-radius: 20px;
+    gap: 10px;
+  }
+
+  .list-icon {
+    width: 38px;
+    height: 38px;
+    flex-basis: 38px;
+    border-radius: 13px;
+    font-size: 16px;
+  }
+
+  .list-icon--account {
+    width: 38px;
+    height: 38px;
+    flex-basis: 38px;
+  }
+
+  .list-title {
+    font-size: 14.5px;
+  }
+
+  .list-subtitle {
+    font-size: 10.5px;
+  }
+
+  .list-right {
+    padding-left: 8px;
+  }
+
+  .list-value {
+    font-size: 14.5px;
+  }
+
+  .list-caption {
+    font-size: 10px;
+  }
+
+  #accountsList .list-card {
+    min-height: 68px;
+    padding: 10px 12px;
+    border-radius: 20px;
+  }
+
+  #accountsList .list-title {
+    font-size: 15.5px;
+  }
+
+  #accountsList .list-value {
+    font-size: 14.5px;
+  }
+
+  .required-payments-section {
+    margin-top: 22px;
+  }
+
+  .required-payment-card {
+    min-height: 68px;
+    padding: 11px 13px;
+    border-radius: 20px;
+    column-gap: 10px;
+  }
+
+  .required-payment-card__title {
+    font-size: 15.5px;
+  }
+
+  .required-payment-card__subtitle {
+    font-size: 10px;
+  }
+
+  .required-payment-card__value {
+    min-width: 76px;
+    font-size: 14.5px;
+  }
+
+  .manager-card {
+    padding: 12px;
+    border-radius: 20px;
+  }
+
+  .manager-back-btn {
+    padding: 8px 12px;
+    font-size: 12.5px;
+  }
+
+  .input,
+  .select {
+    height: 52px;
+    padding: 0 14px;
+    border-radius: 17px;
+    font-size: 15px;
+  }
+
+  .btn {
+    height: 50px;
+    border-radius: 16px;
+    font-size: 14.5px;
+  }
+
+  .icon-action-btn {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    border-radius: 11px;
+  }
+
+  .icon-action-btn svg {
+    width: 15px;
+    height: 15px;
+  }
+
+  .modal {
+    padding: 10px;
+  }
+
+  .modal-sheet {
+    max-height: calc(100vh - 20px);
+    padding: 18px 14px 20px;
+    border-radius: 28px 28px 20px 20px;
+  }
+
+  .modal-title {
+    font-size: 21px;
+  }
+
+  .modal-actions {
+    gap: 10px;
+    margin-top: 16px;
+  }
+
+  .bottom-nav-wrap {
+    bottom: 10px;
+    width: min(430px, calc(100% - 12px));
+  }
+
+  .bottom-nav {
+    gap: 7px;
+    padding: 8px;
+    border-radius: 26px;
+  }
+
+  .nav-item {
+    min-height: 62px;
+    border-radius: 18px;
+    gap: 5px;
+  }
+
+  .nav-icon {
+    font-size: 20px;
+  }
+
+  .nav-label {
+    font-size: 10px;
+  }
+}
