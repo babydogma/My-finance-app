@@ -155,6 +155,84 @@ const faqModalFormula = document.getElementById("faqModalFormula");
 const closeFaqModalBtn = document.getElementById("closeFaqModalBtn");
 const faqButtons = document.querySelectorAll("[data-faq-key]");
 
+const FAQ_CONTENT = {
+  free_money: {
+    title: "Свободные деньги",
+    text: "Деньги, которыми можно пользоваться без риска задеть обязательные платежи, накопления и защищённые суммы.",
+    formula: "Свободно = доступные деньги − защищённые суммы",
+  },
+
+  protected_money: {
+    title: "Защищённые деньги",
+    text: "Деньги, которые лучше не тратить случайно: резервы, накопления, обязательные платежи и другие отложенные суммы.",
+    formula: "Защищённые = резервы + накопления + обязательства",
+  },
+
+  remaining_limits: {
+    title: "Остаток лимитов",
+    text: "Сколько ещё можно потратить по категориям с лимитами в текущем месяце.",
+    formula: "Остаток лимитов = лимиты − уже потрачено",
+  },
+
+  can_save_now: {
+    title: "Можно отложить",
+    text: "Сумма, которую можно безопасно отправить в накопления прямо сейчас, не ломая текущий месяц.",
+    formula: "Можно отложить = свободно − рабочий запас",
+  },
+};
+
+function openFaqModal(key) {
+  const faq = FAQ_CONTENT[key];
+
+  if (!faqModal || !faq) return;
+
+  faqModalTitle.textContent = faq.title;
+  faqModalText.textContent = faq.text;
+
+  if (faq.formula) {
+    faqModalFormula.textContent = faq.formula;
+    faqModalFormula.classList.remove("hidden");
+  } else {
+    faqModalFormula.textContent = "";
+    faqModalFormula.classList.add("hidden");
+  }
+
+  faqModal.classList.remove("hidden", "is-closing");
+
+  requestAnimationFrame(() => {
+    faqModal.classList.add("is-visible");
+  });
+}
+
+function closeFaqModal() {
+  if (!faqModal) return;
+
+  faqModal.classList.remove("is-visible");
+  faqModal.classList.add("is-closing");
+
+  setTimeout(() => {
+    faqModal.classList.remove("is-closing");
+    faqModal.classList.add("hidden");
+  }, MODAL_ANIMATION_MS);
+}
+
+faqButtons.forEach((button) => {
+  button.addEventListener("click", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    openFaqModal(button.dataset.faqKey);
+  });
+});
+
+closeFaqModalBtn?.addEventListener("click", closeFaqModal);
+
+faqModal?.addEventListener("click", (event) => {
+  if (event.target === faqModal) {
+    closeFaqModal();
+  }
+});
+
 const navOperationsBtn = document.getElementById("navOperationsBtn");
 const operationsView = document.getElementById("operationsView");
 
