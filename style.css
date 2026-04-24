@@ -1,44 +1,4 @@
 
-/* =========================================================
-   4. COMMON SURFACE
-   ========================================================= */
-
-.balance,
-.list-card,
-.manager-card,
-.categories-composer,
-.analytics-overview-balance-card,
-.analytics-overview-mini-card,
-.analytics-overview-mandatory-card,
-.analytics-safes-interest-card,
-.analytics-safe-list .list-card {
-  position: relative;
-  overflow: hidden;
-  border-radius: var(--radius-card);
-  border: 1px solid var(--border);
-  background:
-    linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
-  box-shadow:
-    var(--shadow-card),
-    0 0 18px rgba(111, 156, 255, 0.03),
-    inset 0 1px 0 rgba(255, 255, 255, 0.03);
-}
-
-.balance::before,
-.list-card::before,
-.manager-card::before,
-.categories-composer::before,
-.analytics-overview-balance-card::before,
-.analytics-overview-mini-card::before,
-.analytics-overview-mandatory-card::before,
-.analytics-safes-interest-card::before,
-.analytics-safe-list .list-card::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(255,255,255,0.018) 0%, rgba(255,255,255,0) 40%);
-  pointer-events: none;
-}
 
 /* =========================================================
    5. MAIN WALLET
