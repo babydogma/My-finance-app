@@ -945,6 +945,10 @@ function getCurrentMonthKey() {
   return getCurrentMonthValue();
 }
 
+function getMandatoryPaymentsActiveMonthKey() {
+  return mandatoryPaymentsSelectedMonth || getCurrentMonthValue();
+}
+
 function getMandatoryPaymentsStats(monthKey = getCurrentMonthKey()) {
   const unpaidItems = state.mandatoryPayments.filter((item) => {
     if (item.enabled === false) return false;
@@ -1206,8 +1210,8 @@ function openMandatoryPaymentEditor(paymentId) {
 }
 
 function buildDateFromDueDay(dueDay) {
-  const currentMonth = getCurrentMonthValue();
-  const [year, month] = currentMonth.split("-");
+  const activeMonth = getMandatoryPaymentsActiveMonthKey();
+  const [year, month] = activeMonth.split("-");
   const safeDay = String(Math.min(31, Math.max(1, Number(dueDay) || 1))).padStart(2, "0");
   return `${year}-${month}-${safeDay}`;
 }
@@ -1216,7 +1220,7 @@ async function toggleMandatoryPaymentPaid(paymentId) {
   const item = state.mandatoryPayments.find((entry) => entry.id === paymentId);
   if (!item) return false;
 
-  const currentMonthKey = getCurrentMonthKey();
+  const currentMonthKey = getMandatoryPaymentsActiveMonthKey();
   const isPaid = item.last_paid_period === currentMonthKey;
 
   if (!isPaid) {
@@ -1282,7 +1286,7 @@ async function createMandatoryPaymentExpense(item) {
 function startMandatoryPaymentLongPress(card, item, startX = 0, startY = 0) {
   if (!card || !item) return;
 
-  const currentMonthKey = getCurrentMonthKey();
+  const currentMonthKey = getMandatoryPaymentsActiveMonthKey();
   const isPaid = item.last_paid_period === currentMonthKey;
 
   mandatoryLongPressTriggered = false;
@@ -1412,9 +1416,13 @@ resetMandatoryPaymentForm();
 }
 
 function openMandatoryPaymentsModal() {
+  mandatoryPaymentsSelectedMonth = mandatoryPaymentsSelectedMonth || getCurrentMonthValue();
+
+  renderMandatoryPaymentsMonthStrip();
   renderMandatoryPaymentsModal();
+
   openAnimatedModal(mandatoryPaymentsModal);
-document.body.style.overflow = "hidden";
+  document.body.style.overflow = "hidden";
 }
 
 function renderMandatoryPaymentsModal() {
@@ -1435,7 +1443,7 @@ function renderMandatoryPaymentsModal() {
     return;
   }
 
-  const currentMonthKey = getCurrentMonthKey();
+  const currentMonthKey = getMandatoryPaymentsActiveMonthKey();
 
   state.mandatoryPayments
     .slice()
@@ -1650,13 +1658,11 @@ function renderMandatoryPaymentsMonthStrip() {
     `;
 
     button.addEventListener("click", () => {
-      mandatoryPaymentsSelectedMonth = item.key;
-      renderMandatoryPaymentsMonthStrip();
+  mandatoryPaymentsSelectedMonth = item.key;
 
-      if (typeof renderMandatoryPaymentsList === "function") {
-        renderMandatoryPaymentsList();
-      }
-    });
+  renderMandatoryPaymentsMonthStrip();
+  renderMandatoryPaymentsModal();
+});
 
     mandatoryPaymentsMonthStrip.appendChild(button);
   });
