@@ -541,6 +541,11 @@ button {
     linear-gradient(180deg, rgba(68, 74, 92, 0.34) 0%, rgba(36, 40, 54, 0.22) 100%);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
+
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 118px;
+  align-items: center;
+  gap: 12px;
 }
 
 .wallet-mandatory-row--main {
@@ -564,25 +569,44 @@ button {
 }
 
 .wallet-mandatory-row .list-right {
-  flex: 0 0 auto;
-  min-width: max-content;
-  max-width: none;
-  margin-left: auto;
-  padding-left: 12px;
-  overflow: visible;
+  min-width: 0;
+  width: 118px;
+  max-width: 118px;
+  margin-left: 0;
+  padding-left: 0;
+  overflow: hidden;
+  text-align: right;
+  justify-self: end;
 }
 
 .wallet-mandatory-value {
   display: block;
-  width: max-content;
-  max-width: none;
-  font-size: 16px;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  font-size: 15px;
   font-weight: 860;
   line-height: 1;
-  letter-spacing: -0.035em;
+  letter-spacing: -0.04em;
   white-space: nowrap;
   overflow: visible;
   text-align: right;
+}
+
+.wallet-mandatory-row .list-body {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.wallet-mandatory-row .list-title-row {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.wallet-mandatory-row .list-subtitle {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .wallet-mandatory-value--danger {
