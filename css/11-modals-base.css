@@ -1,0 +1,122 @@
+/* =========================================================
+   11. MODALS BASE
+   Shared modal overlay, sheet, handle and actions
+   ========================================================= */
+
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 12px;
+  background: rgba(8, 10, 14, 0.08);
+  backdrop-filter: blur(0px);
+  -webkit-backdrop-filter: blur(0px);
+  opacity: 0;
+  pointer-events: none;
+  will-change: opacity, backdrop-filter, background;
+  transition:
+    opacity 0.34s cubic-bezier(0.16, 1, 0.3, 1),
+    background 0.34s cubic-bezier(0.16, 1, 0.3, 1),
+    backdrop-filter 0.34s cubic-bezier(0.16, 1, 0.3, 1),
+    -webkit-backdrop-filter 0.34s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal.is-visible,
+.modal.is-closing {
+  pointer-events: auto;
+}
+
+.modal.is-visible {
+  opacity: 1;
+  background: rgba(8, 10, 14, 0.62);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.modal.is-closing {
+  pointer-events: none;
+}
+
+.modal.hidden {
+  display: none !important;
+}
+
+.modal-sheet {
+  width: min(480px, 100%);
+  max-height: calc(100vh - 24px);
+  padding: 20px 16px 22px;
+  border-radius: 30px 30px 22px 22px;
+  background:
+    linear-gradient(180deg, rgba(29, 31, 40, 0.99) 0%, rgba(21, 24, 32, 1) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  box-shadow:
+    0 -16px 48px rgba(0, 0, 0, 0.46),
+    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+  opacity: 0;
+  transform: translate3d(0, 56px, 0) scale(0.972);
+  transform-origin: center bottom;
+  will-change: transform, opacity;
+  transition:
+    transform 0.42s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal.is-visible .modal-sheet {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+}
+
+.modal.is-closing .modal-sheet {
+  opacity: 0;
+  transform: translate3d(0, 42px, 0) scale(0.978);
+}
+
+.modal-handle {
+  width: 46px;
+  height: 5px;
+  margin: 0 auto 18px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.modal.is-visible .modal-handle {
+  animation: modalHandleFadeIn 0.56s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.modal-title {
+  margin: 0 0 18px;
+  text-align: center;
+  font-size: 23px;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+  color: #f7f9ff;
+}
+
+.modal-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.modal-actions--triple {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+@keyframes modalHandleFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
