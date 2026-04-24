@@ -5492,6 +5492,75 @@ analyticsRangeToInput?.addEventListener("change", () => {
   requestAnimationFrame(renderAnalyticsExpensesPremium);
 });
 
-requestAnimationFrame(renderAnalyticsExpensesPremium);
+let premiumAnalyticsLastSignature = "";
+
+function getPremiumAnalyticsStateSignature() {
+  const transactions = Array.isArray(state.transactions) ? state.transactions : [];
+  const categories = Array.isArray(state.categories) ? state.categories : [];
+
+  const transactionsSignature = transactions
+    .map((transaction) => {
+      return [
+        transaction.id || "",
+        transaction.created_at || "",
+        transaction.type || "",
+        transaction.amount || 0,
+        transaction.category_id || "",
+        transaction.account_id || "",
+        transaction.from_account_id || "",
+        transaction.to_account_id || "",
+        transaction.from_safe_bucket_id || "",
+        transaction.to_safe_bucket_id || "",
+      ].join(":");
+    })
+    .join("|");
+
+  const categoriesSignature = categories
+    .map((category) => {
+      return [
+        category.id || "",
+        category.name || "",
+        category.is_required ? "1" : "0",
+      ].join(":");
+    })
+    .join("|");
+
+  return [
+    analyticsFilterPeriod,
+    normalizeAnalyticsMonthValuePremium(analyticsSelectedMonth),
+    analyticsRangeStart,
+    analyticsRangeEnd,
+    analyticsExpenseCategoryFilter,
+    transactionsSignature,
+    categoriesSignature,
+  ].join("||");
+}
+
+function renderAnalyticsExpensesPremiumSynced() {
+  renderAnalyticsExpensesPremium();
+  premiumAnalyticsLastSignature = getPremiumAnalyticsStateSignature();
+}
+
+function startPremiumAnalyticsAutoSync() {
+  const sync = () => {
+    const nextSignature = getPremiumAnalyticsStateSignature();
+
+    if (nextSignature !== premiumAnalyticsLastSignature) {
+      renderAnalyticsExpensesPremiumSynced();
+    }
+  };
+
+  requestAnimationFrame(renderAnalyticsExpensesPremiumSynced);
+
+  setTimeout(renderAnalyticsExpensesPremiumSynced, 0);
+  setTimeout(renderAnalyticsExpensesPremiumSynced, 120);
+  setTimeout(renderAnalyticsExpensesPremiumSynced, 350);
+  setTimeout(renderAnalyticsExpensesPremiumSynced, 800);
+  setTimeout(renderAnalyticsExpensesPremiumSynced, 1600);
+
+  setInterval(sync, 350);
+}
+
+startPremiumAnalyticsAutoSync();
   
 });
