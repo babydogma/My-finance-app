@@ -474,4 +474,20 @@
     height: 54px;
     border-radius: 20px;
   }
+
+   #mandatoryPaymentsModal #mandatoryPaymentsList .mandatory-payment-card,
+
+#mandatoryPaymentsModal #mandatoryPaymentsList .mandatory-payment-card * {
+
+  -webkit-user-select: none;
+
+  user-select: none;
+
+  -webkit-touch-callout: none;
+
+}
+
+#mandatoryPaymentsModal #mandatoryPaymentsList .mandatory-payment-card {
+
+  touch-action: manipulation;
 }
