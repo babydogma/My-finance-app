@@ -232,6 +232,21 @@
       </div>
     </div>
   </div>
+  
+  <div class="modal hidden" id="analyticsExpenseCategoryPickerModal">
+  <div class="modal-sheet filters-sheet">
+    <div class="modal-handle"></div>
+
+    <div class="section-head filters-sheet__head">
+      <h3 class="modal-title filters-sheet__title">Категории</h3>
+      <button class="manager-back-btn" type="button" id="closeAnalyticsExpenseCategoryPickerBtn">
+        Закрыть
+      </button>
+    </div>
+
+    <div class="analytics-expense-category-picker-list" id="analyticsExpenseCategoryPickerList"></div>
+  </div>
+</div>
 
   <section class="section analytics-overview-section" id="analyticsOverviewSection">
   <div class="analytics-overview-balance-card">
@@ -310,10 +325,6 @@
 
     <button class="analytics-expenses-chip" type="button" id="analyticsExpenseMonthFilterBtn">
       Месяц
-    </button>
-
-    <button class="analytics-expenses-chip" type="button" id="analyticsExpenseAverageFilterBtn">
-      Среднее за 3 мес.
     </button>
   </div>
 
