@@ -125,6 +125,25 @@
         getAnalyticsColorHash(categoryId) % ANALYTICS_EXPENSE_COLORS.length
       ];
     }
+    
+    function playAnalyticsMonthSwitchAnimation() {
+  const screen = document.getElementById("analyticsExpensesSection");
+  const ring = document.getElementById("analyticsExpensesRingPremium");
+  const total = document.getElementById("analyticsExpenseValuePremium");
+  const list = document.getElementById("analyticsExpensesCategoriesListPremium");
+
+  [screen, ring, total, list].forEach((element) => {
+    if (!element) return;
+
+    element.classList.remove("analytics-month-switch");
+    void element.offsetWidth;
+    element.classList.add("analytics-month-switch");
+
+    window.setTimeout(() => {
+      element.classList.remove("analytics-month-switch");
+    }, 520);
+  });
+}
 
     function getAnalyticsExpensesPeriodNote() {
       const period = getFilterPeriod();
@@ -339,11 +358,12 @@
         `;
 
         button.addEventListener("click", () => {
-          analyticsExpenseCategoryFilter = "all";
-          setSelectedMonth(item.monthKey);
-          setFilterPeriod("month");
-          renderAnalyticsExpensesByCategory();
-        });
+  analyticsExpenseCategoryFilter = "all";
+  setSelectedMonth(item.monthKey);
+  setFilterPeriod("month");
+  playAnalyticsMonthSwitchAnimation();
+  renderAnalyticsExpensesByCategory();
+});
 
         analyticsExpensesMonthStrip.appendChild(button);
       });
