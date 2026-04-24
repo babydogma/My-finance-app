@@ -202,13 +202,6 @@ const analyticsExpensesCategoriesListPremium = document.getElementById("analytic
 const analyticsExpensesMonthStrip = document.getElementById("analyticsExpensesMonthStrip");
 const analyticsExpensesTotalRowValue = document.getElementById("analyticsExpensesTotalRowValue");
 
-const analyticsExpenseCategoryFilterBtn = document.getElementById("analyticsExpenseCategoryFilterBtn");
-const analyticsExpenseMonthFilterBtn = document.getElementById("analyticsExpenseMonthFilterBtn");
-
-const analyticsExpenseCategoryPickerModal = document.getElementById("analyticsExpenseCategoryPickerModal");
-const analyticsExpenseCategoryPickerList = document.getElementById("analyticsExpenseCategoryPickerList");
-const closeAnalyticsExpenseCategoryPickerBtn = document.getElementById("closeAnalyticsExpenseCategoryPickerBtn");
-
 const analyticsInterestValue = document.getElementById("analyticsInterestValue");
 const analyticsSafeList = document.getElementById("analyticsSafeList");
 
@@ -4931,24 +4924,6 @@ const premiumAnalyticsExpensesMonthStrip =
 const premiumAnalyticsExpensesTotalRowValue =
   document.getElementById("analyticsExpensesTotalRowValue");
 
-const premiumAnalyticsExpenseCategoryFilterBtn =
-  document.getElementById("analyticsExpenseCategoryFilterBtn");
-
-const premiumAnalyticsExpenseMonthFilterBtn =
-  document.getElementById("analyticsExpenseMonthFilterBtn");
-
-const premiumAnalyticsExpenseCategoryPickerModal =
-  document.getElementById("analyticsExpenseCategoryPickerModal");
-
-const premiumAnalyticsExpenseCategoryPickerList =
-  document.getElementById("analyticsExpenseCategoryPickerList");
-
-const premiumCloseAnalyticsExpenseCategoryPickerBtn =
-  document.getElementById("closeAnalyticsExpenseCategoryPickerBtn");
-
-const PREMIUM_ANALYTICS_MODAL_MS =
-  typeof MODAL_ANIMATION_MS === "number" ? MODAL_ANIMATION_MS : 420;
-
 const ANALYTICS_EXPENSE_COLORS = [
   "#B878F2",
   "#FF8A45",
@@ -5012,28 +4987,6 @@ function getAnalyticsExpenseColor(categoryId) {
   return ANALYTICS_EXPENSE_COLORS[
     getAnalyticsColorHash(categoryId) % ANALYTICS_EXPENSE_COLORS.length
   ];
-}
-
-function openAnalyticsPremiumModal(modalEl) {
-  if (!modalEl) return;
-
-  modalEl.classList.remove("hidden");
-
-  requestAnimationFrame(() => {
-    modalEl.classList.add("is-visible");
-  });
-}
-
-function closeAnalyticsPremiumModal(modalEl) {
-  if (!modalEl) return;
-
-  modalEl.classList.remove("is-visible");
-  modalEl.classList.add("is-closing");
-
-  setTimeout(() => {
-    modalEl.classList.remove("is-closing");
-    modalEl.classList.add("hidden");
-  }, PREMIUM_ANALYTICS_MODAL_MS);
 }
 
 function getAnalyticsExpenseBaseTransactionsPremium() {
@@ -5326,22 +5279,6 @@ function getAnalyticsExpensesPeriodTextPremium() {
   return `за ${month}`;
 }
 
-function updateAnalyticsExpenseFilterButtonsPremium() {
-  if (premiumAnalyticsExpenseCategoryFilterBtn) {
-    if (analyticsExpenseCategoryFilter === "all") {
-      premiumAnalyticsExpenseCategoryFilterBtn.textContent = "Категории";
-    } else {
-      premiumAnalyticsExpenseCategoryFilterBtn.textContent =
-        getCategoryName(analyticsExpenseCategoryFilter);
-    }
-  }
-
-  if (premiumAnalyticsExpenseMonthFilterBtn) {
-    const date = getAnalyticsMonthDateFromValue(analyticsSelectedMonth);
-    premiumAnalyticsExpenseMonthFilterBtn.textContent = getAnalyticsMonthShortLabel(date);
-  }
-}
-
 function renderAnalyticsExpensesPremium() {
   analyticsSelectedMonth = normalizeAnalyticsMonthValuePremium(analyticsSelectedMonth);
 
@@ -5381,87 +5318,13 @@ function renderAnalyticsExpensesPremium() {
     premiumAnalyticsExpensesPeriodNote.textContent = getAnalyticsExpensesPeriodTextPremium();
   }
 
-  updateAnalyticsExpenseFilterButtonsPremium();
   renderAnalyticsExpensesRingPremium(ringItems, totalAll);
   renderAnalyticsExpensesMonthStripPremium();
   renderAnalyticsExpensesCategoriesPremium(listItems, analyticsExpenseCategoryFilter === "all" ? totalAll : totalFiltered);
 }
 
-function renderAnalyticsExpenseCategoryPickerPremium() {
-  if (!premiumAnalyticsExpenseCategoryPickerList) return;
-
-  const hasUncategorized = state.transactions.some((transaction) => {
-    return transaction.type === "expense" && !transaction.category_id;
-  });
-
-  const categories = [
-    {
-      id: "all",
-      name: "Все категории",
-    },
-    ...state.categories.map((category) => ({
-      id: category.id,
-      name: category.name,
-    })),
-  ];
-
-  if (hasUncategorized) {
-    categories.push({
-      id: UNCATEGORIZED_ID,
-      name: "Без категории",
-    });
-  }
-
-  premiumAnalyticsExpenseCategoryPickerList.innerHTML = "";
-
-  categories.forEach((category) => {
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = `analytics-expense-category-picker-item${
-      analyticsExpenseCategoryFilter === category.id ? " is-active" : ""
-    }`;
-
-    button.innerHTML = `
-      <span>${category.name}</span>
-      <strong>${analyticsExpenseCategoryFilter === category.id ? "✓" : ""}</strong>
-    `;
-
-    button.addEventListener("click", () => {
-      analyticsExpenseCategoryFilter = category.id;
-      closeAnalyticsPremiumModal(premiumAnalyticsExpenseCategoryPickerModal);
-      renderAnalyticsExpensesPremium();
-    });
-
-    premiumAnalyticsExpenseCategoryPickerList.appendChild(button);
-  });
-}
-
 analyticsTabExpensesBtn?.addEventListener("click", () => {
   requestAnimationFrame(renderAnalyticsExpensesPremium);
-});
-
-premiumAnalyticsExpenseMonthFilterBtn?.addEventListener("click", () => {
-  openAnalyticsFiltersBtn?.click();
-
-  requestAnimationFrame(() => {
-    analyticsMonthBtn?.click();
-    analyticsMonthWheelWrap?.classList.remove("hidden");
-  });
-});
-
-premiumAnalyticsExpenseCategoryFilterBtn?.addEventListener("click", () => {
-  renderAnalyticsExpenseCategoryPickerPremium();
-  openAnalyticsPremiumModal(premiumAnalyticsExpenseCategoryPickerModal);
-});
-
-premiumCloseAnalyticsExpenseCategoryPickerBtn?.addEventListener("click", () => {
-  closeAnalyticsPremiumModal(premiumAnalyticsExpenseCategoryPickerModal);
-});
-
-premiumAnalyticsExpenseCategoryPickerModal?.addEventListener("click", (event) => {
-  if (event.target === premiumAnalyticsExpenseCategoryPickerModal) {
-    closeAnalyticsPremiumModal(premiumAnalyticsExpenseCategoryPickerModal);
-  }
 });
 
 analyticsPeriodButtons.forEach((button) => {
