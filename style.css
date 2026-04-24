@@ -548,9 +548,13 @@ button {
 }
 
 .wallet-mandatory-row .list-title {
+  max-width: 100%;
   font-size: 16px;
   font-weight: 780;
   letter-spacing: -0.028em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .wallet-mandatory-row .list-subtitle {
@@ -560,15 +564,25 @@ button {
 }
 
 .wallet-mandatory-row .list-right {
-  min-width: 104px;
-  max-width: 44%;
+  flex: 0 0 auto;
+  min-width: max-content;
+  max-width: none;
+  margin-left: auto;
+  padding-left: 12px;
+  overflow: visible;
 }
 
 .wallet-mandatory-value {
+  display: block;
+  width: max-content;
+  max-width: none;
   font-size: 16px;
   font-weight: 860;
+  line-height: 1;
   letter-spacing: -0.035em;
   white-space: nowrap;
+  overflow: visible;
+  text-align: right;
 }
 
 .wallet-mandatory-value--danger {
