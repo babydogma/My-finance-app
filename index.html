@@ -784,25 +784,38 @@
 </div>
 
   <div class="modal hidden" id="mandatoryPaymentsModal">
-  <div class="modal-sheet">
+  <div class="modal-sheet mandatory-payments-sheet mandatory-payments-sheet--premium">
     <div class="modal-handle"></div>
 
-    <div class="section-head">
-      <h3 class="modal-title" style="margin:0; text-align:left;">Обязательные платежи</h3>
-      <button class="manager-back-btn" type="button" id="closeMandatoryPaymentsModalBtn">
+    <div class="mandatory-payments-head">
+      <div class="mandatory-payments-head__text">
+        <h3 class="mandatory-payments-title">Обязательные платежи</h3>
+        <p class="mandatory-payments-subtitle">
+          Учитываются в расчёте «Можно отложить сейчас»
+        </p>
+      </div>
+
+      <button
+        class="manager-back-btn mandatory-payments-close-btn"
+        type="button"
+        id="closeMandatoryPaymentsModalBtn"
+      >
         Закрыть
       </button>
     </div>
 
-    <div class="section-note" style="margin-bottom:12px;">
-      Эти платежи учитываются в расчёте “Можно отложить сейчас”
-    </div>
+    <div class="mandatory-payments-month-strip" id="mandatoryPaymentsMonthStrip"></div>
 
-    <div class="list" id="mandatoryPaymentsList"></div>
+    <div class="mandatory-payments-panel">
+      <div class="mandatory-payments-list" id="mandatoryPaymentsList"></div>
 
-    <div class="mandatory-payments-footer" style="margin-top:12px;">
-      <button class="btn btn-primary manager-add-btn" type="button" id="openMandatoryPaymentEditorBtn">
-        Добавить платёж
+      <button
+        class="mandatory-payments-add-btn"
+        type="button"
+        id="openMandatoryPaymentEditorBtn"
+      >
+        <span>+</span>
+        <strong>Добавить платёж</strong>
       </button>
     </div>
   </div>
