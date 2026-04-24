@@ -135,10 +135,8 @@ button {
 .analytics-overview-balance-card,
 .analytics-overview-mini-card,
 .analytics-overview-mandatory-card,
-.analytics-expenses-hero,
 .analytics-safes-interest-card,
-.analytics-safe-list .list-card,
-.analytics-expense-category-row {
+.analytics-safe-list .list-card, {
   position: relative;
   overflow: hidden;
   border-radius: var(--radius-card);
@@ -158,10 +156,8 @@ button {
 .analytics-overview-balance-card::before,
 .analytics-overview-mini-card::before,
 .analytics-overview-mandatory-card::before,
-.analytics-expenses-hero::before,
 .analytics-safes-interest-card::before,
-.analytics-safe-list .list-card::before,
-.analytics-expense-category-row::before {
+.analytics-safe-list .list-card::before, {
   content: "";
   position: absolute;
   inset: 0;
@@ -1808,119 +1804,6 @@ button {
   color: #f7f9ff;
 }
 
-.analytics-expenses-hero {
-  padding: 16px;
-  border-radius: 30px;
-  background:
-    radial-gradient(circle at top center, rgba(111,156,255,0.08), transparent 34%),
-    linear-gradient(180deg, rgba(50,54,69,0.985) 0%, rgba(39,43,57,0.995) 100%);
-}
-
-.analytics-expenses-hero--with-ring {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 184px;
-  gap: 14px;
-  align-items: center;
-}
-
-.analytics-expenses-hero__label {
-  margin: 0 0 10px;
-  color: rgba(255,255,255,0.56);
-  font-size: 13px;
-  font-weight: 790;
-}
-
-.analytics-expenses-hero__value {
-  margin: 0 0 8px;
-  font-size: 36px;
-  font-weight: 940;
-  line-height: 0.92;
-  letter-spacing: -0.06em;
-  color: #f7f9ff;
-  white-space: nowrap;
-}
-
-.analytics-expenses-hero__note {
-  color: rgba(255,255,255,0.42);
-  font-size: 12px;
-  font-weight: 740;
-}
-
-.analytics-expenses-ring-card {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.analytics-expenses-ring {
-  position: relative;
-  width: 184px;
-  height: 184px;
-  border-radius: 50%;
-  background: conic-gradient(from -90deg, rgba(255,255,255,0.08) 0deg 360deg);
-  box-shadow:
-    0 0 24px rgba(111,156,255,0.05),
-    inset 0 1px 0 rgba(255,255,255,0.03);
-}
-
-.analytics-expenses-ring::before {
-  content: "";
-  position: absolute;
-  inset: 20px;
-  border-radius: 50%;
-  background:
-    linear-gradient(180deg, var(--surface-dark) 0%, var(--surface-dark-2) 100%);
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.04),
-    0 10px 18px rgba(0,0,0,0.14);
-}
-
-.analytics-expenses-ring__inner {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  z-index: 1;
-  padding: 26px;
-}
-
-.analytics-expenses-ring__center-value {
-  margin: 0 0 6px;
-  font-size: 30px;
-  font-weight: 940;
-  line-height: 0.92;
-  letter-spacing: -0.06em;
-  color: #f7f9ff;
-}
-
-.analytics-expenses-ring__center-label {
-  margin: 0;
-  font-size: 13px;
-  font-weight: 760;
-  color: rgba(255,255,255,0.52);
-  line-height: 1.1;
-}
-
-.analytics-expenses-categories {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-top: 12px;
-}
-
-.analytics-expense-category-row {
-  min-height: 78px;
-  padding: 12px 14px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 14px;
-  border-radius: 24px;
-}
-
 .analytics-expense-category-row__left {
   display: flex;
   align-items: center;
@@ -2857,19 +2740,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     min-height: 56px;
   }
 
-  .analytics-expenses-hero--with-ring {
-    grid-template-columns: minmax(0, 1fr) 148px;
-    gap: 10px;
-  }
-
-  .analytics-expenses-hero {
-    padding: 14px;
-  }
-
-  .analytics-expenses-hero__value {
-    font-size: 32px;
-  }
-
   .analytics-expenses-ring {
     width: 148px;
     height: 148px;
@@ -2885,11 +2755,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 
   .analytics-expenses-ring__center-value {
     font-size: 24px;
-  }
-
-  .analytics-expense-category-row {
-    min-height: 72px;
-    padding: 11px 12px;
   }
 
   .analytics-expense-category-value__amount {
