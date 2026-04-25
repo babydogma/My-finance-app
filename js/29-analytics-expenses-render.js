@@ -127,12 +127,10 @@
     }
     
     function playAnalyticsMonthSwitchAnimation() {
-  const screen = document.getElementById("analyticsExpensesSection");
   const ring = document.getElementById("analyticsExpensesRingPremium");
   const total = document.getElementById("analyticsExpenseValuePremium");
-  const list = document.getElementById("analyticsExpensesCategoriesListPremium");
 
-  [screen, ring, total, list].forEach((element) => {
+  [ring, total].forEach((element) => {
     if (!element) return;
 
     element.classList.remove("analytics-month-switch");
@@ -141,7 +139,7 @@
 
     window.setTimeout(() => {
       element.classList.remove("analytics-month-switch");
-    }, 520);
+    }, 320);
   });
 }
 
@@ -294,7 +292,7 @@
       const selectedDate = getAnalyticsMonthDateFromValue(getSelectedMonth());
       const items = [];
 
-      for (let offset = -5; offset <= 1; offset += 1) {
+      for (let offset = -12; offset <= 6; offset += 1) {
         const date = new Date(
           selectedDate.getFullYear(),
           selectedDate.getMonth() + offset,
@@ -367,6 +365,19 @@
 
         analyticsExpensesMonthStrip.appendChild(button);
       });
+      
+      const activeButton = analyticsExpensesMonthStrip.querySelector(
+  ".analytics-expenses-month-item.is-active"
+);
+
+requestAnimationFrame(() => {
+  activeButton?.scrollIntoView({
+    behavior: "smooth",
+    block: "nearest",
+    inline: "center",
+  });
+});
+
     }
 
     function renderAnalyticsExpensesCategories(items, total) {
