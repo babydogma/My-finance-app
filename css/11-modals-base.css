@@ -120,3 +120,69 @@
     transform: translateY(0);
   }
 }
+
+/* =========================================================
+   Modal Motion Fix
+   Stronger open / close animation for all sheets
+   ========================================================= */
+
+.modal {
+  background: rgba(8, 10, 14, 0);
+  backdrop-filter: blur(0px);
+  -webkit-backdrop-filter: blur(0px);
+  transition:
+    opacity 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+    background 0.34s cubic-bezier(0.16, 1, 0.3, 1),
+    backdrop-filter 0.34s cubic-bezier(0.16, 1, 0.3, 1),
+    -webkit-backdrop-filter 0.34s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal.is-visible {
+  opacity: 1;
+  background: rgba(8, 10, 14, 0.68);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.modal-sheet {
+  opacity: 0;
+  transform: translate3d(0, 96px, 0) scale(0.94);
+  transition: none;
+}
+
+.modal.is-visible .modal-sheet {
+  animation: modalSheetEnterStrong 0.48s cubic-bezier(0.18, 1.18, 0.22, 1) both;
+}
+
+.modal.is-closing .modal-sheet {
+  animation: modalSheetExitStrong 0.28s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+@keyframes modalSheetEnterStrong {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 96px, 0) scale(0.94);
+  }
+
+  62% {
+    opacity: 1;
+    transform: translate3d(0, -8px, 0) scale(1.012);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes modalSheetExitStrong {
+  0% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate3d(0, 58px, 0) scale(0.972);
+  }
+}
