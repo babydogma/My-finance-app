@@ -191,6 +191,8 @@ const analyticsRangeCalendarNextBtn = document.getElementById("analyticsRangeCal
 const analyticsRangeDockCloseBtn = document.getElementById("analyticsRangeDockCloseBtn");
 const analyticsRangeDockResetBtn = document.getElementById("analyticsRangeDockResetBtn");
 const analyticsRangeDockApplyBtn = document.getElementById("analyticsRangeDockApplyBtn");
+const analyticsRangeMonthsStrip = document.getElementById("analyticsRangeMonthsStrip");
+const analyticsRangeSelectedLabel = document.getElementById("analyticsRangeSelectedLabel");
 const analyticsRangeDaysStrip = document.getElementById("analyticsRangeDaysStrip");
 const analyticsRailRangeBtn = document.getElementById("analyticsRailRangeBtn");
 
@@ -857,6 +859,7 @@ let justCreatedTransactionId = null;
    ========================================================= */
 
 const ANALYTICS_RANGE_RIBBON_ANIMATION_MS = 360;
+let analyticsRangePickStep = "start";
 
 function getDateFromValue(value) {
   const match = String(value || "").match(/^(\d{4})-(\d{2})-(\d{2})$/);
@@ -876,30 +879,39 @@ function getValueFromDate(date) {
   return `${year}-${month}-${day}`;
 }
 
-function addDays(date, days) {
-  const nextDate = new Date(date);
-  nextDate.setDate(nextDate.getDate() + days);
-  return nextDate;
+function getMonthValueFromDate(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+
+  return `${year}-${month}`;
+}
+
+function getDateFromMonthValue(monthValue) {
+  const match = String(monthValue || "").match(/^(\d{4})-(\d{2})$/);
+
+  if (!match) {
+    return new Date();
+  }
+
+  return new Date(Number(match[1]), Number(match[2]) - 1, 1);
 }
 
 function getRangeShortDateLabel(value) {
   const date = getDateFromValue(value);
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+
+  return `${day}.${month}`;
+}
+
+function getRangeMonthShortLabel(monthValue) {
+  const date = getDateFromMonthValue(monthValue);
 
   return date
     .toLocaleDateString("ru-RU", {
-      day: "numeric",
       month: "short",
     })
     .replace(".", "");
-}
-
-function getRangeMonthTitle(value) {
-  const date = getDateFromValue(value);
-
-  return date.toLocaleDateString("ru-RU", {
-    month: "long",
-    year: "numeric",
-  });
 }
 
 function isDateValueBetween(value, startValue, endValue) {
@@ -924,83 +936,114 @@ function normalizeAnalyticsRangeDraft() {
     analyticsRangeDraftStart = analyticsRangeDraftEnd;
     analyticsRangeDraftEnd = temp;
   }
+
+  if (!analyticsRangeCalendarMonth) {
+    analyticsRangeCalendarMonth = getMonthValueFromDate(
+      getDateFromValue(analyticsRangeDraftStart)
+    );
+  }
 }
 
-function setAnalyticsRangeRibbonActiveSide(side) {
-  analyticsRangeEditingSide = side;
+function syncAnalyticsRangeSelectedLabel() {
+  if (!analyticsRangeSelectedLabel) return;
 
-  analyticsRangeStartBtn?.classList.toggle("is-active", side === "start");
-  analyticsRangeEndBtn?.classList.toggle("is-active", side === "end");
+  if (!analyticsRangeDraftStart || !analyticsRangeDraftEnd) {
+    analyticsRangeSelectedLabel.textContent = "Выбери период";
+    return;
+  }
+
+  analyticsRangeSelectedLabel.textContent =
+    `${getRangeShortDateLabel(analyticsRangeDraftStart)} — ${getRangeShortDateLabel(analyticsRangeDraftEnd)}`;
 }
 
-function getAnalyticsRangeRibbonDates() {
-  const selectedMonthDate = (() => {
-    const match = String(analyticsSelectedMonth || getCurrentMonthValue()).match(/^(\d{4})-(\d{2})$/);
-
-    if (!match) {
-      return new Date();
-    }
-
-    return new Date(Number(match[1]), Number(match[2]) - 1, 1);
-  })();
-
-  const monthStart = new Date(
-    selectedMonthDate.getFullYear(),
-    selectedMonthDate.getMonth(),
-    1
+function getAnalyticsRangeYearMonths() {
+  const selectedDate = getDateFromMonthValue(
+    analyticsRangeCalendarMonth || analyticsSelectedMonth || getCurrentMonthValue()
   );
 
-  const monthEnd = new Date(
-    selectedMonthDate.getFullYear(),
-    selectedMonthDate.getMonth() + 1,
-    0
+  const year = selectedDate.getFullYear();
+  const months = [];
+
+  for (let monthIndex = 0; monthIndex < 12; monthIndex += 1) {
+    const date = new Date(year, monthIndex, 1);
+
+    months.push({
+      value: getMonthValueFromDate(date),
+      label: getRangeMonthShortLabel(getMonthValueFromDate(date)),
+    });
+  }
+
+  return months;
+}
+
+function renderAnalyticsRangeMonthsStrip() {
+  if (!analyticsRangeMonthsStrip) return;
+
+  const months = getAnalyticsRangeYearMonths();
+  const activeMonth = analyticsRangeCalendarMonth || getCurrentMonthValue();
+
+  analyticsRangeMonthsStrip.innerHTML = "";
+
+  months.forEach((month) => {
+    const button = document.createElement("button");
+
+    button.type = "button";
+    button.className =
+      `analytics-range-ribbon-month${month.value === activeMonth ? " is-active" : ""}`;
+    button.dataset.monthValue = month.value;
+    button.textContent = month.label;
+
+    button.addEventListener("click", () => {
+      analyticsRangeCalendarMonth = month.value;
+      renderAnalyticsRangeRibbon();
+    });
+
+    analyticsRangeMonthsStrip.appendChild(button);
+  });
+
+  requestAnimationFrame(() => {
+    analyticsRangeMonthsStrip
+      .querySelector(".analytics-range-ribbon-month.is-active")
+      ?.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+        inline: "center",
+      });
+  });
+}
+
+function getAnalyticsRangeMonthDates() {
+  const monthDate = getDateFromMonthValue(
+    analyticsRangeCalendarMonth || analyticsSelectedMonth || getCurrentMonthValue()
   );
 
-  const draftStart = getDateFromValue(analyticsRangeDraftStart);
-  const draftEnd = getDateFromValue(analyticsRangeDraftEnd);
-
-  const startLimit = addDays(
-    new Date(Math.min(monthStart.getTime(), draftStart.getTime())),
-    -8
-  );
-
-  const endLimit = addDays(
-    new Date(Math.max(monthEnd.getTime(), draftEnd.getTime())),
-    12
-  );
-
+  const year = monthDate.getFullYear();
+  const month = monthDate.getMonth();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
   const dates = [];
-  let cursor = new Date(startLimit);
 
-  while (cursor.getTime() <= endLimit.getTime()) {
-    dates.push(new Date(cursor));
-    cursor = addDays(cursor, 1);
+  for (let day = 1; day <= daysInMonth; day += 1) {
+    dates.push(new Date(year, month, day));
   }
 
   return dates;
 }
 
-function renderAnalyticsRangeRibbon() {
-  if (!analyticsRangeDock || !analyticsRangeDaysStrip) return;
+function commitAnalyticsRangeDraft() {
+  analyticsRangeStart = analyticsRangeDraftStart;
+  analyticsRangeEnd = analyticsRangeDraftEnd;
+  analyticsFilterPeriod = "range";
 
-  normalizeAnalyticsRangeDraft();
+  renderAnalytics();
+}
 
-  if (analyticsRangeDockTitle) {
-    analyticsRangeDockTitle.textContent = getRangeMonthTitle(analyticsRangeDraftStart);
-  }
-
-  if (analyticsRangeDockStartLabel) {
-    analyticsRangeDockStartLabel.textContent = getRangeShortDateLabel(analyticsRangeDraftStart);
-  }
-
-  if (analyticsRangeDockEndLabel) {
-    analyticsRangeDockEndLabel.textContent = getRangeShortDateLabel(analyticsRangeDraftEnd);
-  }
+function renderAnalyticsRangeDaysStrip() {
+  if (!analyticsRangeDaysStrip) return;
 
   analyticsRangeDaysStrip.innerHTML = "";
 
   const todayValue = getTodayDateValue();
-  const dates = getAnalyticsRangeRibbonDates();
+  const dates = getAnalyticsRangeMonthDates();
 
   dates.forEach((date) => {
     const value = getValueFromDate(date);
@@ -1024,24 +1067,13 @@ function renderAnalyticsRangeRibbon() {
     ].filter(Boolean).join(" ");
 
     button.dataset.dateValue = value;
-
-    button.innerHTML = `
-      <span>${date.toLocaleDateString("ru-RU", { weekday: "short" }).replace(".", "")}</span>
-      <strong>${date.getDate()}</strong>
-    `;
+    button.textContent = String(date.getDate());
 
     button.addEventListener("click", () => {
-      if (analyticsRangeEditingSide === "start") {
+      if (analyticsRangePickStep === "start") {
         analyticsRangeDraftStart = value;
-
-        if (
-          getDateFromValue(analyticsRangeDraftStart).getTime() >
-          getDateFromValue(analyticsRangeDraftEnd).getTime()
-        ) {
-          analyticsRangeDraftEnd = value;
-        }
-
-        setAnalyticsRangeRibbonActiveSide("end");
+        analyticsRangeDraftEnd = value;
+        analyticsRangePickStep = "end";
       } else {
         analyticsRangeDraftEnd = value;
 
@@ -1049,25 +1081,26 @@ function renderAnalyticsRangeRibbon() {
           getDateFromValue(analyticsRangeDraftEnd).getTime() <
           getDateFromValue(analyticsRangeDraftStart).getTime()
         ) {
-          analyticsRangeDraftStart = value;
+          const temp = analyticsRangeDraftStart;
+          analyticsRangeDraftStart = analyticsRangeDraftEnd;
+          analyticsRangeDraftEnd = temp;
         }
 
-        setAnalyticsRangeRibbonActiveSide("start");
+        analyticsRangePickStep = "start";
       }
 
-      analyticsRangeStart = analyticsRangeDraftStart;
-      analyticsRangeEnd = analyticsRangeDraftEnd;
-      analyticsFilterPeriod = "range";
-
+      commitAnalyticsRangeDraft();
       renderAnalyticsRangeRibbon();
-      renderAnalytics();
     });
 
     analyticsRangeDaysStrip.appendChild(button);
   });
 
   requestAnimationFrame(() => {
-    const activeDay = analyticsRangeDaysStrip.querySelector(".is-start");
+    const activeDay =
+      analyticsRangeDaysStrip.querySelector(".analytics-range-ribbon-day.is-end") ||
+      analyticsRangeDaysStrip.querySelector(".analytics-range-ribbon-day.is-start") ||
+      analyticsRangeDaysStrip.querySelector(".analytics-range-ribbon-day.is-today");
 
     activeDay?.scrollIntoView({
       behavior: "smooth",
@@ -1075,6 +1108,15 @@ function renderAnalyticsRangeRibbon() {
       inline: "center",
     });
   });
+}
+
+function renderAnalyticsRangeRibbon() {
+  if (!analyticsRangeDock) return;
+
+  normalizeAnalyticsRangeDraft();
+  syncAnalyticsRangeSelectedLabel();
+  renderAnalyticsRangeMonthsStrip();
+  renderAnalyticsRangeDaysStrip();
 }
 
 function setAnalyticsRangeRailActive(isActive) {
@@ -1093,11 +1135,15 @@ function openAnalyticsRangeRibbon() {
   analyticsFilterPeriod = "range";
   normalizeAnalyticsRangeDraft();
 
+  analyticsRangeCalendarMonth = getMonthValueFromDate(
+    getDateFromValue(analyticsRangeDraftStart)
+  );
+
   analyticsRangeStart = analyticsRangeDraftStart;
   analyticsRangeEnd = analyticsRangeDraftEnd;
+  analyticsRangePickStep = "start";
 
   setAnalyticsRangeRailActive(true);
-  setAnalyticsRangeRibbonActiveSide("start");
   renderAnalyticsRangeRibbon();
 
   analyticsRangeDock.classList.remove("hidden", "is-exiting", "is-entering");
@@ -1126,6 +1172,7 @@ function resetAnalyticsRangeRibbon() {
   analyticsRangeEnd = "";
   analyticsRangeDraftStart = "";
   analyticsRangeDraftEnd = "";
+  analyticsRangePickStep = "start";
   analyticsFilterPeriod = "month";
 
   setAnalyticsRangeRailActive(false);
@@ -1147,22 +1194,10 @@ function resetAnalyticsRangeRibbon() {
 
     setTimeout(() => {
       analyticsExpensesMonthStrip.classList.remove("is-range-returning");
-    }, ANALYTICS_RANGE_RIBBON_ANIMATION_MS + 120);
+    }, ANALYTICS_RANGE_RIBBON_ANIMATION_MS + 80);
 
     renderAnalytics();
-  }, 300);
-}
-
-function applyAnalyticsRangeRibbon() {
-  normalizeAnalyticsRangeDraft();
-
-  analyticsRangeStart = analyticsRangeDraftStart;
-  analyticsRangeEnd = analyticsRangeDraftEnd;
-  analyticsFilterPeriod = "range";
-
-  setAnalyticsRangeRailActive(true);
-  renderAnalyticsRangeRibbon();
-  renderAnalytics();
+  }, ANALYTICS_RANGE_RIBBON_ANIMATION_MS);
 }
 
 analyticsRailRangeBtn?.addEventListener("click", (event) => {
@@ -1170,22 +1205,6 @@ analyticsRailRangeBtn?.addEventListener("click", (event) => {
   event.stopImmediatePropagation();
 
   openAnalyticsRangeRibbon();
-}, true);
-
-analyticsRangeStartBtn?.addEventListener("click", (event) => {
-  event.preventDefault();
-  event.stopImmediatePropagation();
-
-  setAnalyticsRangeRibbonActiveSide("start");
-  renderAnalyticsRangeRibbon();
-}, true);
-
-analyticsRangeEndBtn?.addEventListener("click", (event) => {
-  event.preventDefault();
-  event.stopImmediatePropagation();
-
-  setAnalyticsRangeRibbonActiveSide("end");
-  renderAnalyticsRangeRibbon();
 }, true);
 
 analyticsRangeDockResetBtn?.addEventListener("click", (event) => {
@@ -1206,7 +1225,8 @@ analyticsRangeDockApplyBtn?.addEventListener("click", (event) => {
   event.preventDefault();
   event.stopImmediatePropagation();
 
-  applyAnalyticsRangeRibbon();
+  commitAnalyticsRangeDraft();
+  renderAnalyticsRangeRibbon();
 }, true);
 
 analyticsPeriodButtons.forEach((button) => {
