@@ -72,7 +72,7 @@
           ? item.linked_safe_bucket_id || null
           : null,
         to_safe_bucket_id: null,
-        created_at: buildMandatoryPaymentTransactionCreatedAt(monthKey, item.due_day),
+        created_at: buildMandatoryPaymentTransactionCreatedAt(),
         time_label: getCurrentTime(),
       };
 
