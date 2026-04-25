@@ -315,38 +315,29 @@
 </div>
 
     <div class="analytics-range-dock analytics-range-ribbon hidden" id="analyticsRangeDock">
-  <div class="analytics-range-ribbon__top">
-    <div>
-      <div class="analytics-range-ribbon__kicker">Период</div>
-      <div class="analytics-range-ribbon__title" id="analyticsRangeDockTitle">апрель 2026 г.</div>
-    </div>
-
+  <div class="analytics-range-ribbon__compact-head">
     <button class="analytics-range-ribbon__reset" type="button" id="analyticsRangeDockResetBtn">
       Сброс
     </button>
+
+    <div class="analytics-range-ribbon__selected" id="analyticsRangeSelectedLabel">
+      —
+    </div>
   </div>
 
-  <div class="analytics-range-ribbon__summary">
-    <button class="analytics-range-ribbon__date is-active" type="button" id="analyticsRangeStartBtn">
-      <span>с</span>
-      <strong id="analyticsRangeDockStartLabel">—</strong>
-    </button>
-
-    <div class="analytics-range-ribbon__arrow">→</div>
-
-    <button class="analytics-range-ribbon__date" type="button" id="analyticsRangeEndBtn">
-      <span>по</span>
-      <strong id="analyticsRangeDockEndLabel">—</strong>
-    </button>
-  </div>
+  <div class="analytics-range-ribbon__months" id="analyticsRangeMonthsStrip"></div>
 
   <div class="analytics-range-ribbon__days" id="analyticsRangeDaysStrip"></div>
 
-  <button class="analytics-range-ribbon__apply" type="button" id="analyticsRangeDockApplyBtn">
-    Готово
-  </button>
-
   <button class="hidden" type="button" id="analyticsRangeDockCloseBtn" aria-hidden="true">×</button>
+  <button class="hidden" type="button" id="analyticsRangeDockApplyBtn" aria-hidden="true">Готово</button>
+
+  <button class="hidden" type="button" id="analyticsRangeStartBtn" aria-hidden="true"></button>
+  <button class="hidden" type="button" id="analyticsRangeEndBtn" aria-hidden="true"></button>
+
+  <div class="hidden" id="analyticsRangeDockTitle"></div>
+  <div class="hidden" id="analyticsRangeDockStartLabel"></div>
+  <div class="hidden" id="analyticsRangeDockEndLabel"></div>
 
   <div class="analytics-range-calendar hidden" id="analyticsRangeCalendar" aria-hidden="true">
     <div id="analyticsRangeCalendarTitle"></div>
