@@ -70,83 +70,109 @@
     return new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
   }
 
-  function getTransactionDateKey(item) {
-  const rawValue = item.date || item.created_at || item.createdAt;
+  function getTransactionDateKeys(item) {
+  const rawValues = [
+    item.date,
+    item.transaction_date,
+    item.operation_date,
+    item.created_date,
+    item.created_at,
+    item.createdAt,
+  ].filter(Boolean);
 
-  if (!rawValue) return "";
+  const keys = [];
 
-  const rawText = String(rawValue);
+  rawValues.forEach((rawValue) => {
+    const rawText = String(rawValue);
 
-  if (/^\d{4}-\d{2}-\d{2}$/.test(rawText)) {
-    return rawText;
-  }
+    if (/^\d{4}-\d{2}-\d{2}/.test(rawText)) {
+      keys.push(rawText.slice(0, 10));
+    }
 
-  const parsedDate = new Date(rawText);
+    const parsedDate = new Date(rawText);
 
-  if (!Number.isNaN(parsedDate.getTime())) {
-    return getDateOnlyString(parsedDate);
-  }
+    if (!Number.isNaN(parsedDate.getTime())) {
+      keys.push(getDateOnlyString(parsedDate));
+    }
+  });
 
-  return rawText.slice(0, 10);
+  return Array.from(new Set(keys)).filter((key) => {
+    return /^\d{4}-\d{2}-\d{2}$/.test(key);
+  });
 }
 
 function getTransactionTime(item) {
-  const dateKey = getTransactionDateKey(item);
+  const rawValues = [
+    item.date,
+    item.transaction_date,
+    item.operation_date,
+    item.created_date,
+    item.created_at,
+    item.createdAt,
+  ].filter(Boolean);
 
-  if (!dateKey) return 0;
+  for (const rawValue of rawValues) {
+    const rawText = String(rawValue);
+    const parsedDate = new Date(rawText);
 
-  const rawValue = item.date || item.created_at || item.createdAt;
-  const rawText = String(rawValue || "");
+    if (!Number.isNaN(parsedDate.getTime())) {
+      return parsedDate.getTime();
+    }
 
-  if (/^\d{4}-\d{2}-\d{2}$/.test(rawText)) {
-    const [year, month, day] = dateKey.split("-").map(Number);
-    return new Date(year, month - 1, day).getTime();
+    if (/^\d{4}-\d{2}-\d{2}$/.test(rawText)) {
+      const [year, month, day] = rawText.split("-").map(Number);
+      return new Date(year, month - 1, day).getTime();
+    }
   }
 
-  const parsedDate = new Date(rawText);
-
-  if (!Number.isNaN(parsedDate.getTime())) {
-    return parsedDate.getTime();
-  }
-
-  const [year, month, day] = dateKey.split("-").map(Number);
-
-  if (!year || !month || !day) return 0;
-
-  return new Date(year, month - 1, day).getTime();
+  return 0;
 }
 
 function filterTransactionsByPeriod(items, period, selectedMonth, rangeStart, rangeEnd) {
   const todayKey = getTodayDateValue();
   const currentMonth = selectedMonth || getCurrentMonthValue();
   const startOfToday = getStartOfTodayTime();
+  const sevenDaysStartKey = getDateOnlyString(
+    new Date(startOfToday - 6 * 24 * 60 * 60 * 1000)
+  );
 
   return items.filter((item) => {
-    const dateKey = getTransactionDateKey(item);
+    const dateKeys = getTransactionDateKeys(item);
 
-    if (!dateKey) return false;
+    if (!dateKeys.length) return false;
 
     const time = getTransactionTime(item);
 
     if (period === "month") {
-      return dateKey.slice(0, 7) === currentMonth;
+      return dateKeys.some((dateKey) => {
+        return dateKey.slice(0, 7) === currentMonth;
+      });
     }
 
     if (period === "today") {
-      return dateKey === todayKey;
+      return dateKeys.includes(todayKey);
     }
 
     if (period === "7") {
-      return time >= startOfToday - 6 * 24 * 60 * 60 * 1000;
+      return (
+        time >= startOfToday - 6 * 24 * 60 * 60 * 1000 ||
+        dateKeys.some((dateKey) => {
+          return dateKey >= sevenDaysStartKey && dateKey <= todayKey;
+        })
+      );
     }
 
     if (period === "range") {
       if (!rangeStart || !rangeEnd) return true;
-      return dateKey >= rangeStart && dateKey <= rangeEnd;
+
+      return dateKeys.some((dateKey) => {
+        return dateKey >= rangeStart && dateKey <= rangeEnd;
+      });
     }
 
     return true;
   });
+}
 }
 
   function getCurrentTime() {
