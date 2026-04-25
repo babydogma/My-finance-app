@@ -340,13 +340,33 @@
     </button>
   </div>
 
-  <div class="analytics-range-number-panel hidden" id="analyticsRangeNumberPanel">
-    <div class="analytics-range-number-panel__title" id="analyticsRangeNumberTitle">
-      Выбери число
+  <div class="analytics-range-calendar hidden" id="analyticsRangeCalendar">
+  <div class="analytics-range-calendar__head">
+    <button class="analytics-range-calendar__nav" type="button" id="analyticsRangeCalendarPrevBtn">
+      ‹
+    </button>
+
+    <div class="analytics-range-calendar__title" id="analyticsRangeCalendarTitle">
+      апрель 2026 г.
     </div>
 
-    <div class="analytics-range-number-panel__list" id="analyticsRangeNumberList"></div>
+    <button class="analytics-range-calendar__nav" type="button" id="analyticsRangeCalendarNextBtn">
+      ›
+    </button>
   </div>
+
+  <div class="analytics-range-calendar__weekdays">
+    <span>пн</span>
+    <span>вт</span>
+    <span>ср</span>
+    <span>чт</span>
+    <span>пт</span>
+    <span>сб</span>
+    <span>вс</span>
+  </div>
+
+  <div class="analytics-range-calendar__grid" id="analyticsRangeCalendarGrid"></div>
+</div>
 
   <div class="analytics-range-dock__actions">
     <button class="analytics-range-dock__reset" type="button" id="analyticsRangeDockResetBtn">
