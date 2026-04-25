@@ -490,19 +490,22 @@
     <div class="modal-handle"></div>
     <h3 class="modal-title">Добавить операцию</h3>
 
-    <div class="field">
-  <input
-  class="input"
-  id="amountInput"
-  type="text"
-  inputmode="decimal"
-  autocomplete="off"
-  placeholder="Сумма"
-/>
-</div>
+    <div class="transaction-main-row">
+  <div class="field transaction-main-row__field transaction-money-field">
+    <input
+      class="input transaction-money-input"
+      id="amountInput"
+      type="text"
+      inputmode="decimal"
+      autocomplete="off"
+      placeholder="Сумма"
+    />
+    <span class="transaction-money-symbol">₽</span>
+  </div>
 
-<div class="field">
-  <input class="input" id="dateInput" type="date" />
+  <div class="field transaction-main-row__field">
+    <input class="input transaction-date-input" id="dateInput" type="date" />
+  </div>
 </div>
 
     <div class="field" id="categoryField">
