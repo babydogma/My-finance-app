@@ -173,7 +173,6 @@ function filterTransactionsByPeriod(items, period, selectedMonth, rangeStart, ra
     return true;
   });
 }
-}
 
   function getCurrentTime() {
     const now = new Date();
