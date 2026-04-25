@@ -269,8 +269,9 @@ function getRingItemsTotal(items) {
 function getAnalyticsRingSeamSize(percent) {
   if (percent >= 8) return 0.34;
   if (percent >= 3) return 0.22;
-  if (percent >= 1.25) return 0.10;
-  return 0.035;
+  if (percent >= 1.25) return 0.13;
+  if (percent >= 0.55) return 0.075;
+  return 0.045;
 }
 
 function buildAnalyticsRingGradient(items, total) {
@@ -285,28 +286,26 @@ function buildAnalyticsRingGradient(items, total) {
 
   const visibleItems = items.filter((item) => item.amount > 0.01);
 
-  const gradientParts = visibleItems.flatMap((item, index) => {
-    const percent = Math.max(0, Math.min(100, (item.amount / total) * 100));
-    const seamSize = getAnalyticsRingSeamSize(percent);
-    const start = cursor;
-    const rawEnd = Math.min(100, cursor + percent);
-    const hasNext = index < visibleItems.length - 1;
+  const gradientParts = visibleItems.flatMap((item) => {
+  const percent = Math.max(0, Math.min(100, (item.amount / total) * 100));
+  const baseSeamSize = getAnalyticsRingSeamSize(percent);
+  const seamSize = Math.min(baseSeamSize, percent * 0.22);
 
-    const seamStart = hasNext
-      ? Math.max(start, rawEnd - seamSize)
-      : rawEnd;
+  const start = cursor;
+  const rawEnd = Math.min(100, cursor + percent);
+  const seamStart = Math.max(start, rawEnd - seamSize);
 
-    cursor = rawEnd;
+  cursor = rawEnd;
 
-    if (!hasNext || seamSize <= 0.04 || seamStart <= start) {
-      return [`${item.color} ${start.toFixed(2)}% ${rawEnd.toFixed(2)}%`];
-    }
+  if (seamSize <= 0.012 || seamStart <= start) {
+    return [`${item.color} ${start.toFixed(2)}% ${rawEnd.toFixed(2)}%`];
+  }
 
-    return [
-      `${item.color} ${start.toFixed(2)}% ${seamStart.toFixed(2)}%`,
-      `${seamColor} ${seamStart.toFixed(2)}% ${rawEnd.toFixed(2)}%`,
-    ];
-  });
+  return [
+    `${item.color} ${start.toFixed(2)}% ${seamStart.toFixed(2)}%`,
+    `${seamColor} ${seamStart.toFixed(2)}% ${rawEnd.toFixed(2)}%`,
+  ];
+});
 
   if (!gradientParts.length) {
     return `conic-gradient(${emptyColor} 0deg 360deg)`;
@@ -646,41 +645,37 @@ const gradient = buildAnalyticsRingGradient(mixedItems, mixedTotal);
     }
 
     function getAnalyticsMonthStripItems() {
-      const selectedDate = getAnalyticsMonthDateFromValue(getSelectedMonth());
-      const items = [];
+  const selectedDate = getAnalyticsMonthDateFromValue(getSelectedMonth());
+  const selectedYear = selectedDate.getFullYear();
+  const items = [];
 
-      for (let offset = -12; offset <= 6; offset += 1) {
-        const date = new Date(
-          selectedDate.getFullYear(),
-          selectedDate.getMonth() + offset,
-          1
-        );
+  for (let monthIndex = 0; monthIndex < 12; monthIndex += 1) {
+    const date = new Date(selectedYear, monthIndex, 1);
+    const monthKey = getAnalyticsMonthKeyFromDate(date);
 
-        const monthKey = getAnalyticsMonthKeyFromDate(date);
+    const monthTransactions = filterTransactionsByPeriod(
+      state.transactions,
+      "month",
+      monthKey,
+      "",
+      ""
+    ).filter((transaction) => transaction.type === "expense");
 
-        const monthTransactions = filterTransactionsByPeriod(
-          state.transactions,
-          "month",
-          monthKey,
-          "",
-          ""
-        ).filter((transaction) => transaction.type === "expense");
+    const total = roundToTwo(
+      monthTransactions.reduce((sum, transaction) => {
+        return sum + (Number(transaction.amount) || 0);
+      }, 0)
+    );
 
-        const total = roundToTwo(
-          monthTransactions.reduce((sum, transaction) => {
-            return sum + (Number(transaction.amount) || 0);
-          }, 0)
-        );
+    items.push({
+      monthKey,
+      label: getAnalyticsMonthShortLabel(monthKey),
+      total,
+    });
+  }
 
-        items.push({
-          monthKey,
-          label: getAnalyticsMonthShortLabel(monthKey),
-          total,
-        });
-      }
-
-      return items;
-    }
+  return items;
+}
 
     function renderAnalyticsExpensesMonthStrip() {
       if (!analyticsExpensesMonthStrip) return;
