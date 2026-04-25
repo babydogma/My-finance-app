@@ -29,6 +29,7 @@
   font-size: clamp(36px, 9vw, 48px);
   line-height: 0.92;
   font-weight: 950;
+  font-variant-numeric: tabular-nums;
   letter-spacing: -0.075em;
   color: #f7f8fb;
 }
@@ -70,6 +71,7 @@
 .analytics-expenses-ring {
   width: min(238px, 64vw);
   height: min(238px, 64vw);
+  will-change: background;
   border-radius: 50%;
   position: relative;
   background: var(
@@ -114,6 +116,7 @@
   font-size: 30px;
   line-height: 1;
   font-weight: 920;
+  font-variant-numeric: tabular-nums;
   letter-spacing: -0.06em;
   color: #f7f8fb;
 }
