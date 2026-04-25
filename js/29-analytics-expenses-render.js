@@ -6,6 +6,7 @@
     filterTransactionsByPeriod,
     getCurrentMonthValue,
     getCategoryName,
+    isRequiredCategory,
     formatMoney,
     escapeHtml,
 
@@ -36,6 +37,7 @@
     openAnalyticsCategoryModal,
   }) {
     let analyticsExpenseCategoryFilter = "all";
+    let analyticsExpenseKindFilter = "all";
     let previousRingItems = null;
 let previousRingTotal = 0;
 let previousShownTotal = null;
@@ -486,19 +488,78 @@ function animatePercentValue(element, from, to) {
         getRangeEnd()
       ).filter((transaction) => transaction.type === "expense");
     }
+    
+    function isAnalyticsExpenseRequiredCategory(categoryId) {
+  if (categoryId === UNCATEGORIZED_ID) return false;
+
+  return typeof isRequiredCategory === "function"
+    ? isRequiredCategory(categoryId)
+    : false;
+}
+
+function isAnalyticsExpenseKindTransaction(transaction) {
+  if (analyticsExpenseKindFilter === "all") {
+    return true;
+  }
+
+  const categoryId = transaction.category_id || UNCATEGORIZED_ID;
+  const isRequired = isAnalyticsExpenseRequiredCategory(categoryId);
+
+  if (analyticsExpenseKindFilter === "required") {
+    return isRequired;
+  }
+
+  if (analyticsExpenseKindFilter === "flexible") {
+    return !isRequired;
+  }
+
+  return true;
+}
+
+function getAnalyticsExpenseKindTransactions() {
+  return getAnalyticsExpenseBaseTransactions().filter(isAnalyticsExpenseKindTransaction);
+}
+
+function syncAnalyticsExpenseKindRail() {
+  document.querySelectorAll("[data-analytics-expense-kind]").forEach((button) => {
+    button.classList.toggle(
+      "is-active",
+      button.dataset.analyticsExpenseKind === analyticsExpenseKindFilter
+    );
+  });
+}
+
+function bindAnalyticsExpenseKindRail() {
+  document.querySelectorAll("[data-analytics-expense-kind]").forEach((button) => {
+    if (button.dataset.kindBound === "true") return;
+
+    button.dataset.kindBound = "true";
+
+    button.addEventListener("click", () => {
+      const nextKind = button.dataset.analyticsExpenseKind || "all";
+
+      if (analyticsExpenseKindFilter === nextKind) return;
+
+      analyticsExpenseKindFilter = nextKind;
+      analyticsExpenseCategoryFilter = "all";
+      syncAnalyticsExpenseKindRail();
+      renderAnalyticsExpensesByCategory();
+    });
+  });
+}
 
     function getAnalyticsExpenseFilteredTransactions() {
-      const expenseTransactions = getAnalyticsExpenseBaseTransactions();
+  const expenseTransactions = getAnalyticsExpenseKindTransactions();
 
-      if (analyticsExpenseCategoryFilter === "all") {
-        return expenseTransactions;
-      }
+  if (analyticsExpenseCategoryFilter === "all") {
+    return expenseTransactions;
+  }
 
-      return expenseTransactions.filter((transaction) => {
-        const categoryId = transaction.category_id || UNCATEGORIZED_ID;
-        return categoryId === analyticsExpenseCategoryFilter;
-      });
-    }
+  return expenseTransactions.filter((transaction) => {
+    const categoryId = transaction.category_id || UNCATEGORIZED_ID;
+    return categoryId === analyticsExpenseCategoryFilter;
+  });
+}
 
     function getAnalyticsExpenseItems(expenseTransactions) {
   const byCategory = new Map();
@@ -834,8 +895,11 @@ function animatePercentValue(element, from, to) {
     }
 
     function renderAnalyticsExpensesByCategory() {
-      const baseExpenseTransactions = getAnalyticsExpenseBaseTransactions();
-      const filteredExpenseTransactions = getAnalyticsExpenseFilteredTransactions();
+      bindAnalyticsExpenseKindRail();
+syncAnalyticsExpenseKindRail();
+
+const baseExpenseTransactions = getAnalyticsExpenseKindTransactions();
+const filteredExpenseTransactions = getAnalyticsExpenseFilteredTransactions();
 
       const totalAll = roundToTwo(
         baseExpenseTransactions.reduce((sum, transaction) => {
