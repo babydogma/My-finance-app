@@ -260,24 +260,6 @@ function getTopPercentFromItems(items, total) {
   return Math.round((topItem.amount / total) * 100);
 }
 
-function syncAnalyticsRingReactorVars(ringEl, items, total) {
-  if (!ringEl) return;
-
-  const topItem = items[0];
-  const isEmpty = !total || total <= 0 || !items.length;
-  const topColor = topItem ? topItem.color : "#5B8BE8";
-  const topPercent = getTopPercentFromItems(items, total);
-  const density = Math.min(items.length, 10) / 10;
-
-  const intensity = isEmpty
-    ? 0
-    : Math.min(1, 0.34 + density * 0.28 + (topPercent / 100) * 0.22);
-
-  ringEl.style.setProperty("--analytics-top-color", topColor);
-  ringEl.style.setProperty("--analytics-reactor-intensity", intensity.toFixed(2));
-  ringEl.classList.toggle("is-empty", isEmpty);
-}
-
 function getRingItemsTotal(items) {
   return items.reduce((sum, item) => {
     return sum + (Number(item.amount) || 0);
