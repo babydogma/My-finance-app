@@ -1,4 +1,4 @@
-(() => {
+(() => { 
   function createAnalyticsExpensesRender({
     state,
     UNCATEGORIZED_ID,
