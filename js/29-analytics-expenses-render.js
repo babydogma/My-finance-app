@@ -152,25 +152,99 @@ function getDelayedProgress(progress, delay = 0.32) {
   return clampNumber((progress - delay) / (1 - delay), 0, 1);
 }
 
-function getAnimatedRingTotal(fromTotal, toTotal, mixedItemsTotal, rawProgress) {
+function getEasedDelayedProgress(progress, delay = 0) {
+  return easeOutCubic(getDelayedProgress(progress, delay));
+}
+
+function getRingTransitionProfile(fromItems, toItems, fromTotal, toTotal) {
+  const fromCount = fromItems.length;
+  const toCount = toItems.length;
+
   const safeFromTotal = Math.max(Number(fromTotal) || 0, 0);
   const safeToTotal = Math.max(Number(toTotal) || 0, 0);
 
-  if (safeFromTotal <= 0 && safeToTotal > 0) {
+  if (fromCount === 0 && toCount > 0) {
+    return {
+      type: "empty-in",
+      duration: 1040,
+      totalMode: "target",
+      sharedDelay: 0,
+      enterDelay: 0.08,
+      exitDelay: 0,
+      totalDelay: 0,
+    };
+  }
+
+  if (fromCount > 0 && toCount === 0) {
+    return {
+      type: "empty-out",
+      duration: 1040,
+      totalMode: "source",
+      sharedDelay: 0,
+      enterDelay: 0,
+      exitDelay: 0.08,
+      totalDelay: 0,
+    };
+  }
+
+  const heavyShrink =
+    fromCount >= toCount + 4 ||
+    safeFromTotal > safeToTotal * 2.15;
+
+  if (heavyShrink) {
+    return {
+      type: "heavy-shrink",
+      duration: 1240,
+      totalMode: "delayed-shrink",
+      sharedDelay: 0.08,
+      enterDelay: 0.18,
+      exitDelay: 0.16,
+      totalDelay: 0.34,
+    };
+  }
+
+  const heavyGrow =
+    toCount >= fromCount + 4 ||
+    safeToTotal > safeFromTotal * 2.15;
+
+  if (heavyGrow) {
+    return {
+      type: "heavy-grow",
+      duration: 1120,
+      totalMode: "target",
+      sharedDelay: 0.05,
+      enterDelay: 0.16,
+      exitDelay: 0.06,
+      totalDelay: 0,
+    };
+  }
+
+  return {
+    type: "morph",
+    duration: 980,
+    totalMode: "mixed",
+    sharedDelay: 0,
+    enterDelay: 0.08,
+    exitDelay: 0.08,
+    totalDelay: 0,
+  };
+}
+
+function getAnimatedRingTotal(fromTotal, toTotal, mixedItemsTotal, rawProgress, profile) {
+  const safeFromTotal = Math.max(Number(fromTotal) || 0, 0);
+  const safeToTotal = Math.max(Number(toTotal) || 0, 0);
+
+  if (profile.totalMode === "target") {
     return Math.max(safeToTotal, 1);
   }
 
-  if (safeFromTotal > 0 && safeToTotal <= 0) {
+  if (profile.totalMode === "source") {
     return Math.max(safeFromTotal, 1);
   }
 
-  if (safeFromTotal > safeToTotal * 1.35) {
-    const delayedProgress = easeOutCubic(getDelayedProgress(rawProgress, 0.32));
+  if (profile.totalMode === "delayed-shrink") {
+    const delayedProgress = getEasedDelayedProgress(rawProgress, profile.totalDelay);
     return Math.max(lerpNumber(safeFromTotal, safeToTotal, delayedProgress), 1);
-  }
-
-  if (safeToTotal > safeFromTotal * 1.35) {
-    return Math.max(safeToTotal, 1);
   }
 
   return Math.max(mixedItemsTotal, 1);
@@ -224,7 +298,7 @@ function buildAnalyticsRingGradient(items, total) {
   return `conic-gradient(${gradientParts.join(", ")})`;
 }
 
-function mergeRingItemsForAnimation(fromItems, toItems, progress) {
+function mergeRingItemsForAnimation(fromItems, toItems, rawProgress, profile) {
   const byCategory = new Map();
   const orderedCategoryIds = [];
 
@@ -266,11 +340,24 @@ function mergeRingItemsForAnimation(fromItems, toItems, progress) {
     .map((categoryId) => {
       const item = byCategory.get(categoryId);
 
+      const isLeaving = item.fromAmount > 0 && item.toAmount <= 0;
+      const isEntering = item.fromAmount <= 0 && item.toAmount > 0;
+
+      let itemProgress;
+
+      if (isLeaving) {
+        itemProgress = getEasedDelayedProgress(rawProgress, profile.exitDelay);
+      } else if (isEntering) {
+        itemProgress = getEasedDelayedProgress(rawProgress, profile.enterDelay);
+      } else {
+        itemProgress = getEasedDelayedProgress(rawProgress, profile.sharedDelay);
+      }
+
       return {
         categoryId: item.categoryId,
         name: item.name,
         color: item.color,
-        amount: lerpNumber(item.fromAmount, item.toAmount, progress),
+        amount: lerpNumber(item.fromAmount, item.toAmount, itemProgress),
       };
     })
     .filter((item) => item.amount > 0.01);
@@ -430,10 +517,7 @@ function animatePercentValue(element, from, to) {
   const shouldAnimate = options.animate === true;
   const nextTopPercent = getTopPercentFromItems(items, total);
   const nextTopItem = items[0];
-
-  if (centerLabelEl) {
-    centerLabelEl.textContent = nextTopItem ? nextTopItem.name : "Нет расходов";
-  }
+const nextCenterLabel = nextTopItem ? nextTopItem.name : "Нет расходов";
 
   if (!shouldAnimate || !previousRingItems) {
     const gradient = buildAnalyticsRingGradient(items, total);
@@ -444,6 +528,9 @@ function animatePercentValue(element, from, to) {
     if (centerValueEl) {
       centerValueEl.textContent = `${nextTopPercent}%`;
     }
+    if (centerLabelEl) {
+  centerLabelEl.textContent = nextCenterLabel;
+}
 
     previousRingItems = items.map((item) => ({ ...item }));
     previousRingTotal = total;
@@ -464,22 +551,22 @@ function animatePercentValue(element, from, to) {
   const toItems = items.map((item) => ({ ...item }));
   const toTotal = total;
 
-  const duration = 1040;
-  const startTime = performance.now();
+  const profile = getRingTransitionProfile(fromItems, toItems, fromTotal, toTotal);
+const duration = profile.duration;
+const startTime = performance.now();
 
   animatePercentValue(centerValueEl, fromTopPercent, nextTopPercent);
 
   function tick(now) {
     const rawProgress = Math.min((now - startTime) / duration, 1);
-    const progress = easeOutCubic(rawProgress);
-
-    const mixedItems = mergeRingItemsForAnimation(fromItems, toItems, progress);
+    const mixedItems = mergeRingItemsForAnimation(fromItems, toItems, rawProgress, profile);
 const mixedItemsTotal = getRingItemsTotal(mixedItems);
 const mixedTotal = getAnimatedRingTotal(
   fromTotal,
   toTotal,
   mixedItemsTotal,
-  rawProgress
+  rawProgress,
+  profile
 );
 
 const gradient = buildAnalyticsRingGradient(mixedItems, mixedTotal);
@@ -500,7 +587,10 @@ const gradient = buildAnalyticsRingGradient(mixedItems, mixedTotal);
     if (centerValueEl) {
       centerValueEl.textContent = `${nextTopPercent}%`;
     }
-
+    
+    if (centerLabelEl) {
+  centerLabelEl.textContent = nextCenterLabel;
+}
     previousRingItems = toItems;
     previousRingTotal = toTotal;
     previousTopPercent = nextTopPercent;
