@@ -70,37 +70,84 @@
     return new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
   }
 
-  function filterTransactionsByPeriod(items, period, selectedMonth, rangeStart, rangeEnd) {
-    const todayKey = getTodayDateValue();
-    const currentMonth = selectedMonth || getCurrentMonthValue();
-    const startOfToday = getStartOfTodayTime();
+  function getTransactionDateKey(item) {
+  const rawValue = item.date || item.created_at || item.createdAt;
 
-    return items.filter((item) => {
-      if (!item.created_at) return false;
+  if (!rawValue) return "";
 
-      const dateKey = String(item.created_at).slice(0, 10);
-      const time = new Date(item.created_at).getTime();
+  const rawText = String(rawValue);
 
-      if (period === "month") {
-        return dateKey.slice(0, 7) === currentMonth;
-      }
-
-      if (period === "today") {
-        return dateKey === todayKey;
-      }
-
-      if (period === "7") {
-        return time >= startOfToday - 6 * 24 * 60 * 60 * 1000;
-      }
-
-      if (period === "range") {
-        if (!rangeStart || !rangeEnd) return true;
-        return dateKey >= rangeStart && dateKey <= rangeEnd;
-      }
-
-      return true;
-    });
+  if (/^\d{4}-\d{2}-\d{2}$/.test(rawText)) {
+    return rawText;
   }
+
+  const parsedDate = new Date(rawText);
+
+  if (!Number.isNaN(parsedDate.getTime())) {
+    return getDateOnlyString(parsedDate);
+  }
+
+  return rawText.slice(0, 10);
+}
+
+function getTransactionTime(item) {
+  const dateKey = getTransactionDateKey(item);
+
+  if (!dateKey) return 0;
+
+  const rawValue = item.date || item.created_at || item.createdAt;
+  const rawText = String(rawValue || "");
+
+  if (/^\d{4}-\d{2}-\d{2}$/.test(rawText)) {
+    const [year, month, day] = dateKey.split("-").map(Number);
+    return new Date(year, month - 1, day).getTime();
+  }
+
+  const parsedDate = new Date(rawText);
+
+  if (!Number.isNaN(parsedDate.getTime())) {
+    return parsedDate.getTime();
+  }
+
+  const [year, month, day] = dateKey.split("-").map(Number);
+
+  if (!year || !month || !day) return 0;
+
+  return new Date(year, month - 1, day).getTime();
+}
+
+function filterTransactionsByPeriod(items, period, selectedMonth, rangeStart, rangeEnd) {
+  const todayKey = getTodayDateValue();
+  const currentMonth = selectedMonth || getCurrentMonthValue();
+  const startOfToday = getStartOfTodayTime();
+
+  return items.filter((item) => {
+    const dateKey = getTransactionDateKey(item);
+
+    if (!dateKey) return false;
+
+    const time = getTransactionTime(item);
+
+    if (period === "month") {
+      return dateKey.slice(0, 7) === currentMonth;
+    }
+
+    if (period === "today") {
+      return dateKey === todayKey;
+    }
+
+    if (period === "7") {
+      return time >= startOfToday - 6 * 24 * 60 * 60 * 1000;
+    }
+
+    if (period === "range") {
+      if (!rangeStart || !rangeEnd) return true;
+      return dateKey >= rangeStart && dateKey <= rangeEnd;
+    }
+
+    return true;
+  });
+}
 
   function getCurrentTime() {
     const now = new Date();
