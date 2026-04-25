@@ -1093,3 +1093,256 @@
 .analytics-range-calendar {
   display: none !important;
 }
+
+/* =========================================================
+   Analytics Range Ribbon — compact wallet style
+   ========================================================= */
+
+.analytics-range-dock.analytics-range-ribbon {
+  margin: 6px 0 16px;
+  padding: 10px;
+  border-radius: 24px;
+  background:
+    linear-gradient(180deg, rgba(28, 33, 45, 0.78) 0%, rgba(15, 18, 27, 0.92) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.055);
+  box-shadow:
+    0 14px 30px rgba(0, 0, 0, 0.24),
+    inset 0 1px 0 rgba(255, 255, 255, 0.035);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.analytics-range-ribbon.hidden {
+  display: none;
+}
+
+.analytics-range-ribbon__top,
+.analytics-range-ribbon__kicker,
+.analytics-range-ribbon__title,
+.analytics-range-ribbon__summary,
+.analytics-range-ribbon__arrow,
+.analytics-range-ribbon__date,
+.analytics-range-ribbon__apply {
+  display: none !important;
+}
+
+.analytics-range-ribbon__compact-head {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.analytics-range-ribbon__reset {
+  height: 34px;
+  padding: 0 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.055);
+  background:
+    linear-gradient(180deg, rgba(40, 45, 58, 0.78) 0%, rgba(22, 25, 35, 0.92) 100%);
+  color: rgba(248, 250, 255, 0.72);
+  font-size: 12px;
+  line-height: 1;
+  font-weight: 860;
+  letter-spacing: -0.035em;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.035);
+}
+
+.analytics-range-ribbon__selected {
+  min-width: 0;
+  height: 34px;
+  padding: 0 14px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(111, 156, 255, 0.12), transparent 48%),
+    linear-gradient(180deg, rgba(35, 41, 56, 0.78) 0%, rgba(20, 24, 35, 0.92) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.055);
+  color: rgba(248, 250, 255, 0.88);
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: -0.045em;
+  white-space: nowrap;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.035);
+}
+
+.analytics-range-ribbon__months {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  margin: 0 -10px 8px;
+  padding: 0 10px 2px;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x proximity;
+}
+
+.analytics-range-ribbon__months::-webkit-scrollbar {
+  display: none;
+}
+
+.analytics-range-ribbon-month {
+  height: 30px;
+  min-width: 54px;
+  padding: 0 12px;
+  border: 1px solid rgba(255, 255, 255, 0.045);
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg, rgba(36, 41, 54, 0.66) 0%, rgba(19, 23, 32, 0.86) 100%);
+  color: rgba(255, 255, 255, 0.44);
+  font-size: 12px;
+  line-height: 1;
+  font-weight: 850;
+  letter-spacing: -0.04em;
+  scroll-snap-align: center;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.026);
+}
+
+.analytics-range-ribbon-month.is-active {
+  color: rgba(248, 251, 255, 0.94);
+  border-color: rgba(111, 156, 255, 0.22);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.12), transparent 48%),
+    linear-gradient(180deg, rgba(67, 89, 142, 0.72) 0%, rgba(34, 45, 79, 0.9) 100%);
+  box-shadow:
+    0 0 16px rgba(111, 156, 255, 0.11),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.analytics-range-ribbon__days {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  margin: 0 -10px;
+  padding: 0 10px 2px;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x proximity;
+}
+
+.analytics-range-ribbon__days::-webkit-scrollbar {
+  display: none;
+}
+
+.analytics-range-ribbon-day {
+  width: 38px;
+  min-width: 38px;
+  height: 38px;
+  border-radius: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.045);
+  background:
+    linear-gradient(180deg, rgba(36, 41, 54, 0.70) 0%, rgba(19, 23, 32, 0.90) 100%);
+  color: rgba(255, 255, 255, 0.58);
+  font-size: 15px;
+  line-height: 1;
+  font-weight: 900;
+  letter-spacing: -0.045em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  scroll-snap-align: center;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.028);
+}
+
+.analytics-range-ribbon-day:active,
+.analytics-range-ribbon-month:active,
+.analytics-range-ribbon__reset:active {
+  transform: scale(0.96);
+}
+
+.analytics-range-ribbon-day.is-between {
+  color: rgba(248, 251, 255, 0.82);
+  border-color: rgba(111, 156, 255, 0.10);
+  background:
+    linear-gradient(180deg, rgba(72, 98, 158, 0.42) 0%, rgba(38, 52, 88, 0.66) 100%);
+}
+
+.analytics-range-ribbon-day.is-start,
+.analytics-range-ribbon-day.is-end {
+  color: #f8fbff;
+  border-color: rgba(111, 156, 255, 0.30);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.16), transparent 48%),
+    linear-gradient(180deg, rgba(97, 143, 238, 0.88) 0%, rgba(57, 78, 132, 0.96) 100%);
+  box-shadow:
+    0 0 16px rgba(111, 156, 255, 0.17),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07);
+}
+
+.analytics-range-ribbon-day.is-today:not(.is-start):not(.is-end) {
+  border-color: rgba(0, 229, 204, 0.22);
+  color: rgba(255, 255, 255, 0.88);
+}
+
+/* Анимации: туда и обратно один принцип */
+.analytics-expenses-month-strip.is-range-leaving {
+  animation: analyticsStripDropOut 0.34s cubic-bezier(0.2, 0.9, 0.18, 1) forwards;
+  pointer-events: none;
+}
+
+.analytics-expenses-month-strip.is-range-returning {
+  animation: analyticsStripDropIn 0.42s cubic-bezier(0.18, 1.15, 0.24, 1) both;
+}
+
+.analytics-expenses-month-strip.is-hidden-for-range {
+  display: none;
+}
+
+.analytics-range-ribbon.is-entering {
+  animation: analyticsStripDropIn 0.42s cubic-bezier(0.18, 1.15, 0.24, 1) both;
+}
+
+.analytics-range-ribbon.is-exiting {
+  animation: analyticsStripDropOut 0.34s cubic-bezier(0.2, 0.9, 0.18, 1) forwards;
+  pointer-events: none;
+}
+
+@keyframes analyticsStripDropOut {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  34% {
+    opacity: 1;
+    transform: translateY(-7px) scale(1.012);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(22px) scale(0.972);
+  }
+}
+
+@keyframes analyticsStripDropIn {
+  0% {
+    opacity: 0;
+    transform: translateY(22px) scale(0.972);
+  }
+
+  58% {
+    opacity: 1;
+    transform: translateY(-7px) scale(1.012);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Старую календарную сетку душим окончательно */
+.analytics-range-calendar {
+  display: none !important;
+}
