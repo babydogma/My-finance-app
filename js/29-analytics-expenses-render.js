@@ -46,30 +46,30 @@ let moneyAnimationFrameId = null;
 let percentAnimationFrameId = null;
 
     const ANALYTICS_EXPENSE_COLORS = [
-  "#4DA3FF", // bright blue
-  "#FF4D5E", // coral red
-  "#8DFF4A", // acid green
-  "#FFD45A", // warm yellow
-  "#B26BFF", // violet
-  "#35E6D3", // turquoise
-  "#FF8A3D", // orange
-  "#F45BBD", // pink
-  "#E9F2FF", // ice white
-  "#5C7CFF", // electric indigo
-  "#B8FF3D", // lime
-  "#FF6B9A", // rose
-  "#42C8FF", // sky cyan
-  "#FFB13D", // amber
-  "#D66BFF", // purple neon
-  "#52F28A", // mint green
-  "#FF3D9A", // neon magenta
-  "#7DE3FF", // light aqua
-  "#FFE66D", // soft gold
-  "#A78BFA", // lavender
-  "#34D399", // emerald
-  "#FB7185", // salmon
-  "#93C5FD", // pale blue
-  "#FDE68A", // pale yellow
+  "#D94A38", // brick red
+  "#49A958", // calm green
+  "#F0A21A", // amber
+  "#4F7FD9", // muted blue
+  "#8C68D8", // soft violet
+  "#2FAE9E", // deep teal
+  "#D87A1F", // burnt orange
+  "#C85C8E", // dusty pink
+  "#5E6472", // graphite
+  "#7AA95C", // olive green
+  "#B9892E", // warm bronze
+  "#5B8FB9", // steel blue
+  "#A35FA3", // muted purple
+  "#D1635C", // clay coral
+  "#4E9A82", // sea green
+  "#B56B3A", // copper
+  "#8D7A5A", // muted sand
+  "#6E7FA8", // slate blue
+  "#A56B75", // dusty rose
+  "#72946C", // moss
+  "#9B7357", // taupe brown
+  "#6C8D99", // blue gray
+  "#9A7BBE", // lavender gray
+  "#B8A05A", // muted gold
 ];
 
     function getPrimaryExpenseValueEl() {
