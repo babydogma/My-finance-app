@@ -1,5 +1,5 @@
 (() => {
-  const MODAL_ANIMATION_MS = 420;
+  const MODAL_ANIMATION_MS = 440;
   const modalCloseTimers = new WeakMap();
 
   function openAnimatedModal(modalEl) {
@@ -12,13 +12,18 @@
       modalCloseTimers.delete(modalEl);
     }
 
-    modalEl.classList.remove("hidden", "is-closing");
+    document.body.style.overflow = "hidden";
 
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        modalEl.classList.add("is-visible");
-      });
-    });
+    modalEl.classList.remove("hidden", "is-visible", "is-closing");
+
+    /*
+      Важно: принудительный reflow.
+      Без этого Safari иногда склеивает hidden -> visible
+      и анимация ощущается как мгновенное появление.
+    */
+    void modalEl.offsetHeight;
+
+    modalEl.classList.add("is-visible");
   }
 
   function closeAnimatedModal(modalEl, options = {}) {
