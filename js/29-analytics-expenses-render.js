@@ -539,7 +539,6 @@ function animatePercentValue(element, from, to) {
   const nextTopPercent = getTopPercentFromItems(items, total);
   const nextTopItem = items[0];
 const nextCenterLabel = nextTopItem ? nextTopItem.name : "Нет расходов";
-syncAnalyticsRingReactorVars(ringEl, items, total);
 
   if (!shouldAnimate || !previousRingItems) {
     const gradient = buildAnalyticsRingGradient(items, total);
