@@ -191,6 +191,8 @@ const analyticsRangeCalendarNextBtn = document.getElementById("analyticsRangeCal
 const analyticsRangeDockCloseBtn = document.getElementById("analyticsRangeDockCloseBtn");
 const analyticsRangeDockResetBtn = document.getElementById("analyticsRangeDockResetBtn");
 const analyticsRangeDockApplyBtn = document.getElementById("analyticsRangeDockApplyBtn");
+const analyticsRangeDaysStrip = document.getElementById("analyticsRangeDaysStrip");
+const analyticsRailRangeBtn = document.getElementById("analyticsRailRangeBtn");
 
   const {
     bindMoneyInput,
@@ -849,6 +851,378 @@ let justCreatedTransactionId = null;
     renderAnalyticsExpensesByCategory,
     renderAnalyticsSafes,
   });
+  
+  /* =========================================================
+   Analytics Range Ribbon
+   ========================================================= */
+
+const ANALYTICS_RANGE_RIBBON_ANIMATION_MS = 360;
+
+function getDateFromValue(value) {
+  const match = String(value || "").match(/^(\d{4})-(\d{2})-(\d{2})$/);
+
+  if (!match) {
+    return new Date();
+  }
+
+  return new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+}
+
+function getValueFromDate(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
+
+function addDays(date, days) {
+  const nextDate = new Date(date);
+  nextDate.setDate(nextDate.getDate() + days);
+  return nextDate;
+}
+
+function getRangeShortDateLabel(value) {
+  const date = getDateFromValue(value);
+
+  return date
+    .toLocaleDateString("ru-RU", {
+      day: "numeric",
+      month: "short",
+    })
+    .replace(".", "");
+}
+
+function getRangeMonthTitle(value) {
+  const date = getDateFromValue(value);
+
+  return date.toLocaleDateString("ru-RU", {
+    month: "long",
+    year: "numeric",
+  });
+}
+
+function isDateValueBetween(value, startValue, endValue) {
+  const time = getDateFromValue(value).getTime();
+  const startTime = getDateFromValue(startValue).getTime();
+  const endTime = getDateFromValue(endValue).getTime();
+
+  return time >= startTime && time <= endTime;
+}
+
+function normalizeAnalyticsRangeDraft() {
+  const today = getTodayDateValue();
+
+  analyticsRangeDraftStart = analyticsRangeStart || today;
+  analyticsRangeDraftEnd = analyticsRangeEnd || analyticsRangeDraftStart;
+
+  if (
+    getDateFromValue(analyticsRangeDraftStart).getTime() >
+    getDateFromValue(analyticsRangeDraftEnd).getTime()
+  ) {
+    const temp = analyticsRangeDraftStart;
+    analyticsRangeDraftStart = analyticsRangeDraftEnd;
+    analyticsRangeDraftEnd = temp;
+  }
+}
+
+function setAnalyticsRangeRibbonActiveSide(side) {
+  analyticsRangeEditingSide = side;
+
+  analyticsRangeStartBtn?.classList.toggle("is-active", side === "start");
+  analyticsRangeEndBtn?.classList.toggle("is-active", side === "end");
+}
+
+function getAnalyticsRangeRibbonDates() {
+  const selectedMonthDate = (() => {
+    const match = String(analyticsSelectedMonth || getCurrentMonthValue()).match(/^(\d{4})-(\d{2})$/);
+
+    if (!match) {
+      return new Date();
+    }
+
+    return new Date(Number(match[1]), Number(match[2]) - 1, 1);
+  })();
+
+  const monthStart = new Date(
+    selectedMonthDate.getFullYear(),
+    selectedMonthDate.getMonth(),
+    1
+  );
+
+  const monthEnd = new Date(
+    selectedMonthDate.getFullYear(),
+    selectedMonthDate.getMonth() + 1,
+    0
+  );
+
+  const draftStart = getDateFromValue(analyticsRangeDraftStart);
+  const draftEnd = getDateFromValue(analyticsRangeDraftEnd);
+
+  const startLimit = addDays(
+    new Date(Math.min(monthStart.getTime(), draftStart.getTime())),
+    -8
+  );
+
+  const endLimit = addDays(
+    new Date(Math.max(monthEnd.getTime(), draftEnd.getTime())),
+    12
+  );
+
+  const dates = [];
+  let cursor = new Date(startLimit);
+
+  while (cursor.getTime() <= endLimit.getTime()) {
+    dates.push(new Date(cursor));
+    cursor = addDays(cursor, 1);
+  }
+
+  return dates;
+}
+
+function renderAnalyticsRangeRibbon() {
+  if (!analyticsRangeDock || !analyticsRangeDaysStrip) return;
+
+  normalizeAnalyticsRangeDraft();
+
+  if (analyticsRangeDockTitle) {
+    analyticsRangeDockTitle.textContent = getRangeMonthTitle(analyticsRangeDraftStart);
+  }
+
+  if (analyticsRangeDockStartLabel) {
+    analyticsRangeDockStartLabel.textContent = getRangeShortDateLabel(analyticsRangeDraftStart);
+  }
+
+  if (analyticsRangeDockEndLabel) {
+    analyticsRangeDockEndLabel.textContent = getRangeShortDateLabel(analyticsRangeDraftEnd);
+  }
+
+  analyticsRangeDaysStrip.innerHTML = "";
+
+  const todayValue = getTodayDateValue();
+  const dates = getAnalyticsRangeRibbonDates();
+
+  dates.forEach((date) => {
+    const value = getValueFromDate(date);
+    const button = document.createElement("button");
+
+    const isStart = value === analyticsRangeDraftStart;
+    const isEnd = value === analyticsRangeDraftEnd;
+    const isBetween = isDateValueBetween(
+      value,
+      analyticsRangeDraftStart,
+      analyticsRangeDraftEnd
+    );
+
+    button.type = "button";
+    button.className = [
+      "analytics-range-ribbon-day",
+      isStart ? "is-start" : "",
+      isEnd ? "is-end" : "",
+      isBetween && !isStart && !isEnd ? "is-between" : "",
+      value === todayValue ? "is-today" : "",
+    ].filter(Boolean).join(" ");
+
+    button.dataset.dateValue = value;
+
+    button.innerHTML = `
+      <span>${date.toLocaleDateString("ru-RU", { weekday: "short" }).replace(".", "")}</span>
+      <strong>${date.getDate()}</strong>
+    `;
+
+    button.addEventListener("click", () => {
+      if (analyticsRangeEditingSide === "start") {
+        analyticsRangeDraftStart = value;
+
+        if (
+          getDateFromValue(analyticsRangeDraftStart).getTime() >
+          getDateFromValue(analyticsRangeDraftEnd).getTime()
+        ) {
+          analyticsRangeDraftEnd = value;
+        }
+
+        setAnalyticsRangeRibbonActiveSide("end");
+      } else {
+        analyticsRangeDraftEnd = value;
+
+        if (
+          getDateFromValue(analyticsRangeDraftEnd).getTime() <
+          getDateFromValue(analyticsRangeDraftStart).getTime()
+        ) {
+          analyticsRangeDraftStart = value;
+        }
+
+        setAnalyticsRangeRibbonActiveSide("start");
+      }
+
+      analyticsRangeStart = analyticsRangeDraftStart;
+      analyticsRangeEnd = analyticsRangeDraftEnd;
+      analyticsFilterPeriod = "range";
+
+      renderAnalyticsRangeRibbon();
+      renderAnalytics();
+    });
+
+    analyticsRangeDaysStrip.appendChild(button);
+  });
+
+  requestAnimationFrame(() => {
+    const activeDay = analyticsRangeDaysStrip.querySelector(".is-start");
+
+    activeDay?.scrollIntoView({
+      behavior: "smooth",
+      block: "nearest",
+      inline: "center",
+    });
+  });
+}
+
+function setAnalyticsRangeRailActive(isActive) {
+  document.querySelectorAll(".analytics-period-rail__btn").forEach((button) => {
+    button.classList.remove("is-active");
+  });
+
+  analyticsRailRangeBtn?.classList.toggle("is-active", isActive);
+}
+
+function openAnalyticsRangeRibbon() {
+  if (!analyticsRangeDock || !analyticsExpensesMonthStrip) return;
+
+  closeAnalyticsMonthWheel?.();
+
+  analyticsFilterPeriod = "range";
+  normalizeAnalyticsRangeDraft();
+
+  analyticsRangeStart = analyticsRangeDraftStart;
+  analyticsRangeEnd = analyticsRangeDraftEnd;
+
+  setAnalyticsRangeRailActive(true);
+  setAnalyticsRangeRibbonActiveSide("start");
+  renderAnalyticsRangeRibbon();
+
+  analyticsRangeDock.classList.remove("hidden", "is-exiting", "is-entering");
+  analyticsRangeDock.style.display = "none";
+
+  analyticsExpensesMonthStrip.classList.remove(
+    "is-range-returning",
+    "is-hidden-for-range"
+  );
+
+  analyticsExpensesMonthStrip.classList.add("is-range-leaving");
+
+  setTimeout(() => {
+    analyticsExpensesMonthStrip.classList.add("is-hidden-for-range");
+    analyticsExpensesMonthStrip.classList.remove("is-range-leaving");
+
+    analyticsRangeDock.style.display = "";
+    analyticsRangeDock.classList.add("is-entering");
+  }, ANALYTICS_RANGE_RIBBON_ANIMATION_MS);
+
+  renderAnalytics();
+}
+
+function resetAnalyticsRangeRibbon() {
+  analyticsRangeStart = "";
+  analyticsRangeEnd = "";
+  analyticsRangeDraftStart = "";
+  analyticsRangeDraftEnd = "";
+  analyticsFilterPeriod = "month";
+
+  setAnalyticsRangeRailActive(false);
+
+  if (!analyticsRangeDock || !analyticsExpensesMonthStrip) {
+    renderAnalytics();
+    return;
+  }
+
+  analyticsRangeDock.classList.remove("is-entering");
+  analyticsRangeDock.classList.add("is-exiting");
+
+  setTimeout(() => {
+    analyticsRangeDock.classList.add("hidden");
+    analyticsRangeDock.classList.remove("is-exiting");
+
+    analyticsExpensesMonthStrip.classList.remove("is-hidden-for-range");
+    analyticsExpensesMonthStrip.classList.add("is-range-returning");
+
+    setTimeout(() => {
+      analyticsExpensesMonthStrip.classList.remove("is-range-returning");
+    }, ANALYTICS_RANGE_RIBBON_ANIMATION_MS + 120);
+
+    renderAnalytics();
+  }, 300);
+}
+
+function applyAnalyticsRangeRibbon() {
+  normalizeAnalyticsRangeDraft();
+
+  analyticsRangeStart = analyticsRangeDraftStart;
+  analyticsRangeEnd = analyticsRangeDraftEnd;
+  analyticsFilterPeriod = "range";
+
+  setAnalyticsRangeRailActive(true);
+  renderAnalyticsRangeRibbon();
+  renderAnalytics();
+}
+
+analyticsRailRangeBtn?.addEventListener("click", (event) => {
+  event.preventDefault();
+  event.stopImmediatePropagation();
+
+  openAnalyticsRangeRibbon();
+}, true);
+
+analyticsRangeStartBtn?.addEventListener("click", (event) => {
+  event.preventDefault();
+  event.stopImmediatePropagation();
+
+  setAnalyticsRangeRibbonActiveSide("start");
+  renderAnalyticsRangeRibbon();
+}, true);
+
+analyticsRangeEndBtn?.addEventListener("click", (event) => {
+  event.preventDefault();
+  event.stopImmediatePropagation();
+
+  setAnalyticsRangeRibbonActiveSide("end");
+  renderAnalyticsRangeRibbon();
+}, true);
+
+analyticsRangeDockResetBtn?.addEventListener("click", (event) => {
+  event.preventDefault();
+  event.stopImmediatePropagation();
+
+  resetAnalyticsRangeRibbon();
+}, true);
+
+analyticsRangeDockCloseBtn?.addEventListener("click", (event) => {
+  event.preventDefault();
+  event.stopImmediatePropagation();
+
+  resetAnalyticsRangeRibbon();
+}, true);
+
+analyticsRangeDockApplyBtn?.addEventListener("click", (event) => {
+  event.preventDefault();
+  event.stopImmediatePropagation();
+
+  applyAnalyticsRangeRibbon();
+}, true);
+
+analyticsPeriodButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    if (button.dataset.analyticsPeriod !== "range") {
+      analyticsRangeDock?.classList.add("hidden");
+      analyticsRangeDock?.classList.remove("is-entering", "is-exiting");
+      analyticsExpensesMonthStrip?.classList.remove(
+        "is-hidden-for-range",
+        "is-range-leaving",
+        "is-range-returning"
+      );
+      setAnalyticsRangeRailActive(false);
+    }
+  }, true);
+});
 
   const {
     setActiveNav,
