@@ -46,30 +46,30 @@ let moneyAnimationFrameId = null;
 let percentAnimationFrameId = null;
 
     const ANALYTICS_EXPENSE_COLORS = [
-  "#D94A38", // brick red
-  "#49A958", // calm green
-  "#F0A21A", // amber
-  "#4F7FD9", // muted blue
-  "#8C68D8", // soft violet
-  "#2FAE9E", // deep teal
-  "#D87A1F", // burnt orange
-  "#C85C8E", // dusty pink
-  "#5E6472", // graphite
-  "#7AA95C", // olive green
-  "#B9892E", // warm bronze
-  "#5B8FB9", // steel blue
-  "#A35FA3", // muted purple
-  "#D1635C", // clay coral
-  "#4E9A82", // sea green
-  "#B56B3A", // copper
-  "#8D7A5A", // muted sand
-  "#6E7FA8", // slate blue
-  "#A56B75", // dusty rose
-  "#72946C", // moss
-  "#9B7357", // taupe brown
-  "#6C8D99", // blue gray
-  "#9A7BBE", // lavender gray
-  "#B8A05A", // muted gold
+  "#D85C52", // soft coral
+  "#4FA864", // calm green
+  "#5B8BE8", // clean blue
+  "#F2B84B", // soft amber
+  "#8A6FD6", // violet
+  "#3FA89F", // teal
+  "#D9833F", // warm orange
+  "#C76C95", // dusty pink
+  "#6F7A8C", // slate gray
+  "#86B75F", // soft olive
+  "#5FA7C8", // muted cyan
+  "#A979C9", // lavender
+  "#4E9B82", // sea green
+  "#D06E68", // clay red
+  "#6D8FC7", // steel blue
+  "#B76FA4", // muted magenta
+  "#7B8FA6", // blue gray
+  "#67A889", // eucalyptus
+  "#C9905A", // soft caramel
+  "#8B7FD1", // soft indigo
+  "#5C9CA8", // deep aqua
+  "#A86E7E", // dusty rose
+  "#7DAA78", // muted green
+  "#B79A63", // clean muted gold
 ];
 
     function getPrimaryExpenseValueEl() {
@@ -258,6 +258,24 @@ function getTopPercentFromItems(items, total) {
   if (!topItem) return 0;
 
   return Math.round((topItem.amount / total) * 100);
+}
+
+function syncAnalyticsRingReactorVars(ringEl, items, total) {
+  if (!ringEl) return;
+
+  const topItem = items[0];
+  const isEmpty = !total || total <= 0 || !items.length;
+  const topColor = topItem ? topItem.color : "#5B8BE8";
+  const topPercent = getTopPercentFromItems(items, total);
+  const density = Math.min(items.length, 10) / 10;
+
+  const intensity = isEmpty
+    ? 0
+    : Math.min(1, 0.34 + density * 0.28 + (topPercent / 100) * 0.22);
+
+  ringEl.style.setProperty("--analytics-top-color", topColor);
+  ringEl.style.setProperty("--analytics-reactor-intensity", intensity.toFixed(2));
+  ringEl.classList.toggle("is-empty", isEmpty);
 }
 
 function getRingItemsTotal(items) {
@@ -539,6 +557,7 @@ function animatePercentValue(element, from, to) {
   const nextTopPercent = getTopPercentFromItems(items, total);
   const nextTopItem = items[0];
 const nextCenterLabel = nextTopItem ? nextTopItem.name : "Нет расходов";
+syncAnalyticsRingReactorVars(ringEl, items, total);
 
   if (!shouldAnimate || !previousRingItems) {
     const gradient = buildAnalyticsRingGradient(items, total);
