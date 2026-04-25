@@ -134,18 +134,6 @@ let percentAnimationFrameId = null;
       ];
     }
     
-    function getAnalyticsExpenseCategoryOrderIndex(categoryId) {
-  const categoryIds = state.categories.map((category) => category.id);
-  const allCategoryIds = Array.from(new Set([...categoryIds, UNCATEGORIZED_ID]));
-  const index = allCategoryIds.indexOf(categoryId);
-
-  if (index >= 0) {
-    return index;
-  }
-
-  return allCategoryIds.length + getAnalyticsColorHash(categoryId);
-}
-    
     function easeOutCubic(progress) {
   return progress < 0.5
     ? 4 * progress * progress * progress
@@ -369,9 +357,6 @@ function mergeRingItemsForAnimation(fromItems, toItems, rawProgress, profile) {
   });
 
   return orderedCategoryIds
-  .sort((a, b) => {
-    return getAnalyticsExpenseCategoryOrderIndex(a) - getAnalyticsExpenseCategoryOrderIndex(b);
-  })
   .map((categoryId) => {
       const item = byCategory.get(categoryId);
 
@@ -515,8 +500,7 @@ function animatePercentValue(element, from, to) {
       });
     }
 
-    function getAnalyticsExpenseItems(expenseTransactions, options = {}) {
-  const sortMode = options.sortMode || "amount";
+    function getAnalyticsExpenseItems(expenseTransactions) {
   const byCategory = new Map();
 
   expenseTransactions.forEach((transaction) => {
@@ -528,29 +512,19 @@ function animatePercentValue(element, from, to) {
       name: getCategoryName(categoryId),
       amount: 0,
       color: getAnalyticsExpenseColor(categoryId),
-      orderIndex: getAnalyticsExpenseCategoryOrderIndex(categoryId),
     };
 
     current.amount += amount;
     byCategory.set(categoryId, current);
   });
 
-  const items = Array.from(byCategory.values())
+  return Array.from(byCategory.values())
     .map((item) => ({
       ...item,
       amount: roundToTwo(item.amount),
     }))
-    .filter((item) => item.amount > 0);
-
-  if (sortMode === "stable") {
-    return items.sort((a, b) => {
-      return a.orderIndex - b.orderIndex;
-    });
-  }
-
-  return items.sort((a, b) => {
-    return b.amount - a.amount;
-  });
+    .filter((item) => item.amount > 0)
+    .sort((a, b) => b.amount - a.amount);
 }
 
     function renderAnalyticsExpensesRing(items, total, options = {}) {
@@ -563,25 +537,34 @@ function animatePercentValue(element, from, to) {
   const shouldAnimate = options.animate === true;
   const nextTopPercent = getTopPercentFromItems(items, total);
   const nextTopItem = items[0];
-const nextCenterLabel = nextTopItem ? nextTopItem.name : "Нет расходов";
+  const nextCenterLabel = nextTopItem ? nextTopItem.name : "Нет расходов";
 
-  if (!shouldAnimate || !previousRingItems) {
-    const gradient = buildAnalyticsRingGradient(items, total);
+  function setRingGradient(nextItems, nextTotal) {
+    const gradient = buildAnalyticsRingGradient(nextItems, nextTotal);
 
     ringEl.style.background = gradient;
     ringEl.style.setProperty("--analytics-ring-gradient", gradient);
+  }
+
+  function setFinalRingState(nextItems, nextTotal, nextPercent, nextLabel) {
+    setRingGradient(nextItems, nextTotal);
 
     if (centerValueEl) {
-      centerValueEl.textContent = `${nextTopPercent}%`;
+      centerValueEl.textContent = `${nextPercent}%`;
     }
+
     if (centerLabelEl) {
-  centerLabelEl.textContent = nextCenterLabel;
-}
+      centerLabelEl.textContent = nextLabel;
+    }
 
-    previousRingItems = items.map((item) => ({ ...item }));
-    previousRingTotal = total;
-    previousTopPercent = nextTopPercent;
+    previousRingItems = nextItems.map((item) => ({ ...item }));
+    previousRingTotal = nextTotal;
+    previousTopPercent = nextPercent;
+    ringAnimationFrameId = null;
+  }
 
+  if (!shouldAnimate || !previousRingItems) {
+    setFinalRingState(items, total, nextTopPercent, nextCenterLabel);
     return;
   }
 
@@ -597,53 +580,94 @@ const nextCenterLabel = nextTopItem ? nextTopItem.name : "Нет расходо�
   const toItems = items.map((item) => ({ ...item }));
   const toTotal = total;
 
-  const profile = getRingTransitionProfile(fromItems, toItems, fromTotal, toTotal);
-const duration = profile.duration;
-const startTime = performance.now();
+  function animateRingPhase({
+    phaseFromItems,
+    phaseToItems,
+    phaseFromTotal,
+    phaseToTotal,
+    duration,
+    onDone,
+  }) {
+    const profile = getRingTransitionProfile(
+      phaseFromItems,
+      phaseToItems,
+      phaseFromTotal,
+      phaseToTotal
+    );
 
-  animatePercentValue(centerValueEl, fromTopPercent, nextTopPercent);
+    const startTime = performance.now();
 
-  function tick(now) {
-    const rawProgress = Math.min((now - startTime) / duration, 1);
-    const mixedItems = mergeRingItemsForAnimation(fromItems, toItems, rawProgress, profile);
-const mixedItemsTotal = getRingItemsTotal(mixedItems);
-const mixedTotal = getAnimatedRingTotal(
-  fromTotal,
-  toTotal,
-  mixedItemsTotal,
-  rawProgress,
-  profile
-);
+    function tick(now) {
+      const rawProgress = Math.min((now - startTime) / duration, 1);
 
-const gradient = buildAnalyticsRingGradient(mixedItems, mixedTotal);
+      const mixedItems = mergeRingItemsForAnimation(
+        phaseFromItems,
+        phaseToItems,
+        rawProgress,
+        profile
+      );
 
-    ringEl.style.background = gradient;
-    ringEl.style.setProperty("--analytics-ring-gradient", gradient);
+      const mixedItemsTotal = getRingItemsTotal(mixedItems);
 
-    if (rawProgress < 1) {
-      ringAnimationFrameId = requestAnimationFrame(tick);
-      return;
+      const mixedTotal = getAnimatedRingTotal(
+        phaseFromTotal,
+        phaseToTotal,
+        mixedItemsTotal,
+        rawProgress,
+        profile
+      );
+
+      setRingGradient(mixedItems, mixedTotal);
+
+      if (rawProgress < 1) {
+        ringAnimationFrameId = requestAnimationFrame(tick);
+        return;
+      }
+
+      setRingGradient(phaseToItems, phaseToTotal);
+      ringAnimationFrameId = null;
+      onDone?.();
     }
 
-    const finalGradient = buildAnalyticsRingGradient(toItems, toTotal);
-
-    ringEl.style.background = finalGradient;
-    ringEl.style.setProperty("--analytics-ring-gradient", finalGradient);
-
-    if (centerValueEl) {
-      centerValueEl.textContent = `${nextTopPercent}%`;
-    }
-    
-    if (centerLabelEl) {
-  centerLabelEl.textContent = nextCenterLabel;
-}
-    previousRingItems = toItems;
-    previousRingTotal = toTotal;
-    previousTopPercent = nextTopPercent;
-    ringAnimationFrameId = null;
+    ringAnimationFrameId = requestAnimationFrame(tick);
   }
 
-  ringAnimationFrameId = requestAnimationFrame(tick);
+  animatePercentValue(centerValueEl, fromTopPercent, 0);
+
+  animateRingPhase({
+    phaseFromItems: fromItems,
+    phaseToItems: [],
+    phaseFromTotal: fromTotal,
+    phaseToTotal: 0,
+    duration: 430,
+    onDone: () => {
+      if (centerLabelEl) {
+        centerLabelEl.textContent = "Нет расходов";
+      }
+
+      if (!toItems.length || !toTotal) {
+        setFinalRingState([], 0, 0, "Нет расходов");
+        return;
+      }
+
+      if (centerLabelEl) {
+        centerLabelEl.textContent = nextCenterLabel;
+      }
+
+      animatePercentValue(centerValueEl, 0, nextTopPercent);
+
+      animateRingPhase({
+        phaseFromItems: [],
+        phaseToItems: toItems,
+        phaseFromTotal: 0,
+        phaseToTotal: toTotal,
+        duration: 650,
+        onDone: () => {
+          setFinalRingState(toItems, toTotal, nextTopPercent, nextCenterLabel);
+        },
+      });
+    },
+  });
 }
 
     function getAnalyticsMonthDateFromValue(value) {
@@ -825,13 +849,8 @@ const gradient = buildAnalyticsRingGradient(mixedItems, mixedTotal);
         }, 0)
       );
 
-      const ringItems = getAnalyticsExpenseItems(baseExpenseTransactions, {
-  sortMode: "stable",
-});
-
-const listItems = getAnalyticsExpenseItems(filteredExpenseTransactions, {
-  sortMode: "amount",
-});
+      const ringItems = getAnalyticsExpenseItems(baseExpenseTransactions);
+const listItems = getAnalyticsExpenseItems(filteredExpenseTransactions);
 
       const shownTotal =
         analyticsExpenseCategoryFilter === "all" ? totalAll : totalFiltered;
