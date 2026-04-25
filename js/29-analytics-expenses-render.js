@@ -266,8 +266,16 @@ function getRingItemsTotal(items) {
   }, 0);
 }
 
+function getAnalyticsRingSeamSize(percent) {
+  if (percent >= 8) return 0.34;
+  if (percent >= 3) return 0.22;
+  if (percent >= 1.25) return 0.10;
+  return 0.035;
+}
+
 function buildAnalyticsRingGradient(items, total) {
   const emptyColor = "rgba(255,255,255,0.09)";
+  const seamColor = "rgba(8,10,14,0.62)";
 
   if (!total || total <= 0 || !items.length) {
     return `conic-gradient(${emptyColor} 0deg 360deg)`;
@@ -275,17 +283,30 @@ function buildAnalyticsRingGradient(items, total) {
 
   let cursor = 0;
 
-  const gradientParts = items
-    .filter((item) => item.amount > 0.01)
-    .map((item) => {
-      const percent = Math.max(0, Math.min(100, (item.amount / total) * 100));
-      const start = cursor;
-      const end = Math.min(100, cursor + percent);
+  const visibleItems = items.filter((item) => item.amount > 0.01);
 
-      cursor = end;
+  const gradientParts = visibleItems.flatMap((item, index) => {
+    const percent = Math.max(0, Math.min(100, (item.amount / total) * 100));
+    const seamSize = getAnalyticsRingSeamSize(percent);
+    const start = cursor;
+    const rawEnd = Math.min(100, cursor + percent);
+    const hasNext = index < visibleItems.length - 1;
 
-      return `${item.color} ${start.toFixed(2)}% ${end.toFixed(2)}%`;
-    });
+    const seamStart = hasNext
+      ? Math.max(start, rawEnd - seamSize)
+      : rawEnd;
+
+    cursor = rawEnd;
+
+    if (!hasNext || seamSize <= 0.04 || seamStart <= start) {
+      return [`${item.color} ${start.toFixed(2)}% ${rawEnd.toFixed(2)}%`];
+    }
+
+    return [
+      `${item.color} ${start.toFixed(2)}% ${seamStart.toFixed(2)}%`,
+      `${seamColor} ${seamStart.toFixed(2)}% ${rawEnd.toFixed(2)}%`,
+    ];
+  });
 
   if (!gradientParts.length) {
     return `conic-gradient(${emptyColor} 0deg 360deg)`;
