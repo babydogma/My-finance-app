@@ -183,9 +183,11 @@ const analyticsRangeDockStartLabel = document.getElementById("analyticsRangeDock
 const analyticsRangeDockEndLabel = document.getElementById("analyticsRangeDockEndLabel");
 const analyticsRangeStartBtn = document.getElementById("analyticsRangeStartBtn");
 const analyticsRangeEndBtn = document.getElementById("analyticsRangeEndBtn");
-const analyticsRangeNumberPanel = document.getElementById("analyticsRangeNumberPanel");
-const analyticsRangeNumberTitle = document.getElementById("analyticsRangeNumberTitle");
-const analyticsRangeNumberList = document.getElementById("analyticsRangeNumberList");
+const analyticsRangeCalendar = document.getElementById("analyticsRangeCalendar");
+const analyticsRangeCalendarTitle = document.getElementById("analyticsRangeCalendarTitle");
+const analyticsRangeCalendarGrid = document.getElementById("analyticsRangeCalendarGrid");
+const analyticsRangeCalendarPrevBtn = document.getElementById("analyticsRangeCalendarPrevBtn");
+const analyticsRangeCalendarNextBtn = document.getElementById("analyticsRangeCalendarNextBtn");
 const analyticsRangeDockCloseBtn = document.getElementById("analyticsRangeDockCloseBtn");
 const analyticsRangeDockResetBtn = document.getElementById("analyticsRangeDockResetBtn");
 const analyticsRangeDockApplyBtn = document.getElementById("analyticsRangeDockApplyBtn");
@@ -331,6 +333,7 @@ bindMoneyInput(safeBucketAmountInput);
   let analyticsRangeDraftStart = "";
   let analyticsRangeDraftEnd = "";
   let analyticsRangeEditingSide = "start";
+  let analyticsRangeCalendarMonth = analyticsSelectedMonth;
   
   let analyticsTab = "expenses";
   
@@ -2676,7 +2679,7 @@ function getDefaultAnalyticsRangeDate() {
 
 function closeAnalyticsRangeDock() {
   analyticsRangeDock?.classList.add("hidden");
-  analyticsRangeNumberPanel?.classList.add("hidden");
+  analyticsRangeCalendar?.classList.add("hidden");
 
   analyticsRangeStartBtn?.classList.remove("is-active");
   analyticsRangeEndBtn?.classList.remove("is-active");
@@ -2689,26 +2692,22 @@ function closeAnalyticsRangeDock() {
 function openAnalyticsRangeDock() {
   const defaultDate = getDefaultAnalyticsRangeDate();
 
-  analyticsRangeDraftStart = isDateInSelectedAnalyticsMonth(analyticsRangeStart)
-    ? analyticsRangeStart
-    : defaultDate;
-
-  analyticsRangeDraftEnd = isDateInSelectedAnalyticsMonth(analyticsRangeEnd)
-    ? analyticsRangeEnd
-    : analyticsRangeDraftStart;
-
+  analyticsRangeDraftStart = analyticsRangeStart || defaultDate;
+  analyticsRangeDraftEnd = analyticsRangeEnd || analyticsRangeDraftStart;
   analyticsRangeEditingSide = "start";
+
+  analyticsRangeCalendarMonth = String(analyticsRangeDraftStart).slice(0, 7) || analyticsSelectedMonth;
 
   closeAnalyticsMonthWheel();
 
   analyticsRangeDock?.classList.remove("hidden");
+  analyticsRangeCalendar?.classList.add("hidden");
 
   document
     .getElementById("analyticsRailRangeBtn")
     ?.classList.add("is-active");
 
   renderAnalyticsRangeDock();
-  openAnalyticsRangeNumberPicker("start");
 
   requestAnimationFrame(() => {
     analyticsRangeDock?.scrollIntoView({
@@ -2724,18 +2723,18 @@ function resetAnalyticsRangeDock() {
   analyticsRangeDraftStart = defaultDate;
   analyticsRangeDraftEnd = defaultDate;
   analyticsRangeEditingSide = "start";
+  analyticsRangeCalendarMonth = String(defaultDate).slice(0, 7);
 
   renderAnalyticsRangeDock();
-  openAnalyticsRangeNumberPicker("start");
+  analyticsRangeCalendar?.classList.add("hidden");
 }
 
 function renderAnalyticsRangeDock() {
-  const { year, month } = getAnalyticsSelectedMonthParts();
-
   if (analyticsRangeDockTitle) {
-    analyticsRangeDockTitle.textContent = formatMonthLabel(
-      `${year}-${String(month).padStart(2, "0")}`
-    );
+    const titleMonth =
+      String(analyticsRangeDraftStart || analyticsRangeDraftEnd || analyticsSelectedMonth).slice(0, 7);
+
+    analyticsRangeDockTitle.textContent = formatMonthLabel(titleMonth);
   }
 
   if (analyticsRangeDockStartLabel) {
@@ -2758,52 +2757,81 @@ function renderAnalyticsRangeDock() {
     analyticsRangeEditingSide === "end"
   );
 
-  renderAnalyticsRangeNumberList();
+  renderAnalyticsRangeCalendar();
 }
 
-function openAnalyticsRangeNumberPicker(side) {
+function openAnalyticsRangeCalendar(side) {
   analyticsRangeEditingSide = side === "end" ? "end" : "start";
-  analyticsRangeNumberPanel?.classList.remove("hidden");
-
-  if (analyticsRangeNumberTitle) {
-    analyticsRangeNumberTitle.textContent =
-      analyticsRangeEditingSide === "start" ? "Выбери начало" : "Выбери конец";
-  }
-
-  renderAnalyticsRangeDock();
-}
-
-function renderAnalyticsRangeNumberList() {
-  if (!analyticsRangeNumberList) return;
-
-  const { year, month } = getAnalyticsSelectedMonthParts();
-  const daysInMonth = new Date(year, month, 0).getDate();
 
   const activeDate =
     analyticsRangeEditingSide === "start"
       ? analyticsRangeDraftStart
       : analyticsRangeDraftEnd;
 
-  analyticsRangeNumberList.innerHTML = Array.from({ length: daysInMonth }, (_, index) => {
+  analyticsRangeCalendarMonth =
+    String(activeDate || analyticsRangeDraftStart || analyticsSelectedMonth).slice(0, 7);
+
+  analyticsRangeCalendar?.classList.remove("hidden");
+  renderAnalyticsRangeDock();
+}
+
+function shiftAnalyticsRangeCalendarMonth(delta) {
+  const [yearRaw, monthRaw] = String(analyticsRangeCalendarMonth || analyticsSelectedMonth).split("-");
+  const cursor = new Date(Number(yearRaw), Number(monthRaw) - 1 + delta, 1);
+
+  analyticsRangeCalendarMonth = `${cursor.getFullYear()}-${String(cursor.getMonth() + 1).padStart(2, "0")}`;
+  renderAnalyticsRangeCalendar();
+}
+
+function renderAnalyticsRangeCalendar() {
+  if (!analyticsRangeCalendarGrid) return;
+
+  const monthKey = analyticsRangeCalendarMonth || analyticsSelectedMonth;
+  const [yearRaw, monthRaw] = monthKey.split("-");
+  const year = Number(yearRaw) || new Date().getFullYear();
+  const month = Number(monthRaw) || new Date().getMonth() + 1;
+
+  if (analyticsRangeCalendarTitle) {
+    analyticsRangeCalendarTitle.textContent = formatMonthLabel(monthKey);
+  }
+
+  const daysInMonth = new Date(year, month, 0).getDate();
+  const firstDay = new Date(year, month - 1, 1).getDay();
+  const mondayOffset = firstDay === 0 ? 6 : firstDay - 1;
+  const today = getTodayDateValue();
+
+  const start = analyticsRangeDraftStart;
+  const end = analyticsRangeDraftEnd || analyticsRangeDraftStart;
+
+  const emptyCells = Array.from({ length: mondayOffset }, () => {
+    return `<div class="analytics-range-calendar__empty"></div>`;
+  });
+
+  const dayCells = Array.from({ length: daysInMonth }, (_, index) => {
     const day = index + 1;
     const dateKey = getAnalyticsRangeDateKey(year, month, day);
-    const isActive = dateKey === activeDate;
+
+    const isStart = dateKey === start;
+    const isEnd = dateKey === end;
+    const isBetween = start && end && dateKey > start && dateKey < end;
+    const isToday = dateKey === today;
 
     return `
       <button
-        class="analytics-range-number-btn${isActive ? " is-active" : ""}"
+        class="analytics-range-calendar__day${isStart ? " is-start" : ""}${isEnd ? " is-end" : ""}${isBetween ? " is-between" : ""}${isToday ? " is-today" : ""}"
         type="button"
-        data-range-number="${day}"
+        data-range-date="${dateKey}"
       >
         ${day}
       </button>
     `;
-  }).join("");
+  });
 
-  analyticsRangeNumberList.querySelectorAll("[data-range-number]").forEach((button) => {
+  analyticsRangeCalendarGrid.innerHTML = [...emptyCells, ...dayCells].join("");
+
+  analyticsRangeCalendarGrid.querySelectorAll("[data-range-date]").forEach((button) => {
     button.addEventListener("click", () => {
-      const day = Number(button.dataset.rangeNumber);
-      const nextDate = getAnalyticsRangeDateKey(year, month, day);
+      const nextDate = button.dataset.rangeDate;
 
       if (analyticsRangeEditingSide === "start") {
         analyticsRangeDraftStart = nextDate;
@@ -2885,11 +2913,19 @@ document.getElementById("analyticsRailRangeBtn")?.addEventListener("click", () =
 });
 
 analyticsRangeStartBtn?.addEventListener("click", () => {
-  openAnalyticsRangeNumberPicker("start");
+  openAnalyticsRangeCalendar("start");
 });
 
 analyticsRangeEndBtn?.addEventListener("click", () => {
-  openAnalyticsRangeNumberPicker("end");
+  openAnalyticsRangeCalendar("end");
+});
+
+analyticsRangeCalendarPrevBtn?.addEventListener("click", () => {
+  shiftAnalyticsRangeCalendarMonth(-1);
+});
+
+analyticsRangeCalendarNextBtn?.addEventListener("click", () => {
+  shiftAnalyticsRangeCalendarMonth(1);
 });
 
 analyticsRangeDockCloseBtn?.addEventListener("click", closeAnalyticsRangeDock);
