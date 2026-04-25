@@ -135,7 +135,9 @@ let percentAnimationFrameId = null;
     }
     
     function easeOutCubic(progress) {
-  return 1 - Math.pow(1 - progress, 3);
+  return progress < 0.5
+    ? 4 * progress * progress * progress
+    : 1 - Math.pow(-2 * progress + 2, 3) / 2;
 }
 
 function lerpNumber(from, to, progress) {
@@ -152,19 +154,27 @@ function getTopPercentFromItems(items, total) {
   return Math.round((topItem.amount / total) * 100);
 }
 
+function getRingItemsTotal(items) {
+  return items.reduce((sum, item) => {
+    return sum + (Number(item.amount) || 0);
+  }, 0);
+}
+
 function buildAnalyticsRingGradient(items, total) {
+  const emptyColor = "rgba(255,255,255,0.09)";
+
   if (!total || total <= 0 || !items.length) {
-    return "conic-gradient(rgba(255,255,255,0.09) 0deg 360deg)";
+    return `conic-gradient(${emptyColor} 0deg 360deg)`;
   }
 
   let cursor = 0;
 
   const gradientParts = items
-    .filter((item) => item.amount > 0)
+    .filter((item) => item.amount > 0.01)
     .map((item) => {
-      const percent = (item.amount / total) * 100;
+      const percent = Math.max(0, Math.min(100, (item.amount / total) * 100));
       const start = cursor;
-      const end = cursor + percent;
+      const end = Math.min(100, cursor + percent);
 
       cursor = end;
 
@@ -172,7 +182,11 @@ function buildAnalyticsRingGradient(items, total) {
     });
 
   if (!gradientParts.length) {
-    return "conic-gradient(rgba(255,255,255,0.09) 0deg 360deg)";
+    return `conic-gradient(${emptyColor} 0deg 360deg)`;
+  }
+
+  if (cursor < 99.7) {
+    gradientParts.push(`${emptyColor} ${cursor.toFixed(2)}% 100%`);
   }
 
   return `conic-gradient(${gradientParts.join(", ")})`;
@@ -264,7 +278,7 @@ function animateMoneyValue(element, from, to) {
   animateTextNumber({
     from,
     to,
-    duration: 690,
+    duration: 820,
     format: (value) => formatMoney(roundToTwo(value)),
     onUpdate: (text) => {
       element.textContent = text;
@@ -282,7 +296,7 @@ function animatePercentValue(element, from, to) {
   animateTextNumber({
     from,
     to,
-    duration: 570,
+    duration: 700,
     format: (value) => `${Math.round(value)}%`,
     onUpdate: (text) => {
       element.textContent = text;
@@ -406,7 +420,7 @@ function animatePercentValue(element, from, to) {
   const toItems = items.map((item) => ({ ...item }));
   const toTotal = total;
 
-  const duration = 780;
+  const duration = 920;
   const startTime = performance.now();
 
   animatePercentValue(centerValueEl, fromTopPercent, nextTopPercent);
@@ -416,9 +430,17 @@ function animatePercentValue(element, from, to) {
     const progress = easeOutCubic(rawProgress);
 
     const mixedItems = mergeRingItemsForAnimation(fromItems, toItems, progress);
-    const mixedTotal = lerpNumber(fromTotal, toTotal, progress);
+const mixedItemsTotal = getRingItemsTotal(mixedItems);
 
-    const gradient = buildAnalyticsRingGradient(mixedItems, mixedTotal);
+let mixedTotal = mixedItemsTotal;
+
+if (!fromItems.length && toItems.length) {
+  mixedTotal = Math.max(toTotal, 1);
+} else if (fromItems.length && !toItems.length) {
+  mixedTotal = Math.max(fromTotal, 1);
+}
+
+const gradient = buildAnalyticsRingGradient(mixedItems, mixedTotal);
 
     ringEl.style.background = gradient;
     ringEl.style.setProperty("--analytics-ring-gradient", gradient);
