@@ -144,6 +144,38 @@ function lerpNumber(from, to, progress) {
   return from + (to - from) * progress;
 }
 
+function clampNumber(value, min, max) {
+  return Math.min(Math.max(value, min), max);
+}
+
+function getDelayedProgress(progress, delay = 0.32) {
+  return clampNumber((progress - delay) / (1 - delay), 0, 1);
+}
+
+function getAnimatedRingTotal(fromTotal, toTotal, mixedItemsTotal, rawProgress) {
+  const safeFromTotal = Math.max(Number(fromTotal) || 0, 0);
+  const safeToTotal = Math.max(Number(toTotal) || 0, 0);
+
+  if (safeFromTotal <= 0 && safeToTotal > 0) {
+    return Math.max(safeToTotal, 1);
+  }
+
+  if (safeFromTotal > 0 && safeToTotal <= 0) {
+    return Math.max(safeFromTotal, 1);
+  }
+
+  if (safeFromTotal > safeToTotal * 1.35) {
+    const delayedProgress = easeOutCubic(getDelayedProgress(rawProgress, 0.32));
+    return Math.max(lerpNumber(safeFromTotal, safeToTotal, delayedProgress), 1);
+  }
+
+  if (safeToTotal > safeFromTotal * 1.35) {
+    return Math.max(safeToTotal, 1);
+  }
+
+  return Math.max(mixedItemsTotal, 1);
+}
+
 function getTopPercentFromItems(items, total) {
   if (!total || total <= 0 || !items.length) return 0;
 
@@ -194,8 +226,13 @@ function buildAnalyticsRingGradient(items, total) {
 
 function mergeRingItemsForAnimation(fromItems, toItems, progress) {
   const byCategory = new Map();
+  const orderedCategoryIds = [];
 
   fromItems.forEach((item) => {
+    if (!byCategory.has(item.categoryId)) {
+      orderedCategoryIds.push(item.categoryId);
+    }
+
     byCategory.set(item.categoryId, {
       categoryId: item.categoryId,
       name: item.name,
@@ -206,6 +243,10 @@ function mergeRingItemsForAnimation(fromItems, toItems, progress) {
   });
 
   toItems.forEach((item) => {
+    if (!byCategory.has(item.categoryId)) {
+      orderedCategoryIds.push(item.categoryId);
+    }
+
     const current = byCategory.get(item.categoryId) || {
       categoryId: item.categoryId,
       name: item.name,
@@ -221,15 +262,18 @@ function mergeRingItemsForAnimation(fromItems, toItems, progress) {
     byCategory.set(item.categoryId, current);
   });
 
-  return Array.from(byCategory.values())
-    .map((item) => ({
-      categoryId: item.categoryId,
-      name: item.name,
-      color: item.color,
-      amount: lerpNumber(item.fromAmount, item.toAmount, progress),
-    }))
-    .filter((item) => item.amount > 0.01)
-    .sort((a, b) => b.amount - a.amount);
+  return orderedCategoryIds
+    .map((categoryId) => {
+      const item = byCategory.get(categoryId);
+
+      return {
+        categoryId: item.categoryId,
+        name: item.name,
+        color: item.color,
+        amount: lerpNumber(item.fromAmount, item.toAmount, progress),
+      };
+    })
+    .filter((item) => item.amount > 0.01);
 }
 
 function animateTextNumber({
@@ -420,7 +464,7 @@ function animatePercentValue(element, from, to) {
   const toItems = items.map((item) => ({ ...item }));
   const toTotal = total;
 
-  const duration = 920;
+  const duration = 1040;
   const startTime = performance.now();
 
   animatePercentValue(centerValueEl, fromTopPercent, nextTopPercent);
@@ -431,14 +475,12 @@ function animatePercentValue(element, from, to) {
 
     const mixedItems = mergeRingItemsForAnimation(fromItems, toItems, progress);
 const mixedItemsTotal = getRingItemsTotal(mixedItems);
-
-let mixedTotal = mixedItemsTotal;
-
-if (!fromItems.length && toItems.length) {
-  mixedTotal = Math.max(toTotal, 1);
-} else if (fromItems.length && !toItems.length) {
-  mixedTotal = Math.max(fromTotal, 1);
-}
+const mixedTotal = getAnimatedRingTotal(
+  fromTotal,
+  toTotal,
+  mixedItemsTotal,
+  rawProgress
+);
 
 const gradient = buildAnalyticsRingGradient(mixedItems, mixedTotal);
 
