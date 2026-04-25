@@ -36,6 +36,14 @@
     openAnalyticsCategoryModal,
   }) {
     let analyticsExpenseCategoryFilter = "all";
+    let previousRingItems = null;
+let previousRingTotal = 0;
+let previousShownTotal = null;
+let previousTopPercent = 0;
+
+let ringAnimationFrameId = null;
+let moneyAnimationFrameId = null;
+let percentAnimationFrameId = null;
 
     const ANALYTICS_EXPENSE_COLORS = [
   "#4DA3FF", // bright blue
@@ -125,6 +133,166 @@
         getAnalyticsColorHash(categoryId) % ANALYTICS_EXPENSE_COLORS.length
       ];
     }
+    
+    function easeOutCubic(progress) {
+  return 1 - Math.pow(1 - progress, 3);
+}
+
+function lerpNumber(from, to, progress) {
+  return from + (to - from) * progress;
+}
+
+function getTopPercentFromItems(items, total) {
+  if (!total || total <= 0 || !items.length) return 0;
+
+  const topItem = items[0];
+
+  if (!topItem) return 0;
+
+  return Math.round((topItem.amount / total) * 100);
+}
+
+function buildAnalyticsRingGradient(items, total) {
+  if (!total || total <= 0 || !items.length) {
+    return "conic-gradient(rgba(255,255,255,0.09) 0deg 360deg)";
+  }
+
+  let cursor = 0;
+
+  const gradientParts = items
+    .filter((item) => item.amount > 0)
+    .map((item) => {
+      const percent = (item.amount / total) * 100;
+      const start = cursor;
+      const end = cursor + percent;
+
+      cursor = end;
+
+      return `${item.color} ${start.toFixed(2)}% ${end.toFixed(2)}%`;
+    });
+
+  if (!gradientParts.length) {
+    return "conic-gradient(rgba(255,255,255,0.09) 0deg 360deg)";
+  }
+
+  return `conic-gradient(${gradientParts.join(", ")})`;
+}
+
+function mergeRingItemsForAnimation(fromItems, toItems, progress) {
+  const byCategory = new Map();
+
+  fromItems.forEach((item) => {
+    byCategory.set(item.categoryId, {
+      categoryId: item.categoryId,
+      name: item.name,
+      color: item.color,
+      fromAmount: item.amount,
+      toAmount: 0,
+    });
+  });
+
+  toItems.forEach((item) => {
+    const current = byCategory.get(item.categoryId) || {
+      categoryId: item.categoryId,
+      name: item.name,
+      color: item.color,
+      fromAmount: 0,
+      toAmount: 0,
+    };
+
+    current.name = item.name;
+    current.color = item.color;
+    current.toAmount = item.amount;
+
+    byCategory.set(item.categoryId, current);
+  });
+
+  return Array.from(byCategory.values())
+    .map((item) => ({
+      categoryId: item.categoryId,
+      name: item.name,
+      color: item.color,
+      amount: lerpNumber(item.fromAmount, item.toAmount, progress),
+    }))
+    .filter((item) => item.amount > 0.01)
+    .sort((a, b) => b.amount - a.amount);
+}
+
+function animateTextNumber({
+  from,
+  to,
+  duration = 420,
+  format,
+  onUpdate,
+  onDone,
+  frameIdGetter,
+  frameIdSetter,
+}) {
+  const startTime = performance.now();
+
+  const previousFrameId = frameIdGetter();
+
+  if (previousFrameId) {
+    cancelAnimationFrame(previousFrameId);
+  }
+
+  function tick(now) {
+    const rawProgress = Math.min((now - startTime) / duration, 1);
+    const progress = easeOutCubic(rawProgress);
+    const value = lerpNumber(from, to, progress);
+
+    onUpdate(format(value));
+
+    if (rawProgress < 1) {
+      const nextFrameId = requestAnimationFrame(tick);
+      frameIdSetter(nextFrameId);
+      return;
+    }
+
+    onUpdate(format(to));
+    frameIdSetter(null);
+    onDone?.();
+  }
+
+  const nextFrameId = requestAnimationFrame(tick);
+  frameIdSetter(nextFrameId);
+}
+
+function animateMoneyValue(element, from, to) {
+  if (!element) return;
+
+  animateTextNumber({
+    from,
+    to,
+    duration: 460,
+    format: (value) => formatMoney(roundToTwo(value)),
+    onUpdate: (text) => {
+      element.textContent = text;
+    },
+    frameIdGetter: () => moneyAnimationFrameId,
+    frameIdSetter: (nextId) => {
+      moneyAnimationFrameId = nextId;
+    },
+  });
+}
+
+function animatePercentValue(element, from, to) {
+  if (!element) return;
+
+  animateTextNumber({
+    from,
+    to,
+    duration: 380,
+    format: (value) => `${Math.round(value)}%`,
+    onUpdate: (text) => {
+      element.textContent = text;
+    },
+    frameIdGetter: () => percentAnimationFrameId,
+    frameIdSetter: (nextId) => {
+      percentAnimationFrameId = nextId;
+    },
+  });
+}
 
     function getAnalyticsExpensesPeriodNote() {
       const period = getFilterPeriod();
@@ -194,58 +362,89 @@
         .sort((a, b) => b.amount - a.amount);
     }
 
-    function renderAnalyticsExpensesRing(items, total) {
-      const ringEl = getPrimaryExpenseRingEl();
-      const centerValueEl = getPrimaryExpenseRingCenterValueEl();
-      const centerLabelEl = getPrimaryExpenseRingCenterLabelEl();
+    function renderAnalyticsExpensesRing(items, total, options = {}) {
+  const ringEl = getPrimaryExpenseRingEl();
+  const centerValueEl = getPrimaryExpenseRingCenterValueEl();
+  const centerLabelEl = getPrimaryExpenseRingCenterLabelEl();
 
-      if (!ringEl) return;
+  if (!ringEl) return;
 
-      if (!total || total <= 0 || items.length === 0) {
-        const emptyGradient = "conic-gradient(rgba(255,255,255,0.09) 0deg 360deg)";
+  const shouldAnimate = options.animate === true;
+  const nextTopPercent = getTopPercentFromItems(items, total);
+  const nextTopItem = items[0];
 
-        ringEl.style.background = emptyGradient;
-        ringEl.style.setProperty("--analytics-ring-gradient", emptyGradient);
+  if (centerLabelEl) {
+    centerLabelEl.textContent = nextTopItem ? nextTopItem.name : "Нет расходов";
+  }
 
-        if (centerValueEl) {
-          centerValueEl.textContent = "0%";
-        }
+  if (!shouldAnimate || !previousRingItems) {
+    const gradient = buildAnalyticsRingGradient(items, total);
 
-        if (centerLabelEl) {
-          centerLabelEl.textContent = "Нет расходов";
-        }
+    ringEl.style.background = gradient;
+    ringEl.style.setProperty("--analytics-ring-gradient", gradient);
 
-        return;
-      }
-
-      let cursor = 0;
-
-      const gradientParts = items.map((item) => {
-        const percent = (item.amount / total) * 100;
-        const start = cursor;
-        const end = cursor + percent;
-
-        cursor = end;
-
-        return `${item.color} ${start.toFixed(2)}% ${end.toFixed(2)}%`;
-      });
-
-      const gradient = `conic-gradient(${gradientParts.join(", ")})`;
-
-      ringEl.style.background = gradient;
-      ringEl.style.setProperty("--analytics-ring-gradient", gradient);
-
-      const topItem = items[0];
-      const topPercent = Math.round((topItem.amount / total) * 100);
-
-      if (centerValueEl) {
-        centerValueEl.textContent = `${topPercent}%`;
-      }
-
-      if (centerLabelEl) {
-        centerLabelEl.textContent = topItem.name;
-      }
+    if (centerValueEl) {
+      centerValueEl.textContent = `${nextTopPercent}%`;
     }
+
+    previousRingItems = items.map((item) => ({ ...item }));
+    previousRingTotal = total;
+    previousTopPercent = nextTopPercent;
+
+    return;
+  }
+
+  if (ringAnimationFrameId) {
+    cancelAnimationFrame(ringAnimationFrameId);
+    ringAnimationFrameId = null;
+  }
+
+  const fromItems = previousRingItems.map((item) => ({ ...item }));
+  const fromTotal = previousRingTotal;
+  const fromTopPercent = previousTopPercent;
+
+  const toItems = items.map((item) => ({ ...item }));
+  const toTotal = total;
+
+  const duration = 520;
+  const startTime = performance.now();
+
+  animatePercentValue(centerValueEl, fromTopPercent, nextTopPercent);
+
+  function tick(now) {
+    const rawProgress = Math.min((now - startTime) / duration, 1);
+    const progress = easeOutCubic(rawProgress);
+
+    const mixedItems = mergeRingItemsForAnimation(fromItems, toItems, progress);
+    const mixedTotal = lerpNumber(fromTotal, toTotal, progress);
+
+    const gradient = buildAnalyticsRingGradient(mixedItems, mixedTotal);
+
+    ringEl.style.background = gradient;
+    ringEl.style.setProperty("--analytics-ring-gradient", gradient);
+
+    if (rawProgress < 1) {
+      ringAnimationFrameId = requestAnimationFrame(tick);
+      return;
+    }
+
+    const finalGradient = buildAnalyticsRingGradient(toItems, toTotal);
+
+    ringEl.style.background = finalGradient;
+    ringEl.style.setProperty("--analytics-ring-gradient", finalGradient);
+
+    if (centerValueEl) {
+      centerValueEl.textContent = `${nextTopPercent}%`;
+    }
+
+    previousRingItems = toItems;
+    previousRingTotal = toTotal;
+    previousTopPercent = nextTopPercent;
+    ringAnimationFrameId = null;
+  }
+
+  ringAnimationFrameId = requestAnimationFrame(tick);
+}
 
     function getAnalyticsMonthDateFromValue(value) {
       const normalized = normalizeAnalyticsMonthValue(value);
@@ -347,18 +546,6 @@
 
         analyticsExpensesMonthStrip.appendChild(button);
       });
-      
-      const activeButton = analyticsExpensesMonthStrip.querySelector(
-  ".analytics-expenses-month-item.is-active"
-);
-
-requestAnimationFrame(() => {
-  activeButton?.scrollIntoView({
-    behavior: "smooth",
-    block: "nearest",
-    inline: "center",
-  });
-});
 
     }
 
@@ -451,19 +638,30 @@ requestAnimationFrame(() => {
       const valueEl = getPrimaryExpenseValueEl();
       const periodNoteEl = getPrimaryExpensePeriodNoteEl();
 
-      if (valueEl) {
-        valueEl.textContent = formatMoney(shownTotal);
-      }
+      if (previousShownTotal === null) {
+  if (valueEl) {
+    valueEl.textContent = formatMoney(shownTotal);
+  }
 
-      if (analyticsExpensesTotalRowValue) {
-        analyticsExpensesTotalRowValue.textContent = formatMoney(shownTotal);
-      }
+  if (analyticsExpensesTotalRowValue) {
+    analyticsExpensesTotalRowValue.textContent = formatMoney(shownTotal);
+  }
+
+  previousShownTotal = shownTotal;
+} else {
+  animateMoneyValue(valueEl, previousShownTotal, shownTotal);
+  animateMoneyValue(analyticsExpensesTotalRowValue, previousShownTotal, shownTotal);
+
+  previousShownTotal = shownTotal;
+}
 
       if (periodNoteEl) {
         periodNoteEl.textContent = getAnalyticsExpensesPeriodNote();
       }
 
-      renderAnalyticsExpensesRing(ringItems, totalAll);
+      renderAnalyticsExpensesRing(ringItems, totalAll, {
+  animate: previousRingItems !== null,
+});
       renderAnalyticsExpensesMonthStrip();
       renderAnalyticsExpensesCategories(listItems, shownTotal);
     }
