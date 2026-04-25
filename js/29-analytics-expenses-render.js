@@ -264,7 +264,7 @@ function animateMoneyValue(element, from, to) {
   animateTextNumber({
     from,
     to,
-    duration: 460,
+    duration: 690,
     format: (value) => formatMoney(roundToTwo(value)),
     onUpdate: (text) => {
       element.textContent = text;
@@ -282,7 +282,7 @@ function animatePercentValue(element, from, to) {
   animateTextNumber({
     from,
     to,
-    duration: 380,
+    duration: 570,
     format: (value) => `${Math.round(value)}%`,
     onUpdate: (text) => {
       element.textContent = text;
@@ -406,7 +406,7 @@ function animatePercentValue(element, from, to) {
   const toItems = items.map((item) => ({ ...item }));
   const toTotal = total;
 
-  const duration = 520;
+  const duration = 780;
   const startTime = performance.now();
 
   animatePercentValue(centerValueEl, fromTopPercent, nextTopPercent);
