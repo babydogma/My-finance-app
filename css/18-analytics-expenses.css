@@ -793,28 +793,3 @@
     font-size: 18px;
   }
 }
-
-@keyframes analyticsMonthSwitch {
-  0% {
-    opacity: 0.72;
-    transform: translate3d(0, 4px, 0) scale(0.992);
-    filter: saturate(0.96);
-  }
-
-  60% {
-    opacity: 1;
-    transform: translate3d(0, -1px, 0) scale(1.004);
-    filter: saturate(1.12);
-  }
-
-  100% {
-    opacity: 1;
-    transform: translate3d(0, 0, 0) scale(1);
-    filter: saturate(1);
-  }
-}
-
-.analytics-month-switch {
-  animation: analyticsMonthSwitch 0.32s cubic-bezier(0.2, 0.9, 0.2, 1);
-  will-change: transform, opacity, filter;
-}
