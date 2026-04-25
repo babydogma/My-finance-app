@@ -794,6 +794,7 @@ let justCreatedTransactionId = null;
     filterTransactionsByPeriod,
     getCurrentMonthValue,
     getCategoryName,
+    isRequiredCategory,
     formatMoney,
     escapeHtml,
     getFilterPeriod: () => analyticsFilterPeriod,
