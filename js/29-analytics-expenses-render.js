@@ -134,6 +134,18 @@ let percentAnimationFrameId = null;
       ];
     }
     
+    function getAnalyticsExpenseCategoryOrderIndex(categoryId) {
+  const categoryIds = state.categories.map((category) => category.id);
+  const allCategoryIds = Array.from(new Set([...categoryIds, UNCATEGORIZED_ID]));
+  const index = allCategoryIds.indexOf(categoryId);
+
+  if (index >= 0) {
+    return index;
+  }
+
+  return allCategoryIds.length + getAnalyticsColorHash(categoryId);
+}
+    
     function easeOutCubic(progress) {
   return progress < 0.5
     ? 4 * progress * progress * progress
@@ -357,7 +369,10 @@ function mergeRingItemsForAnimation(fromItems, toItems, rawProgress, profile) {
   });
 
   return orderedCategoryIds
-    .map((categoryId) => {
+  .sort((a, b) => {
+    return getAnalyticsExpenseCategoryOrderIndex(a) - getAnalyticsExpenseCategoryOrderIndex(b);
+  })
+  .map((categoryId) => {
       const item = byCategory.get(categoryId);
 
       const isLeaving = item.fromAmount > 0 && item.toAmount <= 0;
@@ -500,32 +515,43 @@ function animatePercentValue(element, from, to) {
       });
     }
 
-    function getAnalyticsExpenseItems(expenseTransactions) {
-      const byCategory = new Map();
+    function getAnalyticsExpenseItems(expenseTransactions, options = {}) {
+  const sortMode = options.sortMode || "amount";
+  const byCategory = new Map();
 
-      expenseTransactions.forEach((transaction) => {
-        const categoryId = transaction.category_id || UNCATEGORIZED_ID;
-        const amount = Number(transaction.amount) || 0;
+  expenseTransactions.forEach((transaction) => {
+    const categoryId = transaction.category_id || UNCATEGORIZED_ID;
+    const amount = Number(transaction.amount) || 0;
 
-        const current = byCategory.get(categoryId) || {
-          categoryId,
-          name: getCategoryName(categoryId),
-          amount: 0,
-          color: getAnalyticsExpenseColor(categoryId),
-        };
+    const current = byCategory.get(categoryId) || {
+      categoryId,
+      name: getCategoryName(categoryId),
+      amount: 0,
+      color: getAnalyticsExpenseColor(categoryId),
+      orderIndex: getAnalyticsExpenseCategoryOrderIndex(categoryId),
+    };
 
-        current.amount += amount;
-        byCategory.set(categoryId, current);
-      });
+    current.amount += amount;
+    byCategory.set(categoryId, current);
+  });
 
-      return Array.from(byCategory.values())
-        .map((item) => ({
-          ...item,
-          amount: roundToTwo(item.amount),
-        }))
-        .filter((item) => item.amount > 0)
-        .sort((a, b) => b.amount - a.amount);
-    }
+  const items = Array.from(byCategory.values())
+    .map((item) => ({
+      ...item,
+      amount: roundToTwo(item.amount),
+    }))
+    .filter((item) => item.amount > 0);
+
+  if (sortMode === "stable") {
+    return items.sort((a, b) => {
+      return a.orderIndex - b.orderIndex;
+    });
+  }
+
+  return items.sort((a, b) => {
+    return b.amount - a.amount;
+  });
+}
 
     function renderAnalyticsExpensesRing(items, total, options = {}) {
   const ringEl = getPrimaryExpenseRingEl();
@@ -799,8 +825,13 @@ const gradient = buildAnalyticsRingGradient(mixedItems, mixedTotal);
         }, 0)
       );
 
-      const ringItems = getAnalyticsExpenseItems(baseExpenseTransactions);
-      const listItems = getAnalyticsExpenseItems(filteredExpenseTransactions);
+      const ringItems = getAnalyticsExpenseItems(baseExpenseTransactions, {
+  sortMode: "stable",
+});
+
+const listItems = getAnalyticsExpenseItems(filteredExpenseTransactions, {
+  sortMode: "amount",
+});
 
       const shownTotal =
         analyticsExpenseCategoryFilter === "all" ? totalAll : totalFiltered;
