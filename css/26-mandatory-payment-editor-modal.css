@@ -311,3 +311,238 @@
     margin-bottom: 1px;
   }
 }
+
+/* =========================================================
+   Calendar payment editor — final polish
+   ========================================================= */
+
+#mandatoryPaymentEditorModal .modal-sheet {
+  padding: 18px 16px calc(18px + env(safe-area-inset-bottom, 0px));
+  border-radius: 34px 34px 26px 26px;
+}
+
+#mandatoryPaymentEditorModal .section-head {
+  align-items: center;
+  margin-bottom: 18px;
+  gap: 14px;
+}
+
+#mandatoryPaymentEditorModal .modal-title {
+  max-width: none;
+  font-size: 34px;
+  line-height: 0.92;
+  letter-spacing: -0.08em;
+}
+
+#mandatoryPaymentEditorModal .manager-back-btn {
+  min-width: 116px;
+  height: 52px;
+  border-radius: 999px;
+  font-size: 15px;
+}
+
+/* поля */
+
+#mandatoryPaymentEditorModal .field {
+  margin-bottom: 11px;
+}
+
+#mandatoryPaymentEditorModal .input,
+#mandatoryPaymentEditorModal .select,
+#mandatoryPaymentEditorModal .mandatory-linked-safe-btn {
+  height: 56px;
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.055), transparent 46%),
+    linear-gradient(180deg, rgba(32, 37, 51, 0.98) 0%, rgba(18, 22, 33, 1) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow:
+    0 8px 18px rgba(0, 0, 0, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.035);
+}
+
+/* название платежа */
+
+#mandatoryPaymentTitleInput {
+  font-size: 17px;
+  font-weight: 860;
+}
+
+/* сумма */
+
+#mandatoryPaymentAmountInput {
+  font-size: 17px;
+  font-weight: 900;
+}
+
+/* дата */
+
+.mandatory-payment-date-field {
+  position: relative;
+}
+
+#mandatoryPaymentDueDayInput {
+  position: relative;
+  z-index: 2;
+  color: #f7f8fb;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(111, 156, 255, 0.09), transparent 48%),
+    linear-gradient(180deg, rgba(34, 40, 57, 0.98) 0%, rgba(18, 22, 33, 1) 100%);
+  border-color: rgba(111, 156, 255, 0.14);
+}
+
+#mandatoryPaymentDueDayInput:invalid {
+  color: transparent;
+}
+
+#mandatoryPaymentDueDayInput:valid {
+  color: #f7f8fb;
+}
+
+#mandatoryPaymentDueDayInput::-webkit-datetime-edit {
+  color: inherit;
+}
+
+#mandatoryPaymentDueDayInput::-webkit-calendar-picker-indicator {
+  opacity: 0.65;
+  filter: invert(1);
+}
+
+.mandatory-payment-date-placeholder {
+  position: absolute;
+  left: 18px;
+  top: 50%;
+  z-index: 3;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: rgba(255, 255, 255, 0.42);
+  font-size: 17px;
+  font-weight: 860;
+  letter-spacing: -0.035em;
+}
+
+#mandatoryPaymentDueDayInput:valid + .mandatory-payment-date-placeholder {
+  opacity: 0;
+}
+
+/* категория */
+
+#mandatoryPaymentCategorySelect {
+  padding-right: 48px;
+  color: #f7f8fb;
+  font-weight: 900;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(111, 156, 255, 0.10), transparent 46%),
+    linear-gradient(180deg, rgba(36, 42, 58, 0.98) 0%, rgba(19, 23, 34, 1) 100%);
+  border-color: rgba(111, 156, 255, 0.16);
+  box-shadow:
+    0 8px 18px rgba(0, 0, 0, 0.16),
+    0 0 18px rgba(111, 156, 255, 0.045),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+#mandatoryPaymentCategorySelect:focus,
+#mandatoryPaymentDueDayInput:focus,
+#mandatoryPaymentTitleInput:focus,
+#mandatoryPaymentAmountInput:focus {
+  outline: none;
+  border-color: rgba(111, 156, 255, 0.36);
+  box-shadow:
+    0 10px 24px rgba(0, 0, 0, 0.18),
+    0 0 22px rgba(111, 156, 255, 0.11),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+#mandatoryPaymentCategorySelect option,
+#mandatoryPaymentAccountSelect option,
+#mandatoryPaymentLinkedSafeSelect option {
+  background: #141925;
+  color: #f7f8fb;
+}
+
+/* стрелка select */
+
+#mandatoryPaymentEditorModal .field:has(#mandatoryPaymentCategorySelect),
+#mandatoryPaymentEditorModal .field:has(#mandatoryPaymentAccountSelect) {
+  position: relative;
+}
+
+#mandatoryPaymentEditorModal .field:has(#mandatoryPaymentCategorySelect)::after,
+#mandatoryPaymentEditorModal .field:has(#mandatoryPaymentAccountSelect)::after {
+  content: "";
+  position: absolute;
+  right: 19px;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid rgba(247, 249, 255, 0.44);
+  border-bottom: 2px solid rgba(247, 249, 255, 0.44);
+  transform: translateY(-68%) rotate(45deg);
+  pointer-events: none;
+}
+
+/* кнопка выбора накопления */
+
+#mandatoryPaymentEditorModal .mandatory-linked-safe-btn {
+  color: #f7f8fb;
+  font-weight: 880;
+}
+
+/* кнопки */
+
+.mandatory-editor-actions {
+  gap: 11px;
+  margin-top: 14px;
+}
+
+.mandatory-editor-actions .btn-danger,
+.mandatory-editor-actions .btn-primary {
+  height: 58px;
+  border-radius: 23px;
+}
+
+#addMandatoryPaymentBtn {
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.22), transparent 44%),
+    linear-gradient(180deg, rgba(121, 163, 255, 1) 0%, rgba(84, 135, 255, 1) 100%);
+  box-shadow:
+    0 16px 34px rgba(84, 135, 255, 0.30),
+    inset 0 1px 0 rgba(255, 255, 255, 0.26);
+}
+
+/* чуть компактнее на iPhone */
+
+@media (max-width: 420px) {
+  #mandatoryPaymentEditorModal .modal-sheet {
+    padding: 18px 14px calc(18px + env(safe-area-inset-bottom, 0px));
+    border-radius: 31px 31px 22px 22px;
+  }
+
+  #mandatoryPaymentEditorModal .modal-title {
+    font-size: 31px;
+  }
+
+  #mandatoryPaymentEditorModal .manager-back-btn {
+    min-width: 106px;
+    height: 48px;
+    font-size: 14px;
+  }
+
+  #mandatoryPaymentEditorModal .input,
+  #mandatoryPaymentEditorModal .select,
+  #mandatoryPaymentEditorModal .mandatory-linked-safe-btn {
+    height: 54px;
+    border-radius: 20px;
+    font-size: 16px;
+  }
+
+  .mandatory-payment-date-placeholder {
+    font-size: 16px;
+  }
+
+  .mandatory-editor-actions .btn-danger,
+  .mandatory-editor-actions .btn-primary {
+    height: 56px;
+    border-radius: 21px;
+  }
+}
