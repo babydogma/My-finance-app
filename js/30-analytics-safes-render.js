@@ -13,10 +13,18 @@
       const summary = getAnalyticsOverviewSummary();
 
       if (analyticsInterestValue) {
-        analyticsInterestValue.textContent = formatMoney(summary.safeInterest);
-      }
+  analyticsInterestValue.textContent = formatMoney(summary.safeInterest);
+}
 
-      if (!analyticsSafeList) return;
+if (window.FinanceAppAnalyticsSafeModels?.renderAnalyticsSafeModels) {
+  window.FinanceAppAnalyticsSafeModels.renderAnalyticsSafeModels({
+    state,
+    formatMoney,
+    escapeHtml,
+  });
+}
+
+if (!analyticsSafeList) return;
 
       analyticsSafeList.innerHTML = "";
 
