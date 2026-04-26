@@ -60,7 +60,7 @@ mandatoryPaymentLinkedSafeSelect,
       const transaction = {
         id: crypto.randomUUID(),
         type: "expense",
-        title: item.title || "Обязательный платёж",
+        title: item.title || "Календарный платёж",
         amount: roundToTwo(Number(item.amount) || 0),
         account_id: account.id,
         account: account.name,
@@ -138,7 +138,7 @@ const linkedAccountId = mandatoryPaymentAccountSelect?.value || "";
       }
       
       if (!categoryId) {
-  alert("Выбери категорию обязательного платежа");
+  alert("Выбери категорию платежа");
   return;
 }
 
