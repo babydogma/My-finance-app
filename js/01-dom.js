@@ -81,6 +81,7 @@
       const mandatoryPaymentTitleInput = document.getElementById("mandatoryPaymentTitleInput");
       const mandatoryPaymentAmountInput = document.getElementById("mandatoryPaymentAmountInput");
       const mandatoryPaymentDueDayInput = document.getElementById("mandatoryPaymentDueDayInput");
+      const mandatoryPaymentCategorySelect = document.getElementById("mandatoryPaymentCategorySelect");
       const mandatoryPaymentLinkedSafeSelect = document.getElementById("mandatoryPaymentLinkedSafeSelect");
       const mandatoryPaymentAccountSelect = document.getElementById("mandatoryPaymentAccountSelect");
       const mandatoryPaymentBucketPickerModal = document.getElementById("mandatoryPaymentBucketPickerModal");
@@ -280,6 +281,7 @@
         mandatoryPaymentTitleInput,
         mandatoryPaymentAmountInput,
         mandatoryPaymentDueDayInput,
+        mandatoryPaymentCategorySelect,
         mandatoryPaymentLinkedSafeSelect,
         mandatoryPaymentAccountSelect,
         mandatoryPaymentBucketPickerModal,
