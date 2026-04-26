@@ -82,6 +82,18 @@
   );
 }
 
+function getTransactionMainDateValue(item) {
+  return (
+    item.date ||
+    item.transaction_date ||
+    item.operation_date ||
+    item.created_date ||
+    item.created_at ||
+    item.createdAt ||
+    ""
+  );
+}
+
 function getTransactionDateKey(item) {
   const rawValue = getTransactionMainDateValue(item);
 
@@ -142,52 +154,6 @@ function filterTransactionsByPeriod(items, period, selectedMonth, rangeStart, ra
     if (period === "range") {
       if (!rangeStart || !rangeEnd) return true;
       return dateKey >= rangeStart && dateKey <= rangeEnd;
-    }
-
-    return true;
-  });
-}
-
-function filterTransactionsByPeriod(items, period, selectedMonth, rangeStart, rangeEnd) {
-  const todayKey = getTodayDateValue();
-  const currentMonth = selectedMonth || getCurrentMonthValue();
-  const startOfToday = getStartOfTodayTime();
-  const sevenDaysStartKey = getDateOnlyString(
-    new Date(startOfToday - 6 * 24 * 60 * 60 * 1000)
-  );
-
-  return items.filter((item) => {
-    const dateKeys = getTransactionDateKeys(item);
-
-    if (!dateKeys.length) return false;
-
-    const time = getTransactionTime(item);
-
-    if (period === "month") {
-      return dateKeys.some((dateKey) => {
-        return dateKey.slice(0, 7) === currentMonth;
-      });
-    }
-
-    if (period === "today") {
-      return dateKeys.includes(todayKey);
-    }
-
-    if (period === "7") {
-      return (
-        time >= startOfToday - 6 * 24 * 60 * 60 * 1000 ||
-        dateKeys.some((dateKey) => {
-          return dateKey >= sevenDaysStartKey && dateKey <= todayKey;
-        })
-      );
-    }
-
-    if (period === "range") {
-      if (!rangeStart || !rangeEnd) return true;
-
-      return dateKeys.some((dateKey) => {
-        return dateKey >= rangeStart && dateKey <= rangeEnd;
-      });
     }
 
     return true;
