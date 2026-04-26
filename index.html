@@ -97,14 +97,14 @@
             <!-- MANDATORY PAYMENTS -->
       <section class="section required-payments-section">
         <div class="section-head accounts-section-head required-payments-head">
-          <h2 class="section-title">Обязательные платежи</h2>
+          <h2 class="section-title">Календарные платежи</h2>
 
           <button
             class="icon-action-btn icon-action-btn--primary required-payments-add-btn"
             type="button"
             id="openMandatoryPaymentsModalBtn"
-            aria-label="Добавить обязательный платёж"
-            title="Добавить обязательный платёж"
+            aria-label="Добавить платёж"
+title="Добавить платёж"
           >
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="M12 5v14M5 12h14" />
@@ -909,12 +909,14 @@
   placeholder="Сумма"
       </div>
 
-      <div class="field">
-        <input class="input" id="mandatoryPaymentDueDayInput" type="date" />
-        <div class="field">
-  <select class="select" id="mandatoryPaymentCategorySelect">
-    <option value="">Выбери категорию платежа</option>
-  </select>
+      <div class="field mandatory-payment-date-field">
+  <input
+    class="input mandatory-payment-date-input"
+    id="mandatoryPaymentDueDayInput"
+    type="date"
+    required
+  />
+  <span class="mandatory-payment-date-placeholder">Выбери дату</span>
 </div>
       </div>
 
