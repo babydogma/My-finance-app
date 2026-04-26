@@ -244,3 +244,70 @@
     border-radius: 20px;
   }
 }
+
+/* =========================================================
+   Mandatory payment category select polish
+   ========================================================= */
+
+#mandatoryPaymentCategorySelect {
+  padding-right: 48px;
+  background:
+    linear-gradient(180deg, rgba(36, 42, 58, 0.98) 0%, rgba(19, 23, 34, 1) 100%);
+  border-color: rgba(111, 156, 255, 0.12);
+  box-shadow:
+    0 8px 18px rgba(0, 0, 0, 0.16),
+    0 0 18px rgba(111, 156, 255, 0.045),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+#mandatoryPaymentCategorySelect:focus {
+  outline: none;
+  border-color: rgba(111, 156, 255, 0.34);
+  box-shadow:
+    0 10px 24px rgba(0, 0, 0, 0.18),
+    0 0 22px rgba(111, 156, 255, 0.11),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+#mandatoryPaymentCategorySelect option {
+  background: #141925;
+  color: #f7f8fb;
+}
+
+/* маленькая подсветка поля категории */
+#mandatoryPaymentCategorySelect {
+  position: relative;
+}
+
+/* iOS/Safari select fix */
+#mandatoryPaymentEditorModal select#mandatoryPaymentCategorySelect {
+  min-height: 54px;
+  line-height: 1;
+  text-overflow: ellipsis;
+}
+
+/* чтобы поле категории визуально не слипалось с датой и счётом */
+#mandatoryPaymentEditorModal .field:has(#mandatoryPaymentCategorySelect) {
+  position: relative;
+  margin-bottom: 13px;
+}
+
+/* мягкий маркер, что это важное поле */
+#mandatoryPaymentEditorModal .field:has(#mandatoryPaymentCategorySelect)::after {
+  content: "";
+  position: absolute;
+  right: 18px;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  border-right: 2px solid rgba(247, 249, 255, 0.48);
+  border-bottom: 2px solid rgba(247, 249, 255, 0.48);
+  transform: translateY(-68%) rotate(45deg);
+  pointer-events: none;
+}
+
+@supports not selector(:has(*)) {
+  #mandatoryPaymentCategorySelect {
+    margin-bottom: 1px;
+  }
+}
