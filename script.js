@@ -825,16 +825,17 @@ let justCreatedTransactionId = null;
   });
 
   const {
-    renderAnalyticsSafes,
-  } = window.FinanceAppAnalyticsSafesRender.create({
-    state,
-    getAnalyticsOverviewSummary,
-    getSafeBucketBalance,
-    formatMoney,
-    escapeHtml,
-    analyticsInterestValue,
-    analyticsSafeList,
-  });
+  renderAnalyticsSafes,
+} = window.FinanceAppAnalyticsSafesRender.create({
+  state,
+  getAnalyticsOverviewSummary,
+  getSafeBucketBalance,
+  isRequiredCategory,
+  formatMoney,
+  escapeHtml,
+  analyticsInterestValue,
+  analyticsSafeList,
+});
 
   const {
     renderAnalytics,
