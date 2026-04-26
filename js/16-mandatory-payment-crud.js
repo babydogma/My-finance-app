@@ -16,10 +16,11 @@
     getAccountById,
     isVaultAccountId,
     mandatoryPaymentTitleInput,
-    mandatoryPaymentAmountInput,
-    mandatoryPaymentDueDayInput,
-    mandatoryPaymentAccountSelect,
-    mandatoryPaymentLinkedSafeSelect,
+mandatoryPaymentAmountInput,
+mandatoryPaymentDueDayInput,
+mandatoryPaymentCategorySelect,
+mandatoryPaymentAccountSelect,
+mandatoryPaymentLinkedSafeSelect,
     onAfterTogglePaid,
     onAfterSave,
     onAfterDelete,
@@ -63,7 +64,7 @@
         amount: roundToTwo(Number(item.amount) || 0),
         account_id: account.id,
         account: account.name,
-        category_id: UNCATEGORIZED_ID,
+        category_id: item.category_id || UNCATEGORIZED_ID,
         from_account_id: null,
         to_account_id: null,
         from_account: null,
@@ -117,7 +118,8 @@
       const title = mandatoryPaymentTitleInput.value.trim();
       const amount = parseMoneyInputValue(mandatoryPaymentAmountInput.value);
       const dueDateValue = mandatoryPaymentDueDayInput.value;
-      const linkedAccountId = mandatoryPaymentAccountSelect?.value || "";
+const categoryId = mandatoryPaymentCategorySelect?.value || "";
+const linkedAccountId = mandatoryPaymentAccountSelect?.value || "";
       const linkedSafeBucketId = mandatoryPaymentLinkedSafeSelect?.value || "";
 
       if (!title) {
@@ -134,6 +136,11 @@
         alert("Выбери дату платежа");
         return;
       }
+      
+      if (!categoryId) {
+  alert("Выбери категорию обязательного платежа");
+  return;
+}
 
       if (isVaultAccountId(linkedAccountId) && !linkedSafeBucketId) {
         alert("Выбери накопление");
@@ -162,6 +169,7 @@
           target.paid_periods[target.paid_periods.length - 1] || "";
         target.linked_account_id = linkedAccountId;
         target.linked_safe_bucket_id = linkedSafeBucketId;
+        target.category_id = categoryId;
       } else {
         state.mandatoryPayments.push({
           id: crypto.randomUUID(),
@@ -171,8 +179,9 @@
           start_period: duePeriod,
           paid_periods: [],
           linked_account_id: linkedAccountId,
-          linked_safe_bucket_id: linkedSafeBucketId,
-          enabled: true,
+linked_safe_bucket_id: linkedSafeBucketId,
+category_id: categoryId,
+enabled: true,
           last_paid_period: "",
         });
       }
