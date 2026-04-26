@@ -17,7 +17,7 @@
       reserve: 0.15,
     },
     {
-      id: "save",
+      id: "hard",
       title: "50 / 20 / 30",
       subtitle: "Жёсткий режим",
       required: 0.5,
@@ -50,10 +50,6 @@
   }
 
   function getCurrentMonthValue() {
-    if (window.FinanceAppFormatDate?.getCurrentMonthValue) {
-      return window.FinanceAppFormatDate.getCurrentMonthValue();
-    }
-
     const now = new Date();
 
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
@@ -86,21 +82,24 @@
     return `${parsedDate.getFullYear()}-${String(parsedDate.getMonth() + 1).padStart(2, "0")}-${String(parsedDate.getDate()).padStart(2, "0")}`;
   }
 
-  function getCurrentMonthTransactions(state) {
-    const currentMonth = getCurrentMonthValue();
-
-    return (state.transactions || []).filter((transaction) => {
-      const dateKey = getTransactionDateKey(transaction);
-
-      return dateKey.slice(0, 7) === currentMonth;
-    });
-  }
-
   function getCategoryId(transaction) {
     return transaction.category_id || transaction.categoryId || UNCATEGORIZED_ID;
   }
 
-  function getMonthProgressPercent() {
+  function getMonthTransactions(state, selectedMonth) {
+    return (state.transactions || []).filter((transaction) => {
+      const dateKey = getTransactionDateKey(transaction);
+
+      return dateKey.slice(0, 7) === selectedMonth;
+    });
+  }
+
+  function getMonthProgressPercent(selectedMonth) {
+    const currentMonth = getCurrentMonthValue();
+
+    if (selectedMonth < currentMonth) return 100;
+    if (selectedMonth > currentMonth) return 0;
+
     const now = new Date();
     const currentDay = now.getDate();
     const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
@@ -120,8 +119,8 @@
     return Math.min(100, Math.max(0, (value / base) * 100));
   }
 
-  function getMonthStats(state, isRequiredCategory) {
-    const transactions = getCurrentMonthTransactions(state);
+  function getMonthStats(state, selectedMonth, isRequiredCategory) {
+    const transactions = getMonthTransactions(state, selectedMonth);
 
     let income = 0;
     let requiredExpense = 0;
@@ -154,14 +153,13 @@
     });
 
     const totalExpense = requiredExpense + flexibleExpense;
-    const remainingAfterExpenses = income - totalExpense;
 
     return {
       income: roundToTwo(income),
       requiredExpense: roundToTwo(requiredExpense),
       flexibleExpense: roundToTwo(flexibleExpense),
       totalExpense: roundToTwo(totalExpense),
-      remainingAfterExpenses: roundToTwo(remainingAfterExpenses),
+      remainingAfterExpenses: roundToTwo(income - totalExpense),
     };
   }
 
@@ -190,30 +188,30 @@
     return "good";
   }
 
-  function getPaceStatus(stats) {
+  function getPaceStatus(stats, selectedMonth) {
     if (stats.income <= 0) {
       return {
         status: "muted",
-        title: "Нет дохода",
-        text: "Добавь доход за месяц, чтобы сравнить темп расходов.",
+        title: "Ждём доход",
+        text: "После операции “Доход” появится темп месяца.",
       };
     }
 
-    const monthProgress = getMonthProgressPercent();
+    const monthProgress = getMonthProgressPercent(selectedMonth);
     const spentPercent = getPercent(stats.totalExpense, stats.income);
 
     if (spentPercent > monthProgress + 12) {
       return {
         status: "bad",
-        title: "Расходы впереди месяца",
-        text: `Прошло ${monthProgress}% месяца, а потрачено ${spentPercent}% дохода.`,
+        title: "Расходы впереди",
+        text: `Прошло ${monthProgress}% месяца, потрачено ${spentPercent}% дохода.`,
       };
     }
 
     if (spentPercent > monthProgress + 5) {
       return {
         status: "warn",
-        title: "Темп чуть выше нормы",
+        title: "На грани",
         text: `Прошло ${monthProgress}% месяца, потрачено ${spentPercent}% дохода.`,
       };
     }
@@ -225,11 +223,22 @@
     };
   }
 
+  function renderSalaryMissingCard(selectedMonth) {
+    return `
+      <section class="analytics-savings-empty-card">
+        <div class="analytics-savings-empty-card__badge">Месяц выбран</div>
+        <h3>Зарплаты ещё не было</h3>
+        <p>
+          В ${selectedMonth} пока нет операции “Доход”.
+          Модель месяца и сценарии бюджета появятся после добавления дохода.
+        </p>
+      </section>
+    `;
+  }
+
   function renderCurrentModel(stats, helpers) {
     const { formatMoney } = helpers;
-
     const income = stats.income;
-    const remaining = Math.max(0, stats.remainingAfterExpenses);
 
     const rows = [
       {
@@ -246,15 +255,15 @@
       },
       {
         label: "Останется",
-        value: remaining,
-        percent: getPercent(remaining, income),
+        value: stats.remainingAfterExpenses,
+        percent: getPercent(Math.max(0, stats.remainingAfterExpenses), income),
         className: "remain",
       },
     ];
 
     return `
-      <section class="analytics-savings-current-card">
-        <div class="analytics-savings-current-card__head">
+      <section class="analytics-savings-card analytics-savings-current-card">
+        <div class="analytics-savings-card__head">
           <div>
             <h3>Модель месяца</h3>
             <p>Как сейчас распределяется доход</p>
@@ -269,13 +278,16 @@
         <div class="analytics-savings-current-card__rows">
           ${rows
             .map((row) => {
-              const width = getBarWidth(row.value, income);
+              const width = getBarWidth(Math.max(0, row.value), income);
+              const valueLabel = row.value < 0
+                ? formatSignedMoney(row.value, formatMoney)
+                : formatMoney(row.value);
 
               return `
                 <div class="analytics-savings-model-row analytics-savings-model-row--${row.className}">
                   <div class="analytics-savings-model-row__top">
                     <span>${row.label}</span>
-                    <strong>${formatMoney(row.value)}</strong>
+                    <strong>${valueLabel}</strong>
                   </div>
 
                   <div class="analytics-savings-model-row__bar">
@@ -294,21 +306,21 @@
     `;
   }
 
-  function renderProgressCard(stats) {
-    const pace = getPaceStatus(stats);
-    const monthProgress = getMonthProgressPercent();
+  function renderProgressCard(stats, selectedMonth) {
+    const pace = getPaceStatus(stats, selectedMonth);
+    const monthProgress = getMonthProgressPercent(selectedMonth);
     const spentPercent = stats.income > 0 ? getPercent(stats.totalExpense, stats.income) : 0;
     const spentWidth = Math.min(100, Math.max(0, spentPercent));
 
     return `
-      <section class="analytics-savings-pace-card analytics-savings-pace-card--${pace.status}">
-        <div class="analytics-savings-pace-card__head">
+      <section class="analytics-savings-card analytics-savings-pace-card analytics-savings-pace-card--${pace.status}">
+        <div class="analytics-savings-card__head">
           <div>
             <h3>Темп месяца</h3>
             <p>${pace.text}</p>
           </div>
 
-          <div class="analytics-savings-pace-card__badge">
+          <div class="analytics-savings-status-pill">
             ${pace.title}
           </div>
         </div>
@@ -366,7 +378,7 @@
             <p>${escapeHtml(model.subtitle)}</p>
           </div>
 
-          <div class="analytics-savings-scenario-card__badge">
+          <div class="analytics-savings-status-pill">
             ${getStatusLabel(status)}
           </div>
         </div>
@@ -376,7 +388,7 @@
           <strong>${formatSignedMoney(remainingAfterReserve, formatMoney)}</strong>
         </div>
 
-        <div class="analytics-savings-scenario-card__grid">
+        <div class="analytics-savings-scenario-card__rows">
           <div>
             <span>Обязательные</span>
             <strong>${Math.round(model.required * 100)}% · ${formatMoney(requiredPlan)}</strong>
@@ -414,7 +426,13 @@
     `;
   }
 
-  function renderAnalyticsSafeModels({ state, isRequiredCategory, formatMoney, escapeHtml }) {
+  function renderAnalyticsSafeModels({
+    state,
+    selectedMonth,
+    isRequiredCategory,
+    formatMoney,
+    escapeHtml,
+  }) {
     const container = document.getElementById("analyticsSafeModelsList");
 
     if (!container) return;
@@ -424,12 +442,22 @@
       escapeHtml: typeof escapeHtml === "function" ? escapeHtml : fallbackEscapeHtml,
     };
 
-    const stats = getMonthStats(state, isRequiredCategory);
+    const monthValue = selectedMonth || getCurrentMonthValue();
+    const stats = getMonthStats(state, monthValue, isRequiredCategory);
+
+    if (stats.income <= 0) {
+      container.innerHTML = `
+        <div class="analytics-savings-dashboard">
+          ${renderSalaryMissingCard(monthValue)}
+        </div>
+      `;
+      return;
+    }
 
     container.innerHTML = `
       <div class="analytics-savings-dashboard">
         ${renderCurrentModel(stats, helpers)}
-        ${renderProgressCard(stats)}
+        ${renderProgressCard(stats, monthValue)}
         ${renderScenarios(stats, helpers)}
       </div>
     `;
