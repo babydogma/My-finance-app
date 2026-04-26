@@ -864,6 +864,12 @@ mandatoryPaymentAccountSelect,
   escapeHtml,
   analyticsInterestValue,
   analyticsSafeList,
+
+  getSelectedMonth: () => analyticsSelectedMonth,
+  setSelectedMonth: (monthKey) => {
+    analyticsSelectedMonth = monthKey;
+    analyticsFilterPeriod = "month";
+  },
 });
 
   const {
