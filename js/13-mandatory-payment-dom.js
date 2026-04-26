@@ -2,8 +2,9 @@
   function createMandatoryPaymentDom({
     state,
     mandatoryPaymentAccountSelect,
-    mandatoryPaymentLinkedSafeSelect,
-    mandatoryPaymentLinkedSafeField,
+mandatoryPaymentLinkedSafeSelect,
+mandatoryPaymentCategorySelect,
+mandatoryPaymentLinkedSafeField,
     openMandatoryPaymentBucketPickerBtn,
     mandatoryPaymentBucketPickerModal,
     mandatoryPaymentBucketPickerList,
@@ -47,6 +48,34 @@
         mandatoryPaymentLinkedSafeSelect.appendChild(option);
       });
     }
+    
+    function fillMandatoryPaymentCategorySelect(selectedId = "") {
+  if (!mandatoryPaymentCategorySelect) return;
+
+  mandatoryPaymentCategorySelect.innerHTML =
+    `<option value="">Выбери категорию платежа</option>`;
+
+  const requiredCategories = state.categories.filter((category) => {
+    return category.is_required === true;
+  });
+
+  const categories = requiredCategories.length
+    ? requiredCategories
+    : state.categories;
+
+  categories.forEach((category) => {
+    const option = document.createElement("option");
+
+    option.value = category.id;
+    option.textContent = category.name;
+
+    if (selectedId && selectedId === category.id) {
+      option.selected = true;
+    }
+
+    mandatoryPaymentCategorySelect.appendChild(option);
+  });
+}
 
     function syncMandatoryPaymentLinkedSafeField() {
       const accountId = mandatoryPaymentAccountSelect?.value || "";
@@ -124,6 +153,7 @@
     return {
       fillMandatoryPaymentAccountSelect,
       fillMandatoryPaymentSafeSelect,
+      fillMandatoryPaymentCategorySelect,
       syncMandatoryPaymentLinkedSafeField,
       renderMandatoryPaymentBucketPicker,
     };
