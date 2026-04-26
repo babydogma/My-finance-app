@@ -1008,7 +1008,7 @@ function renderAnalyticsRangeMonthsStrip() {
       ?.scrollIntoView({
         behavior: "smooth",
         block: "nearest",
-        inline: "center",
+        inline: "start",
       });
   });
 }
@@ -1106,7 +1106,7 @@ function renderAnalyticsRangeDaysStrip() {
     activeDay?.scrollIntoView({
       behavior: "smooth",
       block: "nearest",
-      inline: "center",
+      inline: "start",
     });
   });
 }
