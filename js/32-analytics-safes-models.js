@@ -6,7 +6,7 @@
       subtitle: "Классика",
       required: 0.5,
       flexible: 0.3,
-      savings: 0.2,
+      reserve: 0.2,
     },
     {
       id: "soft",
@@ -14,15 +14,15 @@
       subtitle: "Мягкий режим",
       required: 0.6,
       flexible: 0.25,
-      savings: 0.15,
+      reserve: 0.15,
     },
     {
-      id: "hard-save",
+      id: "save",
       title: "50 / 20 / 30",
-      subtitle: "Жёсткое накопление",
+      subtitle: "Жёсткий режим",
       required: 0.5,
       flexible: 0.2,
-      savings: 0.3,
+      reserve: 0.3,
     },
   ];
 
@@ -55,6 +55,7 @@
     }
 
     const now = new Date();
+
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
   }
 
@@ -78,7 +79,9 @@
 
     const parsedDate = new Date(rawText);
 
-    if (Number.isNaN(parsedDate.getTime())) return "";
+    if (Number.isNaN(parsedDate.getTime())) {
+      return "";
+    }
 
     return `${parsedDate.getFullYear()}-${String(parsedDate.getMonth() + 1).padStart(2, "0")}-${String(parsedDate.getDate()).padStart(2, "0")}`;
   }
@@ -88,12 +91,33 @@
 
     return (state.transactions || []).filter((transaction) => {
       const dateKey = getTransactionDateKey(transaction);
+
       return dateKey.slice(0, 7) === currentMonth;
     });
   }
 
   function getCategoryId(transaction) {
     return transaction.category_id || transaction.categoryId || UNCATEGORIZED_ID;
+  }
+
+  function getMonthProgressPercent() {
+    const now = new Date();
+    const currentDay = now.getDate();
+    const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+
+    return Math.min(100, Math.max(1, Math.round((currentDay / daysInMonth) * 100)));
+  }
+
+  function getPercent(value, base) {
+    if (base <= 0) return 0;
+
+    return Math.round((value / base) * 100);
+  }
+
+  function getBarWidth(value, base) {
+    if (base <= 0) return 0;
+
+    return Math.min(100, Math.max(0, (value / base) * 100));
   }
 
   function getMonthStats(state, isRequiredCategory) {
@@ -117,9 +141,10 @@
       }
 
       const categoryId = getCategoryId(transaction);
-      const required = typeof isRequiredCategory === "function"
-        ? isRequiredCategory(categoryId)
-        : false;
+      const required =
+        typeof isRequiredCategory === "function"
+          ? isRequiredCategory(categoryId)
+          : false;
 
       if (required) {
         requiredExpense += amount;
@@ -128,11 +153,24 @@
       }
     });
 
+    const totalExpense = requiredExpense + flexibleExpense;
+    const remainingAfterExpenses = income - totalExpense;
+
     return {
       income: roundToTwo(income),
       requiredExpense: roundToTwo(requiredExpense),
       flexibleExpense: roundToTwo(flexibleExpense),
+      totalExpense: roundToTwo(totalExpense),
+      remainingAfterExpenses: roundToTwo(remainingAfterExpenses),
     };
+  }
+
+  function getStatusLabel(status) {
+    if (status === "good") return "Влезает";
+    if (status === "warn") return "На грани";
+    if (status === "bad") return "Не сходится";
+
+    return "Нет дохода";
   }
 
   function formatSignedMoney(value, formatMoney) {
@@ -144,119 +182,235 @@
     return formatMoney(0);
   }
 
-  function getStatusLabel(status) {
-    if (status === "good") return "Влезает";
-    if (status === "warn") return "На грани";
-    if (status === "bad") return "Не сходится";
-    return "Нет дохода";
-  }
-
-  function getModelStatus({ income, remainingAfterPlan, requiredDelta, flexibleDelta }) {
+  function getScenarioStatus({ income, requiredDelta, flexibleDelta, remainingAfterReserve }) {
     if (income <= 0) return "muted";
-    if (remainingAfterPlan < 0) return "bad";
+    if (remainingAfterReserve < 0) return "bad";
     if (requiredDelta < 0 || flexibleDelta < 0) return "warn";
+
     return "good";
   }
 
-  function getFillPercent(fact, plan) {
-    if (plan <= 0) return 0;
-    return Math.min(100, Math.max(0, (fact / plan) * 100));
+  function getPaceStatus(stats) {
+    if (stats.income <= 0) {
+      return {
+        status: "muted",
+        title: "Нет дохода",
+        text: "Добавь доход за месяц, чтобы сравнить темп расходов.",
+      };
+    }
+
+    const monthProgress = getMonthProgressPercent();
+    const spentPercent = getPercent(stats.totalExpense, stats.income);
+
+    if (spentPercent > monthProgress + 12) {
+      return {
+        status: "bad",
+        title: "Расходы впереди месяца",
+        text: `Прошло ${monthProgress}% месяца, а потрачено ${spentPercent}% дохода.`,
+      };
+    }
+
+    if (spentPercent > monthProgress + 5) {
+      return {
+        status: "warn",
+        title: "Темп чуть выше нормы",
+        text: `Прошло ${monthProgress}% месяца, потрачено ${spentPercent}% дохода.`,
+      };
+    }
+
+    return {
+      status: "good",
+      title: "Темп нормальный",
+      text: `Прошло ${monthProgress}% месяца, потрачено ${spentPercent}% дохода.`,
+    };
   }
 
-  function renderCompareRow({ label, percent, fact, plan, formatMoney }) {
-    const delta = roundToTwo(plan - fact);
-    const fill = getFillPercent(fact, plan);
-    const isOver = delta < 0;
+  function renderCurrentModel(stats, helpers) {
+    const { formatMoney } = helpers;
+
+    const income = stats.income;
+    const remaining = Math.max(0, stats.remainingAfterExpenses);
+
+    const rows = [
+      {
+        label: "Обязательные",
+        value: stats.requiredExpense,
+        percent: getPercent(stats.requiredExpense, income),
+        className: "required",
+      },
+      {
+        label: "Гибкие",
+        value: stats.flexibleExpense,
+        percent: getPercent(stats.flexibleExpense, income),
+        className: "flexible",
+      },
+      {
+        label: "Останется",
+        value: remaining,
+        percent: getPercent(remaining, income),
+        className: "remain",
+      },
+    ];
 
     return `
-      <div class="analytics-safe-model-compare ${isOver ? "is-over" : ""}">
-        <div class="analytics-safe-model-compare__top">
+      <section class="analytics-savings-current-card">
+        <div class="analytics-savings-current-card__head">
           <div>
-            <span>${label}</span>
-            <strong>${Math.round(percent * 100)}% · план ${formatMoney(plan)}</strong>
+            <h3>Модель месяца</h3>
+            <p>Как сейчас распределяется доход</p>
           </div>
 
-          <div class="analytics-safe-model-compare__fact">
-            <span>Факт</span>
-            <strong>${formatMoney(fact)}</strong>
+          <div class="analytics-savings-income-pill">
+            <span>Доход</span>
+            <strong>${formatMoney(income)}</strong>
           </div>
         </div>
 
-        <div class="analytics-safe-model-compare__bar">
-          <i style="width:${fill}%"></i>
-        </div>
+        <div class="analytics-savings-current-card__rows">
+          ${rows
+            .map((row) => {
+              const width = getBarWidth(row.value, income);
 
-        <div class="analytics-safe-model-compare__delta">
-          ${isOver ? "Перебор" : "Запас"}: ${formatSignedMoney(delta, formatMoney)}
+              return `
+                <div class="analytics-savings-model-row analytics-savings-model-row--${row.className}">
+                  <div class="analytics-savings-model-row__top">
+                    <span>${row.label}</span>
+                    <strong>${formatMoney(row.value)}</strong>
+                  </div>
+
+                  <div class="analytics-savings-model-row__bar">
+                    <i style="width:${width}%"></i>
+                  </div>
+
+                  <div class="analytics-savings-model-row__bottom">
+                    ${row.percent}% от дохода
+                  </div>
+                </div>
+              `;
+            })
+            .join("")}
         </div>
-      </div>
+      </section>
     `;
   }
 
-  function renderModelCard(model, stats, helpers) {
+  function renderProgressCard(stats) {
+    const pace = getPaceStatus(stats);
+    const monthProgress = getMonthProgressPercent();
+    const spentPercent = stats.income > 0 ? getPercent(stats.totalExpense, stats.income) : 0;
+    const spentWidth = Math.min(100, Math.max(0, spentPercent));
+
+    return `
+      <section class="analytics-savings-pace-card analytics-savings-pace-card--${pace.status}">
+        <div class="analytics-savings-pace-card__head">
+          <div>
+            <h3>Темп месяца</h3>
+            <p>${pace.text}</p>
+          </div>
+
+          <div class="analytics-savings-pace-card__badge">
+            ${pace.title}
+          </div>
+        </div>
+
+        <div class="analytics-savings-pace-card__bars">
+          <div class="analytics-savings-pace-line">
+            <div class="analytics-savings-pace-line__top">
+              <span>Прошло месяца</span>
+              <strong>${monthProgress}%</strong>
+            </div>
+            <div class="analytics-savings-pace-line__bar">
+              <i style="width:${monthProgress}%"></i>
+            </div>
+          </div>
+
+          <div class="analytics-savings-pace-line analytics-savings-pace-line--spent">
+            <div class="analytics-savings-pace-line__top">
+              <span>Потрачено дохода</span>
+              <strong>${spentPercent}%</strong>
+            </div>
+            <div class="analytics-savings-pace-line__bar">
+              <i style="width:${spentWidth}%"></i>
+            </div>
+          </div>
+        </div>
+      </section>
+    `;
+  }
+
+  function renderScenarioCard(model, stats, helpers) {
     const { formatMoney, escapeHtml } = helpers;
 
     const requiredPlan = roundToTwo(stats.income * model.required);
     const flexiblePlan = roundToTwo(stats.income * model.flexible);
-    const savingsTarget = roundToTwo(stats.income * model.savings);
+    const reserveByModel = roundToTwo(stats.income * model.reserve);
 
     const requiredDelta = roundToTwo(requiredPlan - stats.requiredExpense);
     const flexibleDelta = roundToTwo(flexiblePlan - stats.flexibleExpense);
-
-    const remainingAfterPlan = roundToTwo(
-      stats.income - stats.requiredExpense - stats.flexibleExpense - savingsTarget
+    const remainingAfterReserve = roundToTwo(
+      stats.income - stats.requiredExpense - stats.flexibleExpense - reserveByModel
     );
 
-    const status = getModelStatus({
+    const status = getScenarioStatus({
       income: stats.income,
-      remainingAfterPlan,
       requiredDelta,
       flexibleDelta,
+      remainingAfterReserve,
     });
 
     return `
-      <article class="analytics-safe-model-card analytics-safe-model-card--${status}">
-        <div class="analytics-safe-model-card__top">
+      <article class="analytics-savings-scenario-card analytics-savings-scenario-card--${status}">
+        <div class="analytics-savings-scenario-card__top">
           <div>
-            <div class="analytics-safe-model-card__title">${escapeHtml(model.title)}</div>
-            <div class="analytics-safe-model-card__subtitle">${escapeHtml(model.subtitle)}</div>
+            <h4>${escapeHtml(model.title)}</h4>
+            <p>${escapeHtml(model.subtitle)}</p>
           </div>
 
-          <div class="analytics-safe-model-card__badge">
+          <div class="analytics-savings-scenario-card__badge">
             ${getStatusLabel(status)}
           </div>
         </div>
 
-        <div class="analytics-safe-model-card__summary">
-          <div>
-            <span>Осталось бы</span>
-            <strong>${formatSignedMoney(remainingAfterPlan, formatMoney)}</strong>
-          </div>
-
-          <div>
-            <span>Цель накопления</span>
-            <strong>${formatMoney(savingsTarget)}</strong>
-          </div>
+        <div class="analytics-savings-scenario-card__result">
+          <span>После расходов и резерва</span>
+          <strong>${formatSignedMoney(remainingAfterReserve, formatMoney)}</strong>
         </div>
 
-        <div class="analytics-safe-model-card__compare-list">
-          ${renderCompareRow({
-            label: "Обязательные",
-            percent: model.required,
-            fact: stats.requiredExpense,
-            plan: requiredPlan,
-            formatMoney,
-          })}
+        <div class="analytics-savings-scenario-card__grid">
+          <div>
+            <span>Обязательные</span>
+            <strong>${Math.round(model.required * 100)}% · ${formatMoney(requiredPlan)}</strong>
+            <em>Факт: ${formatMoney(stats.requiredExpense)}</em>
+          </div>
 
-          ${renderCompareRow({
-            label: "Гибкие",
-            percent: model.flexible,
-            fact: stats.flexibleExpense,
-            plan: flexiblePlan,
-            formatMoney,
-          })}
+          <div>
+            <span>Гибкие</span>
+            <strong>${Math.round(model.flexible * 100)}% · ${formatMoney(flexiblePlan)}</strong>
+            <em>Факт: ${formatMoney(stats.flexibleExpense)}</em>
+          </div>
+
+          <div>
+            <span>Резерв по модели</span>
+            <strong>${Math.round(model.reserve * 100)}% · ${formatMoney(reserveByModel)}</strong>
+            <em>Не цель, а проверка системы</em>
+          </div>
         </div>
       </article>
+    `;
+  }
+
+  function renderScenarios(stats, helpers) {
+    return `
+      <section class="analytics-savings-scenarios">
+        <div class="analytics-savings-section-head">
+          <h3>Сценарии бюджета</h3>
+          <p>Сравнение систем с текущими расходами</p>
+        </div>
+
+        <div class="analytics-savings-scenarios__list">
+          ${BUDGET_MODELS.map((model) => renderScenarioCard(model, stats, helpers)).join("")}
+        </div>
+      </section>
     `;
   }
 
@@ -273,20 +427,10 @@
     const stats = getMonthStats(state, isRequiredCategory);
 
     container.innerHTML = `
-      <div class="analytics-safe-models__head">
-        <div>
-          <h3>Сценарии бюджета</h3>
-          <p>Сравнение систем с текущими расходами</p>
-        </div>
-
-        <div class="analytics-safe-models__income">
-          <span>Доход</span>
-          <strong>${helpers.formatMoney(stats.income)}</strong>
-        </div>
-      </div>
-
-      <div class="analytics-safe-models__list">
-        ${BUDGET_MODELS.map((model) => renderModelCard(model, stats, helpers)).join("")}
+      <div class="analytics-savings-dashboard">
+        ${renderCurrentModel(stats, helpers)}
+        ${renderProgressCard(stats)}
+        ${renderScenarios(stats, helpers)}
       </div>
     `;
   }
