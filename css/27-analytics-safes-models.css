@@ -1,6 +1,6 @@
 /* =========================================================
    27. ANALYTICS SAFES MODELS
-   Savings dashboard without separate savings goals
+   Monthly savings analytics
    ========================================================= */
 
 .analytics-safe-models,
@@ -19,14 +19,78 @@
   gap: 12px;
 }
 
-/* =========================================================
-   Shared heads
-   ========================================================= */
+/* month strip */
 
-.analytics-savings-section-head {
-  padding: 0 2px;
+.analytics-safes-month-strip {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: calc((100% - 32px) / 5);
+  gap: 8px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  margin: 12px 0 14px;
+  padding: 0 0 2px;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x mandatory;
 }
 
+.analytics-safes-month-strip::-webkit-scrollbar {
+  display: none;
+}
+
+.analytics-safes-month-btn {
+  width: 100%;
+  height: 38px;
+  border: 0;
+  border-radius: 16px;
+  scroll-snap-align: center;
+  color: rgba(255, 255, 255, 0.48);
+  font-size: 13px;
+  font-weight: 860;
+  letter-spacing: -0.045em;
+  background:
+    linear-gradient(180deg, rgba(36, 40, 52, 0.78) 0%, rgba(20, 24, 33, 0.9) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.025),
+    0 8px 16px rgba(0, 0, 0, 0.12);
+}
+
+.analytics-safes-month-btn.is-active {
+  color: rgba(248, 251, 255, 0.96);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(111, 156, 255, 0.30), transparent 56%),
+    linear-gradient(180deg, rgba(69, 102, 178, 0.92) 0%, rgba(34, 47, 84, 0.96) 100%);
+  box-shadow:
+    0 0 20px rgba(72, 148, 255, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+/* shared calm card */
+
+.analytics-savings-card,
+.analytics-savings-empty-card {
+  padding: 14px 16px;
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(111, 156, 255, 0.10), transparent 42%),
+    linear-gradient(180deg, rgba(31, 36, 49, 0.96) 0%, rgba(17, 21, 31, 0.99) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow:
+    0 14px 30px rgba(0, 0, 0, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.035);
+}
+
+.analytics-savings-card__head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.analytics-savings-card__head h3,
+.analytics-savings-empty-card h3,
 .analytics-savings-section-head h3 {
   margin: 0;
   color: #f7f9ff;
@@ -36,76 +100,77 @@
   letter-spacing: -0.065em;
 }
 
+.analytics-savings-card__head p,
+.analytics-savings-empty-card p,
 .analytics-savings-section-head p {
   margin: 7px 0 0;
   color: rgba(255, 255, 255, 0.42);
   font-size: 12px;
-  line-height: 1.05;
+  line-height: 1.12;
   font-weight: 760;
   letter-spacing: -0.03em;
 }
 
-/* =========================================================
-   Current model
-   ========================================================= */
-
-.analytics-savings-current-card {
-  padding: 14px 16px;
-  border-radius: 28px;
-  background:
-    radial-gradient(circle at 18% 0%, rgba(111, 156, 255, 0.13), transparent 38%),
-    linear-gradient(180deg, rgba(31, 36, 49, 0.98) 0%, rgba(18, 22, 32, 1) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.065);
-  box-shadow:
-    0 16px 34px rgba(0, 0, 0, 0.24),
-    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+.analytics-savings-section-head {
+  padding: 0 2px;
 }
 
-.analytics-savings-current-card__head {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 126px;
-  align-items: center;
-  gap: 12px;
+/* empty salary */
+
+.analytics-savings-empty-card {
+  min-height: 156px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.analytics-savings-empty-card__badge {
+  width: max-content;
+  height: 34px;
+  padding: 0 12px;
   margin-bottom: 14px;
-}
-
-.analytics-savings-current-card__head h3 {
-  margin: 0;
-  color: #f7f9ff;
-  font-size: 24px;
-  line-height: 0.95;
-  font-weight: 950;
-  letter-spacing: -0.07em;
-}
-
-.analytics-savings-current-card__head p {
-  margin: 7px 0 0;
-  color: rgba(255, 255, 255, 0.42);
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  color: rgba(255, 213, 139, 0.96);
   font-size: 12px;
-  line-height: 1.05;
-  font-weight: 760;
-  letter-spacing: -0.03em;
+  font-weight: 860;
+  letter-spacing: -0.035em;
+  background: rgba(255, 190, 92, 0.12);
+}
+
+/* pills */
+
+.analytics-savings-income-pill,
+.analytics-savings-status-pill {
+  height: 38px;
+  padding: 0 12px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    linear-gradient(180deg, rgba(44, 50, 64, 0.84) 0%, rgba(24, 28, 38, 0.96) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.052);
+  color: rgba(248, 250, 255, 0.78);
+  font-size: 12px;
+  line-height: 1;
+  font-weight: 860;
+  letter-spacing: -0.035em;
+  white-space: nowrap;
 }
 
 .analytics-savings-income-pill {
   width: 126px;
   height: 50px;
-  padding: 7px 11px;
-  border-radius: 18px;
-  display: flex;
   flex-direction: column;
   align-items: flex-end;
-  justify-content: center;
-  background:
-    linear-gradient(180deg, rgba(44, 50, 64, 0.84) 0%, rgba(24, 28, 38, 0.96) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.052);
 }
 
 .analytics-savings-income-pill span {
   margin-bottom: 4px;
   color: rgba(255, 255, 255, 0.38);
   font-size: 10px;
-  line-height: 1;
   font-weight: 760;
 }
 
@@ -113,60 +178,71 @@
   max-width: 100%;
   color: #f7f9ff;
   font-size: 15px;
-  line-height: 1;
   font-weight: 920;
   letter-spacing: -0.055em;
-  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.analytics-savings-current-card__rows {
+/* rows */
+
+.analytics-savings-current-card__rows,
+.analytics-savings-pace-card__bars,
+.analytics-savings-scenario-card__rows,
+.analytics-savings-scenarios__list {
   display: flex;
   flex-direction: column;
   gap: 10px;
 }
 
-.analytics-savings-model-row {
+.analytics-savings-model-row,
+.analytics-savings-pace-line,
+.analytics-savings-scenario-card__result,
+.analytics-savings-scenario-card__rows > div {
   padding: 10px 11px;
   border-radius: 18px;
   background: rgba(255, 255, 255, 0.045);
   border: 1px solid rgba(255, 255, 255, 0.035);
 }
 
-.analytics-savings-model-row__top {
+.analytics-savings-model-row__top,
+.analytics-savings-pace-line__top {
   display: flex;
-  align-items: center;
   justify-content: space-between;
   gap: 12px;
   margin-bottom: 8px;
 }
 
-.analytics-savings-model-row__top span {
-  color: rgba(255, 255, 255, 0.56);
+.analytics-savings-model-row__top span,
+.analytics-savings-pace-line__top span,
+.analytics-savings-scenario-card__result span,
+.analytics-savings-scenario-card__rows span {
+  color: rgba(255, 255, 255, 0.54);
   font-size: 12px;
-  line-height: 1;
   font-weight: 800;
   letter-spacing: -0.035em;
 }
 
-.analytics-savings-model-row__top strong {
+.analytics-savings-model-row__top strong,
+.analytics-savings-pace-line__top strong,
+.analytics-savings-scenario-card__rows strong {
   color: #f7f9ff;
-  font-size: 16px;
-  line-height: 1;
+  font-size: 15px;
   font-weight: 900;
   letter-spacing: -0.05em;
   white-space: nowrap;
 }
 
-.analytics-savings-model-row__bar {
+.analytics-savings-model-row__bar,
+.analytics-savings-pace-line__bar {
   height: 6px;
   border-radius: 999px;
   overflow: hidden;
   background: rgba(255, 255, 255, 0.11);
 }
 
-.analytics-savings-model-row__bar i {
+.analytics-savings-model-row__bar i,
+.analytics-savings-pace-line__bar i {
   display: block;
   height: 100%;
   max-width: 100%;
@@ -185,155 +261,7 @@
   background: linear-gradient(90deg, rgba(74, 216, 140, 0.9), rgba(0, 229, 204, 0.72));
 }
 
-.analytics-savings-model-row__bottom {
-  margin-top: 7px;
-  color: rgba(255, 255, 255, 0.42);
-  font-size: 11px;
-  line-height: 1;
-  font-weight: 760;
-  letter-spacing: -0.03em;
-}
-
-/* =========================================================
-   Pace card
-   ========================================================= */
-
-.analytics-savings-pace-card {
-  padding: 14px 16px;
-  border-radius: 28px;
-  background:
-    linear-gradient(180deg, rgba(68, 74, 92, 0.34) 0%, rgba(36, 40, 54, 0.22) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.055);
-  box-shadow:
-    0 14px 30px rgba(0, 0, 0, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.035);
-}
-
-.analytics-savings-pace-card--good {
-  background:
-    radial-gradient(circle at 0% 0%, rgba(74, 216, 140, 0.10), transparent 42%),
-    linear-gradient(180deg, rgba(68, 74, 92, 0.34) 0%, rgba(36, 40, 54, 0.22) 100%);
-}
-
-.analytics-savings-pace-card--warn {
-  background:
-    radial-gradient(circle at 0% 0%, rgba(255, 190, 92, 0.12), transparent 42%),
-    linear-gradient(180deg, rgba(68, 74, 92, 0.34) 0%, rgba(36, 40, 54, 0.22) 100%);
-}
-
-.analytics-savings-pace-card--bad {
-  background:
-    radial-gradient(circle at 0% 0%, rgba(255, 114, 104, 0.12), transparent 42%),
-    linear-gradient(180deg, rgba(68, 74, 92, 0.34) 0%, rgba(36, 40, 54, 0.22) 100%);
-}
-
-.analytics-savings-pace-card__head {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: start;
-  gap: 12px;
-  margin-bottom: 14px;
-}
-
-.analytics-savings-pace-card__head h3 {
-  margin: 0;
-  color: #f7f9ff;
-  font-size: 22px;
-  line-height: 0.96;
-  font-weight: 940;
-  letter-spacing: -0.065em;
-}
-
-.analytics-savings-pace-card__head p {
-  margin: 7px 0 0;
-  color: rgba(255, 255, 255, 0.42);
-  font-size: 12px;
-  line-height: 1.1;
-  font-weight: 760;
-  letter-spacing: -0.03em;
-}
-
-.analytics-savings-pace-card__badge {
-  height: 34px;
-  padding: 0 12px;
-  border-radius: 999px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: rgba(248, 250, 255, 0.76);
-  font-size: 12px;
-  line-height: 1;
-  font-weight: 860;
-  letter-spacing: -0.035em;
-  white-space: nowrap;
-  background:
-    linear-gradient(180deg, rgba(44, 50, 64, 0.84) 0%, rgba(24, 28, 38, 0.96) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.052);
-}
-
-.analytics-savings-pace-card--good .analytics-savings-pace-card__badge {
-  color: #a7efbe;
-  background: rgba(74, 216, 140, 0.12);
-}
-
-.analytics-savings-pace-card--warn .analytics-savings-pace-card__badge {
-  color: #ffd58b;
-  background: rgba(255, 190, 92, 0.12);
-}
-
-.analytics-savings-pace-card--bad .analytics-savings-pace-card__badge {
-  color: #ffaaa6;
-  background: rgba(255, 114, 104, 0.12);
-}
-
-.analytics-savings-pace-card__bars {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.analytics-savings-pace-line {
-  padding: 10px 11px;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.045);
-  border: 1px solid rgba(255, 255, 255, 0.035);
-}
-
-.analytics-savings-pace-line__top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 8px;
-}
-
-.analytics-savings-pace-line__top span {
-  color: rgba(255, 255, 255, 0.56);
-  font-size: 12px;
-  line-height: 1;
-  font-weight: 800;
-  letter-spacing: -0.035em;
-}
-
-.analytics-savings-pace-line__top strong {
-  color: #f7f9ff;
-  font-size: 15px;
-  line-height: 1;
-  font-weight: 900;
-  letter-spacing: -0.05em;
-}
-
-.analytics-savings-pace-line__bar {
-  height: 6px;
-  border-radius: 999px;
-  overflow: hidden;
-  background: rgba(255, 255, 255, 0.11);
-}
-
 .analytics-savings-pace-line__bar i {
-  display: block;
-  height: 100%;
-  border-radius: inherit;
   background: linear-gradient(90deg, rgba(111, 156, 255, 0.9), rgba(0, 229, 204, 0.72));
 }
 
@@ -341,9 +269,18 @@
   background: linear-gradient(90deg, rgba(255, 190, 92, 0.9), rgba(255, 114, 104, 0.78));
 }
 
-/* =========================================================
-   Scenarios
-   ========================================================= */
+.analytics-savings-model-row__bottom,
+.analytics-savings-scenario-card__rows em {
+  display: block;
+  margin-top: 7px;
+  color: rgba(255, 255, 255, 0.38);
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 740;
+  letter-spacing: -0.03em;
+}
+
+/* scenarios */
 
 .analytics-savings-scenarios {
   display: flex;
@@ -351,40 +288,34 @@
   gap: 12px;
 }
 
-.analytics-savings-scenarios__list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
 .analytics-savings-scenario-card {
   padding: 14px 16px;
-  border-radius: 26px;
+  border-radius: 28px;
   background:
-    linear-gradient(180deg, rgba(68, 74, 92, 0.34) 0%, rgba(36, 40, 54, 0.22) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.055);
+    radial-gradient(circle at 50% 0%, rgba(111, 156, 255, 0.08), transparent 42%),
+    linear-gradient(180deg, rgba(31, 36, 49, 0.96) 0%, rgba(17, 21, 31, 0.99) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   box-shadow:
-    0 14px 30px rgba(0, 0, 0, 0.2),
+    0 14px 30px rgba(0, 0, 0, 0.22),
     inset 0 1px 0 rgba(255, 255, 255, 0.035);
-  overflow: hidden;
 }
 
 .analytics-savings-scenario-card--good {
   background:
     radial-gradient(circle at 0% 0%, rgba(74, 216, 140, 0.10), transparent 42%),
-    linear-gradient(180deg, rgba(68, 74, 92, 0.34) 0%, rgba(36, 40, 54, 0.22) 100%);
+    linear-gradient(180deg, rgba(31, 36, 49, 0.96) 0%, rgba(17, 21, 31, 0.99) 100%);
 }
 
 .analytics-savings-scenario-card--warn {
   background:
-    radial-gradient(circle at 0% 0%, rgba(255, 190, 92, 0.11), transparent 42%),
-    linear-gradient(180deg, rgba(68, 74, 92, 0.34) 0%, rgba(36, 40, 54, 0.22) 100%);
+    radial-gradient(circle at 0% 0%, rgba(255, 190, 92, 0.10), transparent 42%),
+    linear-gradient(180deg, rgba(31, 36, 49, 0.96) 0%, rgba(17, 21, 31, 0.99) 100%);
 }
 
 .analytics-savings-scenario-card--bad {
   background:
-    radial-gradient(circle at 0% 0%, rgba(255, 114, 104, 0.11), transparent 42%),
-    linear-gradient(180deg, rgba(68, 74, 92, 0.34) 0%, rgba(36, 40, 54, 0.22) 100%);
+    radial-gradient(circle at 0% 0%, rgba(255, 114, 104, 0.10), transparent 42%),
+    linear-gradient(180deg, rgba(31, 36, 49, 0.96) 0%, rgba(17, 21, 31, 0.99) 100%);
 }
 
 .analytics-savings-scenario-card__top {
@@ -398,7 +329,7 @@
 .analytics-savings-scenario-card__top h4 {
   margin: 0;
   color: #f7f9ff;
-  font-size: 26px;
+  font-size: 24px;
   line-height: 0.95;
   font-weight: 950;
   letter-spacing: -0.07em;
@@ -408,72 +339,16 @@
   margin: 6px 0 0;
   color: rgba(255, 255, 255, 0.42);
   font-size: 12px;
-  line-height: 1.05;
   font-weight: 760;
-  letter-spacing: -0.03em;
-}
-
-.analytics-savings-scenario-card__badge {
-  height: 34px;
-  padding: 0 12px;
-  border-radius: 999px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: rgba(248, 250, 255, 0.76);
-  font-size: 12px;
-  line-height: 1;
-  font-weight: 860;
-  letter-spacing: -0.035em;
-  white-space: nowrap;
-  background:
-    linear-gradient(180deg, rgba(44, 50, 64, 0.84) 0%, rgba(24, 28, 38, 0.96) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.052);
-}
-
-.analytics-savings-scenario-card--good .analytics-savings-scenario-card__badge {
-  color: #a7efbe;
-  background: rgba(74, 216, 140, 0.12);
-}
-
-.analytics-savings-scenario-card--warn .analytics-savings-scenario-card__badge {
-  color: #ffd58b;
-  background: rgba(255, 190, 92, 0.12);
-}
-
-.analytics-savings-scenario-card--bad .analytics-savings-scenario-card__badge {
-  color: #ffaaa6;
-  background: rgba(255, 114, 104, 0.12);
-}
-
-.analytics-savings-scenario-card__result {
-  padding: 11px 12px;
-  border-radius: 18px;
-  margin-bottom: 10px;
-  background: rgba(255, 255, 255, 0.045);
-  border: 1px solid rgba(255, 255, 255, 0.035);
-}
-
-.analytics-savings-scenario-card__result span {
-  display: block;
-  margin-bottom: 6px;
-  color: rgba(255, 255, 255, 0.46);
-  font-size: 11px;
-  line-height: 1;
-  font-weight: 760;
-  letter-spacing: -0.03em;
 }
 
 .analytics-savings-scenario-card__result strong {
   display: block;
+  margin-top: 6px;
   color: #ffd072;
   font-size: 24px;
-  line-height: 0.95;
   font-weight: 950;
   letter-spacing: -0.065em;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .analytics-savings-scenario-card--good .analytics-savings-scenario-card__result strong {
@@ -484,111 +359,87 @@
   color: #ff8e86;
 }
 
-.analytics-savings-scenario-card__grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 8px;
+/* interest card calm */
+
+.analytics-safes-interest-card {
+  min-height: 72px;
+  margin-top: 12px;
+  padding: 14px 16px;
+  border-radius: 26px;
+  background:
+    linear-gradient(180deg, rgba(31, 36, 49, 0.86) 0%, rgba(17, 21, 31, 0.94) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.052);
+  box-shadow:
+    0 12px 26px rgba(0, 0, 0, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.028);
 }
 
-.analytics-savings-scenario-card__grid > div {
-  min-width: 0;
-  padding: 10px 11px;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.045);
-  border: 1px solid rgba(255, 255, 255, 0.035);
+.analytics-safes-interest-card__label {
+  color: rgba(255, 255, 255, 0.50);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: -0.035em;
 }
 
-.analytics-savings-scenario-card__grid span {
-  display: block;
-  margin-bottom: 6px;
-  color: rgba(255, 255, 255, 0.46);
-  font-size: 11px;
-  line-height: 1;
-  font-weight: 760;
-  letter-spacing: -0.03em;
+.analytics-safes-interest-card__value {
+  color: rgba(0, 229, 204, 0.92);
+  font-size: 26px;
+  font-weight: 950;
+  letter-spacing: -0.065em;
 }
 
-.analytics-savings-scenario-card__grid strong {
-  display: block;
-  color: rgba(247, 249, 255, 0.88);
-  font-size: 15px;
-  line-height: 1;
-  font-weight: 880;
-  letter-spacing: -0.045em;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+/* no duplicated safe list in analytics */
+
+.analytics-safe-list {
+  display: none !important;
 }
 
-.analytics-savings-scenario-card__grid em {
-  display: block;
-  margin-top: 7px;
-  color: rgba(255, 255, 255, 0.38);
-  font-size: 11px;
-  line-height: 1;
-  font-style: normal;
-  font-weight: 740;
-  letter-spacing: -0.03em;
-}
-
-/* =========================================================
-   Mobile
-   ========================================================= */
+/* mobile */
 
 @media (max-width: 420px) {
-  .analytics-savings-dashboard {
-    gap: 12px;
+  .analytics-safes-month-strip {
+    grid-auto-columns: calc((100% - 32px) / 5);
   }
 
-  .analytics-savings-current-card,
-  .analytics-savings-pace-card,
+  .analytics-savings-card,
+  .analytics-savings-empty-card,
   .analytics-savings-scenario-card {
     padding: 14px 13px;
     border-radius: 24px;
   }
 
-  .analytics-savings-current-card__head {
-    grid-template-columns: minmax(0, 1fr) 112px;
-  }
-
-  .analytics-savings-current-card__head h3,
-  .analytics-savings-pace-card__head h3,
-  .analytics-savings-section-head h3 {
-    font-size: 20px;
-  }
-
-  .analytics-savings-income-pill {
-    width: 112px;
-  }
-
-  .analytics-savings-income-pill strong {
-    font-size: 14px;
-  }
-
-  .analytics-savings-pace-card__head {
+  .analytics-savings-card__head {
     grid-template-columns: 1fr;
   }
 
-  .analytics-savings-pace-card__badge {
+  .analytics-savings-income-pill,
+  .analytics-savings-status-pill {
     justify-self: flex-start;
+  }
+
+  .analytics-savings-income-pill {
+    width: 122px;
+  }
+
+  .analytics-savings-card__head h3,
+  .analytics-savings-empty-card h3,
+  .analytics-savings-section-head h3 {
+    font-size: 21px;
+  }
+
+  .analytics-savings-scenario-card__top {
+    grid-template-columns: 1fr;
   }
 
   .analytics-savings-scenario-card__top h4 {
     font-size: 24px;
   }
 
-  .analytics-savings-scenario-card__badge {
-    height: 32px;
-    padding: 0 10px;
-    font-size: 11.5px;
-  }
-
   .analytics-savings-scenario-card__result strong {
     font-size: 22px;
   }
 
-  .analytics-savings-model-row__top strong,
-  .analytics-savings-scenario-card__grid strong {
-    font-size: 14px;
+  .analytics-safes-interest-card__value {
+    font-size: 24px;
   }
 }
