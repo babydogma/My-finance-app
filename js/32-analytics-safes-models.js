@@ -96,41 +96,7 @@
     return transaction.category_id || transaction.categoryId || UNCATEGORIZED_ID;
   }
 
-  function isTrueFlag(value) {
-    return value === true || value === "true" || value === 1 || value === "1";
-  }
-
-  function isRequiredCategory(state, categoryId) {
-    if (!categoryId || categoryId === UNCATEGORIZED_ID) {
-      return false;
-    }
-
-    const budgetRecord = (state.budgetLimits || []).find((item) => {
-      return item.category_id === categoryId || item.categoryId === categoryId;
-    });
-
-    if (budgetRecord) {
-      return (
-        isTrueFlag(budgetRecord.is_required) ||
-        isTrueFlag(budgetRecord.isRequired) ||
-        isTrueFlag(budgetRecord.required)
-      );
-    }
-
-    const categoryRecord = (state.categories || []).find((item) => {
-      return item.id === categoryId || item.category_id === categoryId;
-    });
-
-    if (!categoryRecord) return false;
-
-    return (
-      isTrueFlag(categoryRecord.is_required) ||
-      isTrueFlag(categoryRecord.isRequired) ||
-      isTrueFlag(categoryRecord.required)
-    );
-  }
-
-  function getMonthStats(state) {
+  function getMonthStats(state, isRequiredCategory) {
     const transactions = getCurrentMonthTransactions(state);
 
     let income = 0;
@@ -141,11 +107,6 @@
       const amount = toNumber(transaction.amount);
       const type = String(transaction.type || "").toLowerCase();
 
-      /*
-        ВАЖНО:
-        Доходом считается ТОЛЬКО операция, созданная через "Доход".
-        Переводы между счетами / сейфами / накоплениями сюда не входят.
-      */
       if (type === "income") {
         income += amount;
         return;
@@ -156,8 +117,11 @@
       }
 
       const categoryId = getCategoryId(transaction);
+      const required = typeof isRequiredCategory === "function"
+        ? isRequiredCategory(categoryId)
+        : false;
 
-      if (isRequiredCategory(state, categoryId)) {
+      if (required) {
         requiredExpense += amount;
       } else {
         flexibleExpense += amount;
@@ -171,20 +135,6 @@
     };
   }
 
-  function getModelStatus({ remainingAfterPlan, requiredDelta, flexibleDelta, income }) {
-    if (income <= 0) return "muted";
-    if (remainingAfterPlan < 0) return "bad";
-    if (requiredDelta < 0 || flexibleDelta < 0) return "warn";
-    return "good";
-  }
-
-  function getStatusLabel(status) {
-    if (status === "good") return "Влезает";
-    if (status === "warn") return "На грани";
-    if (status === "bad") return "Не сходится";
-    return "Нет дохода";
-  }
-
   function formatSignedMoney(value, formatMoney) {
     const amount = roundToTwo(value);
 
@@ -194,8 +144,18 @@
     return formatMoney(0);
   }
 
-  function getPercentLabel(value) {
-    return `${Math.round(value * 100)}%`;
+  function getStatusLabel(status) {
+    if (status === "good") return "Влезает";
+    if (status === "warn") return "На грани";
+    if (status === "bad") return "Не сходится";
+    return "Нет дохода";
+  }
+
+  function getModelStatus({ income, remainingAfterPlan, requiredDelta, flexibleDelta }) {
+    if (income <= 0) return "muted";
+    if (remainingAfterPlan < 0) return "bad";
+    if (requiredDelta < 0 || flexibleDelta < 0) return "warn";
+    return "good";
   }
 
   function getFillPercent(fact, plan) {
@@ -203,17 +163,17 @@
     return Math.min(100, Math.max(0, (fact / plan) * 100));
   }
 
-  function renderCompareRow({ label, fact, plan, percent, kind, formatMoney }) {
+  function renderCompareRow({ label, percent, fact, plan, formatMoney }) {
     const delta = roundToTwo(plan - fact);
     const fill = getFillPercent(fact, plan);
     const isOver = delta < 0;
 
     return `
-      <div class="analytics-safe-model-compare analytics-safe-model-compare--${kind} ${isOver ? "is-over" : ""}">
+      <div class="analytics-safe-model-compare ${isOver ? "is-over" : ""}">
         <div class="analytics-safe-model-compare__top">
           <div>
             <span>${label}</span>
-            <strong>${getPercentLabel(percent)} · план ${formatMoney(plan)}</strong>
+            <strong>${Math.round(percent * 100)}% · план ${formatMoney(plan)}</strong>
           </div>
 
           <div class="analytics-safe-model-compare__fact">
@@ -248,10 +208,10 @@
     );
 
     const status = getModelStatus({
+      income: stats.income,
       remainingAfterPlan,
       requiredDelta,
       flexibleDelta,
-      income: stats.income,
     });
 
     return `
@@ -282,19 +242,17 @@
         <div class="analytics-safe-model-card__compare-list">
           ${renderCompareRow({
             label: "Обязательные",
+            percent: model.required,
             fact: stats.requiredExpense,
             plan: requiredPlan,
-            percent: model.required,
-            kind: "required",
             formatMoney,
           })}
 
           ${renderCompareRow({
             label: "Гибкие",
+            percent: model.flexible,
             fact: stats.flexibleExpense,
             plan: flexiblePlan,
-            percent: model.flexible,
-            kind: "flexible",
             formatMoney,
           })}
         </div>
@@ -302,7 +260,7 @@
     `;
   }
 
-  function renderAnalyticsSafeModels({ state, formatMoney, escapeHtml }) {
+  function renderAnalyticsSafeModels({ state, isRequiredCategory, formatMoney, escapeHtml }) {
     const container = document.getElementById("analyticsSafeModelsList");
 
     if (!container) return;
@@ -312,13 +270,13 @@
       escapeHtml: typeof escapeHtml === "function" ? escapeHtml : fallbackEscapeHtml,
     };
 
-    const stats = getMonthStats(state);
+    const stats = getMonthStats(state, isRequiredCategory);
 
     container.innerHTML = `
       <div class="analytics-safe-models__head">
         <div>
           <h3>Сценарии бюджета</h3>
-          <p>Сравнение систем с твоими текущими расходами</p>
+          <p>Сравнение систем с текущими расходами</p>
         </div>
 
         <div class="analytics-safe-models__income">
