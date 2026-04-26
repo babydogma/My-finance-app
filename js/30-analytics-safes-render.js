@@ -1,14 +1,15 @@
 (() => {
   function createAnalyticsSafesRender({
-    state,
-    getAnalyticsOverviewSummary,
-    getSafeBucketBalance,
-    formatMoney,
-    escapeHtml,
+  state,
+  getAnalyticsOverviewSummary,
+  getSafeBucketBalance,
+  isRequiredCategory,
+  formatMoney,
+  escapeHtml,
 
-    analyticsInterestValue,
-    analyticsSafeList,
-  }) {
+  analyticsInterestValue,
+  analyticsSafeList,
+}) {
     function renderAnalyticsSafes() {
       const summary = getAnalyticsOverviewSummary();
 
@@ -19,6 +20,7 @@
 if (window.FinanceAppAnalyticsSafeModels?.renderAnalyticsSafeModels) {
   window.FinanceAppAnalyticsSafeModels.renderAnalyticsSafeModels({
     state,
+    isRequiredCategory,
     formatMoney,
     escapeHtml,
   });
