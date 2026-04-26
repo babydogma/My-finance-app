@@ -101,7 +101,9 @@
   }
 
   function isRequiredCategory(state, categoryId) {
-    if (!categoryId || categoryId === UNCATEGORIZED_ID) return false;
+    if (!categoryId || categoryId === UNCATEGORIZED_ID) {
+      return false;
+    }
 
     const budgetRecord = (state.budgetLimits || []).find((item) => {
       return item.category_id === categoryId || item.categoryId === categoryId;
@@ -137,20 +139,28 @@
 
     transactions.forEach((transaction) => {
       const amount = toNumber(transaction.amount);
+      const type = String(transaction.type || "").toLowerCase();
 
-      if (transaction.type === "income") {
+      /*
+        ВАЖНО:
+        Доходом считается ТОЛЬКО операция, созданная через "Доход".
+        Переводы между счетами / сейфами / накоплениями сюда не входят.
+      */
+      if (type === "income") {
         income += amount;
         return;
       }
 
-      if (transaction.type === "expense") {
-        const categoryId = getCategoryId(transaction);
+      if (type !== "expense") {
+        return;
+      }
 
-        if (isRequiredCategory(state, categoryId)) {
-          requiredExpense += amount;
-        } else {
-          flexibleExpense += amount;
-        }
+      const categoryId = getCategoryId(transaction);
+
+      if (isRequiredCategory(state, categoryId)) {
+        requiredExpense += amount;
+      } else {
+        flexibleExpense += amount;
       }
     });
 
@@ -161,21 +171,10 @@
     };
   }
 
-  function getStatus(model, stats) {
-    if (stats.income <= 0) return "muted";
-
-    const requiredLimit = stats.income * model.required;
-    const flexibleLimit = stats.income * model.flexible;
-    const savingsTarget = stats.income * model.savings;
-
-    const remaining = stats.income - stats.requiredExpense - stats.flexibleExpense - savingsTarget;
-
-    if (remaining < 0) return "bad";
-
-    if (stats.requiredExpense > requiredLimit || stats.flexibleExpense > flexibleLimit) {
-      return "warn";
-    }
-
+  function getModelStatus({ remainingAfterPlan, requiredDelta, flexibleDelta, income }) {
+    if (income <= 0) return "muted";
+    if (remainingAfterPlan < 0) return "bad";
+    if (requiredDelta < 0 || flexibleDelta < 0) return "warn";
     return "good";
   }
 
@@ -199,18 +198,61 @@
     return `${Math.round(value * 100)}%`;
   }
 
+  function getFillPercent(fact, plan) {
+    if (plan <= 0) return 0;
+    return Math.min(100, Math.max(0, (fact / plan) * 100));
+  }
+
+  function renderCompareRow({ label, fact, plan, percent, kind, formatMoney }) {
+    const delta = roundToTwo(plan - fact);
+    const fill = getFillPercent(fact, plan);
+    const isOver = delta < 0;
+
+    return `
+      <div class="analytics-safe-model-compare analytics-safe-model-compare--${kind} ${isOver ? "is-over" : ""}">
+        <div class="analytics-safe-model-compare__top">
+          <div>
+            <span>${label}</span>
+            <strong>${getPercentLabel(percent)} · план ${formatMoney(plan)}</strong>
+          </div>
+
+          <div class="analytics-safe-model-compare__fact">
+            <span>Факт</span>
+            <strong>${formatMoney(fact)}</strong>
+          </div>
+        </div>
+
+        <div class="analytics-safe-model-compare__bar">
+          <i style="width:${fill}%"></i>
+        </div>
+
+        <div class="analytics-safe-model-compare__delta">
+          ${isOver ? "Перебор" : "Запас"}: ${formatSignedMoney(delta, formatMoney)}
+        </div>
+      </div>
+    `;
+  }
+
   function renderModelCard(model, stats, helpers) {
     const { formatMoney, escapeHtml } = helpers;
 
-    const requiredLimit = roundToTwo(stats.income * model.required);
-    const flexibleLimit = roundToTwo(stats.income * model.flexible);
+    const requiredPlan = roundToTwo(stats.income * model.required);
+    const flexiblePlan = roundToTwo(stats.income * model.flexible);
     const savingsTarget = roundToTwo(stats.income * model.savings);
 
-    const remaining = roundToTwo(
+    const requiredDelta = roundToTwo(requiredPlan - stats.requiredExpense);
+    const flexibleDelta = roundToTwo(flexiblePlan - stats.flexibleExpense);
+
+    const remainingAfterPlan = roundToTwo(
       stats.income - stats.requiredExpense - stats.flexibleExpense - savingsTarget
     );
 
-    const status = getStatus(model, stats);
+    const status = getModelStatus({
+      remainingAfterPlan,
+      requiredDelta,
+      flexibleDelta,
+      income: stats.income,
+    });
 
     return `
       <article class="analytics-safe-model-card analytics-safe-model-card--${status}">
@@ -225,10 +267,10 @@
           </div>
         </div>
 
-        <div class="analytics-safe-model-card__main">
+        <div class="analytics-safe-model-card__summary">
           <div>
             <span>Осталось бы</span>
-            <strong>${formatSignedMoney(remaining, formatMoney)}</strong>
+            <strong>${formatSignedMoney(remainingAfterPlan, formatMoney)}</strong>
           </div>
 
           <div>
@@ -237,16 +279,24 @@
           </div>
         </div>
 
-        <div class="analytics-safe-model-card__split">
-          <div>
-            <span>Обязательные</span>
-            <strong>${getPercentLabel(model.required)} · ${formatMoney(requiredLimit)}</strong>
-          </div>
+        <div class="analytics-safe-model-card__compare-list">
+          ${renderCompareRow({
+            label: "Обязательные",
+            fact: stats.requiredExpense,
+            plan: requiredPlan,
+            percent: model.required,
+            kind: "required",
+            formatMoney,
+          })}
 
-          <div>
-            <span>Гибкие</span>
-            <strong>${getPercentLabel(model.flexible)} · ${formatMoney(flexibleLimit)}</strong>
-          </div>
+          ${renderCompareRow({
+            label: "Гибкие",
+            fact: stats.flexibleExpense,
+            plan: flexiblePlan,
+            percent: model.flexible,
+            kind: "flexible",
+            formatMoney,
+          })}
         </div>
       </article>
     `;
@@ -268,7 +318,7 @@
       <div class="analytics-safe-models__head">
         <div>
           <h3>Сценарии бюджета</h3>
-          <p>Сравнение по текущему месяцу</p>
+          <p>Сравнение систем с твоими текущими расходами</p>
         </div>
 
         <div class="analytics-safe-models__income">
