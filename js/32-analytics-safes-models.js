@@ -55,26 +55,18 @@
     }
 
     const now = new Date();
-    const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, "0");
-
-    return `${year}-${month}`;
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
   }
 
-  function getTransactionMainDateValue(transaction) {
-    return (
+  function getTransactionDateKey(transaction) {
+    const rawValue =
       transaction.date ||
       transaction.transaction_date ||
       transaction.operation_date ||
       transaction.created_date ||
       transaction.created_at ||
       transaction.createdAt ||
-      ""
-    );
-  }
-
-  function getTransactionDateKey(transaction) {
-    const rawValue = getTransactionMainDateValue(transaction);
+      "";
 
     if (!rawValue) return "";
 
@@ -86,15 +78,9 @@
 
     const parsedDate = new Date(rawText);
 
-    if (Number.isNaN(parsedDate.getTime())) {
-      return "";
-    }
+    if (Number.isNaN(parsedDate.getTime())) return "";
 
-    const year = parsedDate.getFullYear();
-    const month = String(parsedDate.getMonth() + 1).padStart(2, "0");
-    const day = String(parsedDate.getDate()).padStart(2, "0");
-
-    return `${year}-${month}-${day}`;
+    return `${parsedDate.getFullYear()}-${String(parsedDate.getMonth() + 1).padStart(2, "0")}-${String(parsedDate.getDate()).padStart(2, "0")}`;
   }
 
   function getCurrentMonthTransactions(state) {
@@ -115,9 +101,7 @@
   }
 
   function isRequiredCategory(state, categoryId) {
-    if (!categoryId || categoryId === UNCATEGORIZED_ID) {
-      return false;
-    }
+    if (!categoryId || categoryId === UNCATEGORIZED_ID) return false;
 
     const budgetRecord = (state.budgetLimits || []).find((item) => {
       return item.category_id === categoryId || item.categoryId === categoryId;
@@ -135,26 +119,12 @@
       return item.id === categoryId || item.category_id === categoryId;
     });
 
-    if (!categoryRecord) {
-      return false;
-    }
+    if (!categoryRecord) return false;
 
     return (
       isTrueFlag(categoryRecord.is_required) ||
       isTrueFlag(categoryRecord.isRequired) ||
       isTrueFlag(categoryRecord.required)
-    );
-  }
-
-  function isTransferToSafe(transaction) {
-    if (transaction.type !== "transfer") return false;
-
-    return Boolean(
-      transaction.to_safe_bucket_id ||
-      transaction.toSafeBucketId ||
-      transaction.to_bucket_id ||
-      transaction.safe_bucket_id ||
-      transaction.safeBucketId
     );
   }
 
@@ -164,7 +134,6 @@
     let income = 0;
     let requiredExpense = 0;
     let flexibleExpense = 0;
-    let actualSavings = 0;
 
     transactions.forEach((transaction) => {
       const amount = toNumber(transaction.amount);
@@ -182,12 +151,6 @@
         } else {
           flexibleExpense += amount;
         }
-
-        return;
-      }
-
-      if (isTransferToSafe(transaction)) {
-        actualSavings += amount;
       }
     });
 
@@ -195,14 +158,11 @@
       income: roundToTwo(income),
       requiredExpense: roundToTwo(requiredExpense),
       flexibleExpense: roundToTwo(flexibleExpense),
-      actualSavings: roundToTwo(actualSavings),
     };
   }
 
   function getStatus(model, stats) {
-    if (stats.income <= 0) {
-      return "muted";
-    }
+    if (stats.income <= 0) return "muted";
 
     const requiredLimit = stats.income * model.required;
     const flexibleLimit = stats.income * model.flexible;
@@ -210,9 +170,7 @@
 
     const remaining = stats.income - stats.requiredExpense - stats.flexibleExpense - savingsTarget;
 
-    if (remaining < 0) {
-      return "bad";
-    }
+    if (remaining < 0) return "bad";
 
     if (stats.requiredExpense > requiredLimit || stats.flexibleExpense > flexibleLimit) {
       return "warn";
@@ -231,38 +189,14 @@
   function formatSignedMoney(value, formatMoney) {
     const amount = roundToTwo(value);
 
-    if (amount > 0) {
-      return `+${formatMoney(amount)}`;
-    }
-
-    if (amount < 0) {
-      return `−${formatMoney(Math.abs(amount))}`;
-    }
+    if (amount > 0) return `+${formatMoney(amount)}`;
+    if (amount < 0) return `−${formatMoney(Math.abs(amount))}`;
 
     return formatMoney(0);
   }
 
-  function getProgressPercent(actual, planned) {
-    if (planned <= 0) return 0;
-
-    return Math.min(100, Math.max(0, (actual / planned) * 100));
-  }
-
-  function renderModelRow({ label, actual, planned, formatMoney }) {
-    const progress = getProgressPercent(actual, planned);
-
-    return `
-      <div class="analytics-safe-model-row">
-        <div class="analytics-safe-model-row__top">
-          <span>${label}</span>
-          <strong>${formatMoney(actual)} / ${formatMoney(planned)}</strong>
-        </div>
-
-        <div class="analytics-safe-model-row__bar">
-          <i style="width:${progress}%"></i>
-        </div>
-      </div>
-    `;
+  function getPercentLabel(value) {
+    return `${Math.round(value * 100)}%`;
   }
 
   function renderModelCard(model, stats, helpers) {
@@ -280,7 +214,7 @@
 
     return `
       <article class="analytics-safe-model-card analytics-safe-model-card--${status}">
-        <div class="analytics-safe-model-card__head">
+        <div class="analytics-safe-model-card__top">
           <div>
             <div class="analytics-safe-model-card__title">${escapeHtml(model.title)}</div>
             <div class="analytics-safe-model-card__subtitle">${escapeHtml(model.subtitle)}</div>
@@ -291,37 +225,28 @@
           </div>
         </div>
 
-        <div class="analytics-safe-model-card__result">
-          <span>Осталось бы</span>
-          <strong>${formatSignedMoney(remaining, formatMoney)}</strong>
+        <div class="analytics-safe-model-card__main">
+          <div>
+            <span>Осталось бы</span>
+            <strong>${formatSignedMoney(remaining, formatMoney)}</strong>
+          </div>
+
+          <div>
+            <span>Цель накопления</span>
+            <strong>${formatMoney(savingsTarget)}</strong>
+          </div>
         </div>
 
-        <div class="analytics-safe-model-card__target">
-          <span>Цель накопления</span>
-          <strong>${formatMoney(savingsTarget)}</strong>
-        </div>
+        <div class="analytics-safe-model-card__split">
+          <div>
+            <span>Обязательные</span>
+            <strong>${getPercentLabel(model.required)} · ${formatMoney(requiredLimit)}</strong>
+          </div>
 
-        <div class="analytics-safe-model-card__rows">
-          ${renderModelRow({
-            label: "Обязательные",
-            actual: stats.requiredExpense,
-            planned: requiredLimit,
-            formatMoney,
-          })}
-
-          ${renderModelRow({
-            label: "Гибкие",
-            actual: stats.flexibleExpense,
-            planned: flexibleLimit,
-            formatMoney,
-          })}
-
-          ${renderModelRow({
-            label: "Накоплено",
-            actual: stats.actualSavings,
-            planned: savingsTarget,
-            formatMoney,
-          })}
+          <div>
+            <span>Гибкие</span>
+            <strong>${getPercentLabel(model.flexible)} · ${formatMoney(flexibleLimit)}</strong>
+          </div>
         </div>
       </article>
     `;
@@ -353,9 +278,7 @@
       </div>
 
       <div class="analytics-safe-models__list">
-        ${BUDGET_MODELS.map((model) => {
-          return renderModelCard(model, stats, helpers);
-        }).join("")}
+        ${BUDGET_MODELS.map((model) => renderModelCard(model, stats, helpers)).join("")}
       </div>
     `;
   }
