@@ -70,10 +70,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     mandatoryPaymentEditorTitle,
     closeMandatoryPaymentEditorModalBtn,
     mandatoryPaymentTitleInput,
-    mandatoryPaymentAmountInput,
-    mandatoryPaymentDueDayInput,
-    mandatoryPaymentLinkedSafeSelect,
-    mandatoryPaymentAccountSelect,
+mandatoryPaymentAmountInput,
+mandatoryPaymentDueDayInput,
+mandatoryPaymentCategorySelect,
+mandatoryPaymentLinkedSafeSelect,
+mandatoryPaymentAccountSelect,
     mandatoryPaymentBucketPickerModal,
     mandatoryPaymentBucketPickerList,
     closeMandatoryPaymentBucketPickerModalBtn,
@@ -496,14 +497,16 @@ let justCreatedTransactionId = null;
   });
 
   const {
-    fillMandatoryPaymentAccountSelect,
-    fillMandatoryPaymentSafeSelect,
-    syncMandatoryPaymentLinkedSafeField,
-    renderMandatoryPaymentBucketPicker,
-  } = window.FinanceAppMandatoryPaymentDom.create({
+  fillMandatoryPaymentAccountSelect,
+  fillMandatoryPaymentSafeSelect,
+  fillMandatoryPaymentCategorySelect,
+  syncMandatoryPaymentLinkedSafeField,
+  renderMandatoryPaymentBucketPicker,
+} = window.FinanceAppMandatoryPaymentDom.create({
     state,
     mandatoryPaymentAccountSelect,
     mandatoryPaymentLinkedSafeSelect,
+    mandatoryPaymentCategorySelect,
     mandatoryPaymentLinkedSafeField,
     openMandatoryPaymentBucketPickerBtn,
     mandatoryPaymentBucketPickerModal,
@@ -512,6 +515,31 @@ let justCreatedTransactionId = null;
     getSafeBucketName,
     escapeHtml,
   });
+  
+  function syncMandatoryPaymentCategorySelectFromActivePayment() {
+  if (!fillMandatoryPaymentCategorySelect) return;
+
+  const activePayment = state.mandatoryPayments.find((item) => {
+    return item.id === activeMandatoryPaymentId;
+  });
+
+  fillMandatoryPaymentCategorySelect(activePayment?.category_id || "");
+}
+
+const mandatoryPaymentCategoryObserver = new MutationObserver(() => {
+  if (!mandatoryPaymentEditorModal) return;
+
+  if (!mandatoryPaymentEditorModal.classList.contains("hidden")) {
+    syncMandatoryPaymentCategorySelectFromActivePayment();
+  }
+});
+
+if (mandatoryPaymentEditorModal) {
+  mandatoryPaymentCategoryObserver.observe(mandatoryPaymentEditorModal, {
+    attributes: true,
+    attributeFilter: ["class"],
+  });
+}
 
   const {
     resetMandatoryPaymentForm,
@@ -583,7 +611,8 @@ let justCreatedTransactionId = null;
     mandatoryPaymentTitleInput,
     mandatoryPaymentAmountInput,
     mandatoryPaymentDueDayInput,
-    mandatoryPaymentAccountSelect,
+mandatoryPaymentCategorySelect,
+mandatoryPaymentAccountSelect,
     mandatoryPaymentLinkedSafeSelect,
     onAfterTogglePaid: async () => {
       await loadDataFromSupabase();
