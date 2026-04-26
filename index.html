@@ -899,26 +899,29 @@ title="Добавить платёж"
         <input class="input" id="mandatoryPaymentTitleInput" type="text" placeholder="Например: Квартира" />
       </div>
 
-      <div class="field">
-        <input
-  class="input"
-  id="mandatoryPaymentAmountInput"
-  type="text"
-  inputmode="decimal"
-  autocomplete="off"
-  placeholder="Сумма"
-      </div>
+      <div class="mandatory-payment-main-row">
+  <div class="field mandatory-payment-main-row__field mandatory-payment-money-field">
+    <input
+      class="input mandatory-payment-money-input"
+      id="mandatoryPaymentAmountInput"
+      type="text"
+      inputmode="decimal"
+      autocomplete="off"
+      placeholder="Сумма"
+    />
+    <span class="mandatory-payment-money-symbol">₽</span>
+  </div>
 
-      <div class="field mandatory-payment-date-field">
-  <input
-    class="input mandatory-payment-date-input"
-    id="mandatoryPaymentDueDayInput"
-    type="date"
-    required
-  />
-  <span class="mandatory-payment-date-placeholder">Выбери дату</span>
+  <div class="field mandatory-payment-main-row__field mandatory-payment-date-field">
+    <input
+      class="input mandatory-payment-date-input"
+      id="mandatoryPaymentDueDayInput"
+      type="date"
+      required
+    />
+    <span class="mandatory-payment-date-placeholder">Выбери дату</span>
+  </div>
 </div>
-      </div>
 
       <div class="field">
         <select class="select" id="mandatoryPaymentAccountSelect">
