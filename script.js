@@ -468,15 +468,18 @@ getSafeBucketIcon,
     fillSafeBucketSelect,
     updateTransferSafeFields,
   } = window.FinanceAppSafeBucketDomHelpers.create({
-    state,
-    isVaultAccountId,
-    fromAccountSelect,
-    toAccountSelect,
-    fromSafeBucketField,
-    toSafeBucketField,
-    fromSafeBucketSelect,
-    toSafeBucketSelect,
-  });
+  state,
+  isVaultAccountId,
+  getRealSafeBuckets,
+  accountSelect,
+  fromAccountSelect,
+  toAccountSelect,
+  fromSafeBucketField,
+  toSafeBucketField,
+  fromSafeBucketSelect,
+  toSafeBucketSelect,
+  getCurrentMode: () => currentMode,
+});
 
   const {
     parseMandatoryPaymentsFromMeta,
