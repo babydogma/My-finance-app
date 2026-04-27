@@ -3,6 +3,8 @@
     state,
     roundToTwo,
     getFreeSafeBucket,
+    getRealSafeBuckets,
+    isRealSafeBucket,
     getSafeAccountId,
     getSafeAccountName,
     getAccountBalance,
@@ -10,9 +12,22 @@
     getProtectedAccounts,
     getFreeMoneyAccounts,
   }) {
+    function getRealBucketsSafe() {
+      if (typeof getRealSafeBuckets === "function") {
+        return getRealSafeBuckets();
+      }
+
+      return state.safeBuckets.filter((bucket) => {
+        if (typeof isRealSafeBucket === "function") {
+          return isRealSafeBucket(bucket);
+        }
+
+        return bucket.include_in_free_money !== true;
+      });
+    }
+
     function getSafeBucketBalance(bucketId) {
       let balance = 0;
-      const freeBucketId = getFreeSafeBucket()?.id || null;
       const safeAccountId = getSafeAccountId();
       const safeAccountName = getSafeAccountName();
 
@@ -52,9 +67,12 @@
             (transaction.account_id && transaction.account_id === safeAccountId) ||
             (!transaction.account_id && transaction.account === safeAccountName);
 
-          const expenseBucketId = transaction.from_safe_bucket_id || freeBucketId;
+          const expenseBucketId =
+            transaction.from_safe_bucket_id ||
+            transaction.safe_bucket_id ||
+            "";
 
-          if (expenseFromSafe && expenseBucketId === bucketId) {
+          if (expenseFromSafe && expenseBucketId && expenseBucketId === bucketId) {
             balance -= amount;
           }
         }
@@ -64,7 +82,7 @@
     }
 
     function getAllSafeBucketsBalance() {
-      return state.safeBuckets.reduce((sum, bucket) => {
+      return getRealBucketsSafe().reduce((sum, bucket) => {
         return sum + getSafeBucketBalance(bucket.id);
       }, 0);
     }
@@ -73,7 +91,7 @@
       const totalSafeBalance = getAccountBalance(getSafeAccountId());
       const distributedBalance = getAllSafeBucketsBalance();
 
-      return totalSafeBalance - distributedBalance;
+      return roundToTwo(totalSafeBalance - distributedBalance);
     }
 
     function normalizeMoneyBucketName(value) {
@@ -83,14 +101,13 @@
     function getSafeBucketsByNames(names) {
       const normalizedNames = names.map(normalizeMoneyBucketName);
 
-      return state.safeBuckets.filter((bucket) =>
+      return getRealBucketsSafe().filter((bucket) =>
         normalizedNames.includes(normalizeMoneyBucketName(bucket.name))
       );
     }
 
     function getFreeSafeBalance() {
-      const freeBucket = getFreeSafeBucket();
-      return freeBucket ? getSafeBucketBalance(freeBucket.id) : 0;
+      return roundToTwo(Math.max(0, getUnassignedSafeBalance()));
     }
 
     function getStrictSafeBalance() {
@@ -128,13 +145,9 @@
         return sum + getAccountBalance(account.id);
       }, 0);
 
-      const bucketsPart = state.safeBuckets
-        .filter((bucket) => bucket.include_in_free_money === true)
-        .reduce((sum, bucket) => {
-          return sum + getSafeBucketBalance(bucket.id);
-        }, 0);
+      const unassignedSafePart = getFreeSafeBalance();
 
-      return roundToTwo(Math.max(0, accountsPart + bucketsPart));
+      return roundToTwo(Math.max(0, accountsPart + unassignedSafePart));
     }
 
     return {
