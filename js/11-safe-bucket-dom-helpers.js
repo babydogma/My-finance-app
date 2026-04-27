@@ -459,99 +459,91 @@
     }
   }
 
-  async function resetUnassignedSafeMoney() {
-    const state = getState();
-    const client = getSupabaseClient();
-    const vaultAccount = getVaultAccount(state);
+    function patchUnassignedRow(modal) {
+  const row = modal.querySelector("#safeBucketsUnassignedCard");
 
-    if (!state || !client || !vaultAccount) {
-      alert("Не получилось обнулить: данные сейфа ещё не загружены.");
-      return;
+  if (!row) return;
+
+  const valueEl =
+    document.getElementById("safeBucketsUnassignedValue") ||
+    row.querySelector(".list-value");
+
+  if (valueEl) {
+    const savedHiddenValue = localStorage.getItem("financeAppHiddenUnassignedSafeValue");
+    const currentValue = String(valueEl.textContent || "").trim();
+
+    if (savedHiddenValue && currentValue === savedHiddenValue) {
+      valueEl.textContent = "";
+      valueEl.classList.add("safe-buckets-value-hidden-by-reset");
     }
 
-    const unassignedBalance = getUnassignedSafeBalance(state);
-    const amount = Math.abs(roundToTwo(unassignedBalance));
-
-    if (amount < 0.01) {
-      alert("Не распределено уже равно 0 ₽.");
-      return;
-    }
-
-    const confirmed = confirm(
-      `Обнулить «Не распределено» на ${amount.toLocaleString("ru-RU", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      })} ₽?`
-    );
-
-    if (!confirmed) return;
-
-    const transactionType = unassignedBalance > 0 ? "expense" : "income";
-    const now = new Date().toISOString();
-
-    try {
-      await insertCorrectionTransaction(client, {
-        created_at: now,
-        type: transactionType,
-        amount,
-        date: getTodayDateValue(),
-        account_id: vaultAccount.id,
-        account: vaultAccount.name,
-        category_id: null,
-        comment: "Обнуление не распределено",
-        from_safe_bucket_id: null,
-        to_safe_bucket_id: null,
-        safe_bucket_id: null,
-      });
-
-      window.location.reload();
-    } catch (error) {
-      alert(`Не получилось обнулить: ${error.message || "ошибка Supabase"}`);
+    if (savedHiddenValue && currentValue && currentValue !== savedHiddenValue) {
+      localStorage.removeItem("financeAppHiddenUnassignedSafeValue");
+      valueEl.classList.remove("safe-buckets-value-hidden-by-reset");
     }
   }
 
-  async function clearFreeBucketReferences(client, bucketId) {
-    const columns = ["from_safe_bucket_id", "to_safe_bucket_id", "safe_bucket_id"];
+  if (row.dataset[PATCHED_MARK] === "true") return;
 
-    for (const column of columns) {
-      const { error } = await client
-        .from("transactions")
-        .update({ [column]: null })
-        .eq(column, bucketId);
+  row.dataset[PATCHED_MARK] = "true";
 
-      if (error && !String(error.message || "").toLowerCase().includes("column")) {
-        throw error;
-      }
-    }
-  }
+  const button = getOrCreateRowActionButton(
+    row,
+    "safe-buckets-row-reset-btn",
+    "Обнулить"
+  );
 
-  async function deleteFreeSafeBucket(event) {
+  button.setAttribute("aria-label", "Скрыть сумму не распределено");
+  button.addEventListener("click", (event) => {
     event.preventDefault();
     event.stopPropagation();
 
-    const state = getState();
-    const client = getSupabaseClient();
-    const freeBucket = getFreeSafeBucket(state);
-
-    if (!state || !client || !freeBucket) {
-      alert("Свободные не найдены или данные ещё не загружены.");
-      return;
+    resetUnassignedSafeMoney();
+  });
+}
+  
+    async function clearFreeBucketReferences(client, bucketId) {
+      const columns = ["from_safe_bucket_id", "to_safe_bucket_id", "safe_bucket_id"];
+  
+      for (const column of columns) {
+        const { error } = await client
+          .from("transactions")
+          .update({ [column]: null })
+          .eq(column, bucketId);
+  
+        if (error && !String(error.message || "").toLowerCase().includes("column")) {
+          throw error;
+        }
+      }
     }
-
-    const confirmed = confirm(
-      "Удалить раздел «Свободные»? Его операции станут нераспределёнными."
-    );
-
-    if (!confirmed) return;
-
-    try {
-      await clearFreeBucketReferences(client, freeBucket.id);
-
-      const { error } = await client
-        .from("safe_buckets")
-        .delete()
-        .eq("id", freeBucket.id);
-
+  
+    async function deleteFreeSafeBucket(event) {
+      event.preventDefault();
+      event.stopPropagation();
+  
+      const state = getState();
+      const client = getSupabaseClient();
+      const freeBucket = getFreeSafeBucket(state);
+  
+      if (!state || !client || !freeBucket) {
+        alert("Свободные не найдены или данные ещё не загружены.");
+        return;
+      }
+  
+      const confirmed = confirm(
+        "Удалить раздел «Свободные»? Его операции станут нераспределёнными."
+      );
+  
+      if (!confirmed) return;
+  
+      try {
+        await clearFreeBucketReferences(client, freeBucket.id);
+  
+        const { error } = await client
+          .from("safe_buckets")
+          .delete()
+          .eq("id", freeBucket.id);
+  
       if (error) {
         throw error;
       }
