@@ -2,19 +2,32 @@
   function createSafeBucketDomHelpers({
     state,
     isVaultAccountId,
+    getRealSafeBuckets,
+    accountSelect,
     fromAccountSelect,
     toAccountSelect,
     fromSafeBucketField,
     toSafeBucketField,
     fromSafeBucketSelect,
     toSafeBucketSelect,
+    getCurrentMode,
   }) {
+    function getBucketsForSelect() {
+      if (typeof getRealSafeBuckets === "function") {
+        return getRealSafeBuckets();
+      }
+
+      return state.safeBuckets.filter((bucket) => {
+        return bucket.include_in_free_money !== true;
+      });
+    }
+
     function fillSafeBucketSelect(selectEl, placeholder, selectedId = "") {
       if (!selectEl) return;
 
       selectEl.innerHTML = `<option value="">${placeholder}</option>`;
 
-      state.safeBuckets.forEach((bucket) => {
+      getBucketsForSelect().forEach((bucket) => {
         const option = document.createElement("option");
         option.value = bucket.id;
         option.textContent = bucket.name;
@@ -27,12 +40,50 @@
       });
     }
 
+    function hideSafeBucketFields() {
+      fromSafeBucketField?.classList.add("hidden");
+      toSafeBucketField?.classList.add("hidden");
+    }
+
     function updateTransferSafeFields() {
+      const mode = typeof getCurrentMode === "function"
+        ? getCurrentMode()
+        : "transfer";
+
+      hideSafeBucketFields();
+
+      if (mode === "expense") {
+        const expenseFromSafes = isVaultAccountId(accountSelect?.value);
+
+        if (!expenseFromSafes) {
+          if (fromSafeBucketSelect) fromSafeBucketSelect.value = "";
+          if (toSafeBucketSelect) toSafeBucketSelect.value = "";
+          return;
+        }
+
+        fillSafeBucketSelect(
+          fromSafeBucketSelect,
+          "Из какого накопления",
+          fromSafeBucketSelect?.value || ""
+        );
+
+        fromSafeBucketField?.classList.remove("hidden");
+
+        if (toSafeBucketSelect) {
+          toSafeBucketSelect.value = "";
+        }
+
+        return;
+      }
+
+      if (mode !== "transfer") {
+        if (fromSafeBucketSelect) fromSafeBucketSelect.value = "";
+        if (toSafeBucketSelect) toSafeBucketSelect.value = "";
+        return;
+      }
+
       const fromIsSafes = isVaultAccountId(fromAccountSelect?.value);
       const toIsSafes = isVaultAccountId(toAccountSelect?.value);
-
-      fromSafeBucketField?.classList.toggle("hidden", !fromIsSafes);
-      toSafeBucketField?.classList.toggle("hidden", !toIsSafes);
 
       if (!fromIsSafes && fromSafeBucketSelect) {
         fromSafeBucketSelect.value = "";
@@ -48,6 +99,8 @@
           "Из какого накопления",
           fromSafeBucketSelect?.value || ""
         );
+
+        fromSafeBucketField?.classList.remove("hidden");
       }
 
       if (toIsSafes) {
@@ -56,6 +109,8 @@
           "В какое накопление",
           toSafeBucketSelect?.value || ""
         );
+
+        toSafeBucketField?.classList.remove("hidden");
       }
     }
 
