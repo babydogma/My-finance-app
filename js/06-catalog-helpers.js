@@ -100,9 +100,35 @@
       return state.accounts.filter((account) => account.include_in_free_money === true);
     }
 
+    function isFreeSafeBucket(bucket) {
+      if (!bucket) return false;
+
+      const name = String(bucket.name || "").trim().toLowerCase();
+      const kind = String(bucket.bucket_kind || "").trim().toLowerCase();
+
+      return (
+        bucket.include_in_free_money === true ||
+        kind === "free" ||
+        kind === "system_free" ||
+        name === "свободные" ||
+        name === "свободно"
+      );
+    }
+
+    function isRealSafeBucket(bucket) {
+      return Boolean(bucket) && !isFreeSafeBucket(bucket);
+    }
+
+    function getRealSafeBuckets() {
+      return state.safeBuckets.filter(isRealSafeBucket);
+    }
+
     function getSafeBucketsByKind(kinds) {
       const list = Array.isArray(kinds) ? kinds : [kinds];
-      return state.safeBuckets.filter((bucket) => list.includes(bucket.bucket_kind));
+
+      return getRealSafeBuckets().filter((bucket) => {
+        return list.includes(bucket.bucket_kind);
+      });
     }
 
     function getFreeSafeBucket() {
@@ -110,11 +136,17 @@
     }
 
     function getProtectedSafeBuckets() {
-      return state.safeBuckets.filter((bucket) => bucket.is_protected === true);
+      return getRealSafeBuckets().filter((bucket) => bucket.is_protected === true);
     }
 
     function getSpendableAccounts() {
       return state.accounts.filter((account) => account.account_kind !== "vault_pool");
+    }
+
+    function getTransferAccounts() {
+      return state.accounts.filter((account) => {
+        return account.account_kind !== "system";
+      });
     }
 
     function getSafeBucketName(bucketId) {
@@ -132,28 +164,41 @@
       getCategoryIcon,
       isRequiredCategory,
       getCategoryTypeLabel,
+
       getSafeBucketById,
       getAccountsByKind,
       getAccountById,
       getAccountNameById,
       getAccountIconById,
+
       getVaultAccount,
       getVaultAccountId,
       getVaultAccountName,
       isVaultAccountId,
+
       getPrimarySpendAccount,
       getPrimarySpendAccountId,
       getPrimarySpendAccountName,
+
       getCashAccount,
       getCashAccountId,
+
       getSafeAccountName,
       getSafeAccountId,
+
       getProtectedAccounts,
       getFreeMoneyAccounts,
+
       getSafeBucketsByKind,
       getFreeSafeBucket,
       getProtectedSafeBuckets,
+      getRealSafeBuckets,
+      isFreeSafeBucket,
+      isRealSafeBucket,
+
       getSpendableAccounts,
+      getTransferAccounts,
+
       getSafeBucketName,
       getSafeBucketIcon,
     };
