@@ -376,11 +376,15 @@ let justCreatedTransactionId = null;
     getProtectedAccounts,
     getFreeMoneyAccounts,
     getSafeBucketsByKind,
-    getFreeSafeBucket,
-    getProtectedSafeBuckets,
-    getSpendableAccounts,
-    getSafeBucketName,
-    getSafeBucketIcon,
+getFreeSafeBucket,
+getProtectedSafeBuckets,
+getRealSafeBuckets,
+isFreeSafeBucket,
+isRealSafeBucket,
+getSpendableAccounts,
+getTransferAccounts,
+getSafeBucketName,
+getSafeBucketIcon,
   } = window.FinanceAppCatalogHelpers.create({ state });
 
   const {
@@ -425,16 +429,18 @@ let justCreatedTransactionId = null;
     getProtectedMoneyTotal,
     getFreeMoneyTotal,
   } = window.FinanceAppSafeBucketCalculations.create({
-    state,
-    roundToTwo,
-    getFreeSafeBucket,
-    getSafeAccountId,
-    getSafeAccountName,
-    getAccountBalance,
-    getSafeBucketsByKind,
-    getProtectedAccounts,
-    getFreeMoneyAccounts,
-  });
+  state,
+  roundToTwo,
+  getFreeSafeBucket,
+  getRealSafeBuckets,
+  isRealSafeBucket,
+  getSafeAccountId,
+  getSafeAccountName,
+  getAccountBalance,
+  getSafeBucketsByKind,
+  getProtectedAccounts,
+  getFreeMoneyAccounts,
+});
 
   const {
     getBudgetLimitByCategoryId,
