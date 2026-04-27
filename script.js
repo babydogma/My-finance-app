@@ -328,6 +328,7 @@ bindMoneyInput(safeBucketAmountInput);
      02. UI STATE
      ========================================================= */
   let currentMode = "expense";
+  updateTransferSafeFields();
   let editingTransactionId = null;
   let mandatoryPaymentsSelectedMonth = getCurrentMonthValue();
 
@@ -479,6 +480,18 @@ getSafeBucketIcon,
   fromSafeBucketSelect,
   toSafeBucketSelect,
   getCurrentMode: () => currentMode,
+});
+
+accountSelect?.addEventListener("change", () => {
+  updateTransferSafeFields();
+});
+
+fromAccountSelect?.addEventListener("change", () => {
+  updateTransferSafeFields();
+});
+
+toAccountSelect?.addEventListener("change", () => {
+  updateTransferSafeFields();
 });
 
   const {
