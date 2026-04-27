@@ -3,6 +3,8 @@
     state,
     isVaultAccountId,
     getRealSafeBuckets,
+    getFreeSafeBucket,
+    getTransferAccounts,
     accountSelect,
     fromAccountSelect,
     toAccountSelect,
@@ -12,7 +14,7 @@
     toSafeBucketSelect,
     getCurrentMode,
   }) {
-    function getBucketsForSelect() {
+    function getRealBucketsForSelect() {
       if (typeof getRealSafeBuckets === "function") {
         return getRealSafeBuckets();
       }
@@ -22,17 +24,116 @@
       });
     }
 
-    function fillSafeBucketSelect(selectEl, placeholder, selectedId = "") {
+    function getFreeBucketForTransfer() {
+      if (typeof getFreeSafeBucket === "function") {
+        return getFreeSafeBucket();
+      }
+
+      return (
+        state.safeBuckets.find((bucket) => {
+          const name = String(bucket.name || "").trim().toLowerCase();
+          const kind = String(bucket.bucket_kind || "").trim().toLowerCase();
+
+          return (
+            bucket.include_in_free_money === true ||
+            kind === "free" ||
+            kind === "system_free" ||
+            name === "свободные" ||
+            name === "свободно"
+          );
+        }) || null
+      );
+    }
+
+    function getBucketsForSelect({ includeFree = false } = {}) {
+      const realBuckets = getRealBucketsForSelect();
+      const freeBucket = includeFree ? getFreeBucketForTransfer() : null;
+
+      if (!freeBucket) {
+        return realBuckets;
+      }
+
+      const hasFreeInRealList = realBuckets.some((bucket) => {
+        return bucket.id === freeBucket.id;
+      });
+
+      if (hasFreeInRealList) {
+        return realBuckets;
+      }
+
+      return [
+        {
+          ...freeBucket,
+          name: "Свободные",
+        },
+        ...realBuckets,
+      ];
+    }
+
+    function getAccountsForTransfer() {
+      if (typeof getTransferAccounts === "function") {
+        return getTransferAccounts();
+      }
+
+      return state.accounts.filter((account) => {
+        return account.account_kind !== "system";
+      });
+    }
+
+    function fillTransferAccountSelect(selectEl, placeholder, selectedId = "") {
       if (!selectEl) return;
+
+      const previousValue = selectedId || selectEl.value || "";
 
       selectEl.innerHTML = `<option value="">${placeholder}</option>`;
 
-      getBucketsForSelect().forEach((bucket) => {
+      getAccountsForTransfer().forEach((account) => {
         const option = document.createElement("option");
-        option.value = bucket.id;
-        option.textContent = bucket.name;
 
-        if (selectedId && selectedId === bucket.id) {
+        option.value = account.id;
+        option.textContent = account.name || "Счёт";
+
+        if (previousValue && previousValue === account.id) {
+          option.selected = true;
+        }
+
+        selectEl.appendChild(option);
+      });
+    }
+
+    function syncTransferAccountSelects() {
+      fillTransferAccountSelect(
+        fromAccountSelect,
+        "С какого счёта",
+        fromAccountSelect?.value || ""
+      );
+
+      fillTransferAccountSelect(
+        toAccountSelect,
+        "На какой счёт",
+        toAccountSelect?.value || ""
+      );
+    }
+
+    function fillSafeBucketSelect(
+      selectEl,
+      placeholder,
+      selectedId = "",
+      options = {}
+    ) {
+      if (!selectEl) return;
+
+      const previousValue = selectedId || selectEl.value || "";
+
+      selectEl.innerHTML = `<option value="">${placeholder}</option>`;
+
+      getBucketsForSelect(options).forEach((bucket) => {
+        const option = document.createElement("option");
+
+        option.value = bucket.id;
+        option.textContent = bucket.name || "Накопление";
+
+        if (previousValue && previousValue === bucket.id) {
           option.selected = true;
         }
 
@@ -46,9 +147,10 @@
     }
 
     function updateTransferSafeFields() {
-      const mode = typeof getCurrentMode === "function"
-        ? getCurrentMode()
-        : "transfer";
+      const mode =
+        typeof getCurrentMode === "function"
+          ? getCurrentMode()
+          : "transfer";
 
       hideSafeBucketFields();
 
@@ -64,7 +166,10 @@
         fillSafeBucketSelect(
           fromSafeBucketSelect,
           "Из какого накопления",
-          fromSafeBucketSelect?.value || ""
+          fromSafeBucketSelect?.value || "",
+          {
+            includeFree: false,
+          }
         );
 
         fromSafeBucketField?.classList.remove("hidden");
@@ -82,6 +187,8 @@
         return;
       }
 
+      syncTransferAccountSelects();
+
       const fromIsSafes = isVaultAccountId(fromAccountSelect?.value);
       const toIsSafes = isVaultAccountId(toAccountSelect?.value);
 
@@ -97,7 +204,10 @@
         fillSafeBucketSelect(
           fromSafeBucketSelect,
           "Из какого накопления",
-          fromSafeBucketSelect?.value || ""
+          fromSafeBucketSelect?.value || "",
+          {
+            includeFree: true,
+          }
         );
 
         fromSafeBucketField?.classList.remove("hidden");
@@ -107,7 +217,10 @@
         fillSafeBucketSelect(
           toSafeBucketSelect,
           "В какое накопление",
-          toSafeBucketSelect?.value || ""
+          toSafeBucketSelect?.value || "",
+          {
+            includeFree: true,
+          }
         );
 
         toSafeBucketField?.classList.remove("hidden");
