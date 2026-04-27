@@ -75,6 +75,12 @@ mandatoryPaymentLinkedSafeSelect,
         to_safe_bucket_id: null,
         created_at: buildMandatoryPaymentTransactionCreatedAt(),
         time_label: getCurrentTime(),
+        
+        source: "calendar_payment",
+source_type: "calendar_payment",
+calendar_payment_id: item.id,
+mandatory_payment_id: item.id,
+calendar_payment_period: period,
       };
 
       const { error } = await supabaseClient
