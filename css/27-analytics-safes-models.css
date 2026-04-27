@@ -277,6 +277,7 @@
 }
 
 .analytics-savings-model-row__bottom,
+.analytics-savings-model-row__detail,
 .analytics-savings-scenario-card__rows em {
   display: block;
   margin-top: 7px;
@@ -285,6 +286,11 @@
   font-style: normal;
   font-weight: 740;
   letter-spacing: -0.03em;
+}
+
+.analytics-savings-model-row__detail {
+  margin-top: 5px;
+  color: rgba(255, 255, 255, 0.34);
 }
 
 /* scenarios */
