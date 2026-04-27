@@ -328,7 +328,6 @@ bindMoneyInput(safeBucketAmountInput);
      02. UI STATE
      ========================================================= */
   let currentMode = "expense";
-  updateTransferSafeFields();
   let editingTransactionId = null;
   let mandatoryPaymentsSelectedMonth = getCurrentMonthValue();
 
