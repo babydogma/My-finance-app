@@ -465,12 +465,14 @@ getSafeBucketIcon,
   });
 
   const {
-    fillSafeBucketSelect,
-    updateTransferSafeFields,
-  } = window.FinanceAppSafeBucketDomHelpers.create({
+  fillSafeBucketSelect,
+  updateTransferSafeFields,
+} = window.FinanceAppSafeBucketDomHelpers.create({
   state,
   isVaultAccountId,
   getRealSafeBuckets,
+  getFreeSafeBucket,
+  getTransferAccounts,
   accountSelect,
   fromAccountSelect,
   toAccountSelect,
