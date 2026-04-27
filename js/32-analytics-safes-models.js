@@ -94,6 +94,117 @@
     });
   }
 
+  function getPaymentStartMonth(payment) {
+    return (
+      payment.start_period ||
+      payment.startPeriod ||
+      payment.start_month ||
+      payment.startMonth ||
+      ""
+    );
+  }
+
+  function getPaymentPaidPeriods(payment) {
+    if (Array.isArray(payment.paid_periods)) return payment.paid_periods;
+    if (Array.isArray(payment.paidPeriods)) return payment.paidPeriods;
+
+    return [];
+  }
+
+  function isPaymentEnabled(payment) {
+    return payment.enabled !== false;
+  }
+
+  function isPaymentStarted(payment, selectedMonth) {
+    const startMonth = getPaymentStartMonth(payment);
+
+    if (!startMonth) return true;
+
+    return startMonth <= selectedMonth;
+  }
+
+  function isCalendarPaymentTransaction(transaction, paymentId, selectedMonth) {
+    const transactionPaymentId =
+      transaction.calendar_payment_id ||
+      transaction.mandatory_payment_id ||
+      transaction.source_id ||
+      "";
+
+    const transactionPeriod =
+      transaction.calendar_payment_period ||
+      transaction.mandatory_payment_period ||
+      "";
+
+    const transactionMonth = getTransactionDateKey(transaction).slice(0, 7);
+
+    const source =
+      transaction.source ||
+      transaction.source_type ||
+      transaction.sourceType ||
+      "";
+
+    const isCalendarSource =
+      source === "calendar_payment" ||
+      source === "mandatory_payment" ||
+      Boolean(transaction.calendar_payment_id) ||
+      Boolean(transaction.mandatory_payment_id);
+
+    if (!isCalendarSource) return false;
+
+    if (String(transactionPaymentId) !== String(paymentId)) return false;
+
+    if (transactionPeriod) {
+      return transactionPeriod === selectedMonth;
+    }
+
+    return transactionMonth === selectedMonth;
+  }
+
+  function isPaymentPaidForMonth(payment, selectedMonth, monthTransactions) {
+    const paidPeriods = getPaymentPaidPeriods(payment);
+
+    if (paidPeriods.includes(selectedMonth)) {
+      return true;
+    }
+
+    return monthTransactions.some((transaction) => {
+      return isCalendarPaymentTransaction(transaction, payment.id, selectedMonth);
+    });
+  }
+
+  function getCalendarReservedAmount(state, selectedMonth, monthTransactions) {
+    const payments = state.mandatoryPayments || state.calendarPayments || [];
+
+    let reserved = 0;
+    const items = [];
+
+    payments.forEach((payment) => {
+      if (!isPaymentEnabled(payment)) return;
+      if (!isPaymentStarted(payment, selectedMonth)) return;
+
+      const alreadyPaid = isPaymentPaidForMonth(payment, selectedMonth, monthTransactions);
+
+      if (alreadyPaid) return;
+
+      const amount = toNumber(payment.amount);
+
+      if (amount <= 0) return;
+
+      reserved += amount;
+
+      items.push({
+        id: payment.id,
+        title: payment.title || "Календарный платёж",
+        amount,
+      });
+    });
+
+    return {
+      amount: roundToTwo(reserved),
+      items,
+    };
+  }
+
   function getMonthProgressPercent(selectedMonth) {
     const currentMonth = getCurrentMonthValue();
 
@@ -120,13 +231,18 @@
   }
 
   function getMonthStats(state, selectedMonth, isRequiredCategory) {
-    const transactions = getMonthTransactions(state, selectedMonth);
+    const monthTransactions = getMonthTransactions(state, selectedMonth);
+    const calendarReserve = getCalendarReservedAmount(
+      state,
+      selectedMonth,
+      monthTransactions
+    );
 
     let income = 0;
-    let requiredExpense = 0;
+    let requiredFactExpense = 0;
     let flexibleExpense = 0;
 
-    transactions.forEach((transaction) => {
+    monthTransactions.forEach((transaction) => {
       const amount = toNumber(transaction.amount);
       const type = String(transaction.type || "").toLowerCase();
 
@@ -146,24 +262,33 @@
           : false;
 
       if (required) {
-        requiredExpense += amount;
+        requiredFactExpense += amount;
       } else {
         flexibleExpense += amount;
       }
     });
 
-    const totalExpense = requiredExpense + flexibleExpense;
+    const requiredTotal = requiredFactExpense + calendarReserve.amount;
+    const totalExpenseAndReserve = requiredTotal + flexibleExpense;
 
     return {
       income: roundToTwo(income),
-      requiredExpense: roundToTwo(requiredExpense),
+
+      requiredFactExpense: roundToTwo(requiredFactExpense),
+      calendarReserve: roundToTwo(calendarReserve.amount),
+      calendarReserveItems: calendarReserve.items,
+
+      requiredExpense: roundToTwo(requiredTotal),
       flexibleExpense: roundToTwo(flexibleExpense),
-      totalExpense: roundToTwo(totalExpense),
-      remainingAfterExpenses: roundToTwo(income - totalExpense),
+
+      totalExpense: roundToTwo(requiredFactExpense + flexibleExpense),
+      totalExpenseAndReserve: roundToTwo(totalExpenseAndReserve),
+      remainingAfterExpenses: roundToTwo(income - totalExpenseAndReserve),
     };
   }
 
   function getStatusLabel(status) {
+    if (status === "plan") return "План месяца";
     if (status === "good") return "Влезает";
     if (status === "warn") return "На грани";
     if (status === "bad") return "Не сходится";
@@ -180,8 +305,19 @@
     return formatMoney(0);
   }
 
-  function getScenarioStatus({ income, requiredDelta, flexibleDelta, remainingAfterReserve }) {
+  function getScenarioStatus({
+    income,
+    requiredDelta,
+    flexibleDelta,
+    remainingAfterReserve,
+    hasAnyFactOrReserve,
+  }) {
     if (income <= 0) return "muted";
+
+    if (!hasAnyFactOrReserve) {
+      return "plan";
+    }
+
     if (remainingAfterReserve < 0) return "bad";
     if (requiredDelta < 0 || flexibleDelta < 0) return "warn";
 
@@ -197,14 +333,22 @@
       };
     }
 
+    if (selectedMonth > getCurrentMonthValue()) {
+      return {
+        status: "muted",
+        title: "Месяц впереди",
+        text: "Темп появится, когда выбранный месяц начнётся.",
+      };
+    }
+
     const monthProgress = getMonthProgressPercent(selectedMonth);
-    const spentPercent = getPercent(stats.totalExpense, stats.income);
+    const spentPercent = getPercent(stats.totalExpenseAndReserve, stats.income);
 
     if (spentPercent > monthProgress + 12) {
       return {
         status: "bad",
         title: "Расходы впереди",
-        text: `Прошло ${monthProgress}% месяца, потрачено ${spentPercent}% дохода.`,
+        text: `Прошло ${monthProgress}% месяца, занято ${spentPercent}% дохода.`,
       };
     }
 
@@ -212,14 +356,14 @@
       return {
         status: "warn",
         title: "На грани",
-        text: `Прошло ${monthProgress}% месяца, потрачено ${spentPercent}% дохода.`,
+        text: `Прошло ${monthProgress}% месяца, занято ${spentPercent}% дохода.`,
       };
     }
 
     return {
       status: "good",
       title: "Темп нормальный",
-      text: `Прошло ${monthProgress}% месяца, потрачено ${spentPercent}% дохода.`,
+      text: `Прошло ${monthProgress}% месяца, занято ${spentPercent}% дохода.`,
     };
   }
 
@@ -246,18 +390,21 @@
         value: stats.requiredExpense,
         percent: getPercent(stats.requiredExpense, income),
         className: "required",
+        detail: `Факт: ${formatMoney(stats.requiredFactExpense)} · календарь: ${formatMoney(stats.calendarReserve)}`,
       },
       {
         label: "Гибкие",
         value: stats.flexibleExpense,
         percent: getPercent(stats.flexibleExpense, income),
         className: "flexible",
+        detail: "Фактические расходы месяца",
       },
       {
         label: "Останется",
         value: stats.remainingAfterExpenses,
         percent: getPercent(Math.max(0, stats.remainingAfterExpenses), income),
         className: "remain",
+        detail: "После факта, календаря и гибких расходов",
       },
     ];
 
@@ -266,7 +413,7 @@
         <div class="analytics-savings-card__head">
           <div>
             <h3>Модель месяца</h3>
-            <p>Как сейчас распределяется доход</p>
+            <p>Факт расходов + неоплаченные календарные платежи</p>
           </div>
 
           <div class="analytics-savings-income-pill">
@@ -297,6 +444,10 @@
                   <div class="analytics-savings-model-row__bottom">
                     ${row.percent}% от дохода
                   </div>
+
+                  <div class="analytics-savings-model-row__detail">
+                    ${row.detail}
+                  </div>
                 </div>
               `;
             })
@@ -309,7 +460,8 @@
   function renderProgressCard(stats, selectedMonth) {
     const pace = getPaceStatus(stats, selectedMonth);
     const monthProgress = getMonthProgressPercent(selectedMonth);
-    const spentPercent = stats.income > 0 ? getPercent(stats.totalExpense, stats.income) : 0;
+    const spentPercent =
+      stats.income > 0 ? getPercent(stats.totalExpenseAndReserve, stats.income) : 0;
     const spentWidth = Math.min(100, Math.max(0, spentPercent));
 
     return `
@@ -338,7 +490,7 @@
 
           <div class="analytics-savings-pace-line analytics-savings-pace-line--spent">
             <div class="analytics-savings-pace-line__top">
-              <span>Потрачено дохода</span>
+              <span>Занято дохода</span>
               <strong>${spentPercent}%</strong>
             </div>
             <div class="analytics-savings-pace-line__bar">
@@ -359,15 +511,22 @@
 
     const requiredDelta = roundToTwo(requiredPlan - stats.requiredExpense);
     const flexibleDelta = roundToTwo(flexiblePlan - stats.flexibleExpense);
+
     const remainingAfterReserve = roundToTwo(
       stats.income - stats.requiredExpense - stats.flexibleExpense - reserveByModel
     );
+
+    const hasAnyFactOrReserve =
+      stats.requiredExpense > 0 ||
+      stats.flexibleExpense > 0 ||
+      stats.calendarReserve > 0;
 
     const status = getScenarioStatus({
       income: stats.income,
       requiredDelta,
       flexibleDelta,
       remainingAfterReserve,
+      hasAnyFactOrReserve,
     });
 
     return `
@@ -384,7 +543,7 @@
         </div>
 
         <div class="analytics-savings-scenario-card__result">
-          <span>После расходов и резерва</span>
+          <span>После факта, календаря и резерва</span>
           <strong>${formatSignedMoney(remainingAfterReserve, formatMoney)}</strong>
         </div>
 
@@ -392,7 +551,11 @@
           <div>
             <span>Обязательные</span>
             <strong>${Math.round(model.required * 100)}% · ${formatMoney(requiredPlan)}</strong>
-            <em>Факт: ${formatMoney(stats.requiredExpense)}</em>
+            <em>
+              Занято: ${formatMoney(stats.requiredExpense)}
+              · факт: ${formatMoney(stats.requiredFactExpense)}
+              · календарь: ${formatMoney(stats.calendarReserve)}
+            </em>
           </div>
 
           <div>
@@ -416,7 +579,7 @@
       <section class="analytics-savings-scenarios">
         <div class="analytics-savings-section-head">
           <h3>Сценарии бюджета</h3>
-          <p>Сравнение систем с текущими расходами</p>
+          <p>Сравнение систем с занятыми деньгами месяца</p>
         </div>
 
         <div class="analytics-savings-scenarios__list">
