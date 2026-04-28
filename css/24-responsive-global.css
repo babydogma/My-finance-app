@@ -228,3 +228,51 @@
     font-size: 10px;
   }
 }
+
+/* =========================================================
+   Mobile viewport stability
+   ========================================================= */
+
+@media (max-width: 420px) {
+  .modal {
+    height: 100dvh;
+    min-height: 100dvh;
+    max-height: 100dvh;
+  }
+
+  .modal-sheet {
+    max-height: calc(100dvh - 20px);
+  }
+
+  #transactionModal .modal-sheet,
+  #budgetModal .modal-sheet,
+  #accountModal .modal-sheet,
+  #faqModal .modal-sheet,
+  #safeInterestRateModal .modal-sheet,
+  #safeBucketAmountModal .modal-sheet {
+    overflow: hidden;
+  }
+
+  #mandatoryPaymentsModal .modal-sheet,
+  #mandatoryPaymentEditorModal .modal-sheet,
+  #mandatoryPaymentBucketPickerModal .modal-sheet,
+  #safeBucketsModal .modal-sheet,
+  #operationsFiltersModal .modal-sheet {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+@supports (height: 100svh) {
+  @media (max-width: 420px) {
+    .modal {
+      height: 100svh;
+      min-height: 100svh;
+      max-height: 100svh;
+    }
+
+    .modal-sheet {
+      max-height: calc(100svh - 20px);
+    }
+  }
+}
