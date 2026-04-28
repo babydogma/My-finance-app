@@ -1,6 +1,6 @@
 /* =========================================================
    06. WALLET ACTIONS
-   Compact action panel
+   Light compact action panel
    ========================================================= */
 
 .actions {
@@ -8,24 +8,22 @@
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 0;
-  margin-top: 18px;
-  padding: 12px;
+  margin-top: 26px;
+  padding: 14px;
   border-radius: 28px;
-  border: 1px solid rgba(255, 255, 255, 0.065);
+  border: 1px solid rgba(22, 30, 46, 0.075);
   background:
-    radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.035), transparent 42%),
-    linear-gradient(180deg, rgba(39, 43, 55, 0.62) 0%, rgba(24, 28, 39, 0.46) 100%);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(250, 252, 255, 0.94) 100%);
   box-shadow:
-    0 18px 36px rgba(0, 0, 0, 0.20),
-    inset 0 1px 0 rgba(255, 255, 255, 0.045);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
+    0 18px 42px rgba(30, 42, 68, 0.09),
+    0 4px 12px rgba(30, 42, 68, 0.045),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
 .action-card {
   position: relative;
   min-width: 0;
-  min-height: 72px;
+  min-height: 76px;
   padding: 8px 5px 7px;
   border: 0;
   border-radius: 20px;
@@ -37,12 +35,9 @@
   gap: 9px;
   text-align: center;
   box-shadow: none;
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
   transition:
     transform 0.16s ease,
-    background 0.16s ease,
-    box-shadow 0.16s ease;
+    background 0.16s ease;
 }
 
 .action-card:not(:last-child)::after {
@@ -52,24 +47,24 @@
   top: 14px;
   bottom: 14px;
   width: 1px;
-  background: linear-gradient(
-    180deg,
-    transparent,
-    rgba(255, 255, 255, 0.07),
-    transparent
-  );
+  background:
+    linear-gradient(
+      180deg,
+      transparent,
+      rgba(22, 30, 46, 0.09),
+      transparent
+    );
 }
 
 .action-card:active {
   transform: scale(0.97);
-  background: rgba(255, 255, 255, 0.035);
+  background: rgba(47, 125, 246, 0.04);
 }
 
 .action-icon {
   width: 42px;
   height: 42px;
   border-radius: 16px;
-  color: rgba(255, 255, 255, 0.94);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -77,43 +72,39 @@
   font-weight: 760;
   line-height: 1;
   box-shadow:
-    0 12px 22px rgba(0, 0, 0, 0.16),
-    inset 0 1px 0 rgba(255, 255, 255, 0.10);
+    0 12px 22px rgba(30, 42, 68, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.86);
 }
 
 .action-card:nth-child(1) .action-icon {
+  color: #f06a54;
   background:
-    radial-gradient(circle at 34% 24%, rgba(255,255,255,0.16), transparent 42%),
-    linear-gradient(180deg, rgba(255, 124, 100, 0.30), rgba(151, 74, 66, 0.18));
-  color: #ff987e;
+    linear-gradient(180deg, rgba(255, 235, 231, 0.98), rgba(255, 224, 218, 0.9));
 }
 
 .action-card:nth-child(2) .action-icon {
+  color: #14996e;
   background:
-    radial-gradient(circle at 34% 24%, rgba(255,255,255,0.16), transparent 42%),
-    linear-gradient(180deg, rgba(74, 216, 140, 0.30), rgba(36, 142, 99, 0.18));
-  color: #8af0bd;
+    linear-gradient(180deg, rgba(225, 248, 239, 0.98), rgba(209, 241, 229, 0.9));
 }
 
 .action-card:nth-child(3) .action-icon {
+  color: #2f7df6;
   background:
-    radial-gradient(circle at 34% 24%, rgba(255,255,255,0.16), transparent 42%),
-    linear-gradient(180deg, rgba(111, 156, 255, 0.34), rgba(68, 102, 190, 0.20));
-  color: #9dbbff;
+    linear-gradient(180deg, rgba(231, 239, 255, 0.98), rgba(218, 230, 255, 0.92));
 }
 
 .action-card:nth-child(4) .action-icon {
+  color: #e79a16;
   background:
-    radial-gradient(circle at 34% 24%, rgba(255,255,255,0.16), transparent 42%),
-    linear-gradient(180deg, rgba(255, 188, 87, 0.30), rgba(177, 111, 40, 0.18));
-  color: #ffc36e;
+    linear-gradient(180deg, rgba(255, 243, 222, 0.98), rgba(255, 235, 199, 0.92));
 }
 
 .action-label {
   max-width: 100%;
-  color: rgba(238, 243, 252, 0.86);
+  color: rgba(20, 24, 33, 0.86);
   font-size: 12.5px;
-  font-weight: 820;
+  font-weight: 760;
   line-height: 1.05;
   letter-spacing: -0.025em;
   white-space: nowrap;
