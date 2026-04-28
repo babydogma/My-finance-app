@@ -21,6 +21,11 @@
   overscroll-behavior: contain;
 }
 
+/* Полностью убираем “Не распределено” из интерфейса */
+#safeBucketsUnassignedCard {
+  display: none !important;
+}
+
 #safeBucketsModal .section-head {
   display: flex;
   align-items: flex-start;
@@ -97,6 +102,10 @@
     0 11px 25px rgba(30, 42, 68, 0.06),
     0 3px 9px rgba(30, 42, 68, 0.028),
     inset 0 1px 0 rgba(255, 255, 255, 0.94);
+}
+
+#safeBucketsModal .safe-buckets-wallet-row:active {
+  transform: scale(0.992);
 }
 
 #safeBucketsModal .safe-buckets-wallet-row .list-body {
@@ -211,6 +220,53 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.22);
 }
 
+/* =========================================================
+   Safe bucket editor modal
+   ========================================================= */
+
+#safeBucketAmountModal .modal-sheet {
+  width: min(480px, 100%);
+}
+
+#safeBucketAmountModal .modal-title {
+  max-width: 100%;
+  text-align: left;
+  white-space: normal;
+}
+
+#safeBucketAmountModal .field {
+  margin-bottom: 11px;
+}
+
+#safeBucketAmountModal .input {
+  height: 50px;
+  border-radius: 18px;
+  font-size: 14.5px;
+  font-weight: 650;
+}
+
+#safeBucketAmountModal #deleteSafeBucketBtn {
+  display: block;
+  width: 100%;
+  height: 50px;
+  margin-top: 11px;
+  border: none;
+  border-radius: 18px;
+  background:
+    linear-gradient(180deg, rgba(255, 236, 233, 0.98), rgba(255, 224, 220, 0.96));
+  color: var(--red);
+  font-size: 15px;
+  font-weight: 760;
+  letter-spacing: -0.018em;
+  box-shadow:
+    0 10px 22px rgba(255, 90, 82, 0.10),
+    inset 0 1px 0 rgba(255, 255, 255, 0.78);
+}
+
+#safeBucketAmountModal #deleteSafeBucketBtn:active {
+  transform: scale(0.985);
+}
+
 #safeBucketsModal .safe-buckets-row-reset-btn,
 #safeBucketsModal .safe-buckets-row-delete-btn {
   flex: 0 0 auto;
@@ -295,6 +351,12 @@
 
   #safeBucketsModal .safe-buckets-create-card .input,
   #safeBucketsModal .safe-buckets-create-btn {
+    height: 48px;
+    border-radius: 17px;
+    font-size: 14px;
+  }
+
+  #safeBucketAmountModal #deleteSafeBucketBtn {
     height: 48px;
     border-radius: 17px;
     font-size: 14px;
