@@ -7,11 +7,11 @@
   width: 100%;
   max-width: 480px;
   margin: 0 auto;
-  padding: 16px 16px 132px;
+  padding: 22px 16px 124px;
 }
 
 .section {
-  margin-top: 24px;
+  margin-top: 28px;
 }
 
 .section--manager-top {
@@ -20,25 +20,26 @@
 
 .section-head {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }
 
 .section-title {
   margin: 0;
-  font-size: 20px;
-  font-weight: 920;
-  letter-spacing: -0.05em;
-  color: #f7f9ff;
+  color: var(--text);
+  font-size: 26px;
+  font-weight: 930;
+  line-height: 0.98;
+  letter-spacing: -0.065em;
 }
 
 .section-note {
-  color: rgba(255, 255, 255, 0.46);
-  font-size: 11.5px;
+  color: var(--text-muted);
+  font-size: 12px;
   font-weight: 760;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.025em;
 }
 
 .hidden {
