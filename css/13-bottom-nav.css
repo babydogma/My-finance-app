@@ -1,45 +1,49 @@
 /* =========================================================
    13. BOTTOM NAV
-   Light fixed bottom navigation
+   Clean light fixed bottom tabbar
    ========================================================= */
 
 .bottom-nav-wrap {
   position: fixed;
   left: 50%;
-  bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+  bottom: calc(8px + env(safe-area-inset-bottom, 0px));
   transform: translateX(-50%);
   width: min(430px, calc(100% - 18px));
   z-index: 50;
+  pointer-events: none;
 }
 
 .bottom-nav {
+  pointer-events: auto;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  padding: 8px;
-  border-radius: 28px;
+  gap: 6px;
+  min-height: 70px;
+  padding: 7px;
+  border-radius: 26px;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.92) 0%, rgba(248, 250, 253, 0.90) 100%);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(22, 30, 46, 0.075);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(248, 250, 253, 0.90));
+  backdrop-filter: blur(22px);
+  -webkit-backdrop-filter: blur(22px);
+  border: 1px solid rgba(22, 30, 46, 0.070);
   box-shadow:
-    0 18px 40px rgba(30, 42, 68, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.92);
+    0 16px 36px rgba(30, 42, 68, 0.105),
+    0 4px 12px rgba(30, 42, 68, 0.035),
+    inset 0 1px 0 rgba(255, 255, 255, 0.94);
 }
 
 .nav-item {
   min-width: 0;
-  min-height: 60px;
+  min-height: 56px;
   border: none;
-  border-radius: 22px;
+  border-radius: 21px;
   background: transparent;
-  color: rgba(20, 24, 33, 0.46);
+  color: rgba(20, 24, 33, 0.44);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 5px;
   transition:
     background 0.16s ease,
     color 0.16s ease,
@@ -54,24 +58,38 @@
 .nav-item.is-active {
   color: var(--accent);
   background:
-    linear-gradient(180deg, rgba(232, 240, 255, 0.98) 0%, rgba(218, 231, 255, 0.94) 100%);
+    linear-gradient(180deg, rgba(232, 240, 255, 0.98), rgba(218, 231, 255, 0.94));
   box-shadow:
-    0 12px 26px rgba(47, 125, 246, 0.13),
+    0 10px 22px rgba(47, 125, 246, 0.115),
     inset 0 1px 0 rgba(255, 255, 255, 0.92);
 }
 
 .nav-icon {
-  font-size: 21px;
-  line-height: 1;
-  filter: saturate(0.9);
+  width: 23px;
+  height: 23px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: currentColor;
+}
+
+.nav-icon svg {
+  width: 23px;
+  height: 23px;
+  display: block;
+  stroke: currentColor;
+  stroke-width: 2;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 .nav-label {
   max-width: 100%;
   font-size: 10.5px;
-  font-weight: 760;
+  font-weight: 620;
   line-height: 1;
-  letter-spacing: -0.025em;
+  letter-spacing: -0.012em;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -80,4 +98,32 @@
 .nav-item.is-active .nav-icon,
 .nav-item.is-active .nav-label {
   color: var(--accent);
+}
+
+@media (max-width: 380px) {
+  .bottom-nav-wrap {
+    width: min(430px, calc(100% - 14px));
+    bottom: calc(7px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .bottom-nav {
+    min-height: 66px;
+    padding: 6px;
+    border-radius: 24px;
+  }
+
+  .nav-item {
+    min-height: 54px;
+    border-radius: 19px;
+  }
+
+  .nav-icon,
+  .nav-icon svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  .nav-label {
+    font-size: 10px;
+  }
 }
