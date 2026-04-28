@@ -1,4 +1,4 @@
-(() => { 
+(() => {
   function createAnalyticsExpensesRender({
     state,
     UNCATEGORIZED_ID,
@@ -38,41 +38,42 @@
   }) {
     let analyticsExpenseCategoryFilter = "all";
     let analyticsExpenseKindFilter = "all";
-    let previousRingItems = null;
-let previousRingTotal = 0;
-let previousShownTotal = null;
-let previousTopPercent = 0;
 
-let ringAnimationFrameId = null;
-let moneyAnimationFrameId = null;
-let percentAnimationFrameId = null;
+    let previousRingItems = null;
+    let previousRingTotal = 0;
+    let previousShownTotal = null;
+    let previousTopPercent = 0;
+
+    let ringAnimationFrameId = null;
+    let moneyAnimationFrameId = null;
+    let percentAnimationFrameId = null;
 
     const ANALYTICS_EXPENSE_COLORS = [
-  "#D85C52", // soft coral
-  "#4FA864", // calm green
-  "#5B8BE8", // clean blue
-  "#F2B84B", // soft amber
-  "#8A6FD6", // violet
-  "#3FA89F", // teal
-  "#D9833F", // warm orange
-  "#C76C95", // dusty pink
-  "#6F7A8C", // slate gray
-  "#86B75F", // soft olive
-  "#5FA7C8", // muted cyan
-  "#A979C9", // lavender
-  "#4E9B82", // sea green
-  "#D06E68", // clay red
-  "#6D8FC7", // steel blue
-  "#B76FA4", // muted magenta
-  "#7B8FA6", // blue gray
-  "#67A889", // eucalyptus
-  "#C9905A", // soft caramel
-  "#8B7FD1", // soft indigo
-  "#5C9CA8", // deep aqua
-  "#A86E7E", // dusty rose
-  "#7DAA78", // muted green
-  "#B79A63", // clean muted gold
-];
+      "#D85C52",
+      "#4FA864",
+      "#5B8BE8",
+      "#F2B84B",
+      "#8A6FD6",
+      "#3FA89F",
+      "#D9833F",
+      "#C76C95",
+      "#6F7A8C",
+      "#86B75F",
+      "#5FA7C8",
+      "#A979C9",
+      "#4E9B82",
+      "#D06E68",
+      "#6D8FC7",
+      "#B76FA4",
+      "#7B8FA6",
+      "#67A889",
+      "#C9905A",
+      "#8B7FD1",
+      "#5C9CA8",
+      "#A86E7E",
+      "#7DAA78",
+      "#B79A63",
+    ];
 
     function getPrimaryExpenseValueEl() {
       return analyticsExpenseValuePremium || analyticsExpenseValue;
@@ -123,7 +124,7 @@ let percentAnimationFrameId = null;
     }
 
     function getAnalyticsExpenseColor(categoryId) {
-      const categoryIds = state.categories.map((category) => category.id);
+      const categoryIds = (state.categories || []).map((category) => category.id);
       const allCategoryIds = Array.from(new Set([...categoryIds, UNCATEGORIZED_ID]));
       const index = allCategoryIds.indexOf(categoryId);
 
@@ -135,331 +136,339 @@ let percentAnimationFrameId = null;
         getAnalyticsColorHash(categoryId) % ANALYTICS_EXPENSE_COLORS.length
       ];
     }
-    
+
     function easeOutCubic(progress) {
-  return progress < 0.5
-    ? 4 * progress * progress * progress
-    : 1 - Math.pow(-2 * progress + 2, 3) / 2;
-}
-
-function lerpNumber(from, to, progress) {
-  return from + (to - from) * progress;
-}
-
-function clampNumber(value, min, max) {
-  return Math.min(Math.max(value, min), max);
-}
-
-function getDelayedProgress(progress, delay = 0.32) {
-  return clampNumber((progress - delay) / (1 - delay), 0, 1);
-}
-
-function getEasedDelayedProgress(progress, delay = 0) {
-  return easeOutCubic(getDelayedProgress(progress, delay));
-}
-
-function getRingTransitionProfile(fromItems, toItems, fromTotal, toTotal) {
-  const fromCount = fromItems.length;
-  const toCount = toItems.length;
-
-  const safeFromTotal = Math.max(Number(fromTotal) || 0, 0);
-  const safeToTotal = Math.max(Number(toTotal) || 0, 0);
-
-  if (fromCount === 0 && toCount > 0) {
-    return {
-      type: "empty-in",
-      duration: 1040,
-      totalMode: "target",
-      sharedDelay: 0,
-      enterDelay: 0.08,
-      exitDelay: 0,
-      totalDelay: 0,
-    };
-  }
-
-  if (fromCount > 0 && toCount === 0) {
-    return {
-      type: "empty-out",
-      duration: 1040,
-      totalMode: "source",
-      sharedDelay: 0,
-      enterDelay: 0,
-      exitDelay: 0.08,
-      totalDelay: 0,
-    };
-  }
-
-  const heavyShrink =
-    fromCount >= toCount + 4 ||
-    safeFromTotal > safeToTotal * 2.15;
-
-  if (heavyShrink) {
-    return {
-      type: "heavy-shrink",
-      duration: 1240,
-      totalMode: "delayed-shrink",
-      sharedDelay: 0.08,
-      enterDelay: 0.18,
-      exitDelay: 0.16,
-      totalDelay: 0.34,
-    };
-  }
-
-  const heavyGrow =
-    toCount >= fromCount + 4 ||
-    safeToTotal > safeFromTotal * 2.15;
-
-  if (heavyGrow) {
-    return {
-      type: "heavy-grow",
-      duration: 1120,
-      totalMode: "target",
-      sharedDelay: 0.05,
-      enterDelay: 0.16,
-      exitDelay: 0.06,
-      totalDelay: 0,
-    };
-  }
-
-  return {
-    type: "morph",
-    duration: 980,
-    totalMode: "mixed",
-    sharedDelay: 0,
-    enterDelay: 0.08,
-    exitDelay: 0.08,
-    totalDelay: 0,
-  };
-}
-
-function getAnimatedRingTotal(fromTotal, toTotal, mixedItemsTotal, rawProgress, profile) {
-  const safeFromTotal = Math.max(Number(fromTotal) || 0, 0);
-  const safeToTotal = Math.max(Number(toTotal) || 0, 0);
-
-  if (profile.totalMode === "target") {
-    return Math.max(safeToTotal, 1);
-  }
-
-  if (profile.totalMode === "source") {
-    return Math.max(safeFromTotal, 1);
-  }
-
-  if (profile.totalMode === "delayed-shrink") {
-    const delayedProgress = getEasedDelayedProgress(rawProgress, profile.totalDelay);
-    return Math.max(lerpNumber(safeFromTotal, safeToTotal, delayedProgress), 1);
-  }
-
-  return Math.max(mixedItemsTotal, 1);
-}
-
-function getTopPercentFromItems(items, total) {
-  if (!total || total <= 0 || !items.length) return 0;
-
-  const topItem = items[0];
-
-  if (!topItem) return 0;
-
-  return (topItem.amount / total) * 100;
-}
-
-function getRingItemsTotal(items) {
-  return items.reduce((sum, item) => {
-    return sum + (Number(item.amount) || 0);
-  }, 0);
-}
-
-function getAnalyticsRingSeamSize(percent) {
-  if (percent >= 8) return 0.34;
-  if (percent >= 3) return 0.22;
-  if (percent >= 1.25) return 0.13;
-  if (percent >= 0.55) return 0.075;
-  return 0.045;
-}
-
-function buildAnalyticsRingGradient(items, total) {
-  const emptyColor = "rgba(255,255,255,0.09)";
-  const seamColor = "rgba(8,10,14,0.62)";
-
-  if (!total || total <= 0 || !items.length) {
-    return `conic-gradient(${emptyColor} 0deg 360deg)`;
-  }
-
-  let cursor = 0;
-
-  const visibleItems = items.filter((item) => item.amount > 0.01);
-
-  const gradientParts = visibleItems.flatMap((item) => {
-  const percent = Math.max(0, Math.min(100, (item.amount / total) * 100));
-  const baseSeamSize = getAnalyticsRingSeamSize(percent);
-  const seamSize = Math.min(baseSeamSize, percent * 0.22);
-
-  const start = cursor;
-  const rawEnd = Math.min(100, cursor + percent);
-  const seamStart = Math.max(start, rawEnd - seamSize);
-
-  cursor = rawEnd;
-
-  if (seamSize <= 0.012 || seamStart <= start) {
-    return [`${item.color} ${start.toFixed(2)}% ${rawEnd.toFixed(2)}%`];
-  }
-
-  return [
-    `${item.color} ${start.toFixed(2)}% ${seamStart.toFixed(2)}%`,
-    `${seamColor} ${seamStart.toFixed(2)}% ${rawEnd.toFixed(2)}%`,
-  ];
-});
-
-  if (!gradientParts.length) {
-    return `conic-gradient(${emptyColor} 0deg 360deg)`;
-  }
-
-  if (cursor < 99.7) {
-    gradientParts.push(`${emptyColor} ${cursor.toFixed(2)}% 100%`);
-  }
-
-  return `conic-gradient(${gradientParts.join(", ")})`;
-}
-
-function mergeRingItemsForAnimation(fromItems, toItems, rawProgress, profile) {
-  const byCategory = new Map();
-  const orderedCategoryIds = [];
-
-  fromItems.forEach((item) => {
-    if (!byCategory.has(item.categoryId)) {
-      orderedCategoryIds.push(item.categoryId);
+      return progress < 0.5
+        ? 4 * progress * progress * progress
+        : 1 - Math.pow(-2 * progress + 2, 3) / 2;
     }
 
-    byCategory.set(item.categoryId, {
-      categoryId: item.categoryId,
-      name: item.name,
-      color: item.color,
-      fromAmount: item.amount,
-      toAmount: 0,
-    });
-  });
-
-  toItems.forEach((item) => {
-    if (!byCategory.has(item.categoryId)) {
-      orderedCategoryIds.push(item.categoryId);
+    function lerpNumber(from, to, progress) {
+      return from + (to - from) * progress;
     }
 
-    const current = byCategory.get(item.categoryId) || {
-      categoryId: item.categoryId,
-      name: item.name,
-      color: item.color,
-      fromAmount: 0,
-      toAmount: 0,
-    };
+    function clampNumber(value, min, max) {
+      return Math.min(Math.max(value, min), max);
+    }
 
-    current.name = item.name;
-    current.color = item.color;
-    current.toAmount = item.amount;
+    function getDelayedProgress(progress, delay = 0.32) {
+      return clampNumber((progress - delay) / (1 - delay), 0, 1);
+    }
 
-    byCategory.set(item.categoryId, current);
-  });
+    function getEasedDelayedProgress(progress, delay = 0) {
+      return easeOutCubic(getDelayedProgress(progress, delay));
+    }
 
-  return orderedCategoryIds
-  .map((categoryId) => {
-      const item = byCategory.get(categoryId);
+    function formatAnalyticsPercent(value) {
+      const percent = Number(value) || 0;
 
-      const isLeaving = item.fromAmount > 0 && item.toAmount <= 0;
-      const isEntering = item.fromAmount <= 0 && item.toAmount > 0;
+      if (percent > 0 && percent < 1) {
+        return "<1%";
+      }
 
-      let itemProgress;
+      return `${Math.round(percent)}%`;
+    }
 
-      if (isLeaving) {
-        itemProgress = getEasedDelayedProgress(rawProgress, profile.exitDelay);
-      } else if (isEntering) {
-        itemProgress = getEasedDelayedProgress(rawProgress, profile.enterDelay);
-      } else {
-        itemProgress = getEasedDelayedProgress(rawProgress, profile.sharedDelay);
+    function getRingTransitionProfile(fromItems, toItems, fromTotal, toTotal) {
+      const fromCount = fromItems.length;
+      const toCount = toItems.length;
+
+      const safeFromTotal = Math.max(Number(fromTotal) || 0, 0);
+      const safeToTotal = Math.max(Number(toTotal) || 0, 0);
+
+      if (fromCount === 0 && toCount > 0) {
+        return {
+          type: "empty-in",
+          duration: 1040,
+          totalMode: "target",
+          sharedDelay: 0,
+          enterDelay: 0.08,
+          exitDelay: 0,
+          totalDelay: 0,
+        };
+      }
+
+      if (fromCount > 0 && toCount === 0) {
+        return {
+          type: "empty-out",
+          duration: 1040,
+          totalMode: "source",
+          sharedDelay: 0,
+          enterDelay: 0,
+          exitDelay: 0.08,
+          totalDelay: 0,
+        };
+      }
+
+      const heavyShrink =
+        fromCount >= toCount + 4 ||
+        safeFromTotal > safeToTotal * 2.15;
+
+      if (heavyShrink) {
+        return {
+          type: "heavy-shrink",
+          duration: 1240,
+          totalMode: "delayed-shrink",
+          sharedDelay: 0.08,
+          enterDelay: 0.18,
+          exitDelay: 0.16,
+          totalDelay: 0.34,
+        };
+      }
+
+      const heavyGrow =
+        toCount >= fromCount + 4 ||
+        safeToTotal > safeFromTotal * 2.15;
+
+      if (heavyGrow) {
+        return {
+          type: "heavy-grow",
+          duration: 1120,
+          totalMode: "target",
+          sharedDelay: 0.05,
+          enterDelay: 0.16,
+          exitDelay: 0.06,
+          totalDelay: 0,
+        };
       }
 
       return {
-        categoryId: item.categoryId,
-        name: item.name,
-        color: item.color,
-        amount: lerpNumber(item.fromAmount, item.toAmount, itemProgress),
+        type: "morph",
+        duration: 980,
+        totalMode: "mixed",
+        sharedDelay: 0,
+        enterDelay: 0.08,
+        exitDelay: 0.08,
+        totalDelay: 0,
       };
-    })
-    .filter((item) => item.amount > 0.01);
-}
-
-function animateTextNumber({
-  from,
-  to,
-  duration = 420,
-  format,
-  onUpdate,
-  onDone,
-  frameIdGetter,
-  frameIdSetter,
-}) {
-  const startTime = performance.now();
-
-  const previousFrameId = frameIdGetter();
-
-  if (previousFrameId) {
-    cancelAnimationFrame(previousFrameId);
-  }
-
-  function tick(now) {
-    const rawProgress = Math.min((now - startTime) / duration, 1);
-    const progress = easeOutCubic(rawProgress);
-    const value = lerpNumber(from, to, progress);
-
-    onUpdate(format(value));
-
-    if (rawProgress < 1) {
-      const nextFrameId = requestAnimationFrame(tick);
-      frameIdSetter(nextFrameId);
-      return;
     }
 
-    onUpdate(format(to));
-    frameIdSetter(null);
-    onDone?.();
-  }
+    function getAnimatedRingTotal(fromTotal, toTotal, mixedItemsTotal, rawProgress, profile) {
+      const safeFromTotal = Math.max(Number(fromTotal) || 0, 0);
+      const safeToTotal = Math.max(Number(toTotal) || 0, 0);
 
-  const nextFrameId = requestAnimationFrame(tick);
-  frameIdSetter(nextFrameId);
-}
+      if (profile.totalMode === "target") {
+        return Math.max(safeToTotal, 1);
+      }
 
-function animateMoneyValue(element, from, to) {
-  if (!element) return;
+      if (profile.totalMode === "source") {
+        return Math.max(safeFromTotal, 1);
+      }
 
-  animateTextNumber({
-    from,
-    to,
-    duration: 820,
-    format: (value) => formatMoney(roundToTwo(value)),
-    onUpdate: (text) => {
-      element.textContent = text;
-    },
-    frameIdGetter: () => moneyAnimationFrameId,
-    frameIdSetter: (nextId) => {
-      moneyAnimationFrameId = nextId;
-    },
-  });
-}
+      if (profile.totalMode === "delayed-shrink") {
+        const delayedProgress = getEasedDelayedProgress(rawProgress, profile.totalDelay);
+        return Math.max(lerpNumber(safeFromTotal, safeToTotal, delayedProgress), 1);
+      }
 
-function animatePercentValue(element, from, to) {
-  if (!element) return;
+      return Math.max(mixedItemsTotal, 1);
+    }
 
-  animateTextNumber({
-    from,
-    to,
-    duration: 700,
-    format: (value) => `${Math.round(value)}%`,
-    onUpdate: (text) => {
-      element.textContent = text;
-    },
-    frameIdGetter: () => percentAnimationFrameId,
-    frameIdSetter: (nextId) => {
-      percentAnimationFrameId = nextId;
-    },
-  });
-}
+    function getTopPercentFromItems(items, total) {
+      if (!total || total <= 0 || !items.length) return 0;
+
+      const topItem = items[0];
+
+      if (!topItem) return 0;
+
+      return (topItem.amount / total) * 100;
+    }
+
+    function getRingItemsTotal(items) {
+      return items.reduce((sum, item) => {
+        return sum + (Number(item.amount) || 0);
+      }, 0);
+    }
+
+    function getAnalyticsRingSeamSize(percent) {
+      if (percent >= 8) return 0.34;
+      if (percent >= 3) return 0.22;
+      if (percent >= 1.25) return 0.13;
+      if (percent >= 0.55) return 0.075;
+      return 0.045;
+    }
+
+    function buildAnalyticsRingGradient(items, total) {
+      const emptyColor = "rgba(255,255,255,0.09)";
+      const seamColor = "rgba(8,10,14,0.62)";
+
+      if (!total || total <= 0 || !items.length) {
+        return `conic-gradient(${emptyColor} 0deg 360deg)`;
+      }
+
+      let cursor = 0;
+      const visibleItems = items.filter((item) => item.amount > 0.01);
+
+      const gradientParts = visibleItems.flatMap((item) => {
+        const percent = Math.max(0, Math.min(100, (item.amount / total) * 100));
+        const baseSeamSize = getAnalyticsRingSeamSize(percent);
+        const seamSize = Math.min(baseSeamSize, percent * 0.22);
+
+        const start = cursor;
+        const rawEnd = Math.min(100, cursor + percent);
+        const seamStart = Math.max(start, rawEnd - seamSize);
+
+        cursor = rawEnd;
+
+        if (seamSize <= 0.012 || seamStart <= start) {
+          return [`${item.color} ${start.toFixed(2)}% ${rawEnd.toFixed(2)}%`];
+        }
+
+        return [
+          `${item.color} ${start.toFixed(2)}% ${seamStart.toFixed(2)}%`,
+          `${seamColor} ${seamStart.toFixed(2)}% ${rawEnd.toFixed(2)}%`,
+        ];
+      });
+
+      if (!gradientParts.length) {
+        return `conic-gradient(${emptyColor} 0deg 360deg)`;
+      }
+
+      if (cursor < 99.7) {
+        gradientParts.push(`${emptyColor} ${cursor.toFixed(2)}% 100%`);
+      }
+
+      return `conic-gradient(${gradientParts.join(", ")})`;
+    }
+
+    function mergeRingItemsForAnimation(fromItems, toItems, rawProgress, profile) {
+      const byCategory = new Map();
+      const orderedCategoryIds = [];
+
+      fromItems.forEach((item) => {
+        if (!byCategory.has(item.categoryId)) {
+          orderedCategoryIds.push(item.categoryId);
+        }
+
+        byCategory.set(item.categoryId, {
+          categoryId: item.categoryId,
+          name: item.name,
+          color: item.color,
+          fromAmount: item.amount,
+          toAmount: 0,
+        });
+      });
+
+      toItems.forEach((item) => {
+        if (!byCategory.has(item.categoryId)) {
+          orderedCategoryIds.push(item.categoryId);
+        }
+
+        const current = byCategory.get(item.categoryId) || {
+          categoryId: item.categoryId,
+          name: item.name,
+          color: item.color,
+          fromAmount: 0,
+          toAmount: 0,
+        };
+
+        current.name = item.name;
+        current.color = item.color;
+        current.toAmount = item.amount;
+
+        byCategory.set(item.categoryId, current);
+      });
+
+      return orderedCategoryIds
+        .map((categoryId) => {
+          const item = byCategory.get(categoryId);
+
+          const isLeaving = item.fromAmount > 0 && item.toAmount <= 0;
+          const isEntering = item.fromAmount <= 0 && item.toAmount > 0;
+
+          let itemProgress;
+
+          if (isLeaving) {
+            itemProgress = getEasedDelayedProgress(rawProgress, profile.exitDelay);
+          } else if (isEntering) {
+            itemProgress = getEasedDelayedProgress(rawProgress, profile.enterDelay);
+          } else {
+            itemProgress = getEasedDelayedProgress(rawProgress, profile.sharedDelay);
+          }
+
+          return {
+            categoryId: item.categoryId,
+            name: item.name,
+            color: item.color,
+            amount: lerpNumber(item.fromAmount, item.toAmount, itemProgress),
+          };
+        })
+        .filter((item) => item.amount > 0.01);
+    }
+
+    function animateTextNumber({
+      from,
+      to,
+      duration = 420,
+      format,
+      onUpdate,
+      onDone,
+      frameIdGetter,
+      frameIdSetter,
+    }) {
+      const startTime = performance.now();
+      const previousFrameId = frameIdGetter();
+
+      if (previousFrameId) {
+        cancelAnimationFrame(previousFrameId);
+      }
+
+      function tick(now) {
+        const rawProgress = Math.min((now - startTime) / duration, 1);
+        const progress = easeOutCubic(rawProgress);
+        const value = lerpNumber(from, to, progress);
+
+        onUpdate(format(value));
+
+        if (rawProgress < 1) {
+          const nextFrameId = requestAnimationFrame(tick);
+          frameIdSetter(nextFrameId);
+          return;
+        }
+
+        onUpdate(format(to));
+        frameIdSetter(null);
+        onDone?.();
+      }
+
+      const nextFrameId = requestAnimationFrame(tick);
+      frameIdSetter(nextFrameId);
+    }
+
+    function animateMoneyValue(element, from, to) {
+      if (!element) return;
+
+      animateTextNumber({
+        from,
+        to,
+        duration: 820,
+        format: (value) => formatMoney(roundToTwo(value)),
+        onUpdate: (text) => {
+          element.textContent = text;
+        },
+        frameIdGetter: () => moneyAnimationFrameId,
+        frameIdSetter: (nextId) => {
+          moneyAnimationFrameId = nextId;
+        },
+      });
+    }
+
+    function animatePercentValue(element, from, to) {
+      if (!element) return;
+
+      animateTextNumber({
+        from,
+        to,
+        duration: 700,
+        format: (value) => formatAnalyticsPercent(value),
+        onUpdate: (text) => {
+          element.textContent = text;
+        },
+        frameIdGetter: () => percentAnimationFrameId,
+        frameIdSetter: (nextId) => {
+          percentAnimationFrameId = nextId;
+        },
+      });
+    }
 
     function getAnalyticsExpensesPeriodNote() {
       const period = getFilterPeriod();
@@ -488,277 +497,248 @@ function animatePercentValue(element, from, to) {
         getRangeEnd()
       ).filter((transaction) => transaction.type === "expense");
     }
-    
+
     function isAnalyticsExpenseRequiredCategory(categoryId) {
-  if (categoryId === UNCATEGORIZED_ID) return false;
+      if (categoryId === UNCATEGORIZED_ID) return false;
 
-  return typeof isRequiredCategory === "function"
-    ? isRequiredCategory(categoryId)
-    : false;
-}
+      return typeof isRequiredCategory === "function"
+        ? isRequiredCategory(categoryId)
+        : false;
+    }
 
-function isAnalyticsExpenseKindTransaction(transaction) {
-  if (analyticsExpenseKindFilter === "all") {
-    return true;
-  }
+    function isAnalyticsExpenseKindTransaction(transaction) {
+      if (analyticsExpenseKindFilter === "all") {
+        return true;
+      }
 
-  const categoryId = transaction.category_id || UNCATEGORIZED_ID;
-  const isRequired = isAnalyticsExpenseRequiredCategory(categoryId);
+      const categoryId = transaction.category_id || UNCATEGORIZED_ID;
+      const isRequired = isAnalyticsExpenseRequiredCategory(categoryId);
 
-  if (analyticsExpenseKindFilter === "required") {
-    return isRequired;
-  }
+      if (analyticsExpenseKindFilter === "required") {
+        return isRequired;
+      }
 
-  if (analyticsExpenseKindFilter === "flexible") {
-    return !isRequired;
-  }
+      if (analyticsExpenseKindFilter === "flexible") {
+        return !isRequired;
+      }
 
-  return true;
-}
+      return true;
+    }
 
-function getAnalyticsExpenseKindTransactions() {
-  return getAnalyticsExpenseBaseTransactions().filter(isAnalyticsExpenseKindTransaction);
-}
+    function getAnalyticsExpenseKindTransactions() {
+      return getAnalyticsExpenseBaseTransactions().filter(isAnalyticsExpenseKindTransaction);
+    }
 
-function syncAnalyticsExpenseKindRail() {
-  document.querySelectorAll("[data-analytics-expense-kind]").forEach((button) => {
-    button.classList.toggle(
-      "is-active",
-      button.dataset.analyticsExpenseKind === analyticsExpenseKindFilter
-    );
-  });
-}
+    function syncAnalyticsExpenseKindRail() {
+      document.querySelectorAll("[data-analytics-expense-kind]").forEach((button) => {
+        button.classList.toggle(
+          "is-active",
+          button.dataset.analyticsExpenseKind === analyticsExpenseKindFilter
+        );
+      });
+    }
 
-function bindAnalyticsExpenseKindRail() {
-  document.querySelectorAll("[data-analytics-expense-kind]").forEach((button) => {
-    if (button.dataset.kindBound === "true") return;
+    function bindAnalyticsExpenseKindRail() {
+      document.querySelectorAll("[data-analytics-expense-kind]").forEach((button) => {
+        if (button.dataset.kindBound === "true") return;
 
-    button.dataset.kindBound = "true";
+        button.dataset.kindBound = "true";
 
-    button.addEventListener("click", () => {
-      const nextKind = button.dataset.analyticsExpenseKind || "all";
+        button.addEventListener("click", () => {
+          const nextKind = button.dataset.analyticsExpenseKind || "all";
 
-      if (analyticsExpenseKindFilter === nextKind) return;
+          if (analyticsExpenseKindFilter === nextKind) return;
 
-      analyticsExpenseKindFilter = nextKind;
-      analyticsExpenseCategoryFilter = "all";
-      syncAnalyticsExpenseKindRail();
-      renderAnalyticsExpensesByCategory();
-    });
-  });
-}
+          analyticsExpenseKindFilter = nextKind;
+          analyticsExpenseCategoryFilter = "all";
+          syncAnalyticsExpenseKindRail();
+          renderAnalyticsExpensesByCategory();
+        });
+      });
+    }
 
     function getAnalyticsExpenseFilteredTransactions() {
-  const expenseTransactions = getAnalyticsExpenseKindTransactions();
+      const expenseTransactions = getAnalyticsExpenseKindTransactions();
 
-  if (analyticsExpenseCategoryFilter === "all") {
-    return expenseTransactions;
-  }
+      if (analyticsExpenseCategoryFilter === "all") {
+        return expenseTransactions;
+      }
 
-  return expenseTransactions.filter((transaction) => {
-    const categoryId = transaction.category_id || UNCATEGORIZED_ID;
-    return categoryId === analyticsExpenseCategoryFilter;
-  });
-}
+      return expenseTransactions.filter((transaction) => {
+        const categoryId = transaction.category_id || UNCATEGORIZED_ID;
+        return categoryId === analyticsExpenseCategoryFilter;
+      });
+    }
 
     function getAnalyticsExpenseItems(expenseTransactions) {
-  const byCategory = new Map();
+      const byCategory = new Map();
 
-  expenseTransactions.forEach((transaction) => {
-    const categoryId = transaction.category_id || UNCATEGORIZED_ID;
-    const amount = Number(transaction.amount) || 0;
+      expenseTransactions.forEach((transaction) => {
+        const categoryId = transaction.category_id || UNCATEGORIZED_ID;
+        const amount = Number(transaction.amount) || 0;
 
-    const current = byCategory.get(categoryId) || {
-      categoryId,
-      name: getCategoryName(categoryId),
-      amount: 0,
-      color: getAnalyticsExpenseColor(categoryId),
-    };
+        const current = byCategory.get(categoryId) || {
+          categoryId,
+          name: getCategoryName(categoryId),
+          amount: 0,
+          color: getAnalyticsExpenseColor(categoryId),
+        };
 
-    current.amount += amount;
-    byCategory.set(categoryId, current);
-  });
+        current.amount += amount;
+        byCategory.set(categoryId, current);
+      });
 
-  return Array.from(byCategory.values())
-    .map((item) => ({
-      ...item,
-      amount: roundToTwo(item.amount),
-    }))
-    .filter((item) => item.amount > 0)
-    .sort((a, b) => b.amount - a.amount);
-}
+      return Array.from(byCategory.values())
+        .map((item) => ({
+          ...item,
+          amount: roundToTwo(item.amount),
+        }))
+        .filter((item) => item.amount > 0)
+        .sort((a, b) => b.amount - a.amount);
+    }
 
     function renderAnalyticsExpensesRing(items, total, options = {}) {
-  const ringEl = getPrimaryExpenseRingEl();
-  const centerValueEl = getPrimaryExpenseRingCenterValueEl();
-  const centerLabelEl = getPrimaryExpenseRingCenterLabelEl();
+      const ringEl = getPrimaryExpenseRingEl();
+      const centerValueEl = getPrimaryExpenseRingCenterValueEl();
+      const centerLabelEl = getPrimaryExpenseRingCenterLabelEl();
 
-  if (!ringEl) return;
+      if (!ringEl) return;
 
-  const shouldAnimate = options.animate === true;
-  const nextTopPercentRaw = getTopPercentFromItems(items, total);
+      const shouldAnimate = options.animate === true;
+      const nextTopPercent = getTopPercentFromItems(items, total);
+      const nextTopItem = items[0];
+      const nextCenterLabel = nextTopItem ? nextTopItem.name : "Нет расходов";
 
-const nextTopItem = items[0];
+      function setRingGradient(nextItems, nextTotal) {
+        const gradient = buildAnalyticsRingGradient(nextItems, nextTotal);
 
-const nextCenterLabel = nextTopItem ? nextTopItem.name : "Нет расходов";
+        ringEl.style.background = gradient;
+        ringEl.style.setProperty("--analytics-ring-gradient", gradient);
+      }
 
-  function setRingGradient(nextItems, nextTotal) {
-    const gradient = buildAnalyticsRingGradient(nextItems, nextTotal);
+      function setFinalRingState(nextItems, nextTotal, nextPercent, nextLabel) {
+        setRingGradient(nextItems, nextTotal);
 
-    ringEl.style.background = gradient;
-    ringEl.style.setProperty("--analytics-ring-gradient", gradient);
-  }
+        if (centerValueEl) {
+          centerValueEl.textContent = formatAnalyticsPercent(nextPercent);
+        }
 
-  function setFinalRingState(nextItems, nextTotal, nextPercent, nextLabel) {
-    setRingGradient(nextItems, nextTotal);
+        if (centerLabelEl) {
+          centerLabelEl.textContent = nextLabel;
+        }
 
-    function setFinalRingState(nextItems, nextTotal, nextPercentRaw, nextLabel) {
+        previousRingItems = nextItems.map((item) => ({ ...item }));
+        previousRingTotal = nextTotal;
+        previousTopPercent = nextPercent;
+        ringAnimationFrameId = null;
+      }
 
-  setRingGradient(nextItems, nextTotal);
+      if (!shouldAnimate || !previousRingItems) {
+        setFinalRingState(items, total, nextTopPercent, nextCenterLabel);
+        return;
+      }
 
-  if (centerValueEl) {
+      if (ringAnimationFrameId) {
+        cancelAnimationFrame(ringAnimationFrameId);
+        ringAnimationFrameId = null;
+      }
 
-    const displayPercent =
+      const fromItems = previousRingItems.map((item) => ({ ...item }));
+      const fromTotal = previousRingTotal;
+      const fromTopPercent = previousTopPercent;
 
-      nextPercentRaw > 0 && nextPercentRaw < 1 ? "<1" : Math.round(nextPercentRaw);
+      const toItems = items.map((item) => ({ ...item }));
+      const toTotal = total;
 
-    centerValueEl.textContent = `${displayPercent}%`;
-
-  }
-
-  if (centerLabelEl) {
-
-    centerLabelEl.textContent = nextLabel;
-
-  }
-
-  previousRingItems = nextItems.map((item) => ({ ...item }));
-
-  previousRingTotal = nextTotal;
-
-  // для анимации храним округлённое число
-
-  previousTopPercent = Math.round(nextPercentRaw);
-
-  ringAnimationFrameId = null;
-    }
-
-    if (centerLabelEl) {
-      centerLabelEl.textContent = nextLabel;
-    }
-
-    previousRingItems = nextItems.map((item) => ({ ...item }));
-    previousRingTotal = nextTotal;
-    setFinalRingState(items, total, nextTopPercentRaw, nextCenterLabel);
-    ringAnimationFrameId = null;
-  }
-
-  if (!shouldAnimate || !previousRingItems) {
-    setFinalRingState(items, total, nextTopPercent, nextCenterLabel);
-    return;
-  }
-
-  if (ringAnimationFrameId) {
-    cancelAnimationFrame(ringAnimationFrameId);
-    ringAnimationFrameId = null;
-  }
-
-  const fromItems = previousRingItems.map((item) => ({ ...item }));
-  const fromTotal = previousRingTotal;
-  const fromTopPercent = previousTopPercent;
-
-  const toItems = items.map((item) => ({ ...item }));
-  const toTotal = total;
-
-  function animateRingPhase({
-    phaseFromItems,
-    phaseToItems,
-    phaseFromTotal,
-    phaseToTotal,
-    duration,
-    onDone,
-  }) {
-    const profile = getRingTransitionProfile(
-      phaseFromItems,
-      phaseToItems,
-      phaseFromTotal,
-      phaseToTotal
-    );
-
-    const startTime = performance.now();
-
-    function tick(now) {
-      const rawProgress = Math.min((now - startTime) / duration, 1);
-
-      const mixedItems = mergeRingItemsForAnimation(
+      function animateRingPhase({
         phaseFromItems,
         phaseToItems,
-        rawProgress,
-        profile
-      );
-
-      const mixedItemsTotal = getRingItemsTotal(mixedItems);
-
-      const mixedTotal = getAnimatedRingTotal(
         phaseFromTotal,
         phaseToTotal,
-        mixedItemsTotal,
-        rawProgress,
-        profile
-      );
+        duration,
+        onDone,
+      }) {
+        const profile = getRingTransitionProfile(
+          phaseFromItems,
+          phaseToItems,
+          phaseFromTotal,
+          phaseToTotal
+        );
 
-      setRingGradient(mixedItems, mixedTotal);
+        const startTime = performance.now();
 
-      if (rawProgress < 1) {
+        function tick(now) {
+          const rawProgress = Math.min((now - startTime) / duration, 1);
+
+          const mixedItems = mergeRingItemsForAnimation(
+            phaseFromItems,
+            phaseToItems,
+            rawProgress,
+            profile
+          );
+
+          const mixedItemsTotal = getRingItemsTotal(mixedItems);
+
+          const mixedTotal = getAnimatedRingTotal(
+            phaseFromTotal,
+            phaseToTotal,
+            mixedItemsTotal,
+            rawProgress,
+            profile
+          );
+
+          setRingGradient(mixedItems, mixedTotal);
+
+          if (rawProgress < 1) {
+            ringAnimationFrameId = requestAnimationFrame(tick);
+            return;
+          }
+
+          setRingGradient(phaseToItems, phaseToTotal);
+          ringAnimationFrameId = null;
+          onDone?.();
+        }
+
         ringAnimationFrameId = requestAnimationFrame(tick);
-        return;
       }
 
-      setRingGradient(phaseToItems, phaseToTotal);
-      ringAnimationFrameId = null;
-      onDone?.();
-    }
-
-    ringAnimationFrameId = requestAnimationFrame(tick);
-  }
-
-  animatePercentValue(centerValueEl, fromTopPercent, 0);
-
-  animateRingPhase({
-    phaseFromItems: fromItems,
-    phaseToItems: [],
-    phaseFromTotal: fromTotal,
-    phaseToTotal: 0,
-    duration: 430,
-    onDone: () => {
-      if (centerLabelEl) {
-        centerLabelEl.textContent = "Нет расходов";
-      }
-
-      if (!toItems.length || !toTotal) {
-        setFinalRingState([], 0, 0, "Нет расходов");
-        return;
-      }
-
-      if (centerLabelEl) {
-        centerLabelEl.textContent = nextCenterLabel;
-      }
-
-      animatePercentValue(centerValueEl, 0, nextTopPercent);
+      animatePercentValue(centerValueEl, fromTopPercent, 0);
 
       animateRingPhase({
-        phaseFromItems: [],
-        phaseToItems: toItems,
-        phaseFromTotal: 0,
-        phaseToTotal: toTotal,
-        duration: 650,
+        phaseFromItems: fromItems,
+        phaseToItems: [],
+        phaseFromTotal: fromTotal,
+        phaseToTotal: 0,
+        duration: 430,
         onDone: () => {
-          setFinalRingState(toItems, toTotal, nextTopPercent, nextCenterLabel);
+          if (centerLabelEl) {
+            centerLabelEl.textContent = "Нет расходов";
+          }
+
+          if (!toItems.length || !toTotal) {
+            setFinalRingState([], 0, 0, "Нет расходов");
+            return;
+          }
+
+          if (centerLabelEl) {
+            centerLabelEl.textContent = nextCenterLabel;
+          }
+
+          animatePercentValue(centerValueEl, 0, nextTopPercent);
+
+          animateRingPhase({
+            phaseFromItems: [],
+            phaseToItems: toItems,
+            phaseFromTotal: 0,
+            phaseToTotal: toTotal,
+            duration: 650,
+            onDone: () => {
+              setFinalRingState(toItems, toTotal, nextTopPercent, nextCenterLabel);
+            },
+          });
         },
       });
-    },
-  });
-}
+    }
 
     function getAnalyticsMonthDateFromValue(value) {
       const normalized = normalizeAnalyticsMonthValue(value);
@@ -785,37 +765,37 @@ const nextCenterLabel = nextTopItem ? nextTopItem.name : "Нет расходо�
     }
 
     function getAnalyticsMonthStripItems() {
-  const selectedDate = getAnalyticsMonthDateFromValue(getSelectedMonth());
-  const selectedYear = selectedDate.getFullYear();
-  const items = [];
+      const selectedDate = getAnalyticsMonthDateFromValue(getSelectedMonth());
+      const selectedYear = selectedDate.getFullYear();
+      const items = [];
 
-  for (let monthIndex = 0; monthIndex < 12; monthIndex += 1) {
-    const date = new Date(selectedYear, monthIndex, 1);
-    const monthKey = getAnalyticsMonthKeyFromDate(date);
+      for (let monthIndex = 0; monthIndex < 12; monthIndex += 1) {
+        const date = new Date(selectedYear, monthIndex, 1);
+        const monthKey = getAnalyticsMonthKeyFromDate(date);
 
-    const monthTransactions = filterTransactionsByPeriod(
-      state.transactions,
-      "month",
-      monthKey,
-      "",
-      ""
-    ).filter((transaction) => transaction.type === "expense");
+        const monthTransactions = filterTransactionsByPeriod(
+          state.transactions,
+          "month",
+          monthKey,
+          "",
+          ""
+        ).filter((transaction) => transaction.type === "expense");
 
-    const total = roundToTwo(
-      monthTransactions.reduce((sum, transaction) => {
-        return sum + (Number(transaction.amount) || 0);
-      }, 0)
-    );
+        const total = roundToTwo(
+          monthTransactions.reduce((sum, transaction) => {
+            return sum + (Number(transaction.amount) || 0);
+          }, 0)
+        );
 
-    items.push({
-      monthKey,
-      label: getAnalyticsMonthShortLabel(monthKey),
-      total,
-    });
-  }
+        items.push({
+          monthKey,
+          label: getAnalyticsMonthShortLabel(monthKey),
+          total,
+        });
+      }
 
-  return items;
-}
+      return items;
+    }
 
     function renderAnalyticsExpensesMonthStrip() {
       if (!analyticsExpensesMonthStrip) return;
@@ -848,15 +828,14 @@ const nextCenterLabel = nextTopItem ? nextTopItem.name : "Нет расходо�
         `;
 
         button.addEventListener("click", () => {
-  analyticsExpenseCategoryFilter = "all";
-  setSelectedMonth(item.monthKey);
-  setFilterPeriod("month");
-  renderAnalyticsExpensesByCategory();
-});
+          analyticsExpenseCategoryFilter = "all";
+          setSelectedMonth(item.monthKey);
+          setFilterPeriod("month");
+          renderAnalyticsExpensesByCategory();
+        });
 
         analyticsExpensesMonthStrip.appendChild(button);
       });
-
     }
 
     function renderAnalyticsExpensesCategories(items, total) {
@@ -877,10 +856,10 @@ const nextCenterLabel = nextTopItem ? nextTopItem.name : "Нет расходо�
 
       items.forEach((item) => {
         const rawPercent = total > 0 ? (item.amount / total) * 100 : 0;
-
-const percentNumber = Math.round(rawPercent);
-
-const percentDisplay = rawPercent > 0 && rawPercent < 1 ? "<1" : percentNumber;
+        const percentForBar = rawPercent > 0 && rawPercent < 1
+          ? 1
+          : Math.round(rawPercent);
+        const percentLabel = formatAnalyticsPercent(rawPercent);
 
         const row = document.createElement("button");
         row.className =
@@ -910,12 +889,11 @@ const percentDisplay = rawPercent > 0 && rawPercent < 1 ? "<1" : percentNumber;
               <div class="analytics-expense-category-row__bar">
                 <div
                   class="analytics-expense-category-row__bar-fill"
-                  .
-            style="width: ${Math.max(2, percentNumber)}%; background: ${item.color}; color: ${item.color};"
+                  style="width: ${Math.max(2, percentForBar)}%; background: ${item.color}; color: ${item.color};"
                 ></div>
               </div>
 
-              <div class="analytics-expense-category-row__percent">${percentDisplay}%</div>
+              <div class="analytics-expense-category-row__percent">${percentLabel}</div>
             </div>
           </div>
         `;
@@ -930,10 +908,10 @@ const percentDisplay = rawPercent > 0 && rawPercent < 1 ? "<1" : percentNumber;
 
     function renderAnalyticsExpensesByCategory() {
       bindAnalyticsExpenseKindRail();
-syncAnalyticsExpenseKindRail();
+      syncAnalyticsExpenseKindRail();
 
-const baseExpenseTransactions = getAnalyticsExpenseKindTransactions();
-const filteredExpenseTransactions = getAnalyticsExpenseFilteredTransactions();
+      const baseExpenseTransactions = getAnalyticsExpenseKindTransactions();
+      const filteredExpenseTransactions = getAnalyticsExpenseFilteredTransactions();
 
       const totalAll = roundToTwo(
         baseExpenseTransactions.reduce((sum, transaction) => {
@@ -948,7 +926,7 @@ const filteredExpenseTransactions = getAnalyticsExpenseFilteredTransactions();
       );
 
       const ringItems = getAnalyticsExpenseItems(baseExpenseTransactions);
-const listItems = getAnalyticsExpenseItems(filteredExpenseTransactions);
+      const listItems = getAnalyticsExpenseItems(filteredExpenseTransactions);
 
       const shownTotal =
         analyticsExpenseCategoryFilter === "all" ? totalAll : totalFiltered;
@@ -957,29 +935,30 @@ const listItems = getAnalyticsExpenseItems(filteredExpenseTransactions);
       const periodNoteEl = getPrimaryExpensePeriodNoteEl();
 
       if (previousShownTotal === null) {
-  if (valueEl) {
-    valueEl.textContent = formatMoney(shownTotal);
-  }
+        if (valueEl) {
+          valueEl.textContent = formatMoney(shownTotal);
+        }
 
-  if (analyticsExpensesTotalRowValue) {
-    analyticsExpensesTotalRowValue.textContent = formatMoney(shownTotal);
-  }
+        if (analyticsExpensesTotalRowValue) {
+          analyticsExpensesTotalRowValue.textContent = formatMoney(shownTotal);
+        }
 
-  previousShownTotal = shownTotal;
-} else {
-  animateMoneyValue(valueEl, previousShownTotal, shownTotal);
-  animateMoneyValue(analyticsExpensesTotalRowValue, previousShownTotal, shownTotal);
+        previousShownTotal = shownTotal;
+      } else {
+        animateMoneyValue(valueEl, previousShownTotal, shownTotal);
+        animateMoneyValue(analyticsExpensesTotalRowValue, previousShownTotal, shownTotal);
 
-  previousShownTotal = shownTotal;
-}
+        previousShownTotal = shownTotal;
+      }
 
       if (periodNoteEl) {
         periodNoteEl.textContent = getAnalyticsExpensesPeriodNote();
       }
 
       renderAnalyticsExpensesRing(ringItems, totalAll, {
-  animate: previousRingItems !== null,
-});
+        animate: previousRingItems !== null,
+      });
+
       renderAnalyticsExpensesMonthStrip();
       renderAnalyticsExpensesCategories(listItems, shownTotal);
     }
