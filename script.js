@@ -2629,38 +2629,28 @@ if (amount > fromBalance) {
     return null;
   }
 
-  if (currentMode === "income") 
-  // проверяем остаток для расхода
-let accBalance = getAccountBalance(accountId);
-if (isVaultAccountId(accountId)) {
-  const freeBucket = getFreeSafeBucket();
-  accBalance = freeBucket ? getSafeBucketBalance(freeBucket.id) : accBalance;
+  if (currentMode === "income") {
+  // доход – проверка остатка не нужна, просто возвращаем объект
+  return {
+    id: editingTransactionId || crypto.randomUUID(),
+    type: "income",
+    title: comment || "Новый доход",
+    amount,
+    account_id: accountId,
+    account,
+    category_id: null,
+    from_account_id: null,
+    to_account_id: null,
+    from_account: null,
+    to_account: null,
+    from_safe_bucket_id: null,
+    to_safe_bucket_id: isVaultAccountId(accountId)
+      ? getFreeSafeBucket()?.id || null
+      : null,
+    created_at: createdAt,
+    time_label: getCurrentTime(),
+  };
 }
-if (amount > accBalance) {
-  alert("Недостаточно средств на счёте");
-  return null;
-}
-  {
-    return {
-      id: editingTransactionId || crypto.randomUUID(),
-      type: "income",
-      title: comment || "Новый доход",
-      amount,
-      account_id: accountId,
-      account,
-      category_id: null,
-      from_account_id: null,
-      to_account_id: null,
-      from_account: null,
-      to_account: null,
-      from_safe_bucket_id: null,
-      to_safe_bucket_id: isVaultAccountId(accountId)
-        ? getFreeSafeBucket()?.id || null
-        : null,
-      created_at: createdAt,
-      time_label: getCurrentTime(),
-    };
-  }
 
   const categoryId = categorySelect.value;
 
@@ -2675,6 +2665,16 @@ if (amount > accBalance) {
     alert("Не найдено накопление, помеченное как свободные деньги.");
     return null;
   }
+  
+let accBalance = getAccountBalance(accountId);
+if (isVaultAccountId(accountId)) {
+  const freeBucket = getFreeSafeBucket();
+  accBalance = freeBucket ? getSafeBucketBalance(freeBucket.id) : accBalance;
+}
+if (amount > accBalance) {
+  alert("Недостаточно средств на счёте");
+  return null;
+}
 
   return {
     id: editingTransactionId || crypto.randomUUID(),
