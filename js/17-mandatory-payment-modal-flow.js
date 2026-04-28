@@ -44,10 +44,7 @@
 
     function closeModalIfOpen(modal) {
       if (!isModalOpen(modal)) return;
-
-      closeAnimatedModal(modal, {
-        keepBodyLocked: false,
-      });
+      closeAnimatedModal(modal);
     }
 
     function resetMandatoryPaymentForm() {
@@ -150,6 +147,16 @@
       closeModalIfOpen(mandatoryPaymentBucketPickerModal);
       closeModalIfOpen(mandatoryPaymentEditorModal);
       closeModalIfOpen(mandatoryPaymentsModal);
+
+      window.setTimeout(() => {
+        if (
+          !isModalOpen(mandatoryPaymentsModal) &&
+          !isModalOpen(mandatoryPaymentEditorModal) &&
+          !isModalOpen(mandatoryPaymentBucketPickerModal)
+        ) {
+          window.FinanceAppModalCore?.forceUnlockBodyScroll?.();
+        }
+      }, window.FinanceAppModalCore?.MODAL_ANIMATION_MS + 60 || 520);
 
       resetMandatoryPaymentForm();
     }
