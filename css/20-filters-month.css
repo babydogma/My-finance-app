@@ -1,6 +1,6 @@
 /* =========================================================
    20. FILTERS / MONTH POPOVER
-   History filters and month wheel picker
+   Light filters and month wheel picker
    ========================================================= */
 
 .filters-sheet {
@@ -15,7 +15,10 @@
 .filters-sheet__title {
   margin: 0 !important;
   text-align: left !important;
-  font-size: 24px;
+  color: var(--text);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
 }
 
 .history-filters {
@@ -24,34 +27,32 @@
   overflow: visible;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 11px;
   align-items: stretch;
   width: 100%;
   max-width: 430px;
   margin: 10px auto 0;
-  padding: 14px;
-  border-radius: 30px;
+  padding: 12px;
+  border-radius: 24px;
   background:
-    radial-gradient(circle at top center, rgba(111, 156, 255, 0.08), transparent 42%),
-    linear-gradient(180deg, rgba(22, 25, 34, 0.72) 0%, rgba(16, 19, 28, 0.8) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.055);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(246, 248, 252, 0.97));
+  border: 1px solid rgba(22, 30, 46, 0.075);
   box-shadow:
-    0 18px 38px rgba(0, 0, 0, 0.22),
-    inset 0 1px 0 rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+    0 14px 32px rgba(30, 42, 68, 0.07),
+    0 3px 10px rgba(30, 42, 68, 0.03),
+    inset 0 1px 0 rgba(255, 255, 255, 0.94);
 }
 
 .history-filters--modal {
   margin-top: 0;
   max-width: 100%;
-  border-radius: 26px;
-  padding: 12px;
+  border-radius: 22px;
+  padding: 10px;
 }
 
 .history-filter-group {
   display: flex;
-  gap: 10px;
+  gap: 9px;
   overflow-x: auto;
   padding-bottom: 2px;
   scrollbar-width: none;
@@ -71,62 +72,60 @@
 .history-filter-group--secondary {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
+  gap: 8px;
   overflow: visible;
 }
 
 .history-filter-group--inputs {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  gap: 8px;
 }
 
 .history-filter-btn {
   flex: 0 0 auto;
-  height: 44px;
-  padding: 0 16px;
-  border: 1px solid rgba(255, 255, 255, 0.055);
-  border-radius: 18px;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid rgba(22, 30, 46, 0.07);
+  border-radius: 16px;
   background:
-    linear-gradient(180deg, rgba(35, 38, 48, 0.96) 0%, rgba(25, 28, 37, 0.99) 100%);
-  color: rgba(255, 255, 255, 0.62);
-  font-size: 14px;
-  font-weight: 830;
-  letter-spacing: -0.025em;
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(242, 246, 252, 0.97));
+  color: rgba(20, 24, 33, 0.56);
+  font-size: 12.5px;
+  font-weight: 580;
+  letter-spacing: -0.006em;
   box-shadow:
-    0 8px 18px rgba(0, 0, 0, 0.16),
-    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+    0 7px 16px rgba(30, 42, 68, 0.052),
+    inset 0 1px 0 rgba(255, 255, 255, 0.94);
   white-space: nowrap;
 }
 
 .history-filter-btn.is-active {
   background:
-    linear-gradient(180deg, rgba(111, 156, 255, 0.3) 0%, rgba(91, 143, 255, 0.2) 100%);
-  color: #f7f9ff;
-  border-color: rgba(111, 156, 255, 0.22);
+    linear-gradient(180deg, rgba(232, 240, 255, 0.99), rgba(218, 231, 255, 0.94));
+  color: var(--accent);
+  border-color: rgba(47, 125, 246, 0.18);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.05),
-    0 0 18px rgba(111, 156, 255, 0.14);
+    0 10px 22px rgba(47, 125, 246, 0.10),
+    inset 0 1px 0 rgba(255, 255, 255, 0.92);
 }
 
 .history-filter-btn--month {
   width: 100%;
   min-width: 0;
-  height: 64px;
-  padding: 0 24px;
-  border-radius: 22px;
-  font-size: 20px;
-  font-weight: 910;
-  letter-spacing: -0.045em;
-  color: #f5f8ff;
+  height: 54px;
+  padding: 0 18px;
+  border-radius: 20px;
+  font-size: 17px;
+  font-weight: 680;
+  letter-spacing: -0.025em;
+  color: var(--accent);
   background:
-    radial-gradient(circle at top center, rgba(111, 156, 255, 0.18), transparent 46%),
-    linear-gradient(180deg, rgba(41, 49, 78, 0.98) 0%, rgba(30, 35, 57, 1) 100%);
-  border: 1px solid rgba(111, 156, 255, 0.18);
+    linear-gradient(180deg, rgba(232, 240, 255, 0.99), rgba(218, 231, 255, 0.94));
+  border: 1px solid rgba(47, 125, 246, 0.16);
   box-shadow:
-    0 16px 34px rgba(0, 0, 0, 0.24),
-    0 0 24px rgba(111, 156, 255, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    0 12px 24px rgba(47, 125, 246, 0.10),
+    inset 0 1px 0 rgba(255, 255, 255, 0.92);
 }
 
 .month-filter-wrap {
@@ -146,52 +145,57 @@
 }
 
 .analytics-month-popover__panel {
-  padding: 14px;
-  border-radius: 30px;
+  padding: 12px;
+  border-radius: 24px;
   background:
-    linear-gradient(180deg, rgba(18, 21, 29, 0.98) 0%, rgba(14, 17, 25, 1) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+    radial-gradient(circle at 50% 0%, rgba(47, 125, 246, 0.055), transparent 38%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(248, 250, 253, 0.98));
+  border: 1px solid rgba(22, 30, 46, 0.075);
   box-shadow:
-    0 22px 56px rgba(0, 0, 0, 0.36),
-    inset 0 1px 0 rgba(255, 255, 255, 0.04);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+    0 18px 42px rgba(30, 42, 68, 0.14),
+    0 4px 14px rgba(30, 42, 68, 0.055),
+    inset 0 1px 0 rgba(255, 255, 255, 0.94);
 }
 
 .analytics-month-popover__actions {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 14px;
-  margin-top: 14px;
+  gap: 12px;
+  margin-top: 12px;
 }
 
 .analytics-month-popover__reset {
-  min-width: 132px;
-  height: 56px;
-  padding: 0 24px;
-  border: none;
-  border-radius: 22px;
-  background: rgba(255, 255, 255, 0.06);
-  color: #f5f7fb;
-  font-size: 17px;
-  font-weight: 820;
-  letter-spacing: -0.03em;
+  min-width: 118px;
+  height: 48px;
+  padding: 0 18px;
+  border: 1px solid rgba(22, 30, 46, 0.07);
+  border-radius: 18px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(242, 246, 252, 0.97));
+  color: rgba(20, 24, 33, 0.62);
+  font-size: 14px;
+  font-weight: 620;
+  letter-spacing: -0.012em;
+  box-shadow:
+    0 7px 16px rgba(30, 42, 68, 0.052),
+    inset 0 1px 0 rgba(255, 255, 255, 0.94);
 }
 
 .analytics-month-popover__apply {
-  width: 74px;
-  height: 74px;
+  width: 60px;
+  height: 60px;
   border: none;
   border-radius: 50%;
-  background: linear-gradient(180deg, #6ea2ff 0%, #5b8fff 100%);
-  color: #d7ffe3;
-  font-size: 42px;
-  font-weight: 700;
+  background:
+    linear-gradient(180deg, rgba(75, 146, 255, 1), rgba(47, 125, 246, 1));
+  color: #ffffff;
+  font-size: 34px;
+  font-weight: 600;
   line-height: 1;
   box-shadow:
-    0 14px 30px rgba(91, 143, 255, 0.22),
-    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+    0 14px 28px rgba(47, 125, 246, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
 }
 
 .month-wheel {
@@ -200,11 +204,12 @@
   grid-template-columns: 1.3fr 1fr;
   gap: 10px;
   width: 100%;
-  height: 234px;
-  padding: 10px 12px;
-  border-radius: 26px;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  height: 214px;
+  padding: 8px 10px;
+  border-radius: 22px;
+  background:
+    linear-gradient(180deg, rgba(246, 248, 252, 0.98), rgba(239, 243, 249, 0.96));
+  border: 1px solid rgba(22, 30, 46, 0.06);
   overflow: hidden;
 }
 
@@ -225,24 +230,28 @@
 
 .month-wheel__item {
   width: 100%;
-  height: 56px;
+  height: 52px;
   border: none;
   background: transparent;
-  color: rgba(255, 255, 255, 0.26);
-  font-size: 18px;
-  font-weight: 760;
-  letter-spacing: -0.03em;
+  color: rgba(20, 24, 33, 0.30);
+  font-size: 17px;
+  font-weight: 560;
+  letter-spacing: -0.012em;
   text-align: center;
   scroll-snap-align: center;
-  opacity: 0.62;
+  opacity: 0.72;
   transform: scale(0.94);
-  transition: color 0.18s ease, opacity 0.18s ease, transform 0.18s ease, font-size 0.18s ease;
+  transition:
+    color 0.18s ease,
+    opacity 0.18s ease,
+    transform 0.18s ease,
+    font-size 0.18s ease;
 }
 
 .month-wheel__item.is-active {
-  color: #f7f8fb;
-  font-size: 28px;
-  font-weight: 880;
+  color: var(--text);
+  font-size: 24px;
+  font-weight: 700;
   opacity: 1;
   transform: scale(1);
 }
@@ -253,13 +262,14 @@
 
 .month-wheel__center-line {
   position: absolute;
-  left: 10px;
-  right: 10px;
+  left: 8px;
+  right: 8px;
   top: 50%;
-  height: 56px;
+  height: 52px;
   transform: translateY(-50%);
   border-radius: 18px;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(47, 125, 246, 0.08);
+  border: 1px solid rgba(47, 125, 246, 0.08);
   pointer-events: none;
 }
 
@@ -267,26 +277,28 @@
   position: absolute;
   left: 0;
   right: 0;
-  height: 52px;
+  height: 50px;
   z-index: 2;
   pointer-events: none;
 }
 
 .month-wheel__fade--top {
   top: 0;
-  background: linear-gradient(180deg, rgba(18, 21, 28, 0.94) 0%, rgba(18, 21, 28, 0.08) 72%, rgba(18, 21, 28, 0) 100%);
+  background:
+    linear-gradient(180deg, rgba(246, 248, 252, 0.98), rgba(246, 248, 252, 0));
 }
 
 .month-wheel__fade--bottom {
   bottom: 0;
-  background: linear-gradient(0deg, rgba(18, 21, 28, 0.98) 0%, rgba(18, 21, 28, 0) 100%);
+  background:
+    linear-gradient(0deg, rgba(239, 243, 249, 0.98), rgba(239, 243, 249, 0));
 }
 
 @media (max-width: 420px) {
   .history-filters {
     gap: 10px;
-    padding: 12px;
-    border-radius: 24px;
+    padding: 10px;
+    border-radius: 22px;
     max-width: 100%;
   }
 
@@ -296,17 +308,17 @@
   }
 
   .history-filter-btn {
-    height: 40px;
-    padding: 0 12px;
-    font-size: 12.5px;
-    border-radius: 16px;
+    height: 38px;
+    padding: 0 10px;
+    font-size: 12px;
+    border-radius: 15px;
   }
 
   .history-filter-btn--month {
-    height: 56px;
-    padding: 0 18px;
-    border-radius: 20px;
-    font-size: 18px;
+    height: 52px;
+    padding: 0 16px;
+    border-radius: 19px;
+    font-size: 16px;
   }
 
   .analytics-month-popover {
@@ -315,48 +327,46 @@
   }
 
   .analytics-month-popover__panel {
-    padding: 12px;
-    border-radius: 24px;
+    padding: 11px;
+    border-radius: 23px;
   }
 
   .analytics-month-popover__reset {
-    min-width: 118px;
-    height: 52px;
-    font-size: 16px;
+    min-width: 108px;
+    height: 46px;
+    font-size: 13px;
   }
 
   .analytics-month-popover__apply {
-    width: 66px;
-    height: 66px;
-    font-size: 38px;
+    width: 56px;
+    height: 56px;
+    font-size: 32px;
   }
 
   .month-wheel {
-    height: 214px;
-    padding: 8px 10px;
+    height: 206px;
+    padding: 8px;
   }
 
   .month-wheel__item {
-    height: 52px;
-    font-size: 17px;
+    height: 50px;
+    font-size: 16px;
   }
 
   .month-wheel__item.is-active {
-    font-size: 24px;
-  }
-
-  .month-wheel__center-line {
-    height: 52px;
-    left: 8px;
-    right: 8px;
-  }
-
-  .filters-sheet__title {
     font-size: 22px;
   }
 
+  .month-wheel__center-line {
+    height: 50px;
+  }
+
+  .filters-sheet__title {
+    font-size: 21px;
+  }
+
   .history-filters--modal {
-    border-radius: 22px;
+    border-radius: 21px;
     padding: 10px;
   }
 }
