@@ -186,3 +186,83 @@
     transform: translate3d(0, 58px, 0) scale(0.972);
   }
 }
+
+/* =========================================================
+   Modal fixed viewport / no useless inner scroll
+   ========================================================= */
+
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+}
+
+html.modal-scroll-locked,
+body.modal-scroll-locked {
+  overflow: hidden !important;
+  overscroll-behavior: none;
+}
+
+body.modal-scroll-locked {
+  touch-action: none;
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100dvh;
+  min-height: 100dvh;
+  max-height: 100dvh;
+  overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: none;
+}
+
+.modal-sheet {
+  max-height: calc(100dvh - 24px);
+  overflow: hidden;
+  overscroll-behavior: contain;
+}
+
+/* Small modals: no internal scroll */
+#transactionModal .modal-sheet,
+#budgetModal .modal-sheet,
+#accountModal .modal-sheet,
+#faqModal .modal-sheet,
+#safeInterestRateModal .modal-sheet,
+#safeBucketAmountModal .modal-sheet {
+  overflow: hidden;
+}
+
+/* Big / potentially long modals: internal scroll is allowed */
+#mandatoryPaymentsModal .modal-sheet,
+#mandatoryPaymentEditorModal .modal-sheet,
+#mandatoryPaymentBucketPickerModal .modal-sheet,
+#safeBucketsModal .modal-sheet,
+#operationsFiltersModal .modal-sheet {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Prevent sideways dragging / zoomed horizontal drift */
+.app,
+.modal,
+.modal-sheet {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+@supports (height: 100svh) {
+  .modal {
+    height: 100svh;
+    min-height: 100svh;
+    max-height: 100svh;
+  }
+
+  .modal-sheet {
+    max-height: calc(100svh - 24px);
+  }
+}
