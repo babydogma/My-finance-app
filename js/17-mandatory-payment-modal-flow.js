@@ -34,6 +34,31 @@
     renderMonthStrip,
     renderModal,
   }) {
+    function isModalActuallyOpen(modal) {
+      return Boolean(
+        modal &&
+        !modal.classList.contains("hidden") &&
+        (
+          modal.classList.contains("is-visible") ||
+          modal.classList.contains("is-closing")
+        )
+      );
+    }
+
+    function setPageScrollLocked(isLocked) {
+      document.documentElement.classList.toggle("modal-scroll-locked", isLocked);
+      document.body.classList.toggle("modal-scroll-locked", isLocked);
+
+      document.documentElement.style.overflow = isLocked ? "hidden" : "";
+      document.body.style.overflow = isLocked ? "hidden" : "";
+
+      document.body.style.touchAction = isLocked ? "none" : "";
+    }
+
+    function shouldKeepScrollLockedAfterEditorClose() {
+      return isModalActuallyOpen(mandatoryPaymentsModal);
+    }
+
     function resetMandatoryPaymentForm() {
       setActiveMandatoryPaymentId(null);
 
@@ -63,26 +88,24 @@
     }
 
     function openMandatoryPaymentEditorModal() {
+      setPageScrollLocked(true);
       openAnimatedModal(mandatoryPaymentEditorModal);
-      document.body.style.overflow = "hidden";
     }
 
     function closeMandatoryPaymentEditorModal() {
-      closeAnimatedModal(mandatoryPaymentBucketPickerModal, { keepBodyLocked: true });
+      closeAnimatedModal(mandatoryPaymentBucketPickerModal, {
+        keepBodyLocked: true,
+      });
 
-      closeAnimatedModal(
-        mandatoryPaymentEditorModal,
-        {
-          keepBodyLocked: Boolean(
-            mandatoryPaymentsModal &&
-            !mandatoryPaymentsModal.classList.contains("hidden")
-          ),
-        }
-      );
+      const keepLocked = shouldKeepScrollLockedAfterEditorClose();
 
-      if (mandatoryPaymentsModal && !mandatoryPaymentsModal.classList.contains("hidden")) {
-        document.body.style.overflow = "hidden";
-      }
+      closeAnimatedModal(mandatoryPaymentEditorModal, {
+        keepBodyLocked: keepLocked,
+      });
+
+      window.setTimeout(() => {
+        setPageScrollLocked(shouldKeepScrollLockedAfterEditorClose());
+      }, 320);
 
       resetMandatoryPaymentForm();
     }
@@ -149,9 +172,20 @@
     }
 
     function closeMandatoryPaymentsModal() {
-      closeAnimatedModal(mandatoryPaymentBucketPickerModal, { keepBodyLocked: true });
-      closeAnimatedModal(mandatoryPaymentEditorModal, { keepBodyLocked: true });
+      closeAnimatedModal(mandatoryPaymentBucketPickerModal, {
+        keepBodyLocked: true,
+      });
+
+      closeAnimatedModal(mandatoryPaymentEditorModal, {
+        keepBodyLocked: true,
+      });
+
       closeAnimatedModal(mandatoryPaymentsModal);
+
+      window.setTimeout(() => {
+        setPageScrollLocked(false);
+      }, 340);
+
       resetMandatoryPaymentForm();
     }
 
@@ -161,8 +195,8 @@
       renderMonthStrip();
       renderModal();
 
+      setPageScrollLocked(true);
       openAnimatedModal(mandatoryPaymentsModal);
-      document.body.style.overflow = "hidden";
     }
 
     return {
