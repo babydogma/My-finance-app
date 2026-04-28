@@ -5,11 +5,15 @@
   let lockedScrollY = 0;
   let bodyLockDepth = 0;
 
-  function lockBodyScroll() {
-    bodyLockDepth += 1;
+  function isModalOpen(modalEl) {
+    return Boolean(
+      modalEl &&
+      !modalEl.classList.contains("hidden") &&
+      !modalEl.classList.contains("is-closing")
+    );
+  }
 
-    if (bodyLockDepth > 1) return;
-
+  function applyBodyScrollLock() {
     lockedScrollY = window.scrollY || document.documentElement.scrollTop || 0;
 
     document.documentElement.classList.add("modal-scroll-locked");
@@ -23,10 +27,8 @@
     document.body.style.overflow = "hidden";
   }
 
-  function unlockBodyScroll() {
-    bodyLockDepth = Math.max(0, bodyLockDepth - 1);
-
-    if (bodyLockDepth > 0) return;
+  function clearBodyScrollLock(shouldRestoreScroll = true) {
+    const scrollY = lockedScrollY;
 
     document.documentElement.classList.remove("modal-scroll-locked");
     document.body.classList.remove("modal-scroll-locked");
@@ -38,8 +40,32 @@
     document.body.style.width = "";
     document.body.style.overflow = "";
 
-    window.scrollTo(0, lockedScrollY);
     lockedScrollY = 0;
+
+    if (shouldRestoreScroll) {
+      window.scrollTo(0, scrollY);
+    }
+  }
+
+  function lockBodyScroll() {
+    bodyLockDepth += 1;
+
+    if (bodyLockDepth > 1) return;
+
+    applyBodyScrollLock();
+  }
+
+  function unlockBodyScroll() {
+    bodyLockDepth = Math.max(0, bodyLockDepth - 1);
+
+    if (bodyLockDepth > 0) return;
+
+    clearBodyScrollLock(true);
+  }
+
+  function forceUnlockBodyScroll() {
+    bodyLockDepth = 0;
+    clearBodyScrollLock(false);
   }
 
   function openAnimatedModal(modalEl) {
@@ -52,30 +78,28 @@
       modalCloseTimers.delete(modalEl);
     }
 
-    lockBodyScroll();
+    if (!isModalOpen(modalEl)) {
+      lockBodyScroll();
+    }
 
     modalEl.classList.remove("hidden", "is-visible", "is-closing");
 
-    /*
-      Важно: принудительный reflow.
-      Без этого Safari иногда склеивает hidden -> visible
-      и анимация ощущается как мгновенное появление.
-    */
     void modalEl.offsetHeight;
 
     modalEl.classList.add("is-visible");
   }
 
-  function closeAnimatedModal(modalEl, options = {}) {
+  function closeAnimatedModal(modalEl) {
     if (!modalEl) return;
 
-    const { keepBodyLocked = false } = options;
+    const existingTimer = modalCloseTimers.get(modalEl);
+
+    if (existingTimer) {
+      clearTimeout(existingTimer);
+      modalCloseTimers.delete(modalEl);
+    }
 
     if (modalEl.classList.contains("hidden")) {
-      if (!keepBodyLocked) {
-        unlockBodyScroll();
-      }
-
       return;
     }
 
@@ -87,9 +111,7 @@
       modalEl.classList.remove("is-closing");
       modalCloseTimers.delete(modalEl);
 
-      if (!keepBodyLocked) {
-        unlockBodyScroll();
-      }
+      unlockBodyScroll();
     }, MODAL_ANIMATION_MS);
 
     modalCloseTimers.set(modalEl, timer);
@@ -99,5 +121,6 @@
     MODAL_ANIMATION_MS,
     openAnimatedModal,
     closeAnimatedModal,
+    forceUnlockBodyScroll,
   };
 })();
