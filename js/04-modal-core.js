@@ -65,7 +65,7 @@
 
   function forceUnlockBodyScroll() {
     bodyLockDepth = 0;
-    clearBodyScrollLock(false);
+    clearBodyScrollLock(true);
   }
 
   function openAnimatedModal(modalEl) {
@@ -103,6 +103,14 @@
       return;
     }
 
+    /*
+      Важно:
+      скролл разблокируем СРАЗУ при старте закрытия,
+      а не через 440 мс после анимации.
+      Иначе на iOS ощущается микролаг после закрытия модалки.
+    */
+    unlockBodyScroll();
+
     modalEl.classList.remove("is-visible");
     modalEl.classList.add("is-closing");
 
@@ -110,8 +118,6 @@
       modalEl.classList.add("hidden");
       modalEl.classList.remove("is-closing");
       modalCloseTimers.delete(modalEl);
-
-      unlockBodyScroll();
     }, MODAL_ANIMATION_MS);
 
     modalCloseTimers.set(modalEl, timer);
