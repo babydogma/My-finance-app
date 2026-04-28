@@ -259,7 +259,7 @@ function getTopPercentFromItems(items, total) {
 
   if (!topItem) return 0;
 
-  return Math.round((topItem.amount / total) * 100);
+  return (topItem.amount / total) * 100;
 }
 
 function getRingItemsTotal(items) {
@@ -596,9 +596,11 @@ function bindAnalyticsExpenseKindRail() {
   if (!ringEl) return;
 
   const shouldAnimate = options.animate === true;
-  const nextTopPercent = getTopPercentFromItems(items, total);
-  const nextTopItem = items[0];
-  const nextCenterLabel = nextTopItem ? nextTopItem.name : "Нет расходов";
+  const nextTopPercentRaw = getTopPercentFromItems(items, total);
+
+const nextTopItem = items[0];
+
+const nextCenterLabel = nextTopItem ? nextTopItem.name : "Нет расходов";
 
   function setRingGradient(nextItems, nextTotal) {
     const gradient = buildAnalyticsRingGradient(nextItems, nextTotal);
@@ -610,8 +612,35 @@ function bindAnalyticsExpenseKindRail() {
   function setFinalRingState(nextItems, nextTotal, nextPercent, nextLabel) {
     setRingGradient(nextItems, nextTotal);
 
-    if (centerValueEl) {
-      centerValueEl.textContent = `${nextPercent}%`;
+    function setFinalRingState(nextItems, nextTotal, nextPercentRaw, nextLabel) {
+
+  setRingGradient(nextItems, nextTotal);
+
+  if (centerValueEl) {
+
+    const displayPercent =
+
+      nextPercentRaw > 0 && nextPercentRaw < 1 ? "<1" : Math.round(nextPercentRaw);
+
+    centerValueEl.textContent = `${displayPercent}%`;
+
+  }
+
+  if (centerLabelEl) {
+
+    centerLabelEl.textContent = nextLabel;
+
+  }
+
+  previousRingItems = nextItems.map((item) => ({ ...item }));
+
+  previousRingTotal = nextTotal;
+
+  // для анимации храним округлённое число
+
+  previousTopPercent = Math.round(nextPercentRaw);
+
+  ringAnimationFrameId = null;
     }
 
     if (centerLabelEl) {
@@ -620,7 +649,7 @@ function bindAnalyticsExpenseKindRail() {
 
     previousRingItems = nextItems.map((item) => ({ ...item }));
     previousRingTotal = nextTotal;
-    previousTopPercent = nextPercent;
+    setFinalRingState(items, total, nextTopPercentRaw, nextCenterLabel);
     ringAnimationFrameId = null;
   }
 
@@ -847,7 +876,11 @@ function bindAnalyticsExpenseKindRail() {
       }
 
       items.forEach((item) => {
-        const percent = total > 0 ? Math.round((item.amount / total) * 100) : 0;
+        const rawPercent = total > 0 ? (item.amount / total) * 100 : 0;
+
+const percentNumber = Math.round(rawPercent);
+
+const percentDisplay = rawPercent > 0 && rawPercent < 1 ? "<1" : percentNumber;
 
         const row = document.createElement("button");
         row.className =
@@ -877,11 +910,12 @@ function bindAnalyticsExpenseKindRail() {
               <div class="analytics-expense-category-row__bar">
                 <div
                   class="analytics-expense-category-row__bar-fill"
-                  style="width: ${Math.max(2, percent)}%; background: ${item.color}; color: ${item.color};"
+                  .
+            style="width: ${Math.max(2, percentNumber)}%; background: ${item.color}; color: ${item.color};"
                 ></div>
               </div>
 
-              <div class="analytics-expense-category-row__percent">${percent}%</div>
+              <div class="analytics-expense-category-row__percent">${percentDisplay}%</div>
             </div>
           </div>
         `;
