@@ -1684,7 +1684,7 @@ function openAccountModal(accountId) {
 
   activeAccountId = accountId;
 
-  accountModalTitle.textContent = `Счёт: ${account.name}`;
+  accountModalTitle.textContent = account.name;
   accountNameInput.value = account.name || "";
   accountRoleSelect.value = account.account_kind || "spend";
   accountPrimarySpendInput.checked = Boolean(account.is_primary_spend);
