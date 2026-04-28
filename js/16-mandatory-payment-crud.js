@@ -16,11 +16,11 @@
     getAccountById,
     isVaultAccountId,
     mandatoryPaymentTitleInput,
-mandatoryPaymentAmountInput,
-mandatoryPaymentDueDayInput,
-mandatoryPaymentCategorySelect,
-mandatoryPaymentAccountSelect,
-mandatoryPaymentLinkedSafeSelect,
+    mandatoryPaymentAmountInput,
+    mandatoryPaymentDueDayInput,
+    mandatoryPaymentCategorySelect,
+    mandatoryPaymentAccountSelect,
+    mandatoryPaymentLinkedSafeSelect,
     onAfterTogglePaid,
     onAfterSave,
     onAfterDelete,
@@ -34,7 +34,7 @@ mandatoryPaymentLinkedSafeSelect,
         });
 
       if (error) {
-        alert("Ошибка сохранения обязательных платежей");
+        alert(`Ошибка сохранения обязательных платежей: ${error.message || error}`);
         console.error(error);
         return false;
       }
@@ -47,10 +47,16 @@ mandatoryPaymentLinkedSafeSelect,
       monthKey = getMandatoryPaymentsActiveMonthKey()
     ) {
       const accountId = item.linked_account_id || "";
-      if (!accountId) return true;
+
+      if (!accountId) {
+        return true;
+      }
 
       const account = getAccountById(accountId);
-      if (!account) return true;
+
+      if (!account) {
+        return true;
+      }
 
       if (isVaultAccountId(account.id) && !item.linked_safe_bucket_id) {
         alert("Для списания из накоплений нужно выбрать конкретное накопление");
@@ -62,25 +68,24 @@ mandatoryPaymentLinkedSafeSelect,
         type: "expense",
         title: item.title || "Календарный платёж",
         amount: roundToTwo(Number(item.amount) || 0),
+
         account_id: account.id,
         account: account.name,
+
         category_id: item.category_id || UNCATEGORIZED_ID,
+
         from_account_id: null,
         to_account_id: null,
         from_account: null,
         to_account: null,
+
         from_safe_bucket_id: isVaultAccountId(account.id)
           ? item.linked_safe_bucket_id || null
           : null,
         to_safe_bucket_id: null,
+
         created_at: buildMandatoryPaymentTransactionCreatedAt(),
         time_label: getCurrentTime(),
-        
-        source: "calendar_payment",
-source_type: "calendar_payment",
-calendar_payment_id: item.id,
-mandatory_payment_id: item.id,
-calendar_payment_period: monthKey,
       };
 
       const { error } = await supabaseClient
@@ -88,7 +93,7 @@ calendar_payment_period: monthKey,
         .insert(transaction);
 
       if (error) {
-        alert("Ошибка списания обязательного платежа");
+        alert(`Ошибка списания обязательного платежа: ${error.message || error}`);
         console.error(error);
         return false;
       }
@@ -124,8 +129,8 @@ calendar_payment_period: monthKey,
       const title = mandatoryPaymentTitleInput.value.trim();
       const amount = parseMoneyInputValue(mandatoryPaymentAmountInput.value);
       const dueDateValue = mandatoryPaymentDueDayInput.value;
-const categoryId = mandatoryPaymentCategorySelect?.value || "";
-const linkedAccountId = mandatoryPaymentAccountSelect?.value || "";
+      const categoryId = mandatoryPaymentCategorySelect?.value || "";
+      const linkedAccountId = mandatoryPaymentAccountSelect?.value || "";
       const linkedSafeBucketId = mandatoryPaymentLinkedSafeSelect?.value || "";
 
       if (!title) {
@@ -142,11 +147,11 @@ const linkedAccountId = mandatoryPaymentAccountSelect?.value || "";
         alert("Выбери дату платежа");
         return;
       }
-      
+
       if (!categoryId) {
-  alert("Выбери категорию платежа");
-  return;
-}
+        alert("Выбери категорию платежа");
+        return;
+      }
 
       if (isVaultAccountId(linkedAccountId) && !linkedSafeBucketId) {
         alert("Выбери накопление");
@@ -185,9 +190,9 @@ const linkedAccountId = mandatoryPaymentAccountSelect?.value || "";
           start_period: duePeriod,
           paid_periods: [],
           linked_account_id: linkedAccountId,
-linked_safe_bucket_id: linkedSafeBucketId,
-category_id: categoryId,
-enabled: true,
+          linked_safe_bucket_id: linkedSafeBucketId,
+          category_id: categoryId,
+          enabled: true,
           last_paid_period: "",
         });
       }
