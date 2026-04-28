@@ -1,6 +1,6 @@
 /* =========================================================
    05. WALLET BALANCE
-   Financial header + free money focus card
+   Light financial header + free money card
    ========================================================= */
 
 .balance {
@@ -11,8 +11,8 @@
   align-items: stretch;
   justify-content: flex-start;
   text-align: left;
-  margin-top: 4px;
-  padding: 16px 2px 0;
+  margin-top: 18px;
+  padding: 0;
   border: 0;
   border-radius: 0;
   background: transparent;
@@ -24,84 +24,78 @@
 }
 
 .balance-label {
-  margin: 0 0 6px;
-  padding: 0 4px;
-  font-size: 14px;
-  font-weight: 760;
+  margin: 0 0 8px;
+  padding: 0 10px;
+  color: rgba(20, 24, 33, 0.56);
+  font-size: 16px;
+  font-weight: 720;
   line-height: 1;
   letter-spacing: -0.025em;
-  color: rgba(255, 255, 255, 0.54);
 }
 
 .balance-amount {
   margin: 0;
-  padding: 0 4px;
+  padding: 0 10px;
   width: 100%;
   text-align: left;
-  color: #f8faff;
-  font-size: clamp(46px, 12vw, 66px);
-  line-height: 0.92;
-  font-weight: 950;
+  color: #171b24;
+  font-size: clamp(46px, 12vw, 64px);
+  line-height: 0.94;
+  font-weight: 920;
   letter-spacing: -0.075em;
-  text-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.025),
-    0 18px 42px rgba(0, 0, 0, 0.28);
 }
 
 .balance-subline {
   position: relative;
-  margin: 22px 0 0;
-  min-height: 74px;
-  padding: 16px 54px 16px 66px;
-  border-radius: 26px;
+  margin: 28px 0 0;
+  min-height: 86px;
+  padding: 17px 58px 17px 78px;
+  border-radius: 28px;
   display: flex;
   align-items: center;
-  color: #8af0bd;
-  font-size: 22px;
-  font-weight: 930;
-  line-height: 1.04;
+  color: #13956c;
+  font-size: 25px;
+  font-weight: 880;
+  line-height: 1.02;
   letter-spacing: -0.055em;
   text-align: left;
   background:
-    radial-gradient(circle at 18% 18%, rgba(121, 255, 187, 0.16), transparent 34%),
-    radial-gradient(circle at 92% 0%, rgba(111, 156, 255, 0.10), transparent 34%),
-    linear-gradient(180deg, rgba(31, 48, 48, 0.72) 0%, rgba(21, 35, 38, 0.52) 100%);
-  border: 1px solid rgba(118, 255, 189, 0.16);
+    radial-gradient(circle at 12% 18%, rgba(31, 184, 132, 0.12), transparent 36%),
+    linear-gradient(180deg, rgba(245, 255, 250, 0.96) 0%, rgba(236, 250, 245, 0.92) 100%);
+  border: 1px solid rgba(31, 184, 132, 0.13);
   box-shadow:
-    0 18px 36px rgba(0, 0, 0, 0.20),
-    0 0 28px rgba(74, 216, 140, 0.06),
-    inset 0 1px 0 rgba(255, 255, 255, 0.055);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+    0 20px 42px rgba(23, 114, 84, 0.10),
+    0 8px 22px rgba(28, 42, 68, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.88);
 }
 
 .balance-subline::before {
   content: "";
   position: absolute;
-  left: 18px;
+  left: 22px;
   top: 50%;
-  width: 34px;
-  height: 34px;
-  border-radius: 14px;
+  width: 42px;
+  height: 42px;
+  border-radius: 18px;
   transform: translateY(-50%);
   background:
-    radial-gradient(circle at 35% 25%, rgba(255, 255, 255, 0.18), transparent 42%),
-    linear-gradient(180deg, rgba(74, 216, 140, 0.34), rgba(36, 154, 108, 0.22));
-  border: 1px solid rgba(139, 255, 198, 0.18);
+    radial-gradient(circle at 35% 25%, rgba(255, 255, 255, 0.92), transparent 42%),
+    linear-gradient(180deg, rgba(210, 246, 233, 0.98), rgba(186, 235, 218, 0.9));
+  border: 1px solid rgba(31, 184, 132, 0.12);
   box-shadow:
-    0 10px 22px rgba(74, 216, 140, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    0 14px 28px rgba(31, 184, 132, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.88);
 }
 
 .balance-subline::after {
   content: "›";
   position: absolute;
-  right: 20px;
+  right: 24px;
   top: 50%;
-  transform: translateY(-53%);
-  color: rgba(138, 240, 189, 0.9);
-  font-size: 34px;
-  font-weight: 520;
+  transform: translateY(-54%);
+  color: #16a575;
+  font-size: 36px;
+  font-weight: 450;
   line-height: 1;
 }
 
@@ -116,13 +110,13 @@
     linear-gradient(
       90deg,
       rgba(255,255,255,0) 0%,
-      rgba(255,255,255,0.04) 42%,
-      rgba(255,255,255,0.08) 50%,
-      rgba(255,255,255,0.04) 58%,
+      rgba(255,255,255,0.38) 42%,
+      rgba(255,255,255,0.62) 50%,
+      rgba(255,255,255,0.38) 58%,
       rgba(255,255,255,0) 100%
     );
   transform: translateX(-115%);
-  animation: balanceSweep 1.35s cubic-bezier(0.18, 0.82, 0.18, 1) forwards;
+  animation: balanceSweep 1.25s cubic-bezier(0.18, 0.82, 0.18, 1) forwards;
   pointer-events: none;
 }
 
@@ -134,15 +128,15 @@
 }
 
 .balance-label--enter {
-  animation: balanceFadeUp 0.45s ease-out both;
+  animation: balanceFadeUp 0.42s ease-out both;
 }
 
 .balance-amount--enter {
-  animation: balanceFadeUp 0.68s cubic-bezier(0.2, 0.85, 0.2, 1) both;
+  animation: balanceFadeUp 0.62s cubic-bezier(0.2, 0.85, 0.2, 1) both;
 }
 
 .balance-subline--enter {
-  animation: balanceFadeUp 0.82s cubic-bezier(0.2, 0.85, 0.2, 1) both;
+  animation: balanceFadeUp 0.78s cubic-bezier(0.2, 0.85, 0.2, 1) both;
 }
 
 @keyframes balanceFadeUp {
