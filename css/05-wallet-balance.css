@@ -1,73 +1,128 @@
 /* =========================================================
    05. WALLET BALANCE
-   Main balance card and enter animation
+   Financial header + free money focus card
    ========================================================= */
 
 .balance {
-  overflow: hidden;
   position: relative;
+  overflow: visible;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
+  align-items: stretch;
+  justify-content: flex-start;
+  text-align: left;
   margin-top: 4px;
-  padding: 18px 18px 16px;
-  border-radius: 30px;
-  background:
-    radial-gradient(circle at top center, rgba(111, 156, 255, 0.13), transparent 34%),
-    linear-gradient(180deg, var(--surface-dark) 0%, var(--surface-dark-2) 100%);
-  box-shadow:
-    0 18px 40px rgba(0, 0, 0, 0.28),
-    0 0 26px rgba(111, 156, 255, 0.05),
-    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  padding: 16px 2px 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.balance::before {
+  display: none;
 }
 
 .balance-label {
-  margin: 0 0 10px;
+  margin: 0 0 6px;
+  padding: 0 4px;
   font-size: 14px;
-  font-weight: 820;
-  letter-spacing: -0.02em;
-  color: rgba(255, 255, 255, 0.6);
+  font-weight: 760;
+  line-height: 1;
+  letter-spacing: -0.025em;
+  color: rgba(255, 255, 255, 0.54);
 }
 
 .balance-amount {
   margin: 0;
+  padding: 0 4px;
   width: 100%;
-  text-align: center;
-  font-size: clamp(44px, 8vw, 62px);
-  line-height: 0.92;
-  font-weight: 940;
-  letter-spacing: -0.065em;
+  text-align: left;
   color: #f8faff;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.02);
+  font-size: clamp(46px, 12vw, 66px);
+  line-height: 0.92;
+  font-weight: 950;
+  letter-spacing: -0.075em;
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.025),
+    0 18px 42px rgba(0, 0, 0, 0.28);
 }
 
 .balance-subline {
-  margin: 14px 0 0;
-  color: rgba(255, 255, 255, 0.66);
-  font-size: 14px;
-  font-weight: 780;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
-  text-align: center;
+  position: relative;
+  margin: 22px 0 0;
+  min-height: 74px;
+  padding: 16px 54px 16px 66px;
+  border-radius: 26px;
+  display: flex;
+  align-items: center;
+  color: #8af0bd;
+  font-size: 22px;
+  font-weight: 930;
+  line-height: 1.04;
+  letter-spacing: -0.055em;
+  text-align: left;
+  background:
+    radial-gradient(circle at 18% 18%, rgba(121, 255, 187, 0.16), transparent 34%),
+    radial-gradient(circle at 92% 0%, rgba(111, 156, 255, 0.10), transparent 34%),
+    linear-gradient(180deg, rgba(31, 48, 48, 0.72) 0%, rgba(21, 35, 38, 0.52) 100%);
+  border: 1px solid rgba(118, 255, 189, 0.16);
+  box-shadow:
+    0 18px 36px rgba(0, 0, 0, 0.20),
+    0 0 28px rgba(74, 216, 140, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.055);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.balance-subline::before {
+  content: "";
+  position: absolute;
+  left: 18px;
+  top: 50%;
+  width: 34px;
+  height: 34px;
+  border-radius: 14px;
+  transform: translateY(-50%);
+  background:
+    radial-gradient(circle at 35% 25%, rgba(255, 255, 255, 0.18), transparent 42%),
+    linear-gradient(180deg, rgba(74, 216, 140, 0.34), rgba(36, 154, 108, 0.22));
+  border: 1px solid rgba(139, 255, 198, 0.18);
+  box-shadow:
+    0 10px 22px rgba(74, 216, 140, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.balance-subline::after {
+  content: "›";
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-53%);
+  color: rgba(138, 240, 189, 0.9);
+  font-size: 34px;
+  font-weight: 520;
+  line-height: 1;
 }
 
 .balance--enter::after {
   content: "";
   position: absolute;
-  inset: 0;
+  left: 0;
+  right: 0;
+  top: 18px;
+  height: 120px;
   background:
     linear-gradient(
       90deg,
       rgba(255,255,255,0) 0%,
-      rgba(255,255,255,0.055) 42%,
-      rgba(255,255,255,0.085) 50%,
-      rgba(255,255,255,0.055) 58%,
+      rgba(255,255,255,0.04) 42%,
+      rgba(255,255,255,0.08) 50%,
+      rgba(255,255,255,0.04) 58%,
       rgba(255,255,255,0) 100%
     );
   transform: translateX(-115%);
-  animation: balanceSweep 1.6s cubic-bezier(0.18, 0.82, 0.18, 1) forwards;
+  animation: balanceSweep 1.35s cubic-bezier(0.18, 0.82, 0.18, 1) forwards;
   pointer-events: none;
 }
 
@@ -79,22 +134,22 @@
 }
 
 .balance-label--enter {
-  animation: balanceFadeUp 0.55s ease-out both;
+  animation: balanceFadeUp 0.45s ease-out both;
 }
 
 .balance-amount--enter {
-  animation: balanceFadeUp 0.85s cubic-bezier(0.2, 0.85, 0.2, 1) both;
+  animation: balanceFadeUp 0.68s cubic-bezier(0.2, 0.85, 0.2, 1) both;
 }
 
 .balance-subline--enter {
-  animation: balanceFadeUp 1.05s cubic-bezier(0.2, 0.85, 0.2, 1) both;
+  animation: balanceFadeUp 0.82s cubic-bezier(0.2, 0.85, 0.2, 1) both;
 }
 
 @keyframes balanceFadeUp {
   0% {
     opacity: 0;
     transform: translateY(10px);
-    filter: blur(6px);
+    filter: blur(5px);
   }
 
   100% {
