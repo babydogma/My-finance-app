@@ -1,10 +1,10 @@
 /* =========================================================
    08. REQUIRED PAYMENTS — WALLET SECTION
-   Light calendar payments overview like banking dashboard
+   Clean light calendar payments overview
    ========================================================= */
 
 .required-payments-section {
-  margin-top: 34px;
+  margin-top: 32px;
 }
 
 .required-payments-head {
@@ -14,7 +14,10 @@
 
 .required-payments-head .section-title {
   max-width: calc(100% - 56px);
-  line-height: 1.04;
+  font-size: 24px;
+  font-weight: 760;
+  line-height: 1.08;
+  letter-spacing: -0.04em;
 }
 
 .required-payments-add-btn {
@@ -22,12 +25,12 @@
 }
 
 .required-payments-overview-label {
-  margin: 24px 0 12px;
-  color: rgba(20, 24, 33, 0.50);
-  font-size: 15px;
+  margin: 22px 0 12px;
+  color: rgba(20, 24, 33, 0.52);
+  font-size: 14px;
   font-weight: 520;
   line-height: 1;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
 }
 
 .required-payments-list {
@@ -36,17 +39,19 @@
   gap: 12px;
 }
 
+/* Base card */
+
 .required-payment-card {
   position: relative;
   min-width: 0;
   width: 100%;
-  border-radius: 24px;
-  border: 1px solid rgba(22, 30, 46, 0.07);
+  border-radius: 22px;
+  border: 1px solid rgba(22, 30, 46, 0.065);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.99) 0%, rgba(250, 252, 255, 0.96) 100%);
   box-shadow:
-    0 14px 34px rgba(30, 42, 68, 0.075),
-    0 3px 10px rgba(30, 42, 68, 0.035),
+    0 12px 28px rgba(30, 42, 68, 0.065),
+    0 3px 10px rgba(30, 42, 68, 0.03),
     inset 0 1px 0 rgba(255, 255, 255, 0.94);
   overflow: hidden;
 }
@@ -57,57 +62,61 @@
   inset: 0;
   border-radius: inherit;
   background:
-    linear-gradient(180deg, rgba(255,255,255,0.68), rgba(255,255,255,0));
+    linear-gradient(180deg, rgba(255,255,255,0.56), rgba(255,255,255,0));
   pointer-events: none;
 }
 
+/* Danger top card */
+
 .required-payment-card--danger {
-  min-height: 92px;
-  padding: 16px 20px 16px 76px;
+  min-height: 82px;
+  padding: 14px 18px 14px 68px;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
-  column-gap: 14px;
+  column-gap: 12px;
   background:
-    radial-gradient(circle at 11% 50%, rgba(239, 91, 79, 0.085), transparent 38%),
-    linear-gradient(180deg, rgba(255, 251, 249, 0.99), rgba(255, 246, 243, 0.96));
-  border-color: rgba(239, 91, 79, 0.13);
+    radial-gradient(circle at 10% 50%, rgba(239, 91, 79, 0.075), transparent 36%),
+    linear-gradient(180deg, rgba(255, 252, 250, 0.99), rgba(255, 247, 244, 0.96));
+  border-color: rgba(239, 91, 79, 0.12);
   box-shadow:
-    0 16px 36px rgba(239, 91, 79, 0.06),
-    0 4px 12px rgba(30, 42, 68, 0.035),
+    0 14px 30px rgba(239, 91, 79, 0.045),
+    0 4px 12px rgba(30, 42, 68, 0.03),
     inset 0 1px 0 rgba(255, 255, 255, 0.94);
 }
 
+/* Overview cards */
+
 .required-payment-card--overview {
-  min-height: 132px;
-  padding: 18px 16px 18px;
+  min-height: 116px;
+  padding: 15px;
   display: grid;
-  grid-template-columns: 52px minmax(0, 1fr);
+  grid-template-columns: 44px minmax(0, 1fr);
   grid-template-rows: auto 1fr;
-  column-gap: 12px;
-  row-gap: 10px;
+  column-gap: 11px;
+  row-gap: 8px;
   align-items: start;
 }
 
 .required-payment-card__icon {
   position: relative;
   z-index: 1;
-  width: 48px;
-  height: 48px;
+  width: 42px;
+  height: 42px;
   border-radius: 999px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   box-shadow:
-    0 12px 24px rgba(30, 42, 68, 0.065),
+    0 10px 20px rgba(30, 42, 68, 0.055),
     inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
 .required-payment-card__icon svg {
-  width: 23px;
-  height: 23px;
+  width: 20px;
+  height: 20px;
   stroke: currentColor;
-  stroke-width: 2.1;
+  stroke-width: 2;
   fill: none;
   stroke-linecap: round;
   stroke-linejoin: round;
@@ -115,15 +124,17 @@
 
 .required-payment-card--danger .required-payment-card__icon {
   position: absolute;
-  left: 20px;
+  left: 18px;
   top: 50%;
+  width: 42px;
+  height: 42px;
   transform: translateY(-50%);
 }
 
 .required-payment-card__icon--danger {
   color: #ffffff;
   background:
-    linear-gradient(180deg, #ff8f77 0%, #ef5b4f 100%);
+    linear-gradient(180deg, #ff8a73 0%, #ef5b4f 100%);
 }
 
 .required-payment-card__icon--wallet {
@@ -167,29 +178,31 @@
   min-width: 0;
   max-width: 100%;
   color: var(--text);
-  font-size: 17px;
-  font-weight: 640;
+  font-size: 15.5px;
+  font-weight: 560;
   line-height: 1.18;
-  letter-spacing: -0.025em;
+  letter-spacing: -0.018em;
   white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+}
+
+.required-payment-card--danger .required-payment-card__title {
+  font-size: 17px;
+  font-weight: 650;
+  line-height: 1.1;
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.required-payment-card--danger .required-payment-card__title {
-  font-size: 18px;
-  font-weight: 720;
-  line-height: 1.1;
-  white-space: nowrap;
-}
-
 .required-payment-card__subtitle {
-  margin-top: 6px;
-  color: rgba(20, 24, 33, 0.50);
-  font-size: 13px;
-  font-weight: 500;
+  margin-top: 5px;
+  color: rgba(20, 24, 33, 0.48);
+  font-size: 12.5px;
+  font-weight: 470;
   line-height: 1.18;
-  letter-spacing: -0.012em;
+  letter-spacing: -0.006em;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -200,10 +213,10 @@
   z-index: 1;
   max-width: 100%;
   color: var(--text);
-  font-size: 24px;
-  font-weight: 760;
+  font-size: 21px;
+  font-weight: 680;
   line-height: 1;
-  letter-spacing: -0.052em;
+  letter-spacing: -0.045em;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -219,8 +232,8 @@
   justify-self: end;
   text-align: right;
   color: var(--red);
-  font-size: 25px;
-  font-weight: 760;
+  font-size: 22px;
+  font-weight: 700;
 }
 
 .required-payment-card__value--danger {
@@ -231,51 +244,55 @@
   color: var(--accent);
 }
 
+/* Control card */
+
 .required-payment-card--control {
   background:
-    radial-gradient(circle at 0% 100%, rgba(47, 125, 246, 0.10), transparent 44%),
-    linear-gradient(180deg, rgba(239, 245, 255, 0.99), rgba(226, 236, 255, 0.94));
-  border-color: rgba(47, 125, 246, 0.12);
+    radial-gradient(circle at 0% 100%, rgba(47, 125, 246, 0.085), transparent 44%),
+    linear-gradient(180deg, rgba(244, 248, 255, 0.99), rgba(233, 241, 255, 0.94));
+  border-color: rgba(47, 125, 246, 0.105);
 }
 
 .required-payment-card__progress {
   position: relative;
   z-index: 1;
   grid-row: 1 / span 2;
-  width: 48px;
-  height: 48px;
+  width: 42px;
+  height: 42px;
   border-radius: 999px;
   background:
     conic-gradient(
       var(--accent) 0 var(--mandatory-control-progress, 0%),
-      rgba(47, 125, 246, 0.13) var(--mandatory-control-progress, 0%) 100%
+      rgba(47, 125, 246, 0.12) var(--mandatory-control-progress, 0%) 100%
     );
   box-shadow:
-    0 12px 24px rgba(47, 125, 246, 0.12),
+    0 10px 20px rgba(47, 125, 246, 0.10),
     inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
 .required-payment-card__progress::after {
   content: "";
   position: absolute;
-  inset: 8px;
+  inset: 7px;
   border-radius: inherit;
   background: rgba(245, 249, 255, 0.98);
 }
 
+/* FAQ */
+
 .faq-chip {
-  width: 25px;
-  height: 25px;
-  min-width: 25px;
+  width: 23px;
+  height: 23px;
+  min-width: 23px;
   border: none;
   border-radius: 999px;
   color: rgba(20, 24, 33, 0.38);
   background:
     linear-gradient(180deg, rgba(255,255,255,0.98), rgba(241,244,249,0.96));
   box-shadow:
-    0 8px 18px rgba(30, 42, 68, 0.08),
+    0 7px 16px rgba(30, 42, 68, 0.07),
     inset 0 1px 0 rgba(255, 255, 255, 0.92);
-  font-size: 13px;
-  font-weight: 700;
+  font-size: 12px;
+  font-weight: 650;
   line-height: 1;
 }
