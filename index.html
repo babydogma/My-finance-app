@@ -154,83 +154,126 @@
   </div>
 </section>
       
-            <!-- MANDATORY PAYMENTS -->
-      <section class="section required-payments-section">
-        <div class="section-head accounts-section-head required-payments-head">
-          <h2 class="section-title">Календарные платежи</h2>
+    <!-- MANDATORY PAYMENTS -->
+<section class="section required-payments-section">
+  <div class="section-head accounts-section-head required-payments-head">
+    <h2 class="section-title">Календарные платежи</h2>
 
-          <button
-            class="icon-action-btn icon-action-btn--primary required-payments-add-btn"
-            type="button"
-            id="openMandatoryPaymentsModalBtn"
-            aria-label="Добавить платёж"
-title="Добавить платёж"
-          >
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M12 5v14M5 12h14" />
-            </svg>
-          </button>
-        </div>
+    <button
+      class="icon-action-btn icon-action-btn--primary required-payments-add-btn"
+      type="button"
+      id="openMandatoryPaymentsModalBtn"
+      aria-label="Добавить платёж"
+      title="Добавить платёж"
+    >
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 5v14M5 12h14" />
+      </svg>
+    </button>
+  </div>
 
-        <div class="required-payments-list">
-          <div class="required-payment-card required-payment-card--danger">
-            <div class="required-payment-card__text">
-              <div class="required-payment-card__title">К вычету из свободных</div>
-              <div class="required-payment-card__subtitle">Уже нужно держать под платежи</div>
-            </div>
+  <div class="required-payment-card required-payment-card--danger">
+    <span class="required-payment-card__icon required-payment-card__icon--danger" aria-hidden="true">
+      <svg viewBox="0 0 24 24">
+        <path d="M12 7v6" />
+        <circle cx="12" cy="17" r="1" />
+      </svg>
+    </span>
 
-            <strong class="required-payment-card__value required-payment-card__value--danger" id="analyticsPendingMandatoryValue">
-              0 ₽
-            </strong>
-          </div>
-
-          <div class="required-payment-card">
-            <div class="required-payment-card__text">
-              <div class="required-payment-card__title">Обязательные всего</div>
-            </div>
-
-            <strong class="required-payment-card__value" id="analyticsMandatoryTotalValue">
-              0 ₽
-            </strong>
-          </div>
-
-          <div class="required-payment-card">
-            <div class="required-payment-card__text">
-              <div class="required-payment-card__title">Покрыто накоплениями</div>
-            </div>
-
-            <strong class="required-payment-card__value" id="analyticsMandatoryCoveredValue">
-              0 ₽
-            </strong>
-          </div>
-
-          <div class="required-payment-card">
-            <div class="required-payment-card__text">
-              <div class="required-payment-card__title-row">
-                <div class="required-payment-card__title">Остаток лимитов</div>
-                <button class="faq-chip" type="button" data-faq-key="remaining_limits" aria-label="Что это?">❔</button>
-              </div>
-            </div>
-
-            <strong class="required-payment-card__value" id="analyticsRemainingBudgetsValue">
-              0 ₽
-            </strong>
-          </div>
-        </div>
-      </section>
-
-      <!-- TRANSACTIONS -->
-
-      <section class="section">
-        <div class="section-head">
-          <h2 class="section-title">Последние операции</h2>
-          <div class="section-note">5 последних</div>
-        </div>
-
-        <div class="list" id="transactionsList"></div>
-      </section>
-
+    <div class="required-payment-card__text">
+      <div class="required-payment-card__title">К вычету из свободных</div>
+      <div class="required-payment-card__subtitle">Уже нужно держать под платежи</div>
     </div>
+
+    <strong class="required-payment-card__value required-payment-card__value--danger" id="analyticsPendingMandatoryValue">
+      0 ₽
+    </strong>
+  </div>
+
+  <div class="required-payments-overview-label">Обзор</div>
+
+  <div class="required-payments-list">
+    <div class="required-payment-card required-payment-card--overview">
+      <span class="required-payment-card__icon required-payment-card__icon--wallet" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <rect x="4" y="7" width="16" height="11" rx="3" />
+          <path d="M16.5 12h2.5" />
+        </svg>
+      </span>
+
+      <div class="required-payment-card__text">
+        <div class="required-payment-card__title">Обязательные всего</div>
+      </div>
+
+      <strong class="required-payment-card__value" id="analyticsMandatoryTotalValue">
+        0 ₽
+      </strong>
+    </div>
+
+    <div class="required-payment-card required-payment-card--overview">
+      <span class="required-payment-card__icon required-payment-card__icon--shield" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <path d="M12 4 18 6.5v5.2c0 3.7-2.2 6.3-6 8.3-3.8-2-6-4.6-6-8.3V6.5L12 4Z" />
+        </svg>
+      </span>
+
+      <div class="required-payment-card__text">
+        <div class="required-payment-card__title">Покрыто накоплениями</div>
+      </div>
+
+      <strong class="required-payment-card__value" id="analyticsMandatoryCoveredValue">
+        0 ₽
+      </strong>
+    </div>
+
+    <div class="required-payment-card required-payment-card--overview">
+      <span class="required-payment-card__icon required-payment-card__icon--limits" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <path d="M12 19V5" />
+          <path d="M5 19V11" />
+          <path d="M19 19V8" />
+        </svg>
+      </span>
+
+      <div class="required-payment-card__text">
+        <div class="required-payment-card__title-row">
+          <div class="required-payment-card__title">Остаток лимитов</div>
+          <button class="faq-chip" type="button" data-faq-key="remaining_limits" aria-label="Что это?">?</button>
+        </div>
+      </div>
+
+      <strong class="required-payment-card__value" id="analyticsRemainingBudgetsValue">
+        0 ₽
+      </strong>
+    </div>
+
+    <div class="required-payment-card required-payment-card--overview required-payment-card--control">
+      <span class="required-payment-card__progress" aria-hidden="true"></span>
+
+      <div class="required-payment-card__text">
+        <div class="required-payment-card__title">Под контролем</div>
+        <div class="required-payment-card__subtitle">от обязательных платежей</div>
+      </div>
+
+      <strong class="required-payment-card__value required-payment-card__value--blue" id="walletMandatoryControlValue">
+        0%
+      </strong>
+    </div>
+  </div>
+</section>
+
+    <!-- TRANSACTIONS -->
+<section class="section transactions-preview-section">
+  <div class="section-head transactions-preview-head">
+    <h2 class="section-title">Последние операции</h2>
+    <div class="section-note">5 последних</div>
+  </div>
+
+  <div class="transactions-preview-card">
+    <div class="transactions-preview-timeline" aria-hidden="true"></div>
+    <div class="list transactions-preview-list" id="transactionsList"></div>
+  </div>
+</section>
 
     <!-- CATEGORIES MANAGER VIEW -->
     <div id="categoriesManagerView" class="hidden">
@@ -1086,6 +1129,7 @@ title="Добавить платёж"
 <script src="./js/31-analytics-category-modal.js"></script>
 <script src="./js/32-analytics-safes-models.js"></script>
 <script src="./js/33-wallet-home-ui.js"></script>
+<script src="./js/34-wallet-calendar-summary.js"></script>
 
 <script src="./script.js"></script>
 </body>
