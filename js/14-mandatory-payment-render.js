@@ -16,6 +16,42 @@
     escapeHtml,
     bindMandatoryPaymentPress,
   }) {
+    function getLinkedAccountName(item) {
+      const accountId = item.linked_account_id || "";
+
+      if (!accountId || !Array.isArray(state.accounts)) {
+        return "";
+      }
+
+      const account = state.accounts.find((entry) => entry.id === accountId);
+
+      return account?.name || "";
+    }
+
+    function getPaymentBindingText(item) {
+      const linkedSafeName = item.linked_safe_bucket_id
+        ? getSafeBucketName(item.linked_safe_bucket_id)
+        : "";
+
+      const linkedSafeBalance = item.linked_safe_bucket_id
+        ? Math.max(0, roundToTwo(getSafeBucketBalance(item.linked_safe_bucket_id)))
+        : 0;
+
+      const covered = Math.min(Number(item.amount) || 0, linkedSafeBalance);
+
+      if (item.linked_safe_bucket_id && linkedSafeName) {
+        return `накопление: ${linkedSafeName} • покрыто ${formatMoney(covered)}`;
+      }
+
+      const linkedAccountName = getLinkedAccountName(item);
+
+      if (linkedAccountName) {
+        return `счёт: ${linkedAccountName}`;
+      }
+
+      return "без привязки";
+    }
+
     function renderMandatoryPaymentsMonthStrip() {
       if (!mandatoryPaymentsMonthStrip) return;
 
@@ -88,20 +124,7 @@
         .sort((a, b) => a.due_day - b.due_day)
         .forEach((item) => {
           const isPaid = isMandatoryPaymentPaidInMonth(item, currentMonthKey);
-
-          const linkedSafeName = item.linked_safe_bucket_id
-            ? getSafeBucketName(item.linked_safe_bucket_id)
-            : "";
-
-          const linkedSafeBalance = item.linked_safe_bucket_id
-            ? Math.max(0, roundToTwo(getSafeBucketBalance(item.linked_safe_bucket_id)))
-            : 0;
-
-          const covered = Math.min(Number(item.amount) || 0, linkedSafeBalance);
-
-          const coverageText = item.linked_safe_bucket_id
-            ? `накопление: ${linkedSafeName} • покрыто ${formatMoney(covered)}`
-            : "без привязки к накоплению";
+          const bindingText = getPaymentBindingText(item);
 
           const card = document.createElement("button");
           card.type = "button";
@@ -121,7 +144,7 @@
                 <h3 class="list-title">${escapeHtml(item.title)}</h3>
               </div>
               <p class="list-subtitle">
-                ${formatMoney(item.amount)} • до ${String(item.due_day).padStart(2, "0")} числа • ${coverageText}
+                ${formatMoney(item.amount)} • до ${String(item.due_day).padStart(2, "0")} числа • ${escapeHtml(bindingText)}
               </p>
             </div>
 
