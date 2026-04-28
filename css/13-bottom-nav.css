@@ -1,6 +1,6 @@
 /* =========================================================
    13. BOTTOM NAV
-   Lighter fixed bottom navigation
+   Light fixed bottom navigation
    ========================================================= */
 
 .bottom-nav-wrap {
@@ -15,27 +15,26 @@
 .bottom-nav {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 7px;
+  gap: 8px;
   padding: 8px;
   border-radius: 28px;
   background:
-    radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.04), transparent 42%),
-    linear-gradient(180deg, rgba(29, 33, 44, 0.82) 0%, rgba(19, 23, 32, 0.88) 100%);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92) 0%, rgba(248, 250, 253, 0.90) 100%);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.065);
+  border: 1px solid rgba(22, 30, 46, 0.075);
   box-shadow:
-    0 18px 40px rgba(0, 0, 0, 0.34),
-    inset 0 1px 0 rgba(255, 255, 255, 0.045);
+    0 18px 40px rgba(30, 42, 68, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.92);
 }
 
 .nav-item {
   min-width: 0;
-  min-height: 58px;
+  min-height: 60px;
   border: none;
   border-radius: 22px;
   background: transparent;
-  color: rgba(238, 241, 247, 0.58);
+  color: rgba(20, 24, 33, 0.46);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -53,25 +52,24 @@
 }
 
 .nav-item.is-active {
-  color: #f8faff;
+  color: var(--accent);
   background:
-    radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.12), transparent 44%),
-    linear-gradient(180deg, rgba(111, 156, 255, 0.24) 0%, rgba(84, 135, 255, 0.13) 100%);
+    linear-gradient(180deg, rgba(232, 240, 255, 0.98) 0%, rgba(218, 231, 255, 0.94) 100%);
   box-shadow:
-    0 12px 28px rgba(84, 135, 255, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    0 12px 26px rgba(47, 125, 246, 0.13),
+    inset 0 1px 0 rgba(255, 255, 255, 0.92);
 }
 
 .nav-icon {
-  font-size: 20px;
+  font-size: 21px;
   line-height: 1;
-  filter: saturate(0.92);
+  filter: saturate(0.9);
 }
 
 .nav-label {
   max-width: 100%;
   font-size: 10.5px;
-  font-weight: 860;
+  font-weight: 760;
   line-height: 1;
   letter-spacing: -0.025em;
   white-space: nowrap;
@@ -81,5 +79,5 @@
 
 .nav-item.is-active .nav-icon,
 .nav-item.is-active .nav-label {
-  color: #f8faff;
+  color: var(--accent);
 }
