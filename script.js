@@ -464,34 +464,6 @@ getSafeBucketIcon,
   getFreeMoneyAccounts,
 });
 
-function getVisibleSafeBucketsTotal() {
-  return roundToTwo(
-    getRealSafeBuckets().reduce((sum, bucket) => {
-      return sum + getSafeBucketBalance(bucket.id);
-    }, 0)
-  );
-}
-
-function syncSafeBucketsModalCleanView() {
-  safeBucketsUnassignedCard?.remove();
-
-  if (safeBucketsModalTotalLabel) {
-    safeBucketsModalTotalLabel.textContent =
-      `Общий баланс: ${formatMoney(getVisibleSafeBucketsTotal())}`;
-  }
-}
-
-if (safeBucketsModal) {
-  const safeBucketsCleanObserver = new MutationObserver(() => {
-    syncSafeBucketsModalCleanView();
-  });
-
-  safeBucketsCleanObserver.observe(safeBucketsModal, {
-    childList: true,
-    subtree: true,
-  });
-}
-
   const {
     getBudgetLimitByCategoryId,
     getBudgetLimitLabel,
