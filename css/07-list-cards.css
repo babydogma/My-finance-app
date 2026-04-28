@@ -1,6 +1,6 @@
 /* =========================================================
    07. LIST CARDS
-   Shared list rows + rebuilt wallet accounts grid
+   Shared list rows + light wallet accounts grid
    ========================================================= */
 
 .list {
@@ -35,12 +35,12 @@
   height: 42px;
   flex: 0 0 42px;
   border-radius: 14px;
-  background: rgba(98, 104, 126, 0.34);
+  background: rgba(47, 125, 246, 0.10);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 18px;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 
 .list-icon--account {
@@ -50,7 +50,7 @@
   border-radius: 0;
   background: transparent !important;
   box-shadow: none;
-  color: rgba(240, 245, 255, 0.88);
+  color: rgba(20, 24, 33, 0.76);
 }
 
 .list-icon--account svg {
@@ -82,9 +82,9 @@
 .list-title {
   margin: 0;
   max-width: 100%;
-  color: #f5f7fd;
+  color: var(--text);
   font-size: 15.5px;
-  font-weight: 840;
+  font-weight: 820;
   line-height: 1.08;
   letter-spacing: -0.03em;
   white-space: nowrap;
@@ -95,7 +95,7 @@
 .list-subtitle {
   margin: 0;
   max-width: 100%;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--text-muted);
   font-size: 11.5px;
   font-weight: 640;
   line-height: 1.18;
@@ -116,7 +116,7 @@
 .list-value {
   margin: 0;
   max-width: 100%;
-  color: #f3f6ff;
+  color: var(--text);
   font-size: 16px;
   font-weight: 860;
   line-height: 1;
@@ -128,18 +128,16 @@
 
 .list-value--green {
   color: var(--green);
-  text-shadow: 0 0 12px rgba(74, 216, 140, 0.08);
 }
 
 .list-value--red {
   color: var(--red);
-  text-shadow: 0 0 12px rgba(255, 114, 104, 0.08);
 }
 
 .list-caption {
   margin-top: 5px;
   max-width: 100%;
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--text-soft);
   font-size: 10.5px;
   font-weight: 680;
   line-height: 1.15;
@@ -161,22 +159,20 @@
 
 #accountsList .list-card {
   min-width: 0;
-  min-height: 158px;
-  padding: 14px 13px 13px;
+  min-height: 160px;
+  padding: 15px 13px 14px;
   border-radius: 26px;
   flex-direction: column;
   align-items: flex-start;
   justify-content: flex-start;
   gap: 10px;
   background:
-    radial-gradient(circle at 20% 0%, rgba(255, 255, 255, 0.055), transparent 36%),
-    linear-gradient(180deg, rgba(58, 63, 78, 0.42) 0%, rgba(30, 35, 48, 0.30) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.065);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(250, 252, 255, 0.96) 100%);
+  border: 1px solid rgba(22, 30, 46, 0.075);
   box-shadow:
-    0 16px 32px rgba(0, 0, 0, 0.20),
-    inset 0 1px 0 rgba(255, 255, 255, 0.045);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+    0 16px 36px rgba(30, 42, 68, 0.09),
+    0 4px 12px rgba(30, 42, 68, 0.045),
+    inset 0 1px 0 rgba(255, 255, 255, 0.92);
 }
 
 #accountsList .list-card::after {
@@ -184,21 +180,18 @@
   position: absolute;
   left: 13px;
   right: 13px;
-  bottom: 9px;
+  bottom: 10px;
   height: 3px;
   border-radius: 999px;
-  background: rgba(111, 156, 255, 0.68);
-  box-shadow: 0 0 14px rgba(111, 156, 255, 0.18);
+  background: rgba(47, 125, 246, 0.62);
 }
 
 #accountsList .list-card:nth-child(2)::after {
-  background: rgba(74, 216, 140, 0.68);
-  box-shadow: 0 0 14px rgba(74, 216, 140, 0.16);
+  background: rgba(21, 151, 107, 0.50);
 }
 
 #accountsList .list-card:nth-child(3)::after {
-  background: rgba(255, 188, 87, 0.72);
-  box-shadow: 0 0 14px rgba(255, 188, 87, 0.15);
+  background: rgba(242, 165, 26, 0.62);
 }
 
 #accountsList .list-icon--account {
@@ -206,37 +199,34 @@
   height: 52px;
   flex: 0 0 52px;
   border-radius: 21px;
-  color: #f8faff;
+  color: #ffffff;
   background:
-    radial-gradient(circle at 34% 22%, rgba(255, 255, 255, 0.18), transparent 42%),
-    linear-gradient(180deg, rgba(111, 156, 255, 0.82), rgba(75, 119, 221, 0.70)) !important;
+    linear-gradient(180deg, #6ea0ff 0%, #3a7af1 100%) !important;
   box-shadow:
-    0 14px 24px rgba(111, 156, 255, 0.18),
-    inset 0 1px 0 rgba(255, 255, 255, 0.16);
+    0 16px 28px rgba(47, 125, 246, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
 }
 
 #accountsList .list-card:nth-child(2) .list-icon--account {
   background:
-    radial-gradient(circle at 34% 22%, rgba(255, 255, 255, 0.18), transparent 42%),
-    linear-gradient(180deg, rgba(74, 216, 140, 0.72), rgba(36, 142, 99, 0.58)) !important;
+    linear-gradient(180deg, #69d7af 0%, #17a574 100%) !important;
   box-shadow:
-    0 14px 24px rgba(74, 216, 140, 0.14),
-    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+    0 16px 28px rgba(21, 151, 107, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
 }
 
 #accountsList .list-card:nth-child(3) .list-icon--account {
   background:
-    radial-gradient(circle at 34% 22%, rgba(255, 255, 255, 0.18), transparent 42%),
-    linear-gradient(180deg, rgba(255, 188, 87, 0.78), rgba(196, 126, 44, 0.58)) !important;
+    linear-gradient(180deg, #ffd17c 0%, #e7a01c 100%) !important;
   box-shadow:
-    0 14px 24px rgba(255, 188, 87, 0.13),
-    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+    0 16px 28px rgba(242, 165, 26, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
 }
 
 #accountsList .list-icon--account svg {
   width: 25px;
   height: 25px;
-  stroke-width: 1.85;
+  stroke-width: 1.9;
 }
 
 #accountsList .list-body {
@@ -245,22 +235,22 @@
 }
 
 #accountsList .list-title-row {
-  margin-bottom: 5px;
+  margin-bottom: 6px;
 }
 
 #accountsList .list-title {
-  color: #f8faff;
+  color: var(--text);
   font-size: 16px;
-  font-weight: 890;
+  font-weight: 860;
   line-height: 1.04;
   letter-spacing: -0.045em;
 }
 
 #accountsList .list-subtitle {
-  color: rgba(255, 255, 255, 0.44);
+  color: rgba(20, 24, 33, 0.46);
   font-size: 11px;
-  font-weight: 680;
-  line-height: 1.05;
+  font-weight: 640;
+  line-height: 1.08;
 }
 
 #accountsList .list-right {
@@ -272,9 +262,9 @@
 }
 
 #accountsList .list-value {
-  color: #f8faff;
+  color: var(--text);
   font-size: 19px;
-  font-weight: 940;
+  font-weight: 900;
   line-height: 1;
   letter-spacing: -0.055em;
 }
@@ -299,12 +289,12 @@
   height: 48px;
   flex-basis: 48px;
   border-radius: 18px;
+  color: rgba(20, 24, 33, 0.68);
   background:
-    radial-gradient(circle at 34% 22%, rgba(255, 255, 255, 0.16), transparent 42%),
-    linear-gradient(180deg, rgba(125, 134, 155, 0.46), rgba(76, 83, 103, 0.28)) !important;
+    linear-gradient(180deg, rgba(243, 246, 251, 1), rgba(235, 239, 246, 0.98)) !important;
   box-shadow:
-    0 12px 22px rgba(0, 0, 0, 0.16),
-    inset 0 1px 0 rgba(255, 255, 255, 0.10);
+    0 12px 24px rgba(30, 42, 68, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
 #accountsList .list-card:nth-child(n + 4) .list-body {
