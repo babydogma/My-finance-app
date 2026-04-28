@@ -1,6 +1,138 @@
 (() => {
+  const ACCOUNT_BALANCE_ADJUSTMENTS_META_KEY = "account_balance_adjustments_v1";
+
+  function roundLocal(value) {
+    return Math.round((Number(value) || 0) * 100) / 100;
+  }
+
+  function getMetaRecord(state, key) {
+    if (!state || !Array.isArray(state.appMeta)) return null;
+
+    return state.appMeta.find((item) => {
+      return (
+        item?.key === key ||
+        item?.name === key ||
+        item?.meta_key === key ||
+        item?.metaKey === key
+      );
+    }) || null;
+  }
+
+  function getMetaValue(state, key) {
+    const record = getMetaRecord(state, key);
+
+    if (!record) return "";
+
+    return (
+      record.value ??
+      record.meta_value ??
+      record.metaValue ??
+      record.data ??
+      ""
+    );
+  }
+
+  function parseAdjustments(rawValue) {
+    if (!rawValue) return {};
+
+    if (typeof rawValue === "object" && !Array.isArray(rawValue)) {
+      return rawValue;
+    }
+
+    try {
+      const parsed = JSON.parse(String(rawValue));
+
+      if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+        return parsed;
+      }
+    } catch (error) {
+      return {};
+    }
+
+    return {};
+  }
+
+  function getLocalStorageAdjustments() {
+    try {
+      return parseAdjustments(
+        window.localStorage.getItem(ACCOUNT_BALANCE_ADJUSTMENTS_META_KEY)
+      );
+    } catch (error) {
+      return {};
+    }
+  }
+
+  function getAccountBalanceAdjustments(state) {
+    const fromState = parseAdjustments(
+      getMetaValue(state, ACCOUNT_BALANCE_ADJUSTMENTS_META_KEY)
+    );
+
+    if (Object.keys(fromState).length > 0) {
+      return fromState;
+    }
+
+    return getLocalStorageAdjustments();
+  }
+
+  function getAccountManualAdjustment(state, accountId) {
+    const adjustments = getAccountBalanceAdjustments(state);
+    const value = Number(adjustments?.[accountId]);
+
+    return Number.isFinite(value) ? roundLocal(value) : 0;
+  }
+
+  function setAccountManualAdjustmentLocal(state, accountId, adjustment) {
+    if (!state) return {};
+
+    if (!Array.isArray(state.appMeta)) {
+      state.appMeta = [];
+    }
+
+    const nextAdjustments = {
+      ...getAccountBalanceAdjustments(state),
+    };
+
+    const roundedAdjustment = roundLocal(adjustment);
+
+    if (Math.abs(roundedAdjustment) < 0.005) {
+      delete nextAdjustments[accountId];
+    } else {
+      nextAdjustments[accountId] = roundedAdjustment;
+    }
+
+    const serialized = JSON.stringify(nextAdjustments);
+    let record = getMetaRecord(state, ACCOUNT_BALANCE_ADJUSTMENTS_META_KEY);
+
+    if (!record) {
+      record = {
+        key: ACCOUNT_BALANCE_ADJUSTMENTS_META_KEY,
+        value: serialized,
+      };
+
+      state.appMeta.push(record);
+    }
+
+    record.key = ACCOUNT_BALANCE_ADJUSTMENTS_META_KEY;
+    record.value = serialized;
+    record.meta_key = ACCOUNT_BALANCE_ADJUSTMENTS_META_KEY;
+    record.meta_value = serialized;
+    record.metaKey = ACCOUNT_BALANCE_ADJUSTMENTS_META_KEY;
+    record.metaValue = serialized;
+
+    try {
+      window.localStorage.setItem(
+        ACCOUNT_BALANCE_ADJUSTMENTS_META_KEY,
+        serialized
+      );
+    } catch (error) {
+      // localStorage может быть недоступен в приватном режиме — это не критично.
+    }
+
+    return nextAdjustments;
+  }
+
   function createAccountHelpers({ state, roundToTwo, getAccountById }) {
-    function getAccountBalance(accountNameOrId) {
+    function getRawAccountBalance(accountNameOrId) {
       const account =
         getAccountById(accountNameOrId) ||
         state.accounts.find((item) => item.name === accountNameOrId) ||
@@ -64,6 +196,20 @@
           return sum;
         }, 0)
       );
+    }
+
+    function getAccountBalance(accountNameOrId) {
+      const account =
+        getAccountById(accountNameOrId) ||
+        state.accounts.find((item) => item.name === accountNameOrId) ||
+        null;
+
+      if (!account) return 0;
+
+      const rawBalance = getRawAccountBalance(account.id);
+      const manualAdjustment = getAccountManualAdjustment(state, account.id);
+
+      return roundToTwo(rawBalance + manualAdjustment);
     }
 
     function getAccountRoleLabel(account) {
@@ -159,6 +305,7 @@
 
     return {
       getAccountBalance,
+      getRawAccountBalance,
       getAccountRoleLabel,
       getAccountRoleIconName,
       getAccountRoleIconSvg,
@@ -170,5 +317,13 @@
 
   window.FinanceAppAccountHelpers = {
     create: createAccountHelpers,
+  };
+
+  window.FinanceAppAccountBalanceAdjustments = {
+    META_KEY: ACCOUNT_BALANCE_ADJUSTMENTS_META_KEY,
+    getAccountBalanceAdjustments,
+    getAccountManualAdjustment,
+    setAccountManualAdjustmentLocal,
+    parseAdjustments,
   };
 })();
