@@ -1,187 +1,63 @@
 /* =========================================================
    24. RESPONSIVE GLOBAL
-   Only global leftovers, not component-specific media
+   Global layout only. No component redesign overrides here.
    ========================================================= */
+
+html,
+body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+}
+
+.app {
+  min-height: 100dvh;
+}
 
 @media (max-width: 420px) {
   .app {
-    padding: 14px 12px 128px;
+    padding: 14px 12px 126px;
   }
 
   .section {
-    margin-top: 22px;
+    margin-top: 24px;
+  }
+
+  .section--manager-top {
+    margin-top: 8px;
   }
 
   .section-head {
-    margin-bottom: 10px;
+    margin-bottom: 12px;
   }
 
   .section-title {
-    font-size: 18px;
+    font-size: 26px;
+    line-height: 0.98;
+    font-weight: 930;
+    letter-spacing: -0.065em;
   }
 
   .section-note {
-    font-size: 10.5px;
+    font-size: 11px;
   }
 
-  .balance {
-    padding: 16px 14px 15px;
-    border-radius: 28px;
+  .icon-action-btn {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    border-radius: 16px;
   }
 
-  .balance-label {
-    font-size: 13px;
-    margin-bottom: 9px;
-  }
-
-  .balance-amount {
-    font-size: clamp(40px, 10vw, 54px);
-  }
-
-  .balance-subline {
-    margin-top: 12px;
-    font-size: 13px;
-  }
-
-  .actions {
-    gap: 8px;
-    margin-top: 16px;
-  }
-
-  .action-card {
-    min-height: 80px;
-    padding: 9px 6px;
-    border-radius: 22px;
-  }
-
-  .action-icon {
-    width: 26px;
-    height: 26px;
-    border-radius: 9px;
-    font-size: 12px;
-  }
-
-  .action-label {
-    font-size: 10.5px;
-  }
-
-  .list {
-    gap: 10px;
-  }
-
-  .list-card {
-    min-height: 70px;
-    padding: 11px 12px;
-    border-radius: 20px;
-    gap: 10px;
-  }
-
-  .list-icon {
-    width: 38px;
-    height: 38px;
-    flex-basis: 38px;
-    border-radius: 13px;
-    font-size: 16px;
-  }
-
-  .list-icon--account {
-    width: 38px;
-    height: 38px;
-    flex-basis: 38px;
-  }
-
-  .list-title {
-    font-size: 14.5px;
-  }
-
-  .list-subtitle {
-    font-size: 10.5px;
-  }
-
-  .list-right {
-    padding-left: 8px;
-  }
-
-  .list-value {
-    font-size: 14.5px;
-  }
-
-  .list-caption {
-    font-size: 10px;
-  }
-
-  #accountsList .list-card {
-    min-height: 68px;
-    padding: 10px 12px;
-    border-radius: 20px;
-  }
-
-  #accountsList .list-title {
-    font-size: 15.5px;
-  }
-
-  #accountsList .list-value {
-    font-size: 14.5px;
-  }
-
-  .required-payments-section {
-    margin-top: 22px;
-  }
-
-  .required-payment-card {
-    min-height: 68px;
-    padding: 11px 13px;
-    border-radius: 20px;
-    column-gap: 10px;
-  }
-
-  .required-payment-card__title {
-    font-size: 15.5px;
-  }
-
-  .required-payment-card__subtitle {
-    font-size: 10px;
-  }
-
-  .required-payment-card__value {
-    min-width: 76px;
-    font-size: 14.5px;
-  }
-
-  .manager-card {
-    padding: 12px;
-    border-radius: 20px;
-  }
-
-  .manager-back-btn {
-    padding: 8px 12px;
-    font-size: 12.5px;
+  .icon-action-btn svg {
+    width: 18px;
+    height: 18px;
   }
 
   .input,
   .select {
-    height: 52px;
-    padding: 0 14px;
-    border-radius: 17px;
-    font-size: 15px;
-  }
-
-  .btn {
-    height: 50px;
-    border-radius: 16px;
-    font-size: 14.5px;
-  }
-
-  .icon-action-btn {
-    width: 32px;
-    height: 32px;
-    min-width: 32px;
-    border-radius: 11px;
-  }
-
-  .icon-action-btn svg {
-    width: 15px;
-    height: 15px;
+    min-width: 0;
   }
 
   .modal {
@@ -189,88 +65,71 @@
   }
 
   .modal-sheet {
-    max-height: calc(100vh - 20px);
-    padding: 18px 14px 20px;
-    border-radius: 28px 28px 20px 20px;
-  }
-
-  .modal-title {
-    font-size: 21px;
-  }
-
-  .modal-actions {
-    gap: 10px;
-    margin-top: 16px;
-  }
-
-  .bottom-nav-wrap {
-    bottom: 10px;
-    width: min(430px, calc(100% - 12px));
-  }
-
-  .bottom-nav {
-    gap: 7px;
-    padding: 8px;
-    border-radius: 26px;
-  }
-
-  .nav-item {
-    min-height: 62px;
-    border-radius: 18px;
-    gap: 5px;
-  }
-
-  .nav-icon {
-    font-size: 20px;
-  }
-
-  .nav-label {
-    font-size: 10px;
+    max-height: calc(100dvh - 20px);
   }
 }
 
-/* =========================================================
-   Mobile viewport stability
-   ========================================================= */
-
-@media (max-width: 420px) {
-  .modal {
-    height: 100dvh;
-    min-height: 100dvh;
-    max-height: 100dvh;
+@media (max-width: 380px) {
+  .app {
+    padding-left: 10px;
+    padding-right: 10px;
   }
 
-  .modal-sheet {
-    max-height: calc(100dvh - 20px);
+  .section-title {
+    font-size: 24px;
   }
 
-  #transactionModal .modal-sheet,
-  #budgetModal .modal-sheet,
-  #accountModal .modal-sheet,
-  #faqModal .modal-sheet,
-  #safeInterestRateModal .modal-sheet,
-  #safeBucketAmountModal .modal-sheet {
-    overflow: hidden;
+  #accountsList {
+    gap: 9px;
   }
 
-  #mandatoryPaymentsModal .modal-sheet,
-  #mandatoryPaymentEditorModal .modal-sheet,
-  #mandatoryPaymentBucketPickerModal .modal-sheet,
-  #safeBucketsModal .modal-sheet,
-  #operationsFiltersModal .modal-sheet {
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
+  #accountsList .list-card {
+    min-height: 148px;
+    padding: 12px 11px 12px;
+    border-radius: 23px;
+  }
+
+  #accountsList .list-icon--account {
+    width: 46px;
+    height: 46px;
+    flex-basis: 46px;
+    border-radius: 18px;
+  }
+
+  #accountsList .list-icon--account svg {
+    width: 22px;
+    height: 22px;
+  }
+
+  #accountsList .list-title {
+    font-size: 14.5px;
+  }
+
+  #accountsList .list-subtitle {
+    font-size: 10px;
+  }
+
+  #accountsList .list-value {
+    font-size: 16.5px;
+  }
+
+  .action-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 15px;
+  }
+
+  .action-label {
+    font-size: 11.5px;
   }
 }
 
 @supports (height: 100svh) {
-  @media (max-width: 420px) {
-    .modal {
-      height: 100svh;
-      min-height: 100svh;
-      max-height: 100svh;
-    }
+  .app {
+    min-height: 100svh;
+  }
 
+  @media (max-width: 420px) {
     .modal-sheet {
       max-height: calc(100svh - 20px);
     }
