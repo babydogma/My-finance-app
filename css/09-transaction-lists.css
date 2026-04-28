@@ -1,58 +1,212 @@
 /* =========================================================
    09. TRANSACTION LISTS
-   Wallet, operations and analytics transaction rows
+   Light transaction preview and full operation rows
    ========================================================= */
 
-#transactionsList .list-card,
-#operationsTransactionsList .list-card,
-#analyticsCategoryTransactionsList .list-card {
-  padding-left: 14px;
+.transactions-preview-section {
+  margin-top: 34px;
 }
 
-#transactionsList .list-card,
-#operationsTransactionsList .list-card,
-#analyticsCategoryTransactionsList .list-card {
-  min-height: 78px;
-  padding: 12px 14px;
+.transactions-preview-head {
+  margin-bottom: 14px;
+}
+
+.transactions-preview-card {
+  position: relative;
+  overflow: hidden;
+  min-height: 84px;
+  padding: 14px 14px 8px 18px;
+  border-radius: 26px;
+  border: 1px solid rgba(22, 30, 46, 0.075);
   background:
-    linear-gradient(180deg, rgba(60, 66, 84, 0.28) 0%, rgba(31, 36, 50, 0.18) 100%);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99) 0%, rgba(250, 252, 255, 0.96) 100%);
+  box-shadow:
+    0 16px 36px rgba(30, 42, 68, 0.075),
+    0 4px 12px rgba(30, 42, 68, 0.035),
+    inset 0 1px 0 rgba(255, 255, 255, 0.94);
+}
+
+.transactions-preview-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.68), rgba(255,255,255,0));
+  pointer-events: none;
+}
+
+.transactions-preview-timeline {
+  position: absolute;
+  left: 22px;
+  top: 34px;
+  bottom: 22px;
+  width: 2px;
+  border-radius: 999px;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(47, 125, 246, 0.14),
+      rgba(47, 125, 246, 0.08),
+      rgba(21, 151, 107, 0.12)
+    );
+}
+
+.transactions-preview-list {
+  position: relative;
+  z-index: 1;
+  gap: 0;
+}
+
+.transaction-card {
+  position: relative;
+  min-width: 0;
+}
+
+#transactionsList .transaction-card {
+  min-height: 72px;
+  padding: 10px 0 11px 50px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+#transactionsList .transaction-card::before {
+  display: none;
+}
+
+#transactionsList .transaction-card:not(:last-child) {
+  border-bottom: 1px solid rgba(22, 30, 46, 0.06);
+}
+
+.transaction-icon {
+  flex: 0 0 42px;
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    0 10px 22px rgba(30, 42, 68, 0.075),
+    inset 0 1px 0 rgba(255, 255, 255, 0.90);
+}
+
+#transactionsList .transaction-icon {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.transaction-icon svg {
+  width: 21px;
+  height: 21px;
+  stroke: currentColor;
+  stroke-width: 2.15;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.transaction-card--expense .transaction-icon {
+  color: #2f7df6;
+  background:
+    linear-gradient(180deg, rgba(226, 238, 255, 0.98), rgba(207, 225, 255, 0.94));
+}
+
+.transaction-card--income .transaction-icon {
+  color: #15976b;
+  background:
+    linear-gradient(180deg, rgba(225, 248, 239, 0.98), rgba(205, 240, 227, 0.94));
+}
+
+.transaction-card--transfer .transaction-icon {
+  color: #7b6ee6;
+  background:
+    linear-gradient(180deg, rgba(238, 235, 255, 0.98), rgba(224, 220, 255, 0.94));
+}
+
+#transactionsList .list-body,
+#operationsTransactionsList .list-body,
+#analyticsCategoryTransactionsList .list-body {
+  min-width: 0;
 }
 
 #transactionsList .list-title,
 #operationsTransactionsList .list-title,
 #analyticsCategoryTransactionsList .list-title {
-  font-size: 16px;
-  font-weight: 760;
+  color: var(--text);
+  font-size: 15.5px;
+  font-weight: 680;
+  line-height: 1.12;
   letter-spacing: -0.025em;
 }
 
 #transactionsList .list-subtitle,
 #operationsTransactionsList .list-subtitle,
 #analyticsCategoryTransactionsList .list-subtitle {
-  font-size: 11px;
-  font-weight: 620;
-  color: rgba(255, 255, 255, 0.42);
+  color: rgba(20, 24, 33, 0.45);
+  font-size: 12.2px;
+  font-weight: 500;
+  line-height: 1.22;
+}
+
+#transactionsList .list-right,
+#operationsTransactionsList .list-right,
+#analyticsCategoryTransactionsList .list-right {
+  min-width: 96px;
+  max-width: 44%;
+  text-align: right;
 }
 
 #transactionsList .list-value,
 #operationsTransactionsList .list-value,
 #analyticsCategoryTransactionsList .list-value {
   font-size: 15.5px;
-  font-weight: 820;
-  letter-spacing: -0.03em;
+  font-weight: 740;
+  letter-spacing: -0.035em;
 }
 
-#transactionsList .list-right,
-#operationsTransactionsList .list-right {
-  min-width: 108px;
+.list-value--transfer {
+  color: var(--accent);
 }
 
 #transactionsList .list-caption,
-#operationsTransactionsList .list-caption {
+#operationsTransactionsList .list-caption,
+#analyticsCategoryTransactionsList .list-caption {
   display: block;
+  margin-top: 7px;
+  color: rgba(20, 24, 33, 0.38);
+  font-size: 11px;
+  font-weight: 500;
   text-align: right;
+}
+
+/* Full operations / category modal rows */
+#operationsTransactionsList .transaction-card,
+#analyticsCategoryTransactionsList .transaction-card {
+  min-height: 76px;
+  padding: 13px 14px;
+  border-radius: 22px;
+  border: 1px solid rgba(22, 30, 46, 0.07);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(250, 252, 255, 0.96));
+  box-shadow:
+    0 12px 28px rgba(30, 42, 68, 0.065),
+    0 3px 10px rgba(30, 42, 68, 0.03),
+    inset 0 1px 0 rgba(255, 255, 255, 0.94);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+#operationsTransactionsList .transaction-card::before,
+#analyticsCategoryTransactionsList .transaction-card::before {
+  display: none;
 }
 
 /* Telegram-like delete animation */
@@ -76,14 +230,14 @@
   pointer-events: none;
   opacity: 0;
   background:
-    radial-gradient(circle at 12% 28%, rgba(255,255,255,0.18) 0 1.2px, transparent 1.9px),
-    radial-gradient(circle at 21% 64%, rgba(255,255,255,0.12) 0 1.1px, transparent 1.8px),
-    radial-gradient(circle at 34% 42%, rgba(255,255,255,0.16) 0 1.25px, transparent 2px),
-    radial-gradient(circle at 48% 24%, rgba(255,255,255,0.14) 0 1.1px, transparent 1.8px),
-    radial-gradient(circle at 57% 70%, rgba(255,255,255,0.12) 0 1.05px, transparent 1.7px),
-    radial-gradient(circle at 68% 38%, rgba(255,255,255,0.16) 0 1.2px, transparent 1.9px),
-    radial-gradient(circle at 79% 58%, rgba(255,255,255,0.12) 0 1.05px, transparent 1.7px),
-    radial-gradient(circle at 88% 30%, rgba(255,255,255,0.16) 0 1.2px, transparent 1.9px);
+    radial-gradient(circle at 12% 28%, rgba(47,125,246,0.18) 0 1.2px, transparent 1.9px),
+    radial-gradient(circle at 21% 64%, rgba(47,125,246,0.12) 0 1.1px, transparent 1.8px),
+    radial-gradient(circle at 34% 42%, rgba(47,125,246,0.16) 0 1.25px, transparent 2px),
+    radial-gradient(circle at 48% 24%, rgba(47,125,246,0.14) 0 1.1px, transparent 1.8px),
+    radial-gradient(circle at 57% 70%, rgba(47,125,246,0.12) 0 1.05px, transparent 1.7px),
+    radial-gradient(circle at 68% 38%, rgba(47,125,246,0.16) 0 1.2px, transparent 1.9px),
+    radial-gradient(circle at 79% 58%, rgba(47,125,246,0.12) 0 1.05px, transparent 1.7px),
+    radial-gradient(circle at 88% 30%, rgba(47,125,246,0.16) 0 1.2px, transparent 1.9px);
   animation: telegramDeleteDustParticles 0.68s cubic-bezier(0.22, 0.8, 0.22, 1) forwards;
 }
 
@@ -168,10 +322,10 @@
 #transactionsList .list-card--fresh-sticker {
   transform-origin: 18% 14%;
   will-change: transform, opacity;
-  animation: freshStickerSettleStage 1.26s cubic-bezier(0.18, 0.84, 0.2, 1) both;
+  animation: freshStickerSettleStage 1.04s cubic-bezier(0.18, 0.84, 0.2, 1) both;
   box-shadow:
-    0 12px 24px rgba(0, 0, 0, 0.18),
-    inset 0 1px 0 rgba(255, 255, 255, 0.035);
+    0 12px 24px rgba(30, 42, 68, 0.10),
+    inset 0 1px 0 rgba(255, 255, 255, 0.92);
 }
 
 #transactionsList .list-card--fresh-sticker .list-title,
@@ -179,33 +333,23 @@
 #transactionsList .list-card--fresh-sticker .list-value,
 #transactionsList .list-card--fresh-sticker .list-caption {
   will-change: transform, opacity;
-  animation: freshStickerContentIn 0.74s cubic-bezier(0.2, 0.82, 0.22, 1) both;
+  animation: freshStickerContentIn 0.62s cubic-bezier(0.2, 0.82, 0.22, 1) both;
 }
 
 @keyframes freshStickerSettleStage {
   0% {
     opacity: 0.26;
-    transform: translate3d(0, 22px, 0) scale(1.055) rotate(-0.95deg);
-  }
-
-  28% {
-    opacity: 0.64;
-    transform: translate3d(0, 13px, 0) scale(1.038) rotate(-0.56deg);
+    transform: translate3d(0, 18px, 0) scale(1.035);
   }
 
   58% {
     opacity: 0.92;
-    transform: translate3d(0, 4px, 0) scale(1.015) rotate(-0.16deg);
-  }
-
-  82% {
-    opacity: 1;
-    transform: translate3d(0, -1px, 0) scale(1.003) rotate(-0.02deg);
+    transform: translate3d(0, 4px, 0) scale(1.01);
   }
 
   100% {
     opacity: 1;
-    transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+    transform: translate3d(0, 0, 0) scale(1);
   }
 }
 
