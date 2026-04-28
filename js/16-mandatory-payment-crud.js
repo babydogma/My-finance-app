@@ -80,7 +80,7 @@ mandatoryPaymentLinkedSafeSelect,
 source_type: "calendar_payment",
 calendar_payment_id: item.id,
 mandatory_payment_id: item.id,
-calendar_payment_period: period,
+calendar_payment_period: monthKey,
       };
 
       const { error } = await supabaseClient
