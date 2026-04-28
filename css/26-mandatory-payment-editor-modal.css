@@ -1,10 +1,6 @@
 /* =========================================================
    26. CALENDAR PAYMENT EDITOR MODAL
-   Add/edit calendar payment and linked safe picker
-   ========================================================= */
-
-/* =========================================================
-   Base z-index
+   Light add/edit calendar payment and linked safe picker
    ========================================================= */
 
 #mandatoryPaymentEditorModal {
@@ -21,69 +17,65 @@
 
 #mandatoryPaymentEditorModal .modal-sheet {
   width: min(480px, 100%);
-  max-height: calc(100vh - 20px);
+  max-height: calc(100dvh - 20px);
   padding: 18px 16px calc(18px + env(safe-area-inset-bottom, 0px));
   border-radius: 30px 30px 22px 22px;
   background:
-    radial-gradient(circle at top center, rgba(111, 156, 255, 0.12), transparent 34%),
-    linear-gradient(180deg, rgba(18, 21, 30, 0.99) 0%, rgba(11, 14, 22, 1) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.07);
+    radial-gradient(circle at top center, rgba(47, 125, 246, 0.055), transparent 34%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99) 0%, rgba(248, 250, 253, 0.98) 100%);
+  border: 1px solid rgba(22, 30, 46, 0.075);
   box-shadow:
-    0 -16px 48px rgba(0, 0, 0, 0.46),
-    0 0 26px rgba(111, 156, 255, 0.06),
-    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+    0 -18px 50px rgba(30, 42, 68, 0.16),
+    0 4px 18px rgba(30, 42, 68, 0.055),
+    inset 0 1px 0 rgba(255, 255, 255, 0.94);
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }
 
 #mandatoryPaymentEditorModal .modal-handle {
   margin-bottom: 16px;
-  background: rgba(255, 255, 255, 0.18);
+  background: rgba(20, 24, 33, 0.12);
 }
 
-/* =========================================================
-   Editor header
-   ========================================================= */
+/* Header */
 
 #mandatoryPaymentEditorModal .section-head {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   gap: 12px;
-  margin-bottom: 18px;
+  margin-bottom: 16px;
 }
 
 #mandatoryPaymentEditorModal .modal-title {
   margin: 0 !important;
   max-width: none;
   text-align: left !important;
-  color: #f7f9ff;
-  font-size: 30px;
-  line-height: 0.94;
-  font-weight: 930;
-  letter-spacing: -0.065em;
+  color: var(--text);
+  font-size: 24px;
+  line-height: 1.02;
+  font-weight: 720;
+  letter-spacing: -0.04em;
 }
 
 #mandatoryPaymentEditorModal .manager-back-btn {
-  min-width: 104px;
-  height: 48px;
-  padding: 0 16px;
+  min-width: 92px;
+  height: 42px;
+  padding: 0 14px;
   border-radius: 999px;
   background:
-    linear-gradient(180deg, rgba(44, 47, 58, 0.96) 0%, rgba(24, 28, 38, 0.98) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  color: #eef3ff;
-  font-size: 14px;
-  font-weight: 860;
-  letter-spacing: -0.03em;
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(241, 244, 249, 0.96));
+  border: 1px solid rgba(22, 30, 46, 0.07);
+  color: rgba(20, 24, 33, 0.68);
+  font-size: 13px;
+  font-weight: 620;
+  letter-spacing: -0.012em;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.03),
-    0 8px 18px rgba(0, 0, 0, 0.16);
+    0 7px 16px rgba(30, 42, 68, 0.052),
+    inset 0 1px 0 rgba(255, 255, 255, 0.94);
 }
 
-/* =========================================================
-   Editor form base
-   ========================================================= */
+/* Form base */
 
 #mandatoryPaymentEditorModal .manager-card {
   padding: 0;
@@ -95,61 +87,57 @@
 }
 
 #mandatoryPaymentEditorModal .field {
-  margin-bottom: 12px;
+  margin-bottom: 11px;
 }
 
 #mandatoryPaymentEditorModal .input,
 #mandatoryPaymentEditorModal .select,
 #mandatoryPaymentEditorModal .mandatory-linked-safe-btn {
   width: 100%;
-  height: 52px;
-  padding: 0 16px;
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.055);
+  height: 50px;
+  padding: 0 15px;
+  border-radius: 18px;
+  border: 1px solid rgba(22, 30, 46, 0.075);
   background:
-    linear-gradient(180deg, rgba(32, 36, 48, 0.94) 0%, rgba(18, 21, 30, 1) 100%);
-  color: #f7f8fb;
-  font-size: 17px;
-  font-weight: 800;
-  letter-spacing: -0.028em;
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(246, 248, 252, 0.98));
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 620;
+  letter-spacing: -0.015em;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.03),
-    0 8px 18px rgba(0, 0, 0, 0.16);
+    inset 0 1px 0 rgba(255, 255, 255, 0.94),
+    0 6px 16px rgba(30, 42, 68, 0.052);
 }
 
 #mandatoryPaymentEditorModal .input::placeholder {
-  color: rgba(255, 255, 255, 0.42);
+  color: rgba(20, 24, 33, 0.38);
 }
 
 #mandatoryPaymentEditorModal .input:focus,
 #mandatoryPaymentEditorModal .select:focus,
 #mandatoryPaymentEditorModal .mandatory-linked-safe-btn:focus {
   outline: none;
-  border-color: rgba(111, 156, 255, 0.34);
+  border-color: rgba(47, 125, 246, 0.28);
   box-shadow:
-    0 10px 24px rgba(0, 0, 0, 0.18),
-    0 0 22px rgba(111, 156, 255, 0.10),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    0 0 0 3px rgba(47, 125, 246, 0.08),
+    0 8px 20px rgba(30, 42, 68, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.94);
 }
 
-/* =========================================================
-   Title input
-   ========================================================= */
+/* Title input */
 
 #mandatoryPaymentTitleInput {
-  font-size: 17px;
-  font-weight: 840;
+  font-size: 15px;
+  font-weight: 640;
 }
 
-/* =========================================================
-   Amount + date row
-   ========================================================= */
+/* Amount + date row */
 
 .mandatory-payment-main-row {
   display: grid;
   grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
-  gap: 10px;
-  margin-bottom: 12px;
+  gap: 9px;
+  margin-bottom: 11px;
 }
 
 .mandatory-payment-main-row__field {
@@ -161,25 +149,23 @@
 }
 
 .mandatory-payment-money-input {
-  padding-right: 42px !important;
-  font-weight: 900 !important;
+  padding-right: 38px !important;
+  font-weight: 680 !important;
 }
 
 .mandatory-payment-money-symbol {
   position: absolute;
-  right: 16px;
+  right: 15px;
   top: 50%;
   transform: translateY(-50%);
-  color: rgba(255, 255, 255, 0.46);
-  font-size: 17px;
-  font-weight: 900;
+  color: rgba(20, 24, 33, 0.42);
+  font-size: 14px;
+  font-weight: 650;
   line-height: 1;
   pointer-events: none;
 }
 
-/* =========================================================
-   Date field
-   ========================================================= */
+/* Date field */
 
 .mandatory-payment-date-field {
   position: relative;
@@ -189,10 +175,10 @@
   position: relative;
   z-index: 2;
   padding-right: 12px;
-  color: #f7f8fb;
-  font-size: 14px;
-  font-weight: 820;
-  letter-spacing: -0.045em;
+  color: var(--text);
+  font-size: 13.2px;
+  font-weight: 600;
+  letter-spacing: -0.025em;
 }
 
 #mandatoryPaymentDueDayInput:invalid {
@@ -200,7 +186,7 @@
 }
 
 #mandatoryPaymentDueDayInput:valid {
-  color: #f7f8fb;
+  color: var(--text);
 }
 
 #mandatoryPaymentDueDayInput::-webkit-datetime-edit {
@@ -208,21 +194,21 @@
 }
 
 #mandatoryPaymentDueDayInput::-webkit-calendar-picker-indicator {
-  opacity: 0.62;
-  filter: invert(1);
+  opacity: 0.58;
+  filter: none;
 }
 
 .mandatory-payment-date-placeholder {
   position: absolute;
-  left: 16px;
+  left: 15px;
   top: 50%;
   z-index: 3;
   transform: translateY(-50%);
   pointer-events: none;
-  color: rgba(255, 255, 255, 0.42);
-  font-size: 15.5px;
-  font-weight: 800;
-  letter-spacing: -0.035em;
+  color: rgba(20, 24, 33, 0.38);
+  font-size: 13.5px;
+  font-weight: 560;
+  letter-spacing: -0.012em;
   white-space: nowrap;
 }
 
@@ -230,67 +216,61 @@
   opacity: 0;
 }
 
-/* =========================================================
-   Category select
-   ========================================================= */
+/* Category select */
 
 #mandatoryPaymentEditorModal .mandatory-payment-category-field {
   position: relative;
   display: block !important;
   width: 100%;
-  margin-bottom: 12px;
+  margin-bottom: 11px;
 }
 
 #mandatoryPaymentCategorySelect {
   display: block !important;
   width: 100%;
-  padding-right: 46px;
+  padding-right: 42px;
   appearance: none;
   -webkit-appearance: none;
-  color: #f7f8fb;
-  font-size: 17px;
-  font-weight: 860;
-  letter-spacing: -0.028em;
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 620;
+  letter-spacing: -0.015em;
 }
 
-#mandatoryPaymentCategorySelect option {
-  background: #141925;
-  color: #f7f8fb;
+#mandatoryPaymentCategorySelect option,
+#mandatoryPaymentAccountSelect option,
+#mandatoryPaymentLinkedSafeSelect option {
+  background: #ffffff;
+  color: var(--text);
 }
 
-#mandatoryPaymentEditorModal .mandatory-payment-category-field::after {
+#mandatoryPaymentEditorModal .mandatory-payment-category-field::after,
+#mandatoryPaymentEditorModal .field:has(#mandatoryPaymentAccountSelect)::after,
+#mandatoryPaymentEditorModal .field:has(#mandatoryPaymentLinkedSafeSelect)::after {
   content: "";
   position: absolute;
-  right: 18px;
+  right: 17px;
   top: 50%;
   z-index: 3;
   width: 8px;
   height: 8px;
-  border-right: 2px solid rgba(247, 249, 255, 0.44);
-  border-bottom: 2px solid rgba(247, 249, 255, 0.44);
+  border-right: 2px solid rgba(20, 24, 33, 0.32);
+  border-bottom: 2px solid rgba(20, 24, 33, 0.32);
   transform: translateY(-68%) rotate(45deg);
   pointer-events: none;
 }
 
-/* =========================================================
-   Other selects / linked safe button
-   ========================================================= */
+/* Other selects / linked safe button */
 
 #mandatoryPaymentEditorModal .select {
   appearance: none;
   -webkit-appearance: none;
-  padding-right: 46px;
+  padding-right: 42px;
 }
 
 #mandatoryPaymentAccountSelect,
 #mandatoryPaymentLinkedSafeSelect {
-  font-weight: 860;
-}
-
-#mandatoryPaymentAccountSelect option,
-#mandatoryPaymentLinkedSafeSelect option {
-  background: #141925;
-  color: #f7f8fb;
+  font-weight: 620;
 }
 
 #mandatoryPaymentEditorModal .field:has(#mandatoryPaymentAccountSelect),
@@ -298,28 +278,13 @@
   position: relative;
 }
 
-#mandatoryPaymentEditorModal .field:has(#mandatoryPaymentAccountSelect)::after,
-#mandatoryPaymentEditorModal .field:has(#mandatoryPaymentLinkedSafeSelect)::after {
-  content: "";
-  position: absolute;
-  right: 18px;
-  top: 50%;
-  z-index: 3;
-  width: 8px;
-  height: 8px;
-  border-right: 2px solid rgba(247, 249, 255, 0.44);
-  border-bottom: 2px solid rgba(247, 249, 255, 0.44);
-  transform: translateY(-68%) rotate(45deg);
-  pointer-events: none;
-}
-
 #mandatoryPaymentEditorModal .mandatory-linked-safe-btn {
   display: flex;
   align-items: center;
   justify-content: flex-start;
   text-align: left;
-  color: #f7f8fb;
-  font-weight: 860;
+  color: var(--text);
+  font-weight: 620;
   cursor: pointer;
 }
 
@@ -327,45 +292,44 @@
   transform: scale(0.99);
 }
 
-/* =========================================================
-   Actions
-   ========================================================= */
+/* Actions */
 
 #mandatoryPaymentEditorModal .modal-actions {
-  margin-top: 16px;
+  margin-top: 15px;
 }
 
 .mandatory-editor-actions {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 11px;
+  gap: 10px;
 }
 
 .mandatory-editor-actions .btn-danger,
 .mandatory-editor-actions .btn-primary {
   width: 100%;
-  height: 58px;
-  border-radius: 22px;
-  font-size: 17px;
-  font-weight: 920;
-  letter-spacing: -0.035em;
+  height: 52px;
+  border-radius: 18px;
+  font-size: 15px;
+  font-weight: 680;
+  letter-spacing: -0.02em;
 }
 
 #mandatoryPaymentEditorModal .btn-primary {
   background:
-    radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.14), transparent 42%),
-    linear-gradient(180deg, rgba(114, 160, 255, 1) 0%, rgba(92, 144, 255, 1) 100%);
+    linear-gradient(180deg, rgba(75, 146, 255, 1) 0%, rgba(47, 125, 246, 1) 100%);
   color: #fff;
-  box-shadow: 0 14px 30px rgba(111, 156, 255, 0.24);
+  box-shadow:
+    0 14px 28px rgba(47, 125, 246, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
 }
 
 #mandatoryPaymentEditorModal .btn-danger {
   background:
-    linear-gradient(180deg, rgba(120, 55, 67, 0.62) 0%, rgba(93, 43, 52, 0.72) 100%);
-  color: #ff7f86;
+    linear-gradient(180deg, rgba(255, 236, 233, 0.98), rgba(255, 224, 220, 0.96));
+  color: var(--red);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.03),
-    0 8px 18px rgba(70, 20, 28, 0.18);
+    0 8px 18px rgba(239, 91, 79, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.88);
 }
 
 /* =========================================================
@@ -374,25 +338,24 @@
 
 #mandatoryPaymentBucketPickerModal .modal-sheet {
   width: min(480px, 100%);
-  max-height: calc(100vh - 24px);
-  padding: 20px 16px calc(20px + env(safe-area-inset-bottom, 0px));
-  border-radius: 34px 34px 24px 24px;
+  max-height: calc(100dvh - 24px);
+  padding: 18px 16px calc(20px + env(safe-area-inset-bottom, 0px));
+  border-radius: 30px 30px 22px 22px;
   background:
-    radial-gradient(circle at 18% 0%, rgba(111, 156, 255, 0.16), transparent 36%),
-    radial-gradient(circle at 90% 14%, rgba(255, 255, 255, 0.045), transparent 30%),
-    linear-gradient(180deg, rgba(18, 22, 33, 0.995) 0%, rgba(10, 13, 20, 1) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.075);
+    radial-gradient(circle at 18% 0%, rgba(47, 125, 246, 0.055), transparent 36%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99) 0%, rgba(248, 250, 253, 0.98) 100%);
+  border: 1px solid rgba(22, 30, 46, 0.075);
   box-shadow:
-    0 -20px 58px rgba(0, 0, 0, 0.56),
-    0 0 32px rgba(111, 156, 255, 0.055),
-    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    0 -18px 50px rgba(30, 42, 68, 0.16),
+    0 4px 18px rgba(30, 42, 68, 0.055),
+    inset 0 1px 0 rgba(255, 255, 255, 0.94);
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }
 
 #mandatoryPaymentBucketPickerModal .modal-handle {
-  margin-bottom: 18px;
-  background: rgba(255, 255, 255, 0.18);
+  margin-bottom: 16px;
+  background: rgba(20, 24, 33, 0.12);
 }
 
 #mandatoryPaymentBucketPickerModal .section-head {
@@ -404,132 +367,123 @@
   margin: 0 !important;
   max-width: 245px;
   text-align: left !important;
-  color: #f8faff;
-  font-size: 31px;
-  line-height: 0.96;
-  font-weight: 950;
-  letter-spacing: -0.07em;
+  color: var(--text);
+  font-size: 24px;
+  line-height: 1.02;
+  font-weight: 720;
+  letter-spacing: -0.04em;
 }
 
 #mandatoryPaymentBucketPickerModal .manager-back-btn {
   flex: 0 0 auto;
-  min-width: 112px;
-  height: 50px;
-  padding: 0 18px;
+  min-width: 96px;
+  height: 42px;
+  padding: 0 14px;
   border-radius: 999px;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.095) 0%, rgba(255, 255, 255, 0.055) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.045);
-  color: #eef3ff;
-  font-size: 15px;
-  font-weight: 860;
-  letter-spacing: -0.03em;
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(241, 244, 249, 0.96));
+  border: 1px solid rgba(22, 30, 46, 0.07);
+  color: rgba(20, 24, 33, 0.68);
+  font-size: 13px;
+  font-weight: 620;
+  letter-spacing: -0.012em;
   box-shadow:
-    0 8px 18px rgba(0, 0, 0, 0.16),
-    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    0 7px 16px rgba(30, 42, 68, 0.052),
+    inset 0 1px 0 rgba(255, 255, 255, 0.94);
 }
 
 #mandatoryPaymentBucketPickerModal .list {
-  gap: 12px;
+  gap: 11px;
 }
 
 #mandatoryPaymentBucketPickerModal .list-card {
-  min-height: 72px;
-  padding: 12px 14px;
-  border-radius: 22px;
+  min-height: 70px;
+  padding: 12px 13px;
+  border-radius: 21px;
   background:
-    linear-gradient(180deg, rgba(68, 74, 92, 0.34) 0%, rgba(36, 40, 54, 0.22) 100%);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(250, 252, 255, 0.96));
+  border: 1px solid rgba(22, 30, 46, 0.065);
+  box-shadow:
+    0 11px 25px rgba(30, 42, 68, 0.06),
+    0 3px 9px rgba(30, 42, 68, 0.028),
+    inset 0 1px 0 rgba(255, 255, 255, 0.94);
 }
 
 #mandatoryPaymentBucketPickerModal .list-title {
-  font-size: 16px;
-  font-weight: 820;
-  letter-spacing: -0.025em;
+  color: var(--text);
+  font-size: 14.5px;
+  font-weight: 620;
+  letter-spacing: -0.016em;
 }
 
 #mandatoryPaymentBucketPickerModal .list-subtitle {
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.42);
+  color: rgba(20, 24, 33, 0.45);
+  font-size: 10.8px;
 }
 
 #mandatoryPaymentBucketPickerModal .list-value {
-  font-size: 15.5px;
-  font-weight: 840;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 620;
 }
 
-/* =========================================================
-   Mobile
-   ========================================================= */
+/* Mobile */
 
 @media (max-width: 420px) {
-  #mandatoryPaymentEditorModal .modal-sheet {
-    padding: 18px 14px calc(18px + env(safe-area-inset-bottom, 0px));
-    border-radius: 30px 30px 22px 22px;
-  }
-
-  #mandatoryPaymentEditorModal .modal-title {
-    font-size: 28px;
-  }
-
-  #mandatoryPaymentEditorModal .manager-back-btn {
-    min-width: 98px;
-    height: 46px;
-    font-size: 14px;
-  }
-
-  .mandatory-payment-main-row {
-    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-    gap: 8px;
-    margin-bottom: 12px;
-  }
-
-  #mandatoryPaymentEditorModal .input,
-  #mandatoryPaymentEditorModal .select,
-  #mandatoryPaymentEditorModal .mandatory-linked-safe-btn {
-    height: 50px;
-    border-radius: 18px;
-    font-size: 15.5px;
-  }
-
-  #mandatoryPaymentDueDayInput {
-    font-size: 13.5px;
-  }
-
-  .mandatory-payment-date-placeholder {
-    left: 14px;
-    font-size: 14.5px;
-  }
-
-  .mandatory-payment-money-symbol {
-    right: 14px;
-    font-size: 16px;
-  }
-
-  .mandatory-payment-money-input {
-    padding-right: 38px !important;
-  }
-
-  .mandatory-editor-actions .btn-danger,
-  .mandatory-editor-actions .btn-primary {
-    height: 56px;
-    border-radius: 20px;
-  }
-
+  #mandatoryPaymentEditorModal .modal-sheet,
   #mandatoryPaymentBucketPickerModal .modal-sheet {
     padding: 18px 14px calc(18px + env(safe-area-inset-bottom, 0px));
     border-radius: 30px 30px 22px 22px;
   }
 
+  #mandatoryPaymentEditorModal .modal-title,
   #mandatoryPaymentBucketPickerModal .modal-title {
-    font-size: 28px;
+    font-size: 23px;
   }
 
+  #mandatoryPaymentEditorModal .manager-back-btn,
   #mandatoryPaymentBucketPickerModal .manager-back-btn {
-    min-width: 104px;
-    height: 46px;
+    min-width: 88px;
+    height: 40px;
+    font-size: 12.5px;
+  }
+
+  .mandatory-payment-main-row {
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: 8px;
+    margin-bottom: 11px;
+  }
+
+  #mandatoryPaymentEditorModal .input,
+  #mandatoryPaymentEditorModal .select,
+  #mandatoryPaymentEditorModal .mandatory-linked-safe-btn {
+    height: 49px;
+    border-radius: 17px;
     font-size: 14px;
+  }
+
+  #mandatoryPaymentDueDayInput {
+    font-size: 12.8px;
+  }
+
+  .mandatory-payment-date-placeholder {
+    left: 14px;
+    font-size: 13px;
+  }
+
+  .mandatory-payment-money-symbol {
+    right: 13px;
+    font-size: 13.5px;
+  }
+
+  .mandatory-payment-money-input {
+    padding-right: 36px !important;
+  }
+
+  .mandatory-editor-actions .btn-danger,
+  .mandatory-editor-actions .btn-primary {
+    height: 52px;
+    border-radius: 18px;
   }
 
   #mandatoryPaymentBucketPickerModal .list-card {
