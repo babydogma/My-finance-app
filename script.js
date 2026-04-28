@@ -399,6 +399,28 @@ getSafeBucketIcon,
     state,
     roundToTwo,
   });
+  
+  async function saveSafeBucketsToMeta() {
+  const serializedSafeBuckets = JSON.stringify(state.safeBuckets);
+
+  setAppMetaLocalValue("safe_buckets", serializedSafeBuckets);
+
+  const { error } = await supabaseClient
+    .from("app_meta")
+    .upsert(
+      {
+        key: "safe_buckets",
+        value: serializedSafeBuckets,
+      },
+      {
+        onConflict: "key",
+      }
+    );
+
+  if (error) {
+    throw error;
+  }
+}
 
   const {
     getAccountBalance,
@@ -441,6 +463,34 @@ getSafeBucketIcon,
   getProtectedAccounts,
   getFreeMoneyAccounts,
 });
+
+function getVisibleSafeBucketsTotal() {
+  return roundToTwo(
+    getRealSafeBuckets().reduce((sum, bucket) => {
+      return sum + getSafeBucketBalance(bucket.id);
+    }, 0)
+  );
+}
+
+function syncSafeBucketsModalCleanView() {
+  safeBucketsUnassignedCard?.remove();
+
+  if (safeBucketsModalTotalLabel) {
+    safeBucketsModalTotalLabel.textContent =
+      `Общий баланс: ${formatMoney(getVisibleSafeBucketsTotal())}`;
+  }
+}
+
+if (safeBucketsModal) {
+  const safeBucketsCleanObserver = new MutationObserver(() => {
+    syncSafeBucketsModalCleanView();
+  });
+
+  safeBucketsCleanObserver.observe(safeBucketsModal, {
+    childList: true,
+    subtree: true,
+  });
+}
 
   const {
     getBudgetLimitByCategoryId,
@@ -1879,6 +1929,16 @@ function openSafeBucketAmountModal(bucketId) {
   if (!bucket || !safeBucketAmountModal) return;
 
   activeSafeBucketAmountId = bucketId;
+  
+  const activeSafeBucket = state.safeBuckets.find((item) => {
+  return item.id === activeSafeBucketAmountId;
+});
+
+if (activeSafeBucket) {
+  safeBucketAmountModalTitle.textContent = activeSafeBucket.name || "Накопление";
+  safeBucketNameInput.value = activeSafeBucket.name || "";
+  deleteSafeBucketBtn?.classList.remove("hidden");
+}
 
   const balance = getSafeBucketBalance(bucketId);
   const annualRate = getSafeBucketInterestAnnualRate(bucketId);
@@ -3499,6 +3559,80 @@ addSafeBucketBtn?.addEventListener("click", addSafeBucket);
 closeSafeBucketAmountModalBtn?.addEventListener("click", closeSafeBucketAmountModal);
 cancelSafeBucketAmountBtn?.addEventListener("click", closeSafeBucketAmountModal);
 saveSafeBucketAmountBtn?.addEventListener("click", saveSafeBucketAmount);
+deleteSafeBucketBtn?.addEventListener("click", async (event) => {
+  event.preventDefault();
+  event.stopPropagation();
+
+  if (!activeSafeBucketAmountId) return;
+
+  const targetSafeBucket = state.safeBuckets.find((item) => {
+    return item.id === activeSafeBucketAmountId;
+  });
+
+  if (!targetSafeBucket) {
+    alert("Накопление не найдено");
+    return;
+  }
+
+  const confirmed = window.confirm(
+    `Удалить накопление «${targetSafeBucket.name}»?`
+  );
+
+  if (!confirmed) return;
+
+  state.safeBuckets = state.safeBuckets.filter((item) => {
+    return item.id !== activeSafeBucketAmountId;
+  });
+
+  try {
+    await saveSafeBucketsToMeta();
+  } catch (error) {
+    alert(`Не получилось удалить накопление: ${error.message || error}`);
+    console.error(error);
+    return;
+  }
+
+  activeSafeBucketAmountId = null;
+
+  closeAnimatedModal(safeBucketAmountModal);
+
+  renderAll();
+
+  if (typeof renderSafeBucketsModal === "function") {
+    renderSafeBucketsModal();
+  }
+
+  syncSafeBucketsModalCleanView();
+});
+
+  if (activeSafeBucketAmountId) {
+    const targetSafeBucket = state.safeBuckets.find((item) => {
+      return item.id === activeSafeBucketAmountId;
+    });
+
+    if (!targetSafeBucket) {
+      alert("Накопление не найдено");
+      return;
+    }
+
+    const nextSafeBucketName = safeBucketNameInput.value.trim();
+
+    if (!nextSafeBucketName) {
+      alert("Название накопления не может быть пустым");
+      return;
+    }
+
+    targetSafeBucket.name = nextSafeBucketName;
+
+    try {
+      await saveSafeBucketsToMeta();
+    } catch (error) {
+      alert(`Не получилось переименовать накопление: ${error.message || error}`);
+      console.error(error);
+      return;
+    }
+  }
+  
 deleteSafeBucketBtn?.addEventListener("click", deleteSafeBucketFromModal);
 safeInterestRateModal?.addEventListener("click", (event) => {
   if (event.target === safeInterestRateModal) closeSafeInterestRateModal();
