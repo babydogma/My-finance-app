@@ -1,6 +1,6 @@
 /* =========================================================
    14. CATEGORIES
-   Categories manager screen
+   Light categories manager screen
    ========================================================= */
 
 #categoriesManagerView {
@@ -20,63 +20,75 @@
 }
 
 .categories-screen__back {
-  min-width: 116px;
-  height: 46px;
-  padding: 0 18px;
+  min-width: 108px;
+  height: 42px;
+  padding: 0 16px;
   border-radius: 999px;
-  font-size: 15px;
-  font-weight: 860;
+  font-size: 13px;
+  font-weight: 620;
+  color: rgba(20, 24, 33, 0.68);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(241, 244, 249, 0.96));
+  border: 1px solid rgba(22, 30, 46, 0.07);
+  box-shadow:
+    0 7px 16px rgba(30, 42, 68, 0.052),
+    inset 0 1px 0 rgba(255, 255, 255, 0.94);
 }
 
 .categories-screen__head {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 5px;
 }
 
 .categories-screen__title {
   margin: 0;
-  font-size: 34px;
-  line-height: 0.95;
-  font-weight: 950;
-  letter-spacing: -0.07em;
-  color: #f7f9ff;
+  color: var(--text);
+  font-size: 28px;
+  line-height: 1.02;
+  font-weight: 760;
+  letter-spacing: -0.045em;
 }
 
 .categories-screen__subtitle {
-  display: none;
+  display: block;
+  margin: 0;
+  color: rgba(20, 24, 33, 0.48);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
 }
 
 .categories-composer {
-  padding: 18px 16px 16px;
-  border-radius: 30px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 15px;
+  border-radius: 24px;
+  border: 1px solid rgba(22, 30, 46, 0.07);
   background:
-    radial-gradient(circle at top center, rgba(111, 156, 255, 0.13), transparent 34%),
-    linear-gradient(180deg, rgba(28, 32, 43, 0.98) 0%, rgba(18, 21, 30, 1) 100%);
+    radial-gradient(circle at 0% 0%, rgba(47, 125, 246, 0.045), transparent 38%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(250, 252, 255, 0.96));
   box-shadow:
-    0 18px 40px rgba(0, 0, 0, 0.28),
-    0 0 26px rgba(111, 156, 255, 0.05),
-    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+    0 12px 28px rgba(30, 42, 68, 0.065),
+    0 3px 10px rgba(30, 42, 68, 0.03),
+    inset 0 1px 0 rgba(255, 255, 255, 0.94);
 }
 
 .categories-composer__head {
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
 
 .categories-composer__title {
   margin: 0;
-  font-size: 20px;
-  font-weight: 920;
-  line-height: 1;
-  letter-spacing: -0.05em;
-  color: #f7f9ff;
+  color: var(--text);
+  font-size: 18px;
+  font-weight: 650;
+  line-height: 1.08;
+  letter-spacing: -0.025em;
 }
 
 .categories-composer__body {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .categories-composer__field {
@@ -84,38 +96,48 @@
 }
 
 .categories-composer__input {
-  height: 58px;
-  padding: 0 18px;
-  border-radius: 22px;
-  border: 1px solid rgba(255, 255, 255, 0.055);
+  height: 50px;
+  padding: 0 15px;
+  border-radius: 18px;
+  border: 1px solid rgba(22, 30, 46, 0.075);
   background:
-    linear-gradient(180deg, rgba(28, 32, 43, 0.98) 0%, rgba(18, 21, 30, 1) 100%);
-  color: #f7f8fb;
-  font-size: 17px;
-  font-weight: 800;
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(246, 248, 252, 0.98));
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
   box-shadow:
-    inset 0 1px 0 rgba(255,255,255,0.03),
-    0 8px 18px rgba(0,0,0,0.16);
+    inset 0 1px 0 rgba(255, 255, 255, 0.94),
+    0 6px 16px rgba(30, 42, 68, 0.052);
+}
+
+.categories-composer__input::placeholder {
+  color: rgba(20, 24, 33, 0.38);
 }
 
 .categories-composer__submit {
-  height: 58px;
+  height: 50px;
   width: 100%;
-  border-radius: 22px;
-  font-size: 17px;
-  font-weight: 900;
-  letter-spacing: -0.03em;
-  box-shadow: 0 14px 30px rgba(111, 156, 255, 0.24);
+  border-radius: 18px;
+  font-size: 15px;
+  font-weight: 680;
+  letter-spacing: -0.02em;
+  background:
+    linear-gradient(180deg, rgba(75, 146, 255, 1), rgba(47, 125, 246, 1));
+  color: #ffffff;
+  box-shadow:
+    0 14px 28px rgba(47, 125, 246, 0.20),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
 }
 
 .categories-list-section--rebuilt {
-  margin-top: 20px;
+  margin-top: 22px;
 }
 
 .categories-list-title {
-  font-size: 18px;
-  font-weight: 900;
-  letter-spacing: -0.045em;
+  font-size: 20px;
+  font-weight: 680;
+  letter-spacing: -0.025em;
 }
 
 .category-row {
@@ -127,60 +149,72 @@
   flex: 0 0 auto;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   margin-left: auto;
 }
 
 .category-row__pill {
-  min-height: 30px;
-  padding: 0 12px;
+  min-height: 28px;
+  padding: 0 10px;
   border-radius: 999px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.06);
-  color: rgba(234, 239, 248, 0.76);
-  font-size: 11.5px;
-  font-weight: 820;
-  letter-spacing: -0.02em;
+  background: rgba(47, 125, 246, 0.08);
+  color: rgba(47, 125, 246, 0.82);
+  font-size: 10.5px;
+  font-weight: 620;
+  letter-spacing: -0.006em;
   white-space: nowrap;
 }
 
 .category-row__pill--required {
-  background: rgba(255, 114, 104, 0.14);
-  color: #ffaaa3;
+  background: rgba(239, 91, 79, 0.09);
+  color: var(--red);
 }
 
 .category-row__chevron {
-  color: rgba(255, 255, 255, 0.34);
-  font-size: 24px;
+  color: rgba(20, 24, 33, 0.28);
+  font-size: 22px;
   line-height: 1;
   transform: translateY(-1px);
 }
 
+#categoriesManagerList {
+  gap: 11px;
+}
+
 #categoriesManagerList .list-card {
-  min-height: 82px;
-  padding: 14px 15px;
-  border-radius: 24px;
+  min-height: 72px;
+  padding: 12px 13px;
+  border-radius: 21px;
+  border: 1px solid rgba(22, 30, 46, 0.065);
   background:
-    linear-gradient(180deg, rgba(60, 66, 84, 0.28) 0%, rgba(31, 36, 50, 0.18) 100%);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(250, 252, 255, 0.96));
+  box-shadow:
+    0 11px 25px rgba(30, 42, 68, 0.06),
+    0 3px 9px rgba(30, 42, 68, 0.028),
+    inset 0 1px 0 rgba(255, 255, 255, 0.94);
+}
+
+#categoriesManagerList .list-card::before {
+  display: none;
 }
 
 #categoriesManagerList .list-title {
-  font-size: 16px;
-  font-weight: 760;
-  line-height: 1.08;
-  letter-spacing: -0.025em;
+  color: var(--text);
+  font-size: 14.5px;
+  font-weight: 620;
+  line-height: 1.1;
+  letter-spacing: -0.016em;
 }
 
 #categoriesManagerList .list-subtitle {
   display: block;
-  margin-top: 6px;
-  color: rgba(255, 255, 255, 0.38);
-  font-size: 11.5px;
-  font-weight: 700;
+  margin-top: 4px;
+  color: rgba(20, 24, 33, 0.45);
+  font-size: 10.8px;
+  font-weight: 440;
 }
 
 #categoriesManagerList .category-manager-actions {
@@ -191,40 +225,44 @@
   width: 32px;
   height: 32px;
   min-width: 32px;
-  border-radius: 11px;
+  border-radius: 12px;
 }
 
 @media (max-width: 420px) {
   .categories-screen__title {
-    font-size: 30px;
+    font-size: 26px;
   }
 
   .categories-screen__subtitle {
-    font-size: 11px;
+    font-size: 11.5px;
   }
 
   .categories-screen__back {
-    min-width: 108px;
-    height: 42px;
-    padding: 0 16px;
-    font-size: 14px;
+    min-width: 100px;
+    height: 40px;
+    padding: 0 14px;
+    font-size: 12.5px;
   }
 
   .categories-composer {
     padding: 14px;
-    border-radius: 26px;
+    border-radius: 23px;
+  }
+
+  .categories-composer__title {
+    font-size: 17px;
   }
 
   .categories-composer__input,
   .categories-composer__submit {
-    height: 54px;
-    border-radius: 20px;
-    font-size: 16px;
+    height: 49px;
+    border-radius: 17px;
+    font-size: 14px;
   }
 
   #categoriesManagerList .list-card {
-    min-height: 74px;
+    min-height: 70px;
     padding: 11px 12px;
-    border-radius: 22px;
+    border-radius: 20px;
   }
 }
