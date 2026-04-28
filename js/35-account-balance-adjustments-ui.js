@@ -332,58 +332,6 @@
     diffEl.classList.toggle("is-negative", adjustment < 0);
     diffEl.classList.toggle("is-positive", adjustment > 0);
   }
-  
-  function refreshVisibleMoneyValues() {
-  const state = getState();
-
-  if (!state || !Array.isArray(state.accounts)) return;
-
-  const totalBalance = roundToTwo(
-    state.accounts.reduce((sum, account) => {
-      return sum + getCorrectedAccountBalance(account.id);
-    }, 0)
-  );
-
-  const freeMoney = roundToTwo(
-    state.accounts.reduce((sum, account) => {
-      const isIncluded =
-        account.include_in_free_money !== false &&
-        account.account_kind !== "vault_pool" &&
-        account.account_kind !== "reserve";
-
-      if (!isIncluded) return sum;
-
-      return sum + getCorrectedAccountBalance(account.id);
-    }, 0)
-  );
-
-  const balanceEl = document.querySelector(".balance-amount");
-  const accountsTotalEl = document.getElementById("accountsTotal");
-  const balanceFreeMoneyValueEl = document.getElementById("balanceFreeMoneyValue");
-
-  if (balanceEl) {
-    balanceEl.textContent = formatMoney(totalBalance);
-  }
-
-  if (accountsTotalEl) {
-    accountsTotalEl.textContent = `Всего: ${formatMoney(totalBalance)}`;
-  }
-
-  if (balanceFreeMoneyValueEl) {
-    balanceFreeMoneyValueEl.textContent = formatMoney(freeMoney);
-  }
-
-  const analyticsTotalBalanceValue = document.getElementById("analyticsTotalBalanceValue");
-  const analyticsFreeMoneyValue = document.getElementById("analyticsFreeMoneyValue");
-
-  if (analyticsTotalBalanceValue) {
-    analyticsTotalBalanceValue.textContent = formatMoney(totalBalance);
-  }
-
-  if (analyticsFreeMoneyValue) {
-    analyticsFreeMoneyValue.textContent = formatMoney(freeMoney);
-  }
-}
 
   async function saveActiveAdjustment() {
     if (!modalEl || !activeAccountId) return;
@@ -402,12 +350,7 @@
       setLocalAdjustment(activeAccountId, adjustment);
       await saveAdjustmentsToSupabase();
 
-      refreshVisibleMoneyValues();
-syncAccountCards();
-closeModal();
-
-saveBtn.disabled = false;
-saveBtn.textContent = "Сохранить";
+    window.location.reload();
     } catch (error) {
       alert(`Не получилось сохранить корректировку: ${error.message || error}`);
       saveBtn.disabled = false;
@@ -427,12 +370,7 @@ saveBtn.textContent = "Сохранить";
       setLocalAdjustment(activeAccountId, 0);
       await saveAdjustmentsToSupabase();
 
-      refreshVisibleMoneyValues();
-syncAccountCards();
-closeModal();
-
-resetBtn.disabled = false;
-resetBtn.textContent = "Убрать корректировку";
+    window.location.reload();
     } catch (error) {
       alert(`Не получилось убрать корректировку: ${error.message || error}`);
       resetBtn.disabled = false;
@@ -478,7 +416,6 @@ resetBtn.textContent = "Убрать корректировку";
       const valueEl = card.querySelector(SELECTORS.accountValue);
 
       if (!rightSide || !valueEl) return;
-      valueEl.textContent = formatMoney(getCorrectedAccountBalance(account.id));
 
       if (!rightSide.querySelector("[data-account-balance-edit-btn='true']")) {
         rightSide.appendChild(createEditButton(account.id));
