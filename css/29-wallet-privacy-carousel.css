@@ -1,6 +1,6 @@
 /* =========================================================
    29. WALLET PRIVACY + ACCOUNTS CAROUSEL
-   Final wallet package: privacy mode and unified accounts carousel
+   Safe version: fixed carousel direction + compact account cards
    ========================================================= */
 
 /* =========================================================
@@ -22,20 +22,22 @@ body.is-privacy-mode .balance-visibility-btn svg {
 }
 
 /* =========================================================
-   Unified accounts carousel
+   Accounts carousel
    ========================================================= */
 
 #accountsList.accounts-list,
 #accountsList {
   display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
   grid-template-columns: none !important;
   gap: 12px !important;
   width: 100%;
   max-width: 100%;
-  overflow-x: auto;
-  overflow-y: visible;
-  padding: 0 0 2px;
-  margin: 0;
+  overflow-x: auto !important;
+  overflow-y: visible !important;
+  padding: 0 0 2px !important;
+  margin: 0 !important;
   scroll-snap-type: x mandatory;
   scroll-padding-left: 0;
   -webkit-overflow-scrolling: touch;
@@ -47,13 +49,14 @@ body.is-privacy-mode .balance-visibility-btn svg {
   display: none;
 }
 
-/* All account cards are the same component now */
+/* All account cards: same compact account component */
 #accountsList .list-card,
 #accountsList .list-card:nth-child(n + 4) {
   position: relative;
   flex: 0 0 calc((100% - 24px) / 3) !important;
-  min-width: 0 !important;
-  max-width: none !important;
+  width: calc((100% - 24px) / 3) !important;
+  min-width: calc((100% - 24px) / 3) !important;
+  max-width: calc((100% - 24px) / 3) !important;
   min-height: 142px !important;
   padding: 13px 12px 14px !important;
   border-radius: 23px !important;
@@ -63,6 +66,7 @@ body.is-privacy-mode .balance-visibility-btn svg {
   justify-content: flex-start !important;
   gap: 9px !important;
   scroll-snap-align: start;
+  grid-column: auto !important;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.99) 0%, rgba(250, 252, 255, 0.97) 100%) !important;
   border: 1px solid rgba(22, 30, 46, 0.07) !important;
@@ -90,7 +94,6 @@ body.is-privacy-mode .balance-visibility-btn svg {
   background: rgba(47, 125, 246, 0.46) !important;
 }
 
-/* Accent strips by account visual order */
 #accountsList .list-card:nth-child(1)::after {
   background: rgba(47, 125, 246, 0.50) !important;
 }
@@ -125,25 +128,16 @@ body.is-privacy-mode .balance-visibility-btn svg {
 #accountsList .list-card:nth-child(2) .list-icon--account {
   background:
     linear-gradient(180deg, #87dfc0 0%, #29a97d 100%) !important;
-  box-shadow:
-    0 12px 22px rgba(21, 151, 107, 0.14),
-    inset 0 1px 0 rgba(255, 255, 255, 0.22) !important;
 }
 
 #accountsList .list-card:nth-child(3) .list-icon--account {
   background:
     linear-gradient(180deg, #ffd98d 0%, #eba527 100%) !important;
-  box-shadow:
-    0 12px 22px rgba(242, 165, 26, 0.14),
-    inset 0 1px 0 rgba(255, 255, 255, 0.22) !important;
 }
 
 #accountsList .list-card:nth-child(4) .list-icon--account {
   background:
     linear-gradient(180deg, #d7d2ff 0%, #7c6be8 100%) !important;
-  box-shadow:
-    0 12px 22px rgba(124, 107, 232, 0.14),
-    inset 0 1px 0 rgba(255, 255, 255, 0.22) !important;
 }
 
 #accountsList .list-icon--account svg,
@@ -153,7 +147,7 @@ body.is-privacy-mode .balance-visibility-btn svg {
   stroke-width: 1.9 !important;
 }
 
-/* Card text */
+/* Text */
 #accountsList .list-body,
 #accountsList .list-card:nth-child(n + 4) .list-body {
   width: 100% !important;
@@ -165,6 +159,7 @@ body.is-privacy-mode .balance-visibility-btn svg {
 #accountsList .list-card:nth-child(n + 4) .list-title-row {
   width: 100% !important;
   margin-bottom: 5px !important;
+  overflow: hidden !important;
 }
 
 #accountsList .list-title,
@@ -190,7 +185,7 @@ body.is-privacy-mode .balance-visibility-btn svg {
   text-overflow: ellipsis !important;
 }
 
-/* Value block */
+/* Value */
 #accountsList .list-right,
 #accountsList .list-card:nth-child(n + 4) .list-right {
   width: 100% !important;
@@ -213,7 +208,6 @@ body.is-privacy-mode .balance-visibility-btn svg {
   text-overflow: ellipsis !important;
 }
 
-/* Value colors by visual order */
 #accountsList .list-card:nth-child(1) .list-value {
   color: #347bef !important;
 }
@@ -230,7 +224,7 @@ body.is-privacy-mode .balance-visibility-btn svg {
   color: #6f63d9 !important;
 }
 
-/* Edit button inside unified cards */
+/* Edit button */
 #accountsList .account-balance-edit-btn,
 #accountsList .list-card:nth-child(n + 4) .account-balance-edit-btn {
   position: absolute !important;
@@ -243,7 +237,7 @@ body.is-privacy-mode .balance-visibility-btn svg {
   font-size: 12px !important;
 }
 
-/* Carousel dots */
+/* Dots */
 .accounts-carousel-dots {
   display: flex !important;
   justify-content: center;
@@ -269,10 +263,13 @@ body.is-privacy-mode .balance-visibility-btn svg {
   box-shadow: 0 0 0 4px rgba(47, 125, 246, 0.08);
 }
 
-/* Small screens */
 @media (max-width: 390px) {
   #accountsList .list-card,
   #accountsList .list-card:nth-child(n + 4) {
+    flex-basis: calc((100% - 20px) / 3) !important;
+    width: calc((100% - 20px) / 3) !important;
+    min-width: calc((100% - 20px) / 3) !important;
+    max-width: calc((100% - 20px) / 3) !important;
     min-height: 136px !important;
     padding: 12px 10px 13px !important;
     border-radius: 22px !important;
@@ -283,12 +280,6 @@ body.is-privacy-mode .balance-visibility-btn svg {
     width: 44px !important;
     height: 44px !important;
     flex-basis: 44px !important;
-  }
-
-  #accountsList .list-icon--account svg,
-  #accountsList .list-card:nth-child(n + 4) .list-icon--account svg {
-    width: 21px !important;
-    height: 21px !important;
   }
 
   #accountsList .list-title,
@@ -315,30 +306,8 @@ body.is-privacy-mode .balance-visibility-btn svg {
   #accountsList .list-card,
   #accountsList .list-card:nth-child(n + 4) {
     flex-basis: calc((100% - 16px) / 3) !important;
-    min-height: 130px !important;
-    padding: 10px 9px 12px !important;
-    border-radius: 20px !important;
-  }
-
-  #accountsList .list-icon--account,
-  #accountsList .list-card:nth-child(n + 4) .list-icon--account {
-    width: 40px !important;
-    height: 40px !important;
-    flex-basis: 40px !important;
-  }
-
-  #accountsList .list-title,
-  #accountsList .list-card:nth-child(n + 4) .list-title {
-    font-size: 12.4px !important;
-  }
-
-  #accountsList .list-subtitle,
-  #accountsList .list-card:nth-child(n + 4) .list-subtitle {
-    font-size: 9.8px !important;
-  }
-
-  #accountsList .list-value,
-  #accountsList .list-card:nth-child(n + 4) .list-value {
-    font-size: 13.5px !important;
+    width: calc((100% - 16px) / 3) !important;
+    min-width: calc((100% - 16px) / 3) !important;
+    max-width: calc((100% - 16px) / 3) !important;
   }
 }
