@@ -34,30 +34,80 @@
     renderMonthStrip,
     renderModal,
   }) {
-    function isModalActuallyOpen(modal) {
+    let savedPageScrollY = 0;
+    let isPageScrollLocked = false;
+
+    function lockPageScroll() {
+      if (isPageScrollLocked) return;
+
+      savedPageScrollY =
+        window.scrollY ||
+        document.documentElement.scrollTop ||
+        document.body.scrollTop ||
+        0;
+
+      isPageScrollLocked = true;
+
+      document.documentElement.classList.add("modal-scroll-locked");
+      document.body.classList.add("modal-scroll-locked");
+
+      document.documentElement.style.overflow = "hidden";
+      document.body.style.overflow = "hidden";
+      document.body.style.position = "fixed";
+      document.body.style.top = `-${savedPageScrollY}px`;
+      document.body.style.left = "0";
+      document.body.style.right = "0";
+      document.body.style.width = "100%";
+
+      document.documentElement.style.removeProperty("touch-action");
+      document.body.style.removeProperty("touch-action");
+    }
+
+    function unlockPageScroll() {
+      if (!isPageScrollLocked) {
+        forceUnlockPageScroll();
+        return;
+      }
+
+      const scrollY = savedPageScrollY;
+
+      isPageScrollLocked = false;
+      savedPageScrollY = 0;
+
+      forceUnlockPageScroll();
+
+      window.scrollTo(0, scrollY);
+    }
+
+    function forceUnlockPageScroll() {
+      document.documentElement.classList.remove("modal-scroll-locked");
+      document.body.classList.remove("modal-scroll-locked");
+
+      document.documentElement.style.removeProperty("overflow");
+      document.body.style.removeProperty("overflow");
+      document.body.style.removeProperty("position");
+      document.body.style.removeProperty("top");
+      document.body.style.removeProperty("left");
+      document.body.style.removeProperty("right");
+      document.body.style.removeProperty("width");
+      document.documentElement.style.removeProperty("touch-action");
+      document.body.style.removeProperty("touch-action");
+    }
+
+    function hardHideModal(modal) {
+      if (!modal) return;
+
+      modal.classList.add("hidden");
+      modal.classList.remove("is-visible");
+      modal.classList.remove("is-closing");
+    }
+
+    function isModalOpen(modal) {
       return Boolean(
         modal &&
         !modal.classList.contains("hidden") &&
-        (
-          modal.classList.contains("is-visible") ||
-          modal.classList.contains("is-closing")
-        )
+        !modal.classList.contains("is-closing")
       );
-    }
-
-    function setPageScrollLocked(isLocked) {
-  document.documentElement.classList.remove("modal-scroll-locked");
-  document.body.classList.remove("modal-scroll-locked");
-
-  document.documentElement.style.overflow = isLocked ? "hidden" : "";
-  document.body.style.overflow = isLocked ? "hidden" : "";
-
-  document.documentElement.style.touchAction = "";
-  document.body.style.touchAction = "";
-}
-
-    function shouldKeepScrollLockedAfterEditorClose() {
-      return isModalActuallyOpen(mandatoryPaymentsModal);
     }
 
     function resetMandatoryPaymentForm() {
@@ -89,7 +139,7 @@
     }
 
     function openMandatoryPaymentEditorModal() {
-      setPageScrollLocked(true);
+      lockPageScroll();
       openAnimatedModal(mandatoryPaymentEditorModal);
     }
 
@@ -98,15 +148,20 @@
         keepBodyLocked: true,
       });
 
-      const keepLocked = shouldKeepScrollLockedAfterEditorClose();
-
       closeAnimatedModal(mandatoryPaymentEditorModal, {
-        keepBodyLocked: keepLocked,
+        keepBodyLocked: true,
       });
 
       window.setTimeout(() => {
-        setPageScrollLocked(shouldKeepScrollLockedAfterEditorClose());
-      }, 320);
+        hardHideModal(mandatoryPaymentBucketPickerModal);
+        hardHideModal(mandatoryPaymentEditorModal);
+
+        if (isModalOpen(mandatoryPaymentsModal)) {
+          lockPageScroll();
+        } else {
+          unlockPageScroll();
+        }
+      }, 340);
 
       resetMandatoryPaymentForm();
     }
@@ -166,10 +221,6 @@
       deleteMandatoryPaymentBtn?.classList.remove("hidden");
 
       openMandatoryPaymentEditorModal();
-
-      window.setTimeout(() => {
-        mandatoryPaymentTitleInput?.focus();
-      }, 80);
     }
 
     function closeMandatoryPaymentsModal() {
@@ -181,19 +232,17 @@
         keepBodyLocked: true,
       });
 
-      closeAnimatedModal(mandatoryPaymentsModal);
+      closeAnimatedModal(mandatoryPaymentsModal, {
+        keepBodyLocked: false,
+      });
 
       window.setTimeout(() => {
-  setPageScrollLocked(false);
+        hardHideModal(mandatoryPaymentBucketPickerModal);
+        hardHideModal(mandatoryPaymentEditorModal);
+        hardHideModal(mandatoryPaymentsModal);
 
-  document.documentElement.style.removeProperty("overflow");
-  document.body.style.removeProperty("overflow");
-  document.documentElement.style.removeProperty("touch-action");
-  document.body.style.removeProperty("touch-action");
-
-  document.documentElement.classList.remove("modal-scroll-locked");
-  document.body.classList.remove("modal-scroll-locked");
-}, 340);
+        unlockPageScroll();
+      }, 360);
 
       resetMandatoryPaymentForm();
     }
@@ -204,7 +253,7 @@
       renderMonthStrip();
       renderModal();
 
-      setPageScrollLocked(true);
+      lockPageScroll();
       openAnimatedModal(mandatoryPaymentsModal);
     }
 
