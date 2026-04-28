@@ -1,23 +1,23 @@
 /* =========================================================
    01. TOKENS
-   Global design variables — light finance theme
+   Global design variables — clean light finance theme
    ========================================================= */
 
 :root {
-  --bg: #f7f8fb;
+  --bg: #f6f7fb;
   --bg-elevated: #ffffff;
 
-  --surface: rgba(255, 255, 255, 0.92);
+  --surface: rgba(255, 255, 255, 0.96);
   --surface-2: rgba(250, 252, 255, 0.98);
   --surface-dark: rgba(255, 255, 255, 0.96);
   --surface-dark-2: rgba(246, 248, 252, 1);
 
-  --text: #141821;
-  --text-muted: rgba(20, 24, 33, 0.58);
-  --text-soft: rgba(20, 24, 33, 0.42);
+  --text: #151922;
+  --text-muted: rgba(21, 25, 34, 0.56);
+  --text-soft: rgba(21, 25, 34, 0.40);
 
   --accent: #2f7df6;
-  --accent-soft: rgba(47, 125, 246, 0.12);
+  --accent-soft: rgba(47, 125, 246, 0.11);
 
   --green: #15976b;
   --red: #ef5b4f;
@@ -26,17 +26,21 @@
   --purple: #7c6be8;
   --amber: #f2a51a;
 
-  --border: rgba(22, 30, 46, 0.08);
-  --border-soft: rgba(22, 30, 46, 0.055);
+  --border: rgba(22, 30, 46, 0.075);
+  --border-soft: rgba(22, 30, 46, 0.052);
 
   --shadow-card:
-    0 18px 42px rgba(30, 42, 68, 0.08),
-    0 4px 12px rgba(30, 42, 68, 0.045);
+    0 14px 32px rgba(30, 42, 68, 0.070),
+    0 3px 10px rgba(30, 42, 68, 0.030);
 
   --shadow-soft:
-    0 12px 28px rgba(30, 42, 68, 0.075);
+    0 10px 24px rgba(30, 42, 68, 0.060);
 
-  --radius-card: 28px;
-  --radius-card-sm: 22px;
+  --shadow-button:
+    0 10px 22px rgba(30, 42, 68, 0.065),
+    inset 0 1px 0 rgba(255, 255, 255, 0.94);
+
+  --radius-card: 24px;
+  --radius-card-sm: 20px;
   --radius-pill: 999px;
 }
