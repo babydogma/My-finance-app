@@ -189,7 +189,7 @@
         <div class="modal-handle"></div>
 
         <h3 class="modal-title account-balance-adjustment-title">
-          Исправить остаток
+          Изменить сумму
         </h3>
 
         <div class="account-balance-adjustment-card">
@@ -202,12 +202,12 @@
           </div>
 
           <div class="account-balance-adjustment-card__meta">
-            Сейчас по операциям:
+            По операциям:
             <strong id="accountBalanceAdjustmentRawValue">0 ₽</strong>
           </div>
 
           <div class="account-balance-adjustment-card__meta">
-            Текущий итог:
+            Сейчас показывается:
             <strong id="accountBalanceAdjustmentCurrentValue">0 ₽</strong>
           </div>
         </div>
@@ -219,17 +219,17 @@
             type="text"
             inputmode="decimal"
             autocomplete="off"
-            placeholder="Фактический остаток"
+            placeholder="Новая сумма"
           />
           <span class="account-balance-adjustment-symbol">₽</span>
         </div>
 
         <div class="account-balance-adjustment-diff" id="accountBalanceAdjustmentDiff">
-          Разница: 0 ₽
+          Новое число заменит старое
         </div>
 
         <div class="account-balance-adjustment-note">
-          Это не создаёт операцию и не попадает в аналитику. Разница просто корректирует остаток счёта.
+          Сумма счёта будет заменена на введённую. Операция не создаётся, в аналитику ничего не попадает.
         </div>
 
         <div class="modal-actions account-balance-adjustment-actions">
@@ -238,11 +238,11 @@
           </button>
 
           <button class="btn btn-primary" type="button" id="saveAccountBalanceAdjustmentBtn">
-            Сохранить
+            Сохранить сумму
           </button>
 
           <button class="btn btn-danger" type="button" id="resetAccountBalanceAdjustmentBtn">
-            Убрать корректировку
+            Вернуть расчёт по операциям
           </button>
         </div>
       </div>
@@ -284,15 +284,15 @@
 
     const modal = ensureModal();
     const rawBalance = getRawAccountBalance(accountId);
-    const correctedBalance = getCorrectedAccountBalance(accountId);
+    const currentBalance = getCorrectedAccountBalance(accountId);
 
     modal.querySelector("#accountBalanceAdjustmentName").textContent = account.name;
     modal.querySelector("#accountBalanceAdjustmentRawValue").textContent = formatMoney(rawBalance);
-    modal.querySelector("#accountBalanceAdjustmentCurrentValue").textContent = formatMoney(correctedBalance);
+    modal.querySelector("#accountBalanceAdjustmentCurrentValue").textContent = formatMoney(currentBalance);
 
     const input = modal.querySelector("#accountBalanceAdjustmentInput");
 
-    input.value = String(correctedBalance).replace(".", ",");
+    input.value = String(currentBalance).replace(".", ",");
     updateDiffPreview();
 
     modal.classList.remove("hidden", "is-closing");
@@ -324,13 +324,18 @@
     const diffEl = modalEl.querySelector("#accountBalanceAdjustmentDiff");
 
     const desiredBalance = parseMoneyInput(input.value);
-    const rawBalance = getRawAccountBalance(activeAccountId);
-    const adjustment = roundToTwo(desiredBalance - rawBalance);
+    const currentBalance = getCorrectedAccountBalance(activeAccountId);
+    const differenceFromCurrent = roundToTwo(desiredBalance - currentBalance);
 
-    diffEl.textContent = `Корректировка: ${formatMoney(adjustment)}`;
+    if (Math.abs(differenceFromCurrent) < 0.005) {
+      diffEl.textContent = "Останется текущее число";
+      diffEl.classList.remove("is-negative", "is-positive");
+      return;
+    }
 
-    diffEl.classList.toggle("is-negative", adjustment < 0);
-    diffEl.classList.toggle("is-positive", adjustment > 0);
+    diffEl.textContent = `Счёт станет: ${formatMoney(desiredBalance)}`;
+    diffEl.classList.toggle("is-negative", differenceFromCurrent < 0);
+    diffEl.classList.toggle("is-positive", differenceFromCurrent > 0);
   }
 
   async function saveActiveAdjustment() {
@@ -341,20 +346,27 @@
 
     const desiredBalance = parseMoneyInput(input.value);
     const rawBalance = getRawAccountBalance(activeAccountId);
-    const adjustment = roundToTwo(desiredBalance - rawBalance);
+
+    /*
+      Важно:
+      здесь НЕ прибавляется новая корректировка к старой.
+      Старое значение для этого счёта заменяется новым:
+      новое_отображаемое_число - баланс_по_операциям.
+    */
+    const replacementAdjustment = roundToTwo(desiredBalance - rawBalance);
 
     saveBtn.disabled = true;
     saveBtn.textContent = "Сохраняю…";
 
     try {
-      setLocalAdjustment(activeAccountId, adjustment);
+      setLocalAdjustment(activeAccountId, replacementAdjustment);
       await saveAdjustmentsToSupabase();
 
-    window.location.reload();
+      window.location.reload();
     } catch (error) {
-      alert(`Не получилось сохранить корректировку: ${error.message || error}`);
+      alert(`Не получилось сохранить сумму: ${error.message || error}`);
       saveBtn.disabled = false;
-      saveBtn.textContent = "Сохранить";
+      saveBtn.textContent = "Сохранить сумму";
     }
   }
 
@@ -364,17 +376,17 @@
     const resetBtn = modalEl.querySelector("#resetAccountBalanceAdjustmentBtn");
 
     resetBtn.disabled = true;
-    resetBtn.textContent = "Убираю…";
+    resetBtn.textContent = "Возвращаю…";
 
     try {
       setLocalAdjustment(activeAccountId, 0);
       await saveAdjustmentsToSupabase();
 
-    window.location.reload();
+      window.location.reload();
     } catch (error) {
-      alert(`Не получилось убрать корректировку: ${error.message || error}`);
+      alert(`Не получилось вернуть расчёт по операциям: ${error.message || error}`);
       resetBtn.disabled = false;
-      resetBtn.textContent = "Убрать корректировку";
+      resetBtn.textContent = "Вернуть расчёт по операциям";
     }
   }
 
@@ -384,7 +396,7 @@
     button.className = "account-balance-edit-btn";
     button.type = "button";
     button.dataset.accountBalanceEditBtn = "true";
-    button.setAttribute("aria-label", "Исправить остаток счёта");
+    button.setAttribute("aria-label", "Изменить сумму счёта");
     button.textContent = "✎";
 
     button.addEventListener("click", (event) => {
