@@ -1,6 +1,6 @@
 /* =========================================================
    04. SURFACES
-   Shared card surfaces
+   Shared card surfaces — light
    ========================================================= */
 
 .balance,
@@ -18,10 +18,7 @@
   border: 1px solid var(--border);
   background:
     linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
-  box-shadow:
-    var(--shadow-card),
-    0 0 18px rgba(111, 156, 255, 0.03),
-    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  box-shadow: var(--shadow-card);
 }
 
 .balance::before,
@@ -36,6 +33,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(255,255,255,0.018) 0%, rgba(255,255,255,0) 40%);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.75) 0%, rgba(255,255,255,0) 46%);
   pointer-events: none;
 }
