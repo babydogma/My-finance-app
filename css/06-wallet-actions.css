@@ -9,24 +9,24 @@
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 0;
   margin-top: 26px;
-  padding: 14px;
+  padding: 13px 12px;
   border-radius: 28px;
   border: 1px solid rgba(22, 30, 46, 0.075);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(250, 252, 255, 0.94) 100%);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.97) 0%, rgba(250, 252, 255, 0.94) 100%);
   box-shadow:
-    0 18px 42px rgba(30, 42, 68, 0.09),
-    0 4px 12px rgba(30, 42, 68, 0.045),
-    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    0 18px 42px rgba(30, 42, 68, 0.085),
+    0 4px 12px rgba(30, 42, 68, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.92);
 }
 
 .action-card {
   position: relative;
   min-width: 0;
-  min-height: 76px;
-  padding: 8px 5px 7px;
+  min-height: 78px;
+  padding: 8px 4px 7px;
   border: 0;
-  border-radius: 20px;
+  border-radius: 19px;
   background: transparent;
   display: flex;
   flex-direction: column;
@@ -51,7 +51,7 @@
     linear-gradient(
       180deg,
       transparent,
-      rgba(22, 30, 46, 0.09),
+      rgba(22, 30, 46, 0.08),
       transparent
     );
 }
@@ -62,51 +62,58 @@
 }
 
 .action-icon {
-  width: 42px;
-  height: 42px;
+  width: 43px;
+  height: 43px;
   border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 20px;
-  font-weight: 760;
-  line-height: 1;
   box-shadow:
-    0 12px 22px rgba(30, 42, 68, 0.08),
+    0 12px 22px rgba(30, 42, 68, 0.075),
     inset 0 1px 0 rgba(255, 255, 255, 0.86);
 }
 
-.action-card:nth-child(1) .action-icon {
+.action-icon svg {
+  width: 22px;
+  height: 22px;
+  stroke: currentColor;
+  stroke-width: 2.25;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.action-card--expense .action-icon {
   color: #f06a54;
   background:
-    linear-gradient(180deg, rgba(255, 235, 231, 0.98), rgba(255, 224, 218, 0.9));
+    linear-gradient(180deg, rgba(255, 238, 234, 0.98), rgba(255, 224, 218, 0.92));
 }
 
-.action-card:nth-child(2) .action-icon {
+.action-card--income .action-icon {
   color: #14996e;
   background:
-    linear-gradient(180deg, rgba(225, 248, 239, 0.98), rgba(209, 241, 229, 0.9));
+    linear-gradient(180deg, rgba(225, 248, 239, 0.98), rgba(209, 241, 229, 0.92));
 }
 
-.action-card:nth-child(3) .action-icon {
+.action-card--transfer .action-icon {
   color: #2f7df6;
   background:
-    linear-gradient(180deg, rgba(231, 239, 255, 0.98), rgba(218, 230, 255, 0.92));
+    linear-gradient(180deg, rgba(231, 239, 255, 0.98), rgba(218, 230, 255, 0.94));
 }
 
-.action-card:nth-child(4) .action-icon {
+.action-card--categories .action-icon {
   color: #e79a16;
   background:
-    linear-gradient(180deg, rgba(255, 243, 222, 0.98), rgba(255, 235, 199, 0.92));
+    linear-gradient(180deg, rgba(255, 244, 224, 0.98), rgba(255, 235, 199, 0.94));
 }
 
 .action-label {
   max-width: 100%;
-  color: rgba(20, 24, 33, 0.86);
+  color: rgba(20, 24, 33, 0.82);
   font-size: 12.5px;
-  font-weight: 760;
+  font-weight: 650;
   line-height: 1.05;
-  letter-spacing: -0.025em;
+  letter-spacing: -0.022em;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
