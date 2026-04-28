@@ -1,6 +1,6 @@
 /* =========================================================
    24. RESPONSIVE GLOBAL
-   Global layout only. Minimal component size tuning.
+   Final responsive polish
    ========================================================= */
 
 html,
@@ -9,19 +9,21 @@ body {
   max-width: 100%;
   overflow-x: hidden;
   -webkit-text-size-adjust: 100%;
+  overscroll-behavior-x: none;
 }
 
 .app {
   min-height: 100dvh;
+  padding-bottom: calc(118px + env(safe-area-inset-bottom, 0px));
 }
 
 @media (max-width: 420px) {
   .app {
-    padding: 18px 12px 126px;
+    padding: 18px 12px calc(118px + env(safe-area-inset-bottom, 0px));
   }
 
   .section {
-    margin-top: 30px;
+    margin-top: 28px;
   }
 
   .section--manager-top {
@@ -29,13 +31,13 @@ body {
   }
 
   .section-head {
-    margin-bottom: 14px;
+    margin-bottom: 13px;
   }
 
   .section-title {
-    font-size: 24px;
-    line-height: 1.02;
-    letter-spacing: -0.045em;
+    font-size: 23px;
+    line-height: 1.04;
+    letter-spacing: -0.038em;
   }
 
   .section-note {
@@ -43,20 +45,21 @@ body {
   }
 
   .icon-action-btn {
-    width: 42px;
-    height: 42px;
-    min-width: 42px;
-    border-radius: 16px;
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    border-radius: 15px;
   }
 
   .icon-action-btn svg {
-    width: 18px;
-    height: 18px;
+    width: 17px;
+    height: 17px;
   }
 
   .input,
   .select {
     min-width: 0;
+    font-size: 16px;
   }
 
   .modal {
@@ -74,20 +77,20 @@ body {
   }
 
   #accountsList .list-card {
-    min-height: 138px;
-    padding: 12px 11px 13px;
+    min-height: 136px;
+    padding: 12px 10px 13px;
     border-radius: 22px;
   }
 
   #accountsList .list-card::after {
-    left: 11px;
-    right: 11px;
+    left: 10px;
+    right: 10px;
   }
 
   #accountsList .list-icon--account {
-    width: 46px;
-    height: 46px;
-    flex-basis: 46px;
+    width: 44px;
+    height: 44px;
+    flex-basis: 44px;
   }
 
   #accountsList .list-icon--account svg {
@@ -96,16 +99,16 @@ body {
   }
 
   #accountsList .list-title {
-    font-size: 13.5px;
+    font-size: 13.2px;
   }
 
   #accountsList .list-subtitle {
-    font-size: 10.5px;
+    font-size: 10.3px;
   }
 
   #accountsList .list-value {
-    font-size: 15.2px;
-    letter-spacing: -0.052em;
+    font-size: 14.8px;
+    letter-spacing: -0.048em;
   }
 
   #accountsList .list-card:nth-child(n + 4) {
@@ -113,7 +116,7 @@ body {
   }
 
   #accountsList .list-card:nth-child(n + 4) .list-value {
-    font-size: 19px;
+    font-size: 18px;
   }
 }
 
@@ -124,7 +127,7 @@ body {
   }
 
   .section-title {
-    font-size: 22px;
+    font-size: 21px;
   }
 
   #accountsList {
@@ -132,36 +135,36 @@ body {
   }
 
   #accountsList .list-card {
-    min-height: 132px;
-    padding: 11px 9px 12px;
+    min-height: 130px;
+    padding: 10px 9px 12px;
     border-radius: 20px;
   }
 
   #accountsList .list-icon--account {
-    width: 42px;
-    height: 42px;
-    flex-basis: 42px;
+    width: 40px;
+    height: 40px;
+    flex-basis: 40px;
   }
 
   #accountsList .list-icon--account svg {
-    width: 20px;
-    height: 20px;
+    width: 19px;
+    height: 19px;
   }
 
   #accountsList .list-title {
-    font-size: 12.8px;
+    font-size: 12.4px;
   }
 
   #accountsList .list-subtitle {
-    font-size: 10px;
+    font-size: 9.8px;
   }
 
   #accountsList .list-value {
-    font-size: 14px;
+    font-size: 13.5px;
   }
 
   .accounts-carousel-dots {
-    margin-top: 11px;
+    margin-top: 10px;
   }
 }
 
