@@ -495,11 +495,22 @@
 
   button.setAttribute("aria-label", "Скрыть сумму не распределено");
   button.addEventListener("click", (event) => {
-    event.preventDefault();
-    event.stopPropagation();
+  event.preventDefault();
+  event.stopPropagation();
 
-    resetUnassignedSafeMoney();
-  });
+  // только скрываем текущую сумму, ничего не пишем в Supabase
+  const valueEl =
+    document.getElementById("safeBucketsUnassignedValue") ||
+    row.querySelector(".list-value");
+  if (valueEl) {
+    const current = String(valueEl.textContent || "").trim();
+    if (current) {
+      localStorage.setItem("financeAppHiddenUnassignedSafeValue", current);
+      valueEl.textContent = "";
+      valueEl.classList.add("safe-buckets-value-hidden-by-reset");
+    }
+  }
+});
 }
   
     async function clearFreeBucketReferences(client, bucketId) {
@@ -585,11 +596,22 @@
 
     button.setAttribute("aria-label", "Обнулить не распределено");
     button.addEventListener("click", (event) => {
-      event.preventDefault();
-      event.stopPropagation();
+  event.preventDefault();
+  event.stopPropagation();
 
-      resetUnassignedSafeMoney();
-    });
+  // только скрываем текущую сумму, ничего не пишем в Supabase
+  const valueEl =
+    document.getElementById("safeBucketsUnassignedValue") ||
+    row.querySelector(".list-value");
+  if (valueEl) {
+    const current = String(valueEl.textContent || "").trim();
+    if (current) {
+      localStorage.setItem("financeAppHiddenUnassignedSafeValue", current);
+      valueEl.textContent = "";
+      valueEl.classList.add("safe-buckets-value-hidden-by-reset");
+    }
+  }
+});
   }
 
   function patchFreeBucketRow(modal) {
