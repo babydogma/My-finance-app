@@ -1,10 +1,10 @@
 /* =========================================================
    08. REQUIRED PAYMENTS — WALLET SECTION
-   Summary cards inside wallet tab
+   Lighter secondary calendar payments module
    ========================================================= */
 
 .required-payments-section {
-  margin-top: 24px;
+  margin-top: 28px;
 }
 
 .required-payments-head {
@@ -22,33 +22,33 @@
 }
 
 .required-payments-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
 }
 
 .required-payment-card {
   position: relative;
-  min-height: 72px;
+  min-width: 0;
+  min-height: 78px;
   width: 100%;
-  padding: 12px 16px;
-  border-radius: 22px;
-  border: 1px solid var(--border);
+  padding: 13px 14px;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.055);
   background:
-    linear-gradient(180deg, rgba(68, 74, 92, 0.34) 0%, rgba(36, 40, 54, 0.22) 100%);
+    radial-gradient(circle at 16% 0%, rgba(255, 255, 255, 0.045), transparent 36%),
+    linear-gradient(180deg, rgba(55, 60, 76, 0.36) 0%, rgba(30, 35, 48, 0.24) 100%);
   box-shadow:
-    var(--shadow-card),
-    0 0 18px rgba(111, 156, 255, 0.03),
-    inset 0 1px 0 rgba(255, 255, 255, 0.03);
+    0 14px 28px rgba(0, 0, 0, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.035);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
-  column-gap: 14px;
-
-  overflow: visible;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 9px;
+  overflow: hidden;
 }
 
 .required-payment-card::before {
@@ -56,40 +56,62 @@
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  background: linear-gradient(180deg, rgba(255,255,255,0.018) 0%, rgba(255,255,255,0) 40%);
+  background: linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0));
   pointer-events: none;
+}
+
+.required-payment-card--danger {
+  grid-column: 1 / -1;
+  min-height: 84px;
+  padding: 15px 16px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 12px;
+  background:
+    radial-gradient(circle at 100% 50%, rgba(255, 114, 104, 0.10), transparent 44%),
+    linear-gradient(180deg, rgba(70, 50, 56, 0.42) 0%, rgba(42, 34, 44, 0.30) 100%);
+  border-color: rgba(255, 114, 104, 0.13);
 }
 
 .required-payment-card__text {
   position: relative;
   z-index: 1;
   min-width: 0;
+  width: 100%;
 }
 
 .required-payment-card__title-row {
+  min-width: 0;
+  max-width: 100%;
   display: flex;
   align-items: center;
   gap: 8px;
-  min-width: 0;
 }
 
 .required-payment-card__title {
   min-width: 0;
+  max-width: 100%;
   color: #f5f7fd;
-  font-size: 17px;
-  font-weight: 760;
+  font-size: 15.5px;
+  font-weight: 820;
   line-height: 1.08;
-  letter-spacing: -0.028em;
+  letter-spacing: -0.034em;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
+.required-payment-card--danger .required-payment-card__title {
+  font-size: 17px;
+  font-weight: 880;
+}
+
 .required-payment-card__subtitle {
   margin-top: 5px;
-  color: rgba(255, 255, 255, 0.34);
+  color: rgba(255, 255, 255, 0.38);
   font-size: 10.5px;
-  font-weight: 600;
+  font-weight: 640;
   line-height: 1.15;
   letter-spacing: -0.01em;
   white-space: nowrap;
@@ -100,21 +122,26 @@
 .required-payment-card__value {
   position: relative;
   z-index: 1;
-  justify-self: end;
-  min-width: 82px;
-  max-width: none;
+  max-width: 100%;
   color: #f3f6ff;
-  font-size: 15.5px;
-  font-weight: 820;
+  font-size: 17px;
+  font-weight: 900;
   line-height: 1;
-  letter-spacing: -0.03em;
-  text-align: right;
+  letter-spacing: -0.04em;
+  text-align: left;
   white-space: nowrap;
-  overflow: visible;
+  overflow: hidden;
+  text-overflow: ellipsis;
   font-variant-numeric: tabular-nums;
 }
 
+.required-payment-card--danger .required-payment-card__value {
+  justify-self: end;
+  text-align: right;
+  font-size: 18px;
+}
+
 .required-payment-card__value--danger {
-  color: var(--red);
-  text-shadow: 0 0 12px rgba(255, 114, 104, 0.08);
+  color: #ff8f93;
+  text-shadow: 0 0 12px rgba(255, 114, 104, 0.10);
 }
