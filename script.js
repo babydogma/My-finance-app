@@ -2499,23 +2499,23 @@ animateLabeledCurrencyValue(balanceFreeMoneyValueEl, "Свободно: ", freeM
     card.className = "list-card list-card--clickable category-row";
 
     const typeLabel = category.is_required ? "Обязательная" : "Гибкая";
-    const lockedLabel = category.locked ? "Системная" : "Редактируемая";
+const lockedLabel = category.locked ? "Системная" : "Редактируемая";
 
-    card.innerHTML = `
-      <div class="list-body">
-        <div class="list-title-row">
-          <h3 class="list-title">${escapeHtml(category.name)}</h3>
-        </div>
-        <p class="list-subtitle">${lockedLabel} • ${typeLabel}</p>
-      </div>
+card.innerHTML = `
+  <div class="list-body">
+    <div class="list-title-row">
+      <h3 class="list-title">${escapeHtml(category.name)}</h3>
+    </div>
+    <p class="list-subtitle">${lockedLabel}</p>
+  </div>
 
-      <div class="category-row__meta">
-        <span class="category-row__pill ${category.is_required ? "category-row__pill--required" : ""}">
-          ${typeLabel}
-        </span>
-        <span class="category-row__chevron">›</span>
-      </div>
-    `;
+  <div class="category-row__meta">
+    <span class="category-row__pill ${category.is_required ? "category-row__pill--required" : ""}">
+      ${typeLabel}
+    </span>
+    <span class="category-row__chevron">›</span>
+  </div>
+`;
 
     card.addEventListener("click", () => {
       openBudgetModal(category.id);
