@@ -2590,6 +2590,17 @@ animateLabeledCurrencyValue(balanceFreeMoneyValueEl, "Свободно: ", freeM
       alert("Выбери накопление зачисления");
       return null;
     }
+    
+    // проверяем остаток для перевода
+let fromBalance = getAccountBalance(fromAccountId);
+if (isVaultAccountId(fromAccountId) && fromSafeBucketId) {
+  // если переводим из накопления, берем баланс выбранного накопления
+  fromBalance = getSafeBucketBalance(fromSafeBucketId);
+}
+if (amount > fromBalance) {
+  alert("Недостаточно средств на счёте для перевода");
+  return null;
+}
 
     return {
       id: editingTransactionId || crypto.randomUUID(),
@@ -2618,7 +2629,18 @@ animateLabeledCurrencyValue(balanceFreeMoneyValueEl, "Свободно: ", freeM
     return null;
   }
 
-  if (currentMode === "income") {
+  if (currentMode === "income") 
+  // проверяем остаток для расхода
+let accBalance = getAccountBalance(accountId);
+if (isVaultAccountId(accountId)) {
+  const freeBucket = getFreeSafeBucket();
+  accBalance = freeBucket ? getSafeBucketBalance(freeBucket.id) : accBalance;
+}
+if (amount > accBalance) {
+  alert("Недостаточно средств на счёте");
+  return null;
+}
+  {
     return {
       id: editingTransactionId || crypto.randomUUID(),
       type: "income",
@@ -3049,6 +3071,23 @@ accountModal?.addEventListener("click", (event) => {
 analyticsFiltersModal?.addEventListener("click", (event) => {
   if (event.target === analyticsFiltersModal) {
     closeAnalyticsFiltersModal();
+  }
+});
+
+// обработчики для фильтров операций
+openOperationsFiltersBtn?.addEventListener("click", () => {
+  if (operationsFiltersModal) {
+    openAnimatedModal(operationsFiltersModal);
+  }
+});
+closeOperationsFiltersBtn?.addEventListener("click", () => {
+  if (operationsFiltersModal) {
+    closeAnimatedModal(operationsFiltersModal);
+  }
+});
+operationsFiltersModal?.addEventListener("click", (event) => {
+  if (event.target === operationsFiltersModal) {
+    closeAnimatedModal(operationsFiltersModal);
   }
 });
 
