@@ -1,24 +1,31 @@
 /* =========================================================
    11. MODALS BASE
-   Shared modal overlay, sheet, handle and actions
+   Shared light modal overlay, sheet, handle and actions
    ========================================================= */
 
 .modal {
   position: fixed;
   inset: 0;
   z-index: 100;
+  width: 100%;
+  height: 100dvh;
+  min-height: 100dvh;
+  max-height: 100dvh;
   display: flex;
   align-items: flex-end;
   justify-content: center;
   padding: 12px;
-  background: rgba(8, 10, 14, 0.08);
+  background: rgba(20, 24, 33, 0);
   backdrop-filter: blur(0px);
   -webkit-backdrop-filter: blur(0px);
   opacity: 0;
   pointer-events: none;
-  will-change: opacity, backdrop-filter, background;
+  overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: none;
+  will-change: opacity, background, backdrop-filter;
   transition:
-    opacity 0.34s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 0.28s cubic-bezier(0.16, 1, 0.3, 1),
     background 0.34s cubic-bezier(0.16, 1, 0.3, 1),
     backdrop-filter 0.34s cubic-bezier(0.16, 1, 0.3, 1),
     -webkit-backdrop-filter 0.34s cubic-bezier(0.16, 1, 0.3, 1);
@@ -31,9 +38,9 @@
 
 .modal.is-visible {
   opacity: 1;
-  background: rgba(8, 10, 14, 0.62);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: rgba(20, 24, 33, 0.22);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
 }
 
 .modal.is-closing {
@@ -46,157 +53,60 @@
 
 .modal-sheet {
   width: min(480px, 100%);
-  max-height: calc(100vh - 24px);
-  padding: 20px 16px 22px;
+  max-width: 100%;
+  max-height: calc(100dvh - 24px);
+  padding: 18px 16px calc(20px + env(safe-area-inset-bottom, 0px));
   border-radius: 30px 30px 22px 22px;
   background:
-    linear-gradient(180deg, rgba(29, 31, 40, 0.99) 0%, rgba(21, 24, 32, 1) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.07);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99) 0%, rgba(248, 250, 253, 0.98) 100%);
+  border: 1px solid rgba(22, 30, 46, 0.075);
   box-shadow:
-    0 -16px 48px rgba(0, 0, 0, 0.46),
-    inset 0 1px 0 rgba(255, 255, 255, 0.03);
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
+    0 -18px 50px rgba(30, 42, 68, 0.16),
+    0 4px 18px rgba(30, 42, 68, 0.055),
+    inset 0 1px 0 rgba(255, 255, 255, 0.94);
+  overflow: hidden;
   overscroll-behavior: contain;
   opacity: 0;
-  transform: translate3d(0, 56px, 0) scale(0.972);
+  transform: translate3d(0, 96px, 0) scale(0.94);
   transform-origin: center bottom;
   will-change: transform, opacity;
-  transition:
-    transform 0.42s cubic-bezier(0.16, 1, 0.3, 1),
-    opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .modal.is-visible .modal-sheet {
-  opacity: 1;
-  transform: translate3d(0, 0, 0) scale(1);
+  animation: modalSheetEnterLight 0.46s cubic-bezier(0.18, 1.12, 0.22, 1) both;
 }
 
 .modal.is-closing .modal-sheet {
-  opacity: 0;
-  transform: translate3d(0, 42px, 0) scale(0.978);
+  animation: modalSheetExitLight 0.26s cubic-bezier(0.4, 0, 0.2, 1) both;
 }
 
 .modal-handle {
-  width: 46px;
+  width: 44px;
   height: 5px;
-  margin: 0 auto 18px;
+  margin: 0 auto 16px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.16);
-}
-
-.modal.is-visible .modal-handle {
-  animation: modalHandleFadeIn 0.56s cubic-bezier(0.16, 1, 0.3, 1) both;
+  background: rgba(20, 24, 33, 0.12);
 }
 
 .modal-title {
-  margin: 0 0 18px;
+  margin: 0 0 16px;
   text-align: center;
+  color: var(--text);
   font-size: 23px;
-  font-weight: 900;
-  letter-spacing: -0.04em;
-  color: #f7f9ff;
+  font-weight: 720;
+  line-height: 1.04;
+  letter-spacing: -0.035em;
 }
 
 .modal-actions {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-top: 18px;
+  gap: 11px;
+  margin-top: 16px;
 }
 
 .modal-actions--triple {
   grid-template-columns: 1fr 1fr 1fr;
-}
-
-@keyframes modalHandleFadeIn {
-  0% {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* =========================================================
-   Modal Motion Fix
-   Stronger open / close animation for all sheets
-   ========================================================= */
-
-.modal {
-  background: rgba(8, 10, 14, 0);
-  backdrop-filter: blur(0px);
-  -webkit-backdrop-filter: blur(0px);
-  transition:
-    opacity 0.28s cubic-bezier(0.16, 1, 0.3, 1),
-    background 0.34s cubic-bezier(0.16, 1, 0.3, 1),
-    backdrop-filter 0.34s cubic-bezier(0.16, 1, 0.3, 1),
-    -webkit-backdrop-filter 0.34s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.modal.is-visible {
-  opacity: 1;
-  background: rgba(8, 10, 14, 0.68);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-}
-
-.modal-sheet {
-  opacity: 0;
-  transform: translate3d(0, 96px, 0) scale(0.94);
-  transition: none;
-}
-
-.modal.is-visible .modal-sheet {
-  animation: modalSheetEnterStrong 0.48s cubic-bezier(0.18, 1.18, 0.22, 1) both;
-}
-
-.modal.is-closing .modal-sheet {
-  animation: modalSheetExitStrong 0.28s cubic-bezier(0.4, 0, 0.2, 1) both;
-}
-
-@keyframes modalSheetEnterStrong {
-  0% {
-    opacity: 0;
-    transform: translate3d(0, 96px, 0) scale(0.94);
-  }
-
-  62% {
-    opacity: 1;
-    transform: translate3d(0, -8px, 0) scale(1.012);
-  }
-
-  100% {
-    opacity: 1;
-    transform: translate3d(0, 0, 0) scale(1);
-  }
-}
-
-@keyframes modalSheetExitStrong {
-  0% {
-    opacity: 1;
-    transform: translate3d(0, 0, 0) scale(1);
-  }
-
-  100% {
-    opacity: 0;
-    transform: translate3d(0, 58px, 0) scale(0.972);
-  }
-}
-
-/* =========================================================
-   Modal fixed viewport / no useless inner scroll
-   ========================================================= */
-
-html,
-body {
-  width: 100%;
-  max-width: 100%;
-  overflow-x: hidden;
-  -webkit-text-size-adjust: 100%;
 }
 
 html.modal-scroll-locked,
@@ -209,25 +119,14 @@ body.modal-scroll-locked {
   touch-action: none;
 }
 
-.modal {
-  position: fixed;
-  inset: 0;
-  width: 100%;
-  height: 100dvh;
-  min-height: 100dvh;
-  max-height: 100dvh;
-  overflow: hidden;
-  overscroll-behavior: none;
-  touch-action: none;
-}
-
+.app,
+.modal,
 .modal-sheet {
-  max-height: calc(100dvh - 24px);
-  overflow: hidden;
-  overscroll-behavior: contain;
+  max-width: 100%;
+  overflow-x: hidden;
 }
 
-/* Small modals: no internal scroll */
+/* Small modals: no useless inner scroll */
 #transactionModal .modal-sheet,
 #budgetModal .modal-sheet,
 #accountModal .modal-sheet,
@@ -237,7 +136,7 @@ body.modal-scroll-locked {
   overflow: hidden;
 }
 
-/* Big / potentially long modals: internal scroll is allowed */
+/* Big / long modals */
 #mandatoryPaymentsModal .modal-sheet,
 #mandatoryPaymentEditorModal .modal-sheet,
 #mandatoryPaymentBucketPickerModal .modal-sheet,
@@ -247,12 +146,33 @@ body.modal-scroll-locked {
   -webkit-overflow-scrolling: touch;
 }
 
-/* Prevent sideways dragging / zoomed horizontal drift */
-.app,
-.modal,
-.modal-sheet {
-  max-width: 100%;
-  overflow-x: hidden;
+@keyframes modalSheetEnterLight {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 96px, 0) scale(0.94);
+  }
+
+  62% {
+    opacity: 1;
+    transform: translate3d(0, -6px, 0) scale(1.008);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes modalSheetExitLight {
+  0% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate3d(0, 52px, 0) scale(0.972);
+  }
 }
 
 @supports (height: 100svh) {
