@@ -122,29 +122,37 @@
 </section>
 
       <!-- ACCOUNTS -->
-      <section class="section">
-        <div class="section-head accounts-section-head">
-  <h2 class="section-title">Счета</h2>
+<section class="section accounts-section">
+  <div class="section-head accounts-section-head">
+    <h2 class="section-title">Счета</h2>
 
-  <div class="accounts-section-head__right">
-    <div class="section-note" id="accountsTotal">Всего: 0 ₽</div>
+    <div class="accounts-section-head__right">
+      <div class="section-note accounts-total-note" id="accountsTotal">Всего: 0 ₽</div>
 
-    <button
-      class="icon-action-btn icon-action-btn--primary"
-      type="button"
-      id="openCreateAccountModalBtn"
-      aria-label="Добавить счёт"
-      title="Добавить счёт"
-    >
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M12 5v14M5 12h14" />
-      </svg>
-    </button>
+      <button
+        class="icon-action-btn icon-action-btn--primary accounts-add-btn"
+        type="button"
+        id="openCreateAccountModalBtn"
+        aria-label="Добавить счёт"
+        title="Добавить счёт"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 5v14M5 12h14" />
+        </svg>
+      </button>
+    </div>
   </div>
-</div>
 
-        <div class="list" id="accountsList"></div>
-      </section>
+  <div class="list accounts-list" id="accountsList"></div>
+
+  <div class="accounts-carousel-dots" aria-hidden="true">
+    <span class="is-active"></span>
+    <span></span>
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</section>
       
             <!-- MANDATORY PAYMENTS -->
       <section class="section required-payments-section">
