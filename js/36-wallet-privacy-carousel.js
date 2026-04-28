@@ -7,7 +7,6 @@
     "#accountsTotal",
 
     "#accountsList .list-value",
-    ".account-balance-adjustment-card__meta strong",
 
     ".required-payment-card__value",
     "#analyticsPendingMandatoryValue",
@@ -37,16 +36,12 @@
     ".analytics-savings-scenario-card__result strong",
     ".analytics-savings-scenario-card__rows strong",
 
-    "#mandatoryPaymentsList .list-subtitle",
-    "#mandatoryPaymentsList .mandatory-payment-card__status",
-
     "#safeBucketsModal .list-value",
     ".safe-buckets-total",
     ".safe-buckets-wallet-row .list-value"
   ];
 
   let privacyEnabled = false;
-  let privacyObserver = null;
   let accountsObserver = null;
   let carouselScrollTimer = null;
 
@@ -62,12 +57,8 @@
     try {
       window.localStorage.setItem(PRIVACY_STORAGE_KEY, nextValue ? "1" : "0");
     } catch (error) {
-      // localStorage может быть недоступен — не критично.
+      // Не критично.
     }
-  }
-
-  function isMaskedText(text) {
-    return String(text || "").includes("••");
   }
 
   function maskText(originalText) {
@@ -75,11 +66,8 @@
 
     if (!text.trim()) return text;
 
-    let nextText = text;
-
-    nextText = nextText.replace(
-      /([+\-−]?\s*)\d[\d\s.,]*\s*₽/g,
-      (match, sign) => {
+    return text
+      .replace(/([+\-−]?\s*)\d[\d\s.,]*\s*₽/g, (match, sign) => {
         const normalizedSign = String(sign || "").trim();
 
         if (normalizedSign === "-" || normalizedSign === "−") {
@@ -91,30 +79,8 @@
         }
 
         return "••••• ₽";
-      }
-    );
-
-    nextText = nextText.replace(
-      /\d[\d\s.,]*\s*%/g,
-      "••%"
-    );
-
-    return nextText;
-  }
-
-  function shouldMaskElement(element) {
-    if (!element || element.nodeType !== 1) return false;
-
-    if (
-      element.closest("input, textarea, select") ||
-      element.matches("input, textarea, select")
-    ) {
-      return false;
-    }
-
-    const text = element.textContent || "";
-
-    return /₽|%/.test(text);
+      })
+      .replace(/\d[\d\s.,]*\s*%/g, "••%");
   }
 
   function getMaskableElements() {
@@ -123,6 +89,24 @@
       .filter((element, index, array) => {
         return element && array.indexOf(element) === index;
       });
+  }
+
+  function rememberOriginalText(element) {
+    if (!element.dataset.privateOriginal) {
+      element.dataset.privateOriginal = element.textContent || "";
+    }
+  }
+
+  function maskElement(element) {
+    rememberOriginalText(element);
+    element.textContent = maskText(element.dataset.privateOriginal || "");
+  }
+
+  function restoreElement(element) {
+    if (!element.dataset.privateOriginal) return;
+
+    element.textContent = element.dataset.privateOriginal;
+    delete element.dataset.privateOriginal;
   }
 
   function applyPrivacyMask() {
@@ -143,23 +127,10 @@
     }
 
     getMaskableElements().forEach((element) => {
-      if (!shouldMaskElement(element)) return;
-
-      const currentText = element.textContent || "";
-
       if (privacyEnabled) {
-        if (!isMaskedText(currentText)) {
-          element.dataset.privateOriginal = currentText;
-        }
-
-        const sourceText = element.dataset.privateOriginal || currentText;
-        element.textContent = maskText(sourceText);
-        return;
-      }
-
-      if (element.dataset.privateOriginal) {
-        element.textContent = element.dataset.privateOriginal;
-        delete element.dataset.privateOriginal;
+        maskElement(element);
+      } else {
+        restoreElement(element);
       }
     });
   }
@@ -177,24 +148,6 @@
       privacyEnabled = !privacyEnabled;
       savePrivacyEnabledToStorage(privacyEnabled);
       applyPrivacyMask();
-    });
-  }
-
-  function startPrivacyObserver() {
-    if (privacyObserver) return;
-
-    privacyObserver = new MutationObserver(() => {
-      if (!privacyEnabled) return;
-
-      window.requestAnimationFrame(() => {
-        applyPrivacyMask();
-      });
-    });
-
-    privacyObserver.observe(document.body, {
-      childList: true,
-      subtree: true,
-      characterData: true,
     });
   }
 
@@ -321,7 +274,6 @@
 
     accountsObserver.observe(accountsList, {
       childList: true,
-      subtree: true,
     });
   }
 
@@ -329,7 +281,6 @@
     privacyEnabled = getPrivacyEnabledFromStorage();
 
     bindPrivacyToggle();
-    startPrivacyObserver();
 
     bindAccountsCarousel();
     renderAccountDots();
@@ -340,7 +291,10 @@
     window.setTimeout(() => {
       bindAccountsCarousel();
       renderAccountDots();
-      applyPrivacyMask();
+
+      if (privacyEnabled) {
+        applyPrivacyMask();
+      }
     }, 500);
   }
 
