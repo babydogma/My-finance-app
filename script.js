@@ -1879,11 +1879,21 @@ function openSafeBucketAmountModal(bucketId) {
   if (!bucket || !safeBucketAmountModal) return;
 
   activeSafeBucketAmountId = bucketId;
+  
+  const activeSafeBucket = state.safeBuckets.find((item) => {
+  return item.id === activeSafeBucketAmountId;
+});
+
+if (activeSafeBucket) {
+  safeBucketAmountModalTitle.textContent = activeSafeBucket.name || "ĐĐ°ĐşĐžĐżĐťĐľĐ˝Đ¸Đľ";
+  safeBucketNameInput.value = activeSafeBucket.name || "";
+  deleteSafeBucketBtn?.classList.remove("hidden");
+}
 
   const balance = getSafeBucketBalance(bucketId);
   const annualRate = getSafeBucketInterestAnnualRate(bucketId);
 
-  safeBucketAmountModalTitle.textContent = bucket.name || "ĐĐ°ĐşĐžĐżĐťĐľĐ˝Đ¸Đľ";
+  safeBucketAmountModalTitle.textContent = bucket.name;
   safeBucketAmountCurrentValue.textContent = `ĐĄĐľĐšŃĐ°Ń: ${formatMoney(balance)}`;
   safeBucketNameInput.value = bucket.name || "";
   safeBucketInterestInput.value = String(roundToTwo(annualRate * 100)).replace(".", ",");
@@ -1918,25 +1928,20 @@ function closeSafeBucketAmountModal() {
 function renderSafeBucketsModal() {
   if (!safeBucketsList) return;
 
-  safeBucketsUnassignedCard?.remove();
-
-  const visibleBuckets = getRealSafeBuckets()
-    .slice()
-    .sort((a, b) => (Number(a.sort_order) || 0) - (Number(b.sort_order) || 0));
-
-  const visibleSafeBalance = roundToTwo(
-    visibleBuckets.reduce((sum, bucket) => {
+  const totalSafeBalance = roundToTwo(
+    getRealSafeBuckets().reduce((sum, bucket) => {
       return sum + getSafeBucketBalance(bucket.id);
     }, 0)
   );
 
-  if (safeBucketsModalTotalLabel) {
-    safeBucketsModalTotalLabel.textContent = `ĐĐąŃĐ¸Đš ĐąĐ°ĐťĐ°Đ˝Ń: ${formatMoney(visibleSafeBalance)}`;
-  }
+  safeBucketsUnassignedCard?.remove();
 
+  if (safeBucketsModalTotalLabel) {
+    safeBucketsModalTotalLabel.textContent = `ĐĐąŃĐ¸Đš ĐąĐ°ĐťĐ°Đ˝Ń: ${formatMoney(totalSafeBalance)}`;
+  }
   safeBucketsList.innerHTML = "";
 
-  if (!visibleBuckets.length) {
+  if (!state.safeBuckets.length) {
     const empty = document.createElement("div");
     empty.className = "list-card";
     empty.innerHTML = `
@@ -1948,32 +1953,35 @@ function renderSafeBucketsModal() {
     return;
   }
 
-  visibleBuckets.forEach((bucket) => {
-    const balance = getSafeBucketBalance(bucket.id);
+  state.safeBuckets
+    .slice()
+    .sort((a, b) => (Number(a.sort_order) || 0) - (Number(b.sort_order) || 0))
+    .forEach((bucket) => {
+      const balance = getSafeBucketBalance(bucket.id);
 
-    const card = document.createElement("button");
-    card.type = "button";
-    card.className = "list-card list-card--clickable safe-buckets-wallet-row safe-buckets-wallet-row--editable";
-    card.dataset.safeBucketOpenId = bucket.id;
+      const card = document.createElement("button");
+      card.type = "button";
+      card.className = "list-card list-card--clickable safe-buckets-wallet-row safe-buckets-wallet-row--editable";
+      card.dataset.safeBucketOpenId = bucket.id;
 
-    card.innerHTML = `
-      <div class="list-body">
-        <div class="list-title-row">
-          <h3 class="list-title">${escapeHtml(bucket.name)}</h3>
+      card.innerHTML = `
+        <div class="list-body">
+          <div class="list-title-row">
+            <h3 class="list-title">${escapeHtml(bucket.name)}</h3>
+          </div>
         </div>
-      </div>
 
-      <div class="list-right">
-        <p class="list-value">${formatMoney(balance)}</p>
-      </div>
-    `;
+        <div class="list-right">
+          <p class="list-value">${formatMoney(balance)}</p>
+        </div>
+      `;
 
-    card.addEventListener("click", () => {
-      openSafeBucketAmountModal(bucket.id);
+      card.addEventListener("click", () => {
+        openSafeBucketAmountModal(bucket.id);
+      });
+
+      safeBucketsList.appendChild(card);
     });
-
-    safeBucketsList.appendChild(card);
-  });
 }
 
 async function addSafeBucket() {
@@ -3493,7 +3501,7 @@ addSafeBucketBtn?.addEventListener("click", addSafeBucket);
 closeSafeBucketAmountModalBtn?.addEventListener("click", closeSafeBucketAmountModal);
 cancelSafeBucketAmountBtn?.addEventListener("click", closeSafeBucketAmountModal);
 saveSafeBucketAmountBtn?.addEventListener("click", saveSafeBucketAmount);
-deleteSafeBucketBtn?.addEventListener("click", deleteSafeBucketFromModal);
+  deleteSafeBucketBtn?.addEventListener("click", deleteSafeBucketFromModal);
 safeInterestRateModal?.addEventListener("click", (event) => {
   if (event.target === safeInterestRateModal) closeSafeInterestRateModal();
 });
