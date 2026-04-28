@@ -44,33 +44,82 @@
 
     <!-- BALANCE -->
 <section class="balance">
-  <p class="balance-label">Баланс</p>
-  <h1 class="balance-amount">0 ₽</h1>
-  <p class="balance-subline" id="balanceFreeMoneyValue">Свободно: 0 ₽</p>
+  <div class="balance-topline">
+    <div>
+      <p class="balance-label">Баланс</p>
+      <h1 class="balance-amount">0 ₽</h1>
+    </div>
+
+    <button class="balance-visibility-btn" type="button" aria-label="Скрыть баланс">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M2.8 12s3.4-6 9.2-6 9.2 6 9.2 6-3.4 6-9.2 6-9.2-6-9.2-6Z" />
+        <circle cx="12" cy="12" r="2.7" />
+      </svg>
+    </button>
+  </div>
+
+  <button class="balance-free-card" type="button">
+    <span class="balance-free-card__icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24">
+        <rect x="4" y="6.5" width="16" height="11" rx="3" />
+        <path d="M4 10h16" />
+        <path d="M8 14h3.2" />
+      </svg>
+    </span>
+
+    <span class="balance-free-card__body">
+      <span class="balance-free-card__label">Свободно</span>
+      <strong class="balance-free-card__value" id="balanceFreeMoneyValue">0 ₽</strong>
+    </span>
+
+    <span class="balance-free-card__arrow" aria-hidden="true">›</span>
+  </button>
 </section>
 
       <!-- ACTIONS -->
-      <section class="actions">
-        <button class="action-card" type="button" id="openExpenseModal">
-          <div class="action-icon">−</div>
-          <div class="action-label">Расход</div>
-        </button>
+<section class="actions">
+  <button class="action-card action-card--expense" type="button" id="openExpenseModal">
+    <div class="action-icon">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M7 17 17 7" />
+        <path d="M9 7h8v8" />
+      </svg>
+    </div>
+    <div class="action-label">Расход</div>
+  </button>
 
-        <button class="action-card" type="button" id="openIncomeModal">
-          <div class="action-icon">+</div>
-          <div class="action-label">Доход</div>
-        </button>
+  <button class="action-card action-card--income" type="button" id="openIncomeModal">
+    <div class="action-icon">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M17 7 7 17" />
+        <path d="M7 9v8h8" />
+      </svg>
+    </div>
+    <div class="action-label">Доход</div>
+  </button>
 
-        <button class="action-card" type="button" id="openTransferModal">
-          <div class="action-icon">↗</div>
-          <div class="action-label">Перевод</div>
-        </button>
+  <button class="action-card action-card--transfer" type="button" id="openTransferModal">
+    <div class="action-icon">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M7 17 17 7" />
+        <path d="M10 7h7v7" />
+      </svg>
+    </div>
+    <div class="action-label">Перевод</div>
+  </button>
 
-        <button class="action-card" type="button" id="openCategoriesManagerBtn">
-          <div class="action-icon">⇄</div>
-          <div class="action-label">Категории</div>
-        </button>
-      </section>
+  <button class="action-card action-card--categories" type="button" id="openCategoriesManagerBtn">
+    <div class="action-icon">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M6 8h9" />
+        <path d="M12 5l3 3-3 3" />
+        <path d="M18 16H9" />
+        <path d="M12 13l-3 3 3 3" />
+      </svg>
+    </div>
+    <div class="action-label">Категории</div>
+  </button>
+</section>
 
       <!-- ACCOUNTS -->
       <section class="section">
@@ -1028,6 +1077,7 @@ title="Добавить платёж"
 <script src="./js/30-analytics-safes-render.js"></script>
 <script src="./js/31-analytics-category-modal.js"></script>
 <script src="./js/32-analytics-safes-models.js"></script>
+<script src="./js/33-wallet-home-ui.js"></script>
 
 <script src="./script.js"></script>
 </body>
