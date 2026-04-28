@@ -46,14 +46,15 @@
     }
 
     function setPageScrollLocked(isLocked) {
-      document.documentElement.classList.toggle("modal-scroll-locked", isLocked);
-      document.body.classList.toggle("modal-scroll-locked", isLocked);
+  document.documentElement.classList.remove("modal-scroll-locked");
+  document.body.classList.remove("modal-scroll-locked");
 
-      document.documentElement.style.overflow = isLocked ? "hidden" : "";
-      document.body.style.overflow = isLocked ? "hidden" : "";
+  document.documentElement.style.overflow = isLocked ? "hidden" : "";
+  document.body.style.overflow = isLocked ? "hidden" : "";
 
-      document.body.style.touchAction = isLocked ? "none" : "";
-    }
+  document.documentElement.style.touchAction = "";
+  document.body.style.touchAction = "";
+}
 
     function shouldKeepScrollLockedAfterEditorClose() {
       return isModalActuallyOpen(mandatoryPaymentsModal);
@@ -183,8 +184,16 @@
       closeAnimatedModal(mandatoryPaymentsModal);
 
       window.setTimeout(() => {
-        setPageScrollLocked(false);
-      }, 340);
+  setPageScrollLocked(false);
+
+  document.documentElement.style.removeProperty("overflow");
+  document.body.style.removeProperty("overflow");
+  document.documentElement.style.removeProperty("touch-action");
+  document.body.style.removeProperty("touch-action");
+
+  document.documentElement.classList.remove("modal-scroll-locked");
+  document.body.classList.remove("modal-scroll-locked");
+}, 340);
 
       resetMandatoryPaymentForm();
     }
