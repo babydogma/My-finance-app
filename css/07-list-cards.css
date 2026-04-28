@@ -1,6 +1,6 @@
 /* =========================================================
    07. LIST CARDS
-   Shared rows + light wallet accounts module
+   Shared rows + light wallet accounts carousel
    ========================================================= */
 
 .list {
@@ -189,70 +189,106 @@
 }
 
 /* =========================================================
-   Wallet accounts grid
+   Wallet accounts carousel
    ========================================================= */
 
 #accountsList.accounts-list,
 #accountsList {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-  align-items: stretch;
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  grid-template-columns: none !important;
+  gap: 12px !important;
+  align-items: stretch !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: auto !important;
+  overflow-y: visible !important;
+  padding: 0 0 2px !important;
+  margin: 0 !important;
+  scroll-snap-type: x mandatory;
+  scroll-padding-left: 0;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
 }
 
-#accountsList .list-card {
-  position: relative;
-  min-width: 0;
-  min-height: 142px;
-  padding: 13px 12px 14px;
-  border-radius: 23px;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: flex-start;
-  gap: 9px;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.99) 0%, rgba(250, 252, 255, 0.97) 100%);
-  border: 1px solid rgba(22, 30, 46, 0.07);
-  box-shadow:
-    0 14px 30px rgba(30, 42, 68, 0.075),
-    0 3px 10px rgba(30, 42, 68, 0.035),
-    inset 0 1px 0 rgba(255, 255, 255, 0.94);
-}
-
-#accountsList .list-card::before {
+#accountsList::-webkit-scrollbar {
   display: none;
 }
 
-#accountsList .list-card::after {
-  content: "";
-  position: absolute;
-  left: 12px;
-  right: 12px;
-  bottom: 10px;
-  height: 3px;
-  border-radius: 999px;
-  background: rgba(47, 125, 246, 0.46);
+#accountsList .list-card,
+#accountsList .list-card:nth-child(n + 4) {
+  position: relative !important;
+  flex: 0 0 calc((100% - 24px) / 3) !important;
+  width: calc((100% - 24px) / 3) !important;
+  min-width: calc((100% - 24px) / 3) !important;
+  max-width: calc((100% - 24px) / 3) !important;
+  min-height: 142px !important;
+  padding: 13px 12px 14px !important;
+  border-radius: 23px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  justify-content: flex-start !important;
+  gap: 9px !important;
+  grid-column: auto !important;
+  scroll-snap-align: start;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99) 0%, rgba(250, 252, 255, 0.97) 100%) !important;
+  border: 1px solid rgba(22, 30, 46, 0.07) !important;
+  box-shadow:
+    0 14px 30px rgba(30, 42, 68, 0.075),
+    0 3px 10px rgba(30, 42, 68, 0.035),
+    inset 0 1px 0 rgba(255, 255, 255, 0.94) !important;
+}
+
+#accountsList .list-card::before,
+#accountsList .list-card:nth-child(n + 4)::before {
+  display: none !important;
+}
+
+#accountsList .list-card::after,
+#accountsList .list-card:nth-child(n + 4)::after {
+  content: "" !important;
+  position: absolute !important;
+  left: 12px !important;
+  right: 12px !important;
+  bottom: 10px !important;
+  display: block !important;
+  height: 3px !important;
+  border-radius: 999px !important;
+  background: rgba(47, 125, 246, 0.46) !important;
+}
+
+#accountsList .list-card:nth-child(1)::after {
+  background: rgba(47, 125, 246, 0.50) !important;
 }
 
 #accountsList .list-card:nth-child(2)::after {
-  background: rgba(21, 151, 107, 0.42);
+  background: rgba(21, 151, 107, 0.46) !important;
 }
 
 #accountsList .list-card:nth-child(3)::after {
-  background: rgba(242, 165, 26, 0.48);
+  background: rgba(242, 165, 26, 0.52) !important;
 }
 
-#accountsList .list-icon--account {
-  width: 48px;
-  height: 48px;
-  flex: 0 0 48px;
-  border-radius: 999px;
-  color: #ffffff;
+#accountsList .list-card:nth-child(4)::after {
+  background: rgba(124, 107, 232, 0.42) !important;
+}
+
+#accountsList .list-icon--account,
+#accountsList .list-card:nth-child(n + 4) .list-icon--account {
+  width: 48px !important;
+  height: 48px !important;
+  flex: 0 0 48px !important;
+  border-radius: 999px !important;
+  color: #ffffff !important;
   background:
     linear-gradient(180deg, #73a5ff 0%, #3f7ff2 100%) !important;
   box-shadow:
     0 12px 22px rgba(47, 125, 246, 0.16),
-    inset 0 1px 0 rgba(255, 255, 255, 0.24);
+    inset 0 1px 0 rgba(255, 255, 255, 0.24) !important;
 }
 
 #accountsList .list-card:nth-child(2) .list-icon--account {
@@ -260,7 +296,7 @@
     linear-gradient(180deg, #87dfc0 0%, #29a97d 100%) !important;
   box-shadow:
     0 12px 22px rgba(21, 151, 107, 0.14),
-    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+    inset 0 1px 0 rgba(255, 255, 255, 0.22) !important;
 }
 
 #accountsList .list-card:nth-child(3) .list-icon--account {
@@ -268,131 +304,113 @@
     linear-gradient(180deg, #ffd98d 0%, #eba527 100%) !important;
   box-shadow:
     0 12px 22px rgba(242, 165, 26, 0.14),
-    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+    inset 0 1px 0 rgba(255, 255, 255, 0.22) !important;
 }
 
-#accountsList .list-icon--account svg {
-  width: 23px;
-  height: 23px;
-  stroke-width: 1.9;
+#accountsList .list-card:nth-child(4) .list-icon--account {
+  background:
+    linear-gradient(180deg, #d7d2ff 0%, #7c6be8 100%) !important;
+  box-shadow:
+    0 12px 22px rgba(124, 107, 232, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22) !important;
 }
 
-#accountsList .list-body {
-  width: 100%;
-  flex: 0 0 auto;
-  min-width: 0;
+#accountsList .list-icon--account svg,
+#accountsList .list-card:nth-child(n + 4) .list-icon--account svg {
+  width: 23px !important;
+  height: 23px !important;
+  stroke-width: 1.9 !important;
 }
 
-#accountsList .list-title-row {
-  width: 100%;
-  margin-bottom: 5px;
+#accountsList .list-body,
+#accountsList .list-card:nth-child(n + 4) .list-body {
+  width: 100% !important;
+  flex: 0 0 auto !important;
+  min-width: 0 !important;
 }
 
-#accountsList .list-title {
-  color: var(--text);
-  font-size: 14.5px;
-  font-weight: 760;
-  line-height: 1.08;
-  letter-spacing: -0.035em;
+#accountsList .list-title-row,
+#accountsList .list-card:nth-child(n + 4) .list-title-row {
+  width: 100% !important;
+  margin-bottom: 5px !important;
+  overflow: hidden !important;
 }
 
-#accountsList .list-subtitle {
-  color: rgba(20, 24, 33, 0.46);
-  font-size: 11px;
-  font-weight: 540;
-  line-height: 1.08;
+#accountsList .list-title,
+#accountsList .list-card:nth-child(n + 4) .list-title {
+  color: var(--text) !important;
+  font-size: 14.5px !important;
+  font-weight: 760 !important;
+  line-height: 1.08 !important;
+  letter-spacing: -0.035em !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
 }
 
-#accountsList .list-right {
-  width: 100%;
-  max-width: 100%;
-  margin: auto 0 0;
-  padding-left: 0;
-  padding-bottom: 8px;
-  text-align: left;
+#accountsList .list-subtitle,
+#accountsList .list-card:nth-child(n + 4) .list-subtitle {
+  color: rgba(20, 24, 33, 0.46) !important;
+  font-size: 11px !important;
+  font-weight: 540 !important;
+  line-height: 1.08 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
 }
 
-#accountsList .list-value {
-  color: var(--text);
-  font-size: 16.5px;
-  font-weight: 760;
-  line-height: 1;
-  letter-spacing: -0.045em;
+#accountsList .list-right,
+#accountsList .list-card:nth-child(n + 4) .list-right {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: auto 0 0 !important;
+  padding-left: 0 !important;
+  padding-bottom: 8px !important;
+  text-align: left !important;
 }
 
-/* First three cards use accent value colors like the reference */
+#accountsList .list-value,
+#accountsList .list-card:nth-child(n + 4) .list-value {
+  color: var(--text) !important;
+  font-size: 16.5px !important;
+  font-weight: 760 !important;
+  line-height: 1 !important;
+  letter-spacing: -0.045em !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
 #accountsList .list-card:nth-child(1) .list-value {
-  color: #347bef;
+  color: #347bef !important;
 }
 
 #accountsList .list-card:nth-child(2) .list-value {
-  color: #13956c;
+  color: #13956c !important;
 }
 
 #accountsList .list-card:nth-child(3) .list-value {
-  color: #e6a11d;
+  color: #e6a11d !important;
 }
 
-/* Fourth and next accounts become wide reserve rows */
-#accountsList .list-card:nth-child(n + 4) {
-  grid-column: 1 / -1;
-  min-height: 76px;
-  padding: 13px 16px;
-  border-radius: 22px;
-  flex-direction: row;
-  align-items: center;
-  gap: 13px;
+#accountsList .list-card:nth-child(4) .list-value {
+  color: #6f63d9 !important;
 }
 
-#accountsList .list-card:nth-child(n + 4)::after {
-  display: none;
-}
-
-#accountsList .list-card:nth-child(n + 4) .list-icon--account {
-  width: 48px;
-  height: 48px;
-  flex-basis: 48px;
-  border-radius: 999px;
-  color: rgba(20, 24, 33, 0.58);
-  background:
-    linear-gradient(180deg, rgba(246, 248, 252, 1), rgba(238, 242, 248, 0.98)) !important;
-  box-shadow:
-    0 10px 22px rgba(30, 42, 68, 0.07),
-    inset 0 1px 0 rgba(255, 255, 255, 0.92);
-}
-
-#accountsList .list-card:nth-child(n + 4) .list-body {
-  flex: 1 1 auto;
-  width: auto;
-}
-
-#accountsList .list-card:nth-child(n + 4) .list-title {
-  font-size: 15.5px;
-  font-weight: 760;
-}
-
-#accountsList .list-card:nth-child(n + 4) .list-subtitle {
-  font-size: 12px;
-}
-
-#accountsList .list-card:nth-child(n + 4) .list-right {
-  width: auto;
-  max-width: 42%;
-  margin-left: auto;
-  padding-left: 10px;
-  padding-bottom: 0;
-  text-align: right;
-}
-
-#accountsList .list-card:nth-child(n + 4) .list-value {
-  color: var(--text);
-  font-size: 20px;
-  font-weight: 780;
-  letter-spacing: -0.05em;
+#accountsList .account-balance-edit-btn,
+#accountsList .list-card:nth-child(n + 4) .account-balance-edit-btn {
+  position: absolute !important;
+  top: 10px !important;
+  right: 10px !important;
+  width: 27px !important;
+  height: 27px !important;
+  min-width: 27px !important;
+  margin: 0 !important;
+  font-size: 12px !important;
 }
 
 /* =========================================================
-   Decorative carousel dots
+   Carousel dots
    ========================================================= */
 
 .accounts-carousel-dots {
@@ -408,9 +426,115 @@
   height: 8px;
   border-radius: 999px;
   background: rgba(20, 24, 33, 0.10);
+  transition:
+    width 0.18s ease,
+    background 0.18s ease,
+    box-shadow 0.18s ease;
 }
 
 .accounts-carousel-dots span.is-active {
+  width: 9px;
   background: var(--accent);
   box-shadow: 0 0 0 4px rgba(47, 125, 246, 0.08);
+}
+
+@media (max-width: 390px) {
+  #accountsList {
+    gap: 10px !important;
+  }
+
+  #accountsList .list-card,
+  #accountsList .list-card:nth-child(n + 4) {
+    flex-basis: calc((100% - 20px) / 3) !important;
+    width: calc((100% - 20px) / 3) !important;
+    min-width: calc((100% - 20px) / 3) !important;
+    max-width: calc((100% - 20px) / 3) !important;
+    min-height: 136px !important;
+    padding: 12px 10px 13px !important;
+    border-radius: 22px !important;
+  }
+
+  #accountsList .list-card::after,
+  #accountsList .list-card:nth-child(n + 4)::after {
+    left: 10px !important;
+    right: 10px !important;
+  }
+
+  #accountsList .list-icon--account,
+  #accountsList .list-card:nth-child(n + 4) .list-icon--account {
+    width: 44px !important;
+    height: 44px !important;
+    flex-basis: 44px !important;
+  }
+
+  #accountsList .list-icon--account svg,
+  #accountsList .list-card:nth-child(n + 4) .list-icon--account svg {
+    width: 21px !important;
+    height: 21px !important;
+  }
+
+  #accountsList .list-title,
+  #accountsList .list-card:nth-child(n + 4) .list-title {
+    font-size: 13.2px !important;
+  }
+
+  #accountsList .list-subtitle,
+  #accountsList .list-card:nth-child(n + 4) .list-subtitle {
+    font-size: 10.3px !important;
+  }
+
+  #accountsList .list-value,
+  #accountsList .list-card:nth-child(n + 4) .list-value {
+    font-size: 14.8px !important;
+    letter-spacing: -0.048em !important;
+  }
+}
+
+@media (max-width: 360px) {
+  #accountsList {
+    gap: 8px !important;
+  }
+
+  #accountsList .list-card,
+  #accountsList .list-card:nth-child(n + 4) {
+    flex-basis: calc((100% - 16px) / 3) !important;
+    width: calc((100% - 16px) / 3) !important;
+    min-width: calc((100% - 16px) / 3) !important;
+    max-width: calc((100% - 16px) / 3) !important;
+    min-height: 130px !important;
+    padding: 10px 9px 12px !important;
+    border-radius: 20px !important;
+  }
+
+  #accountsList .list-icon--account,
+  #accountsList .list-card:nth-child(n + 4) .list-icon--account {
+    width: 40px !important;
+    height: 40px !important;
+    flex-basis: 40px !important;
+  }
+
+  #accountsList .list-icon--account svg,
+  #accountsList .list-card:nth-child(n + 4) .list-icon--account svg {
+    width: 19px !important;
+    height: 19px !important;
+  }
+
+  #accountsList .list-title,
+  #accountsList .list-card:nth-child(n + 4) .list-title {
+    font-size: 12.4px !important;
+  }
+
+  #accountsList .list-subtitle,
+  #accountsList .list-card:nth-child(n + 4) .list-subtitle {
+    font-size: 9.8px !important;
+  }
+
+  #accountsList .list-value,
+  #accountsList .list-card:nth-child(n + 4) .list-value {
+    font-size: 13.5px !important;
+  }
+
+  .accounts-carousel-dots {
+    margin-top: 10px;
+  }
 }
