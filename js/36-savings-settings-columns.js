@@ -1,4 +1,6 @@
 (() => {
+  const ACCOUNT_BALANCE_ADJUSTMENTS_META_KEY = "account_balance_adjustments_v1";
+
   const SAVINGS_TYPES = {
     default: {
       label: "Обычное",
@@ -22,36 +24,56 @@
     return document.getElementById(id);
   }
 
-  function getGlobalValue(name) {
-    try {
-      return Function(`return typeof ${name} !== "undefined" ? ${name} : undefined`)();
-    } catch (error) {
-      return undefined;
+  function getBridge() {
+    return window.FinanceAppSavingsBridge || null;
+  }
+
+  function getState() {
+    return getBridge()?.getState?.() || window.FinanceAppState?.state || null;
+  }
+
+  function getSupabaseClient() {
+    return getBridge()?.getSupabaseClient?.() || null;
+  }
+
+  function roundToTwo(value) {
+    const bridgeRound = getBridge()?.roundToTwo;
+
+    if (typeof bridgeRound === "function") {
+      return bridgeRound(value);
     }
+
+    return Math.round((Number(value) || 0) * 100) / 100;
   }
 
   function getActiveBucketId() {
-    const activeId = getGlobalValue("activeSafeBucketAmountId");
+    const bridgeId = getBridge()?.getActiveBucketId?.();
 
-    if (activeId) return activeId;
+    if (bridgeId) return bridgeId;
 
     const modal = $("safeBucketAmountModal");
 
     return modal?.dataset?.bucketId || modal?.dataset?.safeBucketId || "";
   }
 
-  function getAppState() {
-    return getGlobalValue("state") || window.state || null;
-  }
-
-  function getSupabaseClient() {
-    return getGlobalValue("supabaseClient") || window.supabaseClient || null;
-  }
-
   function getBucketById(bucketId) {
-    const state = getAppState();
+    const fromBridge = getBridge()?.getSafeBucketById?.(bucketId);
+
+    if (fromBridge) return fromBridge;
+
+    const state = getState();
 
     return state?.safeBuckets?.find((bucket) => bucket.id === bucketId) || null;
+  }
+
+  function getVaultAccount() {
+    const fromBridge = getBridge()?.getVaultAccount?.();
+
+    if (fromBridge) return fromBridge;
+
+    const state = getState();
+
+    return state?.accounts?.find((account) => account.account_kind === "vault_pool") || null;
   }
 
   function roundRate(value) {
@@ -72,7 +94,7 @@
   }
 
   function legacyTypeFromBucket(bucket) {
-    const kind = String(bucket?.kind || "").trim();
+    const kind = String(bucket?.kind || bucket?.bucket_kind || "").trim();
 
     if (kind === "tax" || kind === "housing") return "required";
     if (kind === "reserve") return "reserve";
@@ -167,9 +189,7 @@
       interestField.insertAdjacentElement("afterend", panel);
     }
 
-    $("savingsTypeSelect")?.addEventListener("change", () => {
-      syncHint();
-    });
+    $("savingsTypeSelect")?.addEventListener("change", syncHint);
 
     $("savingsInterestEnabledInput")?.addEventListener("change", () => {
       const checkbox = $("savingsInterestEnabledInput");
@@ -224,6 +244,12 @@
 
     if (!bucket) return;
 
+    const modal = $("safeBucketAmountModal");
+
+    if (modal) {
+      modal.dataset.bucketId = bucketId;
+    }
+
     const settings = getBucketSettings(bucket);
     const typeSelect = $("savingsTypeSelect");
     const checkbox = $("savingsInterestEnabledInput");
@@ -270,7 +296,7 @@
   }
 
   function patchLocalBucket(bucketId, patch) {
-    const state = getAppState();
+    const state = getState();
 
     if (!state?.safeBuckets) return;
 
@@ -289,14 +315,17 @@
 
     if (!supabaseClient || !bucketId) return;
 
+    const state = getState();
     let ratesMap = {};
 
-    const getRatesMap = getGlobalValue("getSafeBucketInterestRatesMap");
+    const metaRecord = state?.appMeta?.find((item) => item.key === "safe_bucket_interest_rates");
 
-    if (typeof getRatesMap === "function") {
-      ratesMap = {
-        ...getRatesMap(),
-      };
+    if (metaRecord?.value) {
+      try {
+        ratesMap = JSON.parse(metaRecord.value) || {};
+      } catch (error) {
+        ratesMap = {};
+      }
     }
 
     if (annualRate > 0) {
@@ -305,7 +334,7 @@
       delete ratesMap[bucketId];
     }
 
-    const setAppMetaLocalValue = getGlobalValue("setAppMetaLocalValue");
+    const setAppMetaLocalValue = getBridge()?.setAppMetaLocalValue;
 
     if (typeof setAppMetaLocalValue === "function") {
       setAppMetaLocalValue("safe_bucket_interest_rates", ratesMap);
@@ -345,13 +374,209 @@
       return;
     }
 
-    /*
-      Legacy-синхронизация:
-      старый код начисления процентов может ещё читать app_meta.safe_bucket_interest_rates.
-      Поэтому пока дублируем туда annual_rate.
-      Когда полностью уберём старую логику процентов — этот блок можно будет удалить.
-    */
     await saveLegacyInterestRate(bucketId, patch.annual_rate);
+  }
+
+  function calculateRawAccountBalance(account) {
+    const state = getState();
+
+    if (!state || !account) return 0;
+
+    const accountId = account.id;
+    const accountName = account.name;
+
+    return roundToTwo(
+      state.transactions.reduce((sum, transaction) => {
+        const amount = roundToTwo(Number(transaction.amount) || 0);
+
+        if (transaction.type === "income") {
+          const byId = transaction.account_id && transaction.account_id === accountId;
+          const legacy = !transaction.account_id && transaction.account === accountName;
+
+          if (byId || legacy) return sum + amount;
+        }
+
+        if (transaction.type === "expense") {
+          const byId = transaction.account_id && transaction.account_id === accountId;
+          const legacy = !transaction.account_id && transaction.account === accountName;
+
+          if (byId || legacy) return sum - amount;
+        }
+
+        if (transaction.type === "transfer") {
+          const fromById = transaction.from_account_id && transaction.from_account_id === accountId;
+          const toById = transaction.to_account_id && transaction.to_account_id === accountId;
+
+          const fromLegacy = !transaction.from_account_id && transaction.from_account === accountName;
+          const toLegacy = !transaction.to_account_id && transaction.to_account === accountName;
+
+          if (fromById || fromLegacy) sum -= amount;
+          if (toById || toLegacy) sum += amount;
+        }
+
+        return sum;
+      }, 0)
+    );
+  }
+
+  function getBucketsTotalBalance() {
+    const state = getState();
+    const getSafeBucketBalance = getBridge()?.getSafeBucketBalance;
+
+    if (!state?.safeBuckets) return 0;
+
+    return roundToTwo(
+      state.safeBuckets.reduce((sum, bucket) => {
+        const amount =
+          typeof getSafeBucketBalance === "function"
+            ? getSafeBucketBalance(bucket.id)
+            : Number(bucket.amount || bucket.balance || 0);
+
+        return sum + (Number(amount) || 0);
+      }, 0)
+    );
+  }
+
+  async function syncVaultAccountBalanceToBuckets() {
+    const supabaseClient = getSupabaseClient();
+    const state = getState();
+    const vaultAccount = getVaultAccount();
+
+    if (!supabaseClient || !state || !vaultAccount) return;
+
+    const bucketTotal = getBucketsTotalBalance();
+
+    const rawBalanceFromBridge =
+      typeof getBridge()?.getRawAccountBalance === "function"
+        ? getBridge().getRawAccountBalance(vaultAccount.id)
+        : calculateRawAccountBalance(vaultAccount);
+
+    const manualAdjustment = roundToTwo(bucketTotal - rawBalanceFromBridge);
+
+    const accountAdjustmentsApi = window.FinanceAppAccountBalanceAdjustments;
+
+    if (!accountAdjustmentsApi?.setAccountManualAdjustmentLocal) return;
+
+    const nextAdjustments = accountAdjustmentsApi.setAccountManualAdjustmentLocal(
+      state,
+      vaultAccount.id,
+      manualAdjustment
+    );
+
+    const { error } = await supabaseClient
+      .from("app_meta")
+      .upsert(
+        {
+          key: ACCOUNT_BALANCE_ADJUSTMENTS_META_KEY,
+          value: JSON.stringify(nextAdjustments),
+        },
+        {
+          onConflict: "key",
+        }
+      );
+
+    if (error) {
+      console.error("syncVaultAccountBalanceToBuckets error:", error);
+      return;
+    }
+
+    getBridge()?.renderAll?.();
+  }
+
+  async function renameSavingsAccountTitle(nextTitle) {
+    const supabaseClient = getSupabaseClient();
+    const state = getState();
+    const vaultAccount = getVaultAccount();
+
+    const title = String(nextTitle || "").trim();
+
+    if (!title || !supabaseClient || !state || !vaultAccount) return;
+
+    const { error } = await supabaseClient
+      .from("accounts")
+      .update({
+        name: title,
+      })
+      .eq("id", vaultAccount.id);
+
+    if (error) {
+      console.error("renameSavingsAccountTitle error:", error);
+      alert(`Не получилось переименовать накопительный счёт: ${error.message || "unknown error"}`);
+      return;
+    }
+
+    const account = state.accounts.find((item) => item.id === vaultAccount.id);
+
+    if (account) {
+      account.name = title;
+    }
+
+    const modalTitle = $("safeBucketsModalTitle");
+
+    if (modalTitle) {
+      modalTitle.textContent = title;
+    }
+
+    await getBridge()?.loadDataFromSupabase?.();
+    getBridge()?.renderAll?.();
+  }
+
+  function syncSavingsSectionTitle() {
+    const modalTitle = $("safeBucketsModalTitle");
+    const vaultAccount = getVaultAccount();
+
+    if (!modalTitle || !vaultAccount) return;
+
+    modalTitle.textContent = vaultAccount.name || "Накопления";
+  }
+
+  function ensureSavingsTitleEditButton() {
+    const modalTitle = $("safeBucketsModalTitle");
+
+    if (!modalTitle) return;
+
+    const titleWrap = modalTitle.parentElement;
+
+    if (!titleWrap) return;
+
+    let button = $("editSavingsSectionTitleBtn");
+
+    if (!button) {
+      button = document.createElement("button");
+      button.type = "button";
+      button.id = "editSavingsSectionTitleBtn";
+      button.className = "savings-section-title-edit-btn";
+      button.textContent = "Переименовать";
+
+      titleWrap.appendChild(button);
+    }
+
+    button.onclick = async () => {
+      const currentTitle = getVaultAccount()?.name || "Накопления";
+
+      const nextTitle = window.prompt(
+        "Название накопительного счёта",
+        currentTitle
+      );
+
+      if (nextTitle === null) return;
+
+      await renameSavingsAccountTitle(nextTitle);
+    };
+  }
+
+  function schedulePostSaveSync() {
+    window.setTimeout(async () => {
+      try {
+        await getBridge()?.loadDataFromSupabase?.();
+        await syncVaultAccountBalanceToBuckets();
+        await getBridge()?.loadDataFromSupabase?.();
+        getBridge()?.renderAll?.();
+        syncEditorFromBucket();
+      } catch (error) {
+        console.error("schedulePostSaveSync error:", error);
+      }
+    }, 700);
   }
 
   function bindSavingsColumnsEditor() {
@@ -373,12 +598,35 @@
 
     saveBtn.addEventListener("click", () => {
       saveSavingsColumnsFromEditor();
+      schedulePostSaveSync();
     });
+  }
+
+  function bindSavingsModalTitle() {
+    const modal = $("safeBucketsModal");
+
+    if (!modal) return;
+
+    const observer = new MutationObserver(() => {
+      if (!modal.classList.contains("hidden")) {
+        syncSavingsSectionTitle();
+        ensureSavingsTitleEditButton();
+      }
+    });
+
+    observer.observe(modal, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    syncSavingsSectionTitle();
+    ensureSavingsTitleEditButton();
   }
 
   function boot() {
     ensureSettingsPanel();
     bindSavingsColumnsEditor();
+    bindSavingsModalTitle();
   }
 
   if (document.readyState === "loading") {
