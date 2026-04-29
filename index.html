@@ -292,24 +292,26 @@
 <div id="monthlyReportView" class="hidden monthly-report-view">
   <section class="monthly-report-page">
     <div class="monthly-report-topbar">
-      <button
-        class="manager-back-btn monthly-report-back-btn"
-        type="button"
-        id="closeMonthlyReportBtn"
-      >
-        ← Кошелёк
-      </button>
+  <button
+    class="manager-back-btn monthly-report-back-btn"
+    type="button"
+    id="closeMonthlyReportBtn"
+  >
+    ← Кошелёк
+  </button>
 
-      <button
-        class="monthly-report-print-btn"
-        type="button"
-        id="printMonthlyReportBtn"
-      >
-        Печать
-      </button>
-    </div>
+  <button
+    class="monthly-report-print-btn"
+    type="button"
+    id="printMonthlyReportBtn"
+  >
+    Печать
+  </button>
+</div>
 
-    <section class="monthly-report-hero">
+<div class="monthly-report-month-switch" id="monthlyReportMonthSwitch"></div>
+
+<section class="monthly-report-hero">
       <div class="monthly-report-hero__decor monthly-report-hero__decor--coin"></div>
       <div class="monthly-report-hero__decor monthly-report-hero__decor--wallet"></div>
 
@@ -322,24 +324,40 @@
       </div>
     </section>
 
-    <section class="monthly-report-metrics">
-      <div class="monthly-report-metric">
+<section class="monthly-report-card monthly-report-flow-card">
+  <div class="monthly-report-section-head monthly-report-section-head--flow">
+    <div>
+      <p class="monthly-report-card__eyebrow">Движение денег</p>
+      <h3>Доходы против расходов</h3>
+    </div>
+  </div>
+
+  <div class="monthly-report-flow">
+    <div class="monthly-report-flow-row monthly-report-flow-row--income">
+      <div class="monthly-report-flow-row__top">
         <span>Доходы</span>
-        <strong id="monthlyReportIncomeValue">0 ₽</strong>
+        <strong id="monthlyReportIncomeFlowValue">0 ₽</strong>
       </div>
 
-      <div class="monthly-report-metric">
+      <div class="monthly-report-flow-bar">
+        <span id="monthlyReportIncomeBar"></span>
+      </div>
+    </div>
+
+    <div class="monthly-report-flow-row monthly-report-flow-row--expense">
+      <div class="monthly-report-flow-row__top">
         <span>Расходы</span>
-        <strong id="monthlyReportExpenseValue">0 ₽</strong>
+        <strong id="monthlyReportExpenseFlowValue">0 ₽</strong>
       </div>
 
-      <div class="monthly-report-metric">
-        <span>Разница</span>
-        <strong id="monthlyReportDifferenceValue">0 ₽</strong>
+      <div class="monthly-report-flow-bar">
+        <span id="monthlyReportExpenseBar"></span>
       </div>
-    </section>
+    </div>
+  </div>
+</section>
 
-    <section class="monthly-report-card monthly-report-card--top-category">
+<section class="monthly-report-card monthly-report-card--top-category">
       <div class="monthly-report-card__head">
         <div>
           <p class="monthly-report-card__eyebrow">Главная гибкая трата</p>
