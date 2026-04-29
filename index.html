@@ -291,6 +291,7 @@
 <!-- MONTHLY REPORT VIEW -->
 <div id="monthlyReportView" class="hidden monthly-report-view">
   <section class="monthly-report-page">
+    
     <div class="monthly-report-topbar">
   <button
     class="manager-back-btn monthly-report-back-btn"
@@ -300,13 +301,23 @@
     ← Кошелёк
   </button>
 
-  <button
-    class="monthly-report-print-btn"
-    type="button"
-    id="printMonthlyReportBtn"
-  >
-    Печать
-  </button>
+  <div class="monthly-report-topbar__actions">
+    <button
+      class="monthly-report-copy-btn"
+      type="button"
+      id="copyMonthlyReportBtn"
+    >
+      Скопировать
+    </button>
+
+    <button
+      class="monthly-report-print-btn"
+      type="button"
+      id="printMonthlyReportBtn"
+    >
+      Печать
+    </button>
+  </div>
 </div>
 
 <div class="monthly-report-month-switch" id="monthlyReportMonthSwitch"></div>
@@ -355,6 +366,28 @@
       </div>
     </div>
   </div>
+</section>
+
+<section class="monthly-report-card monthly-report-insight-card">
+  <div class="monthly-report-card__head">
+    <div>
+      <p class="monthly-report-card__eyebrow">Вывод месяца</p>
+      <h3 id="monthlyReportInsightTitle">—</h3>
+    </div>
+
+    <div class="monthly-report-card__icon monthly-report-card__icon--blue">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 5v7" />
+        <path d="M12 17.5h.01" />
+        <path d="M5.5 19h13" />
+        <path d="M7 19 12 4l5 15" />
+      </svg>
+    </div>
+  </div>
+
+  <p class="monthly-report-insight-text" id="monthlyReportInsightText">
+    —
+  </p>
 </section>
 
 <section class="monthly-report-card monthly-report-card--top-category">
@@ -441,6 +474,30 @@
   </div>
 </div>
     </section>
+    
+    <section class="monthly-report-card monthly-report-focus-card">
+  <div class="monthly-report-card__head">
+    <div>
+      <p class="monthly-report-card__eyebrow">Фокус следующего месяца</p>
+      <h3 id="monthlyReportFocusTitle">—</h3>
+    </div>
+
+    <div class="monthly-report-card__icon monthly-report-card__icon--orange">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="12" cy="12" r="7" />
+        <circle cx="12" cy="12" r="3" />
+        <path d="M12 2.8v2.5" />
+        <path d="M12 18.7v2.5" />
+        <path d="M2.8 12h2.5" />
+        <path d="M18.7 12h2.5" />
+      </svg>
+    </div>
+  </div>
+
+  <p class="monthly-report-insight-text" id="monthlyReportFocusText">
+    —
+  </p>
+</section>
 
     <section class="monthly-report-card monthly-report-card--achievements">
       <div class="monthly-report-section-head">
