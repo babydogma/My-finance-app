@@ -417,6 +417,148 @@ body.monthly-report-is-open .app {
   color: var(--red);
 }
 
+/* Month switch */
+
+.monthly-report-month-switch {
+  display: flex;
+  gap: 8px;
+  margin: -2px -2px 2px;
+  padding: 2px 2px 6px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.monthly-report-month-switch::-webkit-scrollbar {
+  display: none;
+}
+
+.monthly-report-month-btn {
+  flex: 0 0 auto;
+  min-width: 58px;
+  height: 34px;
+  padding: 0 13px;
+  border: 1px solid rgba(22, 30, 46, 0.065);
+  border-radius: 999px;
+  color: rgba(20, 24, 33, 0.48);
+  font-size: 12px;
+  font-weight: 720;
+  letter-spacing: -0.025em;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(246, 248, 252, 0.92));
+  box-shadow:
+    0 8px 16px rgba(30, 42, 68, 0.045),
+    inset 0 1px 0 rgba(255, 255, 255, 0.96);
+}
+
+.monthly-report-month-btn.is-active {
+  color: #ffffff;
+  border-color: rgba(47, 125, 246, 0.12);
+  background: linear-gradient(180deg, #4a93ff, #2f7df6);
+  box-shadow:
+    0 12px 26px rgba(47, 125, 246, 0.24),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+}
+
+/* Hero states */
+
+.monthly-report-hero--profit {
+  background:
+    radial-gradient(circle at 15% 12%, rgba(255, 255, 255, 0.30), transparent 26%),
+    radial-gradient(circle at 100% 0%, rgba(21, 151, 107, 0.38), transparent 36%),
+    linear-gradient(145deg, #101827, #1c3540 54%, #15976b);
+}
+
+.monthly-report-hero--loss {
+  background:
+    radial-gradient(circle at 15% 12%, rgba(255, 255, 255, 0.25), transparent 26%),
+    radial-gradient(circle at 100% 0%, rgba(239, 91, 79, 0.32), transparent 36%),
+    linear-gradient(145deg, #16151d, #3a2732 54%, #ef5b4f);
+}
+
+.monthly-report-hero--neutral {
+  background:
+    radial-gradient(circle at 15% 12%, rgba(255, 255, 255, 0.26), transparent 26%),
+    radial-gradient(circle at 100% 0%, rgba(47, 125, 246, 0.30), transparent 36%),
+    linear-gradient(145deg, #101827, #1e2e46 54%, #2f7df6);
+}
+
+/* Income / expense flow */
+
+.monthly-report-section-head--flow {
+  align-items: center;
+}
+
+.monthly-report-flow {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.monthly-report-flow-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.monthly-report-flow-row__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.monthly-report-flow-row__top span {
+  color: rgba(20, 24, 33, 0.48);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.monthly-report-flow-row__top strong {
+  color: var(--text);
+  font-size: 16px;
+  line-height: 1;
+  font-weight: 730;
+  letter-spacing: -0.045em;
+  white-space: nowrap;
+}
+
+.monthly-report-flow-bar {
+  position: relative;
+  height: 12px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(20, 24, 33, 0.065);
+}
+
+.monthly-report-flow-bar span {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 0%;
+  min-width: 6px;
+  border-radius: inherit;
+  transition: width 0.35s ease;
+}
+
+.monthly-report-flow-row--income .monthly-report-flow-bar span {
+  background:
+    linear-gradient(90deg, rgba(21, 151, 107, 0.72), rgba(87, 213, 162, 0.96));
+}
+
+.monthly-report-flow-row--expense .monthly-report-flow-bar span {
+  background:
+    linear-gradient(90deg, rgba(239, 91, 79, 0.72), rgba(255, 143, 127, 0.96));
+}
+
+body.monthly-report-is-open .bottom-nav-wrap {
+  display: none !important;
+}
+
+body.monthly-report-is-open .app {
+  padding-bottom: 0;
+}
+
 @media print {
   body {
     background: #ffffff !important;
