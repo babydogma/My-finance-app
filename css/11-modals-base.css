@@ -141,7 +141,8 @@ body.modal-scroll-locked {
 #mandatoryPaymentEditorModal .modal-sheet,
 #mandatoryPaymentBucketPickerModal .modal-sheet,
 #safeBucketsModal .modal-sheet,
-#operationsFiltersModal .modal-sheet {
+#operationsFiltersModal .modal-sheet,
+#analyticsCategoryModal .modal-sheet {
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
 }
