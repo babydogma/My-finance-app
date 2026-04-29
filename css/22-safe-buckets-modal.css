@@ -58,6 +58,27 @@
   letter-spacing: -0.006em;
 }
 
+#safeBucketsModal .savings-section-title-edit-btn {
+  margin-top: 9px;
+  height: 30px;
+  padding: 0 11px;
+  border: 1px solid rgba(47, 125, 246, 0.16);
+  border-radius: 999px;
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 680;
+  letter-spacing: -0.012em;
+  background:
+    linear-gradient(180deg, rgba(239, 245, 255, 0.98), rgba(225, 237, 255, 0.94));
+  box-shadow:
+    0 8px 18px rgba(47, 125, 246, 0.09),
+    inset 0 1px 0 rgba(255, 255, 255, 0.90);
+}
+
+#safeBucketsModal .savings-section-title-edit-btn:active {
+  transform: scale(0.97);
+}
+
 #safeBucketsModal .manager-back-btn {
   flex: 0 0 auto;
   min-width: 100px;
@@ -243,6 +264,143 @@
   border-radius: 18px;
   font-size: 14.5px;
   font-weight: 650;
+}
+
+#safeBucketAmountModal .savings-editor-field-label {
+  margin: 0 0 7px 4px;
+  color: rgba(20, 24, 33, 0.46);
+  font-size: 11px;
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: 0.035em;
+  text-transform: uppercase;
+}
+
+#safeBucketAmountModal .savings-editor-settings-panel {
+  margin: 4px 0 13px;
+  padding: 13px;
+  border-radius: 22px;
+  border: 1px solid rgba(22, 30, 46, 0.065);
+  background:
+    radial-gradient(circle at 0% 0%, rgba(47, 125, 246, 0.050), transparent 38%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(248, 251, 255, 0.97));
+  box-shadow:
+    0 10px 24px rgba(30, 42, 68, 0.055),
+    inset 0 1px 0 rgba(255, 255, 255, 0.92);
+}
+
+#safeBucketAmountModal .savings-editor-type-select {
+  width: 100%;
+  height: 50px;
+  margin-bottom: 12px;
+  padding: 0 15px;
+  border-radius: 18px;
+  border: 1px solid rgba(22, 30, 46, 0.075);
+  color: var(--text);
+  font-size: 14.5px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(246, 248, 252, 0.98));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.94),
+    0 6px 16px rgba(30, 42, 68, 0.052);
+}
+
+#safeBucketAmountModal .savings-editor-toggle-row {
+  min-height: 64px;
+  padding: 11px 12px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  border-radius: 19px;
+  border: 1px solid rgba(22, 30, 46, 0.065);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(246, 248, 252, 0.96));
+}
+
+#safeBucketAmountModal .savings-editor-toggle-row strong {
+  display: block;
+  color: var(--text);
+  font-size: 13.5px;
+  line-height: 1.1;
+  font-weight: 760;
+  letter-spacing: -0.025em;
+}
+
+#safeBucketAmountModal .savings-editor-toggle-row small {
+  display: block;
+  margin-top: 4px;
+  color: rgba(20, 24, 33, 0.46);
+  font-size: 11px;
+  line-height: 1.22;
+  font-weight: 560;
+  letter-spacing: -0.012em;
+}
+
+#safeBucketAmountModal .savings-editor-toggle-row input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+#safeBucketAmountModal .savings-editor-toggle-row i {
+  position: relative;
+  width: 48px;
+  height: 30px;
+  border-radius: 999px;
+  background: rgba(20, 24, 33, 0.12);
+  box-shadow:
+    inset 0 1px 2px rgba(20, 24, 33, 0.08),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.65);
+}
+
+#safeBucketAmountModal .savings-editor-toggle-row i::after {
+  content: "";
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow:
+    0 4px 10px rgba(30, 42, 68, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  transition:
+    transform 0.18s ease,
+    background 0.18s ease;
+}
+
+#safeBucketAmountModal .savings-editor-toggle-row input:checked + i {
+  background: linear-gradient(180deg, #4a93ff, #2f7df6);
+}
+
+#safeBucketAmountModal .savings-editor-toggle-row input:checked + i::after {
+  transform: translateX(18px);
+}
+
+#safeBucketAmountModal .savings-editor-settings-hint {
+  margin-top: 10px;
+  padding: 10px 11px;
+  border-radius: 16px;
+  color: rgba(20, 24, 33, 0.52);
+  font-size: 11.5px;
+  line-height: 1.28;
+  font-weight: 560;
+  letter-spacing: -0.012em;
+  background: rgba(246, 248, 252, 0.9);
+}
+
+#safeBucketAmountModal .savings-editor-interest-disabled {
+  opacity: 0.58;
+}
+
+#safeBucketAmountModal .savings-editor-interest-disabled .input {
+  color: rgba(20, 24, 33, 0.40);
+  background:
+    linear-gradient(180deg, rgba(246, 248, 252, 0.94), rgba(239, 242, 247, 0.92));
 }
 
 #safeBucketAmountModal #deleteSafeBucketBtn {
