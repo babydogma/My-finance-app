@@ -200,6 +200,7 @@ const analyticsRailRangeBtn = document.getElementById("analyticsRailRangeBtn");
 const openMonthlyReportBtn = document.getElementById("openMonthlyReportBtn");
 const closeMonthlyReportBtn = document.getElementById("closeMonthlyReportBtn");
 const printMonthlyReportBtn = document.getElementById("printMonthlyReportBtn");
+const copyMonthlyReportBtn = document.getElementById("copyMonthlyReportBtn");
 const monthlyReportView = document.getElementById("monthlyReportView");
 
 const monthlyReportHero = document.querySelector(".monthly-report-hero");
@@ -218,6 +219,9 @@ const monthlyReportExpenseFlowValue = document.getElementById("monthlyReportExpe
 const monthlyReportIncomeBar = document.getElementById("monthlyReportIncomeBar");
 const monthlyReportExpenseBar = document.getElementById("monthlyReportExpenseBar");
 
+const monthlyReportInsightTitle = document.getElementById("monthlyReportInsightTitle");
+const monthlyReportInsightText = document.getElementById("monthlyReportInsightText");
+
 const monthlyReportTopCategoryName = document.getElementById("monthlyReportTopCategoryName");
 const monthlyReportTopCategoryValue = document.getElementById("monthlyReportTopCategoryValue");
 const monthlyReportWeeksList = document.getElementById("monthlyReportWeeksList");
@@ -232,6 +236,9 @@ const monthlyReportSavingsNetValue = document.getElementById("monthlyReportSavin
 const monthlyReportSavingsDepositValue = document.getElementById("monthlyReportSavingsDepositValue");
 const monthlyReportSavingsInterestValue = document.getElementById("monthlyReportSavingsInterestValue");
 const monthlyReportSavingsWithdrawalsValue = document.getElementById("monthlyReportSavingsWithdrawalsValue");
+
+const monthlyReportFocusTitle = document.getElementById("monthlyReportFocusTitle");
+const monthlyReportFocusText = document.getElementById("monthlyReportFocusText");
 
 const monthlyReportAchievementsList = document.getElementById("monthlyReportAchievementsList");
 
@@ -3464,6 +3471,62 @@ function getMonthlyReportSavings(transactions) {
   };
 }
 
+function getMonthlyReportInsight({ totals, topCategory, repeat, savings }) {
+  if (totals.difference > 0) {
+    return {
+      title: "Месяц закрыт уверенно",
+      text: `Доходы оказались выше расходов на ${formatMoney(totals.difference)}. Главная гибкая трата месяца — ${topCategory.name} на ${formatMoney(topCategory.amount)}. В накопления добавлено ${formatMoney(savings.growth)}.`,
+    };
+  }
+
+  if (totals.difference < 0) {
+    return {
+      title: "Месяц ушёл в минус",
+      text: `Расходы превысили доходы на ${formatMoney(Math.abs(totals.difference))}. Главная гибкая трата — ${topCategory.name} на ${formatMoney(topCategory.amount)}. В следующем месяце стоит жёстче контролировать повторяющиеся траты.`,
+    };
+  }
+
+  return {
+    title: "Месяц закрыт в ноль",
+    text: `Доходы и расходы почти сравнялись. Главная гибкая трата — ${topCategory.name} на ${formatMoney(topCategory.amount)}. Запаса почти нет, поэтому лучше заранее держать под контролем крупные категории.`,
+  };
+}
+
+function getMonthlyReportFocus({ totals, topCategory, repeat, savings }) {
+  if (repeat.count >= 3) {
+    return {
+      title: `Следить за “${repeat.label}”`,
+      text: `Эта трата повторилась ${repeat.count} раза и суммарно забрала ${formatMoney(repeat.amount)}. Это не обязательно плохо, но теперь видно, где привычка превращается в заметную статью расходов.`,
+    };
+  }
+
+  if (topCategory.amount > 0) {
+    return {
+      title: `Контролировать “${topCategory.name}”`,
+      text: `Это главная гибкая категория месяца: ${formatMoney(topCategory.amount)}. Если в следующем месяце нужен запас, начинать резать логичнее именно отсюда.`,
+    };
+  }
+
+  if (savings.growth <= 0) {
+    return {
+      title: "Вернуть пополнение накоплений",
+      text: "За месяц накопления почти не выросли. Даже небольшое регулярное пополнение лучше, чем ждать идеального момента.",
+    };
+  }
+
+  if (totals.difference > 0) {
+    return {
+      title: "Сохранить темп",
+      text: "Месяц прошёл нормально. Главная задача — не раздувать гибкие траты после хорошего результата.",
+    };
+  }
+
+  return {
+    title: "Держать базу",
+    text: "Критичных повторов не видно. Следующий месяц лучше начать с контроля свободных денег и обязательных платежей.",
+  };
+}
+
 function getMonthlyReportAchievements({ totals, topCategory, repeat, savings }) {
   const achievements = [];
 
@@ -3597,6 +3660,71 @@ function renderMonthlyReportWeeks(weeks) {
   });
 }
 
+function buildMonthlyReportTextSummary() {
+  const monthValue = getMonthlyReportMonthValue();
+  const transactions = getMonthlyReportMonthTransactions(monthValue);
+
+  const totals = getMonthlyReportIncomeExpense(transactions);
+  const topCategory = getMonthlyReportTopFlexibleCategory(transactions);
+  const repeat = getMonthlyReportRepeat(transactions);
+  const savings = getMonthlyReportSavings(transactions);
+  const insight = getMonthlyReportInsight({
+    totals,
+    topCategory,
+    repeat,
+    savings,
+  });
+
+  return [
+    getMonthlyReportMonthLabel(monthValue),
+    "",
+    `Итог: ${formatMoney(totals.difference)} — ${
+      totals.difference > 0
+        ? "месяц в плюс"
+        : totals.difference < 0
+          ? "месяц в минус"
+          : "месяц в ноль"
+    }`,
+    `Доходы: ${formatMoney(totals.income)}`,
+    `Расходы: ${formatMoney(totals.expense)}`,
+    "",
+    `Главная гибкая трата: ${topCategory.name} — ${formatMoney(topCategory.amount)}`,
+    repeat.count > 1
+      ? `Повтор месяца: ${repeat.label} — ${repeat.count} раза / ${formatMoney(repeat.amount)}`
+      : "Повтор месяца: повторов нет",
+    "",
+    `Баланс: ${formatMoney(calculateBalance())}`,
+    `Свободно: ${formatMoney(getFreeMoneyTotal())}`,
+    "",
+    `Накопления: +${formatMoney(savings.growth)}`,
+    `Пополнено: ${formatMoney(savings.deposits)}`,
+    `Проценты: ${formatMoney(savings.interest)}`,
+    `Списано: ${formatMoney(savings.withdrawals)}`,
+    "",
+    `Вывод: ${insight.text}`,
+  ].join("\n");
+}
+
+async function copyMonthlyReportSummary() {
+  const text = buildMonthlyReportTextSummary();
+
+  try {
+    await navigator.clipboard.writeText(text);
+
+    if (copyMonthlyReportBtn) {
+      const previousText = copyMonthlyReportBtn.textContent;
+      copyMonthlyReportBtn.textContent = "Скопировано";
+
+      window.setTimeout(() => {
+        copyMonthlyReportBtn.textContent = previousText || "Скопировать";
+      }, 1300);
+    }
+  } catch (error) {
+    console.error("copyMonthlyReportSummary error:", error);
+    alert("Не получилось скопировать итог. Safari иногда блокирует буфер обмена.");
+  }
+}
+
 function renderMonthlyReportAchievements(achievements) {
   if (!monthlyReportAchievementsList) return;
 
@@ -3630,7 +3758,21 @@ function renderMonthlyReport() {
   const weeks = getMonthlyReportWeeks(transactions, monthValue);
   const repeat = getMonthlyReportRepeat(transactions);
   const savings = getMonthlyReportSavings(transactions);
-  const achievements = getMonthlyReportAchievements({
+  const insight = getMonthlyReportInsight({
+  totals,
+  topCategory,
+  repeat,
+  savings,
+});
+
+const focus = getMonthlyReportFocus({
+  totals,
+  topCategory,
+  repeat,
+  savings,
+});
+
+const achievements = getMonthlyReportAchievements({
   totals,
   topCategory,
   repeat,
@@ -3669,6 +3811,14 @@ if (monthlyReportMonthLabel) {
   if (monthlyReportDifferenceValue) {
     monthlyReportDifferenceValue.textContent = formatMoney(totals.difference);
   }
+  
+  if (monthlyReportInsightTitle) {
+  monthlyReportInsightTitle.textContent = insight.title;
+}
+
+if (monthlyReportInsightText) {
+  monthlyReportInsightText.textContent = insight.text;
+}
 
   if (monthlyReportTopCategoryName) {
     monthlyReportTopCategoryName.textContent = topCategory.name;
@@ -3708,6 +3858,21 @@ if (monthlyReportMonthLabel) {
   if (monthlyReportSavingsInterestValue) {
     monthlyReportSavingsInterestValue.textContent = formatMoney(savings.interest);
   }
+  
+  if (monthlyReportSavingsWithdrawalsValue) {
+  monthlyReportSavingsWithdrawalsValue.textContent = formatMoney(savings.withdrawals);
+}
+
+if (monthlyReportFocusTitle) {
+  monthlyReportFocusTitle.textContent = focus.title;
+}
+
+if (monthlyReportFocusText) {
+  monthlyReportFocusText.textContent = focus.text;
+}
+
+renderMonthlyReportWeeks(weeks);
+renderMonthlyReportAchievements(achievements);
 
   renderMonthlyReportWeeks(weeks);
   renderMonthlyReportAchievements(achievements);
@@ -3770,6 +3935,8 @@ closeMonthlyReportBtn?.addEventListener("click", closeMonthlyReportView);
 printMonthlyReportBtn?.addEventListener("click", () => {
   window.print();
 });
+
+copyMonthlyReportBtn?.addEventListener("click", copyMonthlyReportSummary);
 
 openCreateAccountModalBtn?.addEventListener("click", openCreateAccountModal);
 closeAccountModalBtn?.addEventListener("click", closeAccountModal);
