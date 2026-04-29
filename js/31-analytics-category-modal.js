@@ -36,146 +36,24 @@
     loadDataFromSupabase,
     renderAll,
   }) {
-    const DYNAMIC_MODAL_ID = "analyticsCategoryModal";
+    let modalBound = false;
 
-    let dynamicModalBound = false;
+    function bindAnalyticsCategoryModalEvents() {
+      if (modalBound || !analyticsCategoryModal) return;
 
-    function getSafeElementById(id) {
-      return document.getElementById(id);
-    }
+      modalBound = true;
 
-    function ensureAnalyticsCategoryModal() {
-      let modal = analyticsCategoryModal || getSafeElementById(DYNAMIC_MODAL_ID);
-
-      if (modal) {
-        bindAnalyticsCategoryModalClose(modal);
-        return modal;
-      }
-
-      modal = document.createElement("div");
-      modal.className = "modal hidden";
-      modal.id = DYNAMIC_MODAL_ID;
-
-      modal.innerHTML = `
-        <div class="modal-sheet analytics-category-sheet">
-          <div class="modal-handle"></div>
-
-          <div class="section-head filters-sheet__head">
-            <div>
-              <h3 class="modal-title filters-sheet__title" id="analyticsCategoryModalTitle">
-                Категория
-              </h3>
-              <p class="list-subtitle" id="analyticsCategoryModalPeriodLabel">
-                Период
-              </p>
-            </div>
-
-            <button
-              class="manager-back-btn"
-              type="button"
-              id="closeAnalyticsCategoryModalBtn"
-            >
-              Закрыть
-            </button>
-          </div>
-
-          <div class="history-filters history-filters--modal">
-            <div class="history-filter-group history-filter-group--secondary">
-              <button
-                class="history-filter-btn"
-                type="button"
-                id="analyticsCategoryBudgetBtn"
-              >
-                —
-              </button>
-
-              <button
-                class="history-filter-btn"
-                type="button"
-                id="analyticsCategoryTypeBtn"
-              >
-                —
-              </button>
-            </div>
-          </div>
-
-          <div class="list" id="analyticsCategoryTransactionsList"></div>
-        </div>
-      `;
-
-      document.body.appendChild(modal);
-      bindAnalyticsCategoryModalClose(modal);
-
-      return modal;
-    }
-
-    function getModalRefs() {
-      const modal = ensureAnalyticsCategoryModal();
-
-      return {
-        modal,
-        title:
-          analyticsCategoryModalTitle ||
-          modal.querySelector("#analyticsCategoryModalTitle"),
-        period:
-          analyticsCategoryModalPeriodLabel ||
-          modal.querySelector("#analyticsCategoryModalPeriodLabel"),
-        budget:
-          analyticsCategoryBudgetBtn ||
-          modal.querySelector("#analyticsCategoryBudgetBtn"),
-        type:
-          analyticsCategoryTypeBtn ||
-          modal.querySelector("#analyticsCategoryTypeBtn"),
-        list:
-          analyticsCategoryTransactionsList ||
-          modal.querySelector("#analyticsCategoryTransactionsList"),
-        close:
-          modal.querySelector("#closeAnalyticsCategoryModalBtn"),
-      };
-    }
-
-    function bindAnalyticsCategoryModalClose(modal) {
-      if (!modal || dynamicModalBound) return;
-
-      dynamicModalBound = true;
-
-      const closeBtn = modal.querySelector("#closeAnalyticsCategoryModalBtn");
+      const closeBtn = document.getElementById("closeAnalyticsCategoryModalBtn");
 
       closeBtn?.addEventListener("click", () => {
         closeAnalyticsCategoryModal();
       });
 
-      modal.addEventListener("click", (event) => {
-        if (event.target === modal) {
+      analyticsCategoryModal.addEventListener("click", (event) => {
+        if (event.target === analyticsCategoryModal) {
           closeAnalyticsCategoryModal();
         }
       });
-    }
-
-    function showModal(modal) {
-      if (!modal) return;
-
-      /*
-        Не используем document.body.style.overflow.
-        Не трогаем ручной scroll-lock, потому что он уже несколько раз ломал приложение.
-      */
-      modal.classList.remove("hidden", "is-closing");
-
-      requestAnimationFrame(() => {
-        modal.classList.add("is-visible");
-      });
-    }
-
-    function hideModal(modal) {
-      if (!modal) return;
-
-      modal.classList.remove("is-visible");
-      modal.classList.add("is-closing");
-
-      window.setTimeout(() => {
-        modal.classList.remove("is-closing");
-        modal.classList.add("hidden");
-      }, 260);
     }
 
     function getSafeCategoryName(categoryId) {
@@ -205,9 +83,7 @@
 
       if (categoryId === "transfers") {
         return sortTransactionsByLatest(
-          items.filter((transaction) => {
-            return transaction.type === "transfer";
-          })
+          items.filter((transaction) => transaction.type === "transfer")
         );
       }
 
@@ -239,10 +115,7 @@
     }
 
     function renderAnalyticsCategoryTransactions(categoryId) {
-      const refs = getModalRefs();
-      const list = refs.list;
-
-      if (!list) {
+      if (!analyticsCategoryTransactionsList) {
         console.error("analyticsCategoryTransactionsList not found");
         return;
       }
@@ -254,7 +127,7 @@
       } catch (error) {
         console.error("getAnalyticsTransactionsByCategory error:", error, categoryId);
 
-        list.innerHTML = `
+        analyticsCategoryTransactionsList.innerHTML = `
           <div class="list-card">
             <div class="list-body">
               <h3 class="list-title">Ошибка загрузки операций</h3>
@@ -266,7 +139,7 @@
         return;
       }
 
-      list.innerHTML = "";
+      analyticsCategoryTransactionsList.innerHTML = "";
 
       if (!transactions.length) {
         const empty = document.createElement("div");
@@ -278,61 +151,71 @@
           </div>
         `;
 
-        list.appendChild(empty);
+        analyticsCategoryTransactionsList.appendChild(empty);
         return;
       }
 
       transactions.forEach((transaction) => {
         try {
-          list.appendChild(createTransactionCard(transaction));
+          analyticsCategoryTransactionsList.appendChild(
+            createTransactionCard(transaction)
+          );
         } catch (error) {
           console.error("analytics category transaction render error:", error, transaction);
-          list.appendChild(renderBrokenTransactionFallback(transaction));
+
+          analyticsCategoryTransactionsList.appendChild(
+            renderBrokenTransactionFallback(transaction)
+          );
         }
       });
     }
 
     function syncAnalyticsCategoryBudgetButton(categoryId, isTransferCategory) {
-      const refs = getModalRefs();
-      const budgetBtn = refs.budget;
-
-      if (!budgetBtn) return;
+      if (!analyticsCategoryBudgetBtn) return;
 
       if (isTransferCategory) {
-        budgetBtn.textContent = "—";
-        budgetBtn.onclick = null;
-        budgetBtn.disabled = true;
+        analyticsCategoryBudgetBtn.textContent = "—";
+        analyticsCategoryBudgetBtn.onclick = null;
+        analyticsCategoryBudgetBtn.disabled = true;
         return;
       }
 
-      budgetBtn.textContent = getBudgetLimitLabel(categoryId);
-      budgetBtn.disabled = false;
-      budgetBtn.onclick = () => openBudgetModal(categoryId);
+      analyticsCategoryBudgetBtn.textContent = getBudgetLimitLabel(categoryId);
+      analyticsCategoryBudgetBtn.disabled = false;
+
+      analyticsCategoryBudgetBtn.onclick = () => {
+        openBudgetModal(categoryId);
+      };
     }
 
     function syncAnalyticsCategoryTypeButton(categoryId, isTransferCategory) {
-      const refs = getModalRefs();
-      const typeBtn = refs.type;
-
-      if (!typeBtn) return;
+      if (!analyticsCategoryTypeBtn) return;
 
       if (isTransferCategory) {
-        typeBtn.textContent = "Гибкая";
-        typeBtn.disabled = true;
-        typeBtn.onclick = null;
-        typeBtn.classList.remove("analytics-category-type-btn--required");
-        typeBtn.classList.add("analytics-category-type-btn--flex");
+        analyticsCategoryTypeBtn.textContent = "Гибкая";
+        analyticsCategoryTypeBtn.disabled = true;
+        analyticsCategoryTypeBtn.onclick = null;
+        analyticsCategoryTypeBtn.classList.remove("analytics-category-type-btn--required");
+        analyticsCategoryTypeBtn.classList.add("analytics-category-type-btn--flex");
         return;
       }
 
       const required = isRequiredCategory(categoryId);
 
-      typeBtn.textContent = required ? "Обязательная" : "Гибкая";
-      typeBtn.disabled = false;
-      typeBtn.classList.toggle("analytics-category-type-btn--required", required);
-      typeBtn.classList.toggle("analytics-category-type-btn--flex", !required);
+      analyticsCategoryTypeBtn.textContent = required ? "Обязательная" : "Гибкая";
+      analyticsCategoryTypeBtn.disabled = false;
 
-      typeBtn.onclick = async () => {
+      analyticsCategoryTypeBtn.classList.toggle(
+        "analytics-category-type-btn--required",
+        required
+      );
+
+      analyticsCategoryTypeBtn.classList.toggle(
+        "analytics-category-type-btn--flex",
+        !required
+      );
+
+      analyticsCategoryTypeBtn.onclick = async () => {
         try {
           const { error } = await supabaseClient
             .from("categories")
@@ -357,13 +240,14 @@
     }
 
     function openAnalyticsCategoryModal(categoryId) {
-      try {
-        const refs = getModalRefs();
+      if (!analyticsCategoryModal) {
+        console.error("analyticsCategoryModal not found in index.html");
+        alert("Модалка категории не найдена в index.html");
+        return;
+      }
 
-        if (!refs.modal) {
-          console.error("analyticsCategoryModal not found and was not created");
-          return;
-        }
+      try {
+        bindAnalyticsCategoryModalEvents();
 
         setActiveAnalyticsCategoryId(categoryId);
 
@@ -371,36 +255,30 @@
         const title = getSafeCategoryName(categoryId);
         const periodLabel = getAnalyticsPeriodLabel() || "Период";
 
-        if (refs.title) {
-          refs.title.textContent = title;
+        if (analyticsCategoryModalTitle) {
+          analyticsCategoryModalTitle.textContent = title;
         }
 
-        if (refs.period) {
-          refs.period.textContent = periodLabel;
+        if (analyticsCategoryModalPeriodLabel) {
+          analyticsCategoryModalPeriodLabel.textContent = periodLabel;
         }
 
         syncAnalyticsCategoryBudgetButton(categoryId, isTransferCategory);
         syncAnalyticsCategoryTypeButton(categoryId, isTransferCategory);
         renderAnalyticsCategoryTransactions(categoryId);
 
-        showModal(refs.modal);
+        openAnimatedModal(analyticsCategoryModal);
       } catch (error) {
-        console.error("openAnalyticsCategoryModal hard error:", error, categoryId);
+        console.error("openAnalyticsCategoryModal error:", error, categoryId);
 
-        alert(
-          "Не получилось открыть операции категории. Приложение не умерло, но данные категории надо проверить."
-        );
+        alert("Не получилось открыть операции категории. Ошибка в данных операции.");
       }
     }
 
     function closeAnalyticsCategoryModal() {
-      const modal =
-        analyticsCategoryModal ||
-        getSafeElementById(DYNAMIC_MODAL_ID);
+      if (!analyticsCategoryModal) return;
 
-      if (!modal) return;
-
-      hideModal(modal);
+      closeAnimatedModal(analyticsCategoryModal);
       setActiveAnalyticsCategoryId(null);
     }
 
