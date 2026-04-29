@@ -197,6 +197,35 @@ const analyticsRangeSelectedLabel = document.getElementById("analyticsRangeSelec
 const analyticsRangeDaysStrip = document.getElementById("analyticsRangeDaysStrip");
 const analyticsRailRangeBtn = document.getElementById("analyticsRailRangeBtn");
 
+const openMonthlyReportBtn = document.getElementById("openMonthlyReportBtn");
+const closeMonthlyReportBtn = document.getElementById("closeMonthlyReportBtn");
+const printMonthlyReportBtn = document.getElementById("printMonthlyReportBtn");
+const monthlyReportView = document.getElementById("monthlyReportView");
+
+const monthlyReportMonthLabel = document.getElementById("monthlyReportMonthLabel");
+const monthlyReportResultValue = document.getElementById("monthlyReportResultValue");
+const monthlyReportResultText = document.getElementById("monthlyReportResultText");
+
+const monthlyReportIncomeValue = document.getElementById("monthlyReportIncomeValue");
+const monthlyReportExpenseValue = document.getElementById("monthlyReportExpenseValue");
+const monthlyReportDifferenceValue = document.getElementById("monthlyReportDifferenceValue");
+
+const monthlyReportTopCategoryName = document.getElementById("monthlyReportTopCategoryName");
+const monthlyReportTopCategoryValue = document.getElementById("monthlyReportTopCategoryValue");
+const monthlyReportWeeksList = document.getElementById("monthlyReportWeeksList");
+
+const monthlyReportRepeatName = document.getElementById("monthlyReportRepeatName");
+const monthlyReportRepeatValue = document.getElementById("monthlyReportRepeatValue");
+
+const monthlyReportBalanceValue = document.getElementById("monthlyReportBalanceValue");
+const monthlyReportFreeValue = document.getElementById("monthlyReportFreeValue");
+
+const monthlyReportSavingsNetValue = document.getElementById("monthlyReportSavingsNetValue");
+const monthlyReportSavingsDepositValue = document.getElementById("monthlyReportSavingsDepositValue");
+const monthlyReportSavingsInterestValue = document.getElementById("monthlyReportSavingsInterestValue");
+
+const monthlyReportAchievementsList = document.getElementById("monthlyReportAchievementsList");
+
   const {
     bindMoneyInput,
     parseMoneyInputValue,
@@ -3047,6 +3076,525 @@ function renderAll() {
   renderAnalytics();
 }
 
+function getMonthlyReportMonthValue() {
+  return getCurrentMonthValue();
+}
+
+function getMonthlyReportMonthTransactions(monthValue) {
+  return filterTransactionsByPeriod(
+    state.transactions,
+    "month",
+    monthValue,
+    "",
+    ""
+  );
+}
+
+function getMonthlyReportMonthLabel(monthValue) {
+  return `Итоги ${formatMonthLabel(monthValue)}`;
+}
+
+function isSafeBucketAdjustment(transaction) {
+  return String(transaction.title || "").trim() === "Корректировка накопления";
+}
+
+function isSafeInterestTransaction(transaction) {
+  return (
+    transaction.type === "income" &&
+    isVaultAccountId(transaction.account_id) &&
+    transaction.to_safe_bucket_id &&
+    String(transaction.title || "").trim() === "Проценты по накоплению"
+  );
+}
+
+function isFlexibleExpense(transaction) {
+  if (transaction.type !== "expense") return false;
+
+  const categoryId = transaction.category_id || UNCATEGORIZED_ID;
+
+  return !isRequiredCategory(categoryId);
+}
+
+function getMonthlyReportIncomeExpense(transactions) {
+  let income = 0;
+  let expense = 0;
+
+  transactions.forEach((transaction) => {
+    if (isSafeBucketAdjustment(transaction)) return;
+
+    const amount = Number(transaction.amount) || 0;
+
+    if (transaction.type === "income" && !isSafeInterestTransaction(transaction)) {
+      income += amount;
+    }
+
+    if (transaction.type === "expense") {
+      expense += amount;
+    }
+  });
+
+  return {
+    income: roundToTwo(income),
+    expense: roundToTwo(expense),
+    difference: roundToTwo(income - expense),
+  };
+}
+
+function getMonthlyReportTopFlexibleCategory(transactions) {
+  const byCategory = new Map();
+
+  transactions.forEach((transaction) => {
+    if (!isFlexibleExpense(transaction)) return;
+
+    const categoryId = transaction.category_id || UNCATEGORIZED_ID;
+    const current = byCategory.get(categoryId) || 0;
+
+    byCategory.set(categoryId, current + (Number(transaction.amount) || 0));
+  });
+
+  const top = [...byCategory.entries()]
+    .map(([categoryId, amount]) => ({
+      categoryId,
+      name: getCategoryName(categoryId),
+      amount: roundToTwo(amount),
+    }))
+    .sort((a, b) => b.amount - a.amount)[0];
+
+  return top || {
+    categoryId: "",
+    name: "Гибких расходов нет",
+    amount: 0,
+  };
+}
+
+function getMonthlyReportWeekIndex(createdAt) {
+  const day = Number(String(createdAt || "").slice(8, 10)) || 1;
+
+  if (day <= 7) return 0;
+  if (day <= 14) return 1;
+  if (day <= 21) return 2;
+  if (day <= 28) return 3;
+
+  return 4;
+}
+
+function getMonthlyReportWeeks(transactions, monthValue) {
+  const [, monthRaw] = String(monthValue || "").split("-");
+  const month = Number(monthRaw) || new Date().getMonth() + 1;
+  const year = Number(String(monthValue || "").slice(0, 4)) || new Date().getFullYear();
+  const lastDay = new Date(year, month, 0).getDate();
+
+  const weekLabels = [
+    "1–7",
+    "8–14",
+    "15–21",
+    "22–28",
+    `29–${lastDay}`,
+  ];
+
+  const weekMaps = [new Map(), new Map(), new Map(), new Map(), new Map()];
+
+  transactions.forEach((transaction) => {
+    if (!isFlexibleExpense(transaction)) return;
+
+    const weekIndex = getMonthlyReportWeekIndex(transaction.created_at);
+    const categoryId = transaction.category_id || UNCATEGORIZED_ID;
+    const current = weekMaps[weekIndex].get(categoryId) || 0;
+
+    weekMaps[weekIndex].set(categoryId, current + (Number(transaction.amount) || 0));
+  });
+
+  return weekMaps.map((map, index) => {
+    const top = [...map.entries()]
+      .map(([categoryId, amount]) => ({
+        categoryId,
+        name: getCategoryName(categoryId),
+        amount: roundToTwo(amount),
+      }))
+      .sort((a, b) => b.amount - a.amount)[0];
+
+    return {
+      label: weekLabels[index],
+      name: top?.name || "Нет гибких расходов",
+      amount: top?.amount || 0,
+    };
+  });
+}
+
+function normalizeMonthlyReportComment(value) {
+  return String(value || "")
+    .trim()
+    .replace(/\s+/g, " ")
+    .toLowerCase();
+}
+
+function getMonthlyReportRepeat(transactions) {
+  const byComment = new Map();
+
+  transactions.forEach((transaction) => {
+    if (!isFlexibleExpense(transaction)) return;
+
+    const rawTitle = String(transaction.title || "").trim();
+
+    if (!rawTitle || rawTitle === "Новая трата") return;
+
+    const key = normalizeMonthlyReportComment(rawTitle);
+
+    if (!key) return;
+
+    const current = byComment.get(key) || {
+      label: rawTitle,
+      count: 0,
+      amount: 0,
+    };
+
+    current.count += 1;
+    current.amount += Number(transaction.amount) || 0;
+
+    byComment.set(key, current);
+  });
+
+  const top = [...byComment.values()]
+    .filter((item) => item.count > 1)
+    .sort((a, b) => {
+      if (b.count !== a.count) return b.count - a.count;
+
+      return b.amount - a.amount;
+    })[0];
+
+  if (!top) {
+    return {
+      label: "Повторов нет",
+      count: 0,
+      amount: 0,
+    };
+  }
+
+  return {
+    label: top.label,
+    count: top.count,
+    amount: roundToTwo(top.amount),
+  };
+}
+
+function getMonthlyReportSavings(transactions) {
+  let deposits = 0;
+  let withdrawals = 0;
+  let interest = 0;
+
+  transactions.forEach((transaction) => {
+    if (isSafeBucketAdjustment(transaction)) return;
+
+    const amount = Number(transaction.amount) || 0;
+
+    if (isSafeInterestTransaction(transaction)) {
+      interest += amount;
+      return;
+    }
+
+    if (transaction.type !== "transfer") return;
+
+    const fromSafe = isVaultAccountId(transaction.from_account_id);
+    const toSafe = isVaultAccountId(transaction.to_account_id);
+
+    const hasFromBucket = Boolean(transaction.from_safe_bucket_id);
+    const hasToBucket = Boolean(transaction.to_safe_bucket_id);
+
+    const isInternalSafeMove = fromSafe && toSafe && (hasFromBucket || hasToBucket);
+
+    if (isInternalSafeMove) return;
+
+    if (!fromSafe && toSafe && hasToBucket) {
+      deposits += amount;
+    }
+
+    if (fromSafe && !toSafe && hasFromBucket) {
+      withdrawals += amount;
+    }
+  });
+
+  return {
+    deposits: roundToTwo(deposits),
+    withdrawals: roundToTwo(withdrawals),
+    interest: roundToTwo(interest),
+    net: roundToTwo(deposits + interest - withdrawals),
+  };
+}
+
+function getMonthlyReportAchievements({ totals, topCategory, repeat, savings }) {
+  const achievements = [];
+
+  if (totals.difference > 0) {
+    achievements.push({
+      type: "success",
+      title: "Месяц в плюс",
+      text: `Разница составила ${formatMoney(totals.difference)}`,
+      icon: "up",
+    });
+  } else if (totals.difference < 0) {
+    achievements.push({
+      type: "danger",
+      title: "Месяц в минус",
+      text: `Расходы выше доходов на ${formatMoney(Math.abs(totals.difference))}`,
+      icon: "down",
+    });
+  }
+
+  if (savings.net > 0) {
+    achievements.push({
+      type: "success",
+      title: "Сейф пополнен",
+      text: `Накопления выросли на ${formatMoney(savings.net)}`,
+      icon: "shield",
+    });
+  }
+
+  if (repeat.count >= 3) {
+    achievements.push({
+      type: "warning",
+      title: "Повтор месяца",
+      text: `${repeat.label}: ${repeat.count} раза`,
+      icon: "repeat",
+    });
+  }
+
+  if (topCategory.amount > 0) {
+    achievements.push({
+      type: "warning",
+      title: "Главная гибкая трата",
+      text: `${topCategory.name}: ${formatMoney(topCategory.amount)}`,
+      icon: "target",
+    });
+  }
+
+  if (!achievements.length) {
+    achievements.push({
+      type: "success",
+      title: "Спокойный месяц",
+      text: "Критичных финансовых меток нет",
+      icon: "check",
+    });
+  }
+
+  return achievements.slice(0, 4);
+}
+
+function getMonthlyReportAchievementIcon(icon) {
+  const icons = {
+    up: `
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 17V7" />
+        <path d="M8.5 10.5 12 7l3.5 3.5" />
+      </svg>
+    `,
+    down: `
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 7v10" />
+        <path d="M8.5 13.5 12 17l3.5-3.5" />
+      </svg>
+    `,
+    shield: `
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 4 18 6.5v5.2c0 3.7-2.2 6.3-6 8.3-3.8-2-6-4.6-6-8.3V6.5L12 4Z" />
+        <path d="M12 9v5" />
+        <path d="M9.5 11.5H14.5" />
+      </svg>
+    `,
+    repeat: `
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M17 7a7 7 0 0 0-11.6 2.8" />
+        <path d="M5 5v4.8h4.8" />
+        <path d="M7 17a7 7 0 0 0 11.6-2.8" />
+        <path d="M19 19v-4.8h-4.8" />
+      </svg>
+    `,
+    target: `
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="12" cy="12" r="7" />
+        <circle cx="12" cy="12" r="3" />
+      </svg>
+    `,
+    check: `
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M6 12.5 10 16l8-9" />
+      </svg>
+    `,
+  };
+
+  return icons[icon] || icons.check;
+}
+
+function renderMonthlyReportWeeks(weeks) {
+  if (!monthlyReportWeeksList) return;
+
+  monthlyReportWeeksList.innerHTML = "";
+
+  weeks.forEach((week) => {
+    const row = document.createElement("div");
+    row.className = "monthly-report-week-row";
+
+    row.innerHTML = `
+      <div class="monthly-report-week-dot">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 5v14" />
+          <path d="M7 10h10" />
+          <path d="M7 15h10" />
+        </svg>
+      </div>
+
+      <div>
+        <h4>${escapeHtml(week.name)}</h4>
+        <p>${escapeHtml(week.label)} число</p>
+      </div>
+
+      <strong>${formatMoney(week.amount)}</strong>
+    `;
+
+    monthlyReportWeeksList.appendChild(row);
+  });
+}
+
+function renderMonthlyReportAchievements(achievements) {
+  if (!monthlyReportAchievementsList) return;
+
+  monthlyReportAchievementsList.innerHTML = "";
+
+  achievements.forEach((achievement) => {
+    const card = document.createElement("div");
+    card.className = `monthly-report-achievement monthly-report-achievement--${achievement.type}`;
+
+    card.innerHTML = `
+      <div class="monthly-report-achievement__icon">
+        ${getMonthlyReportAchievementIcon(achievement.icon)}
+      </div>
+
+      <div>
+        <h4>${escapeHtml(achievement.title)}</h4>
+        <p>${escapeHtml(achievement.text)}</p>
+      </div>
+    `;
+
+    monthlyReportAchievementsList.appendChild(card);
+  });
+}
+
+function renderMonthlyReport() {
+  const monthValue = getMonthlyReportMonthValue();
+  const transactions = getMonthlyReportMonthTransactions(monthValue);
+
+  const totals = getMonthlyReportIncomeExpense(transactions);
+  const topCategory = getMonthlyReportTopFlexibleCategory(transactions);
+  const weeks = getMonthlyReportWeeks(transactions, monthValue);
+  const repeat = getMonthlyReportRepeat(transactions);
+  const savings = getMonthlyReportSavings(transactions);
+  const achievements = getMonthlyReportAchievements({
+    totals,
+    topCategory,
+    repeat,
+    savings,
+  });
+
+  if (monthlyReportMonthLabel) {
+    monthlyReportMonthLabel.textContent = getMonthlyReportMonthLabel(monthValue);
+  }
+
+  if (monthlyReportResultValue) {
+    monthlyReportResultValue.textContent = formatMoney(totals.difference);
+  }
+
+  if (monthlyReportResultText) {
+    monthlyReportResultText.textContent =
+      totals.difference > 0
+        ? "Месяц закрыт в плюс"
+        : totals.difference < 0
+          ? "Месяц закрыт в минус"
+          : "Месяц закрыт в ноль";
+  }
+
+  if (monthlyReportIncomeValue) {
+    monthlyReportIncomeValue.textContent = formatMoney(totals.income);
+  }
+
+  if (monthlyReportExpenseValue) {
+    monthlyReportExpenseValue.textContent = formatMoney(totals.expense);
+  }
+
+  if (monthlyReportDifferenceValue) {
+    monthlyReportDifferenceValue.textContent = formatMoney(totals.difference);
+  }
+
+  if (monthlyReportTopCategoryName) {
+    monthlyReportTopCategoryName.textContent = topCategory.name;
+  }
+
+  if (monthlyReportTopCategoryValue) {
+    monthlyReportTopCategoryValue.textContent = formatMoney(topCategory.amount);
+  }
+
+  if (monthlyReportRepeatName) {
+    monthlyReportRepeatName.textContent = repeat.label;
+  }
+
+  if (monthlyReportRepeatValue) {
+    monthlyReportRepeatValue.textContent =
+      repeat.count > 1
+        ? `${repeat.count} раза · ${formatMoney(repeat.amount)}`
+        : "Повторов нет";
+  }
+
+  if (monthlyReportBalanceValue) {
+    monthlyReportBalanceValue.textContent = formatMoney(calculateBalance());
+  }
+
+  if (monthlyReportFreeValue) {
+    monthlyReportFreeValue.textContent = formatMoney(getFreeMoneyTotal());
+  }
+
+  if (monthlyReportSavingsNetValue) {
+    monthlyReportSavingsNetValue.textContent = formatMoney(savings.net);
+  }
+
+  if (monthlyReportSavingsDepositValue) {
+    monthlyReportSavingsDepositValue.textContent = formatMoney(savings.deposits);
+  }
+
+  if (monthlyReportSavingsInterestValue) {
+    monthlyReportSavingsInterestValue.textContent = formatMoney(savings.interest);
+  }
+
+  renderMonthlyReportWeeks(weeks);
+  renderMonthlyReportAchievements(achievements);
+}
+
+function openMonthlyReportView() {
+  if (!monthlyReportView) return;
+
+  renderMonthlyReport();
+
+  mainView?.classList.add("hidden");
+  categoriesManagerView?.classList.add("hidden");
+  analyticsView?.classList.add("hidden");
+  operationsView?.classList.add("hidden");
+
+  monthlyReportView.classList.remove("hidden");
+
+  navWalletBtn?.classList.remove("is-active");
+  navAnalyticsBtn?.classList.remove("is-active");
+  navOperationsBtn?.classList.remove("is-active");
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth",
+  });
+}
+
+function closeMonthlyReportView() {
+  if (!monthlyReportView) return;
+
+  monthlyReportView.classList.add("hidden");
+  showWalletView();
+}
+
   /* =========================================================
      12. EVENTS / LISTENERS
      ========================================================= */
@@ -3066,6 +3614,13 @@ analyticsTabExpensesBtn?.addEventListener("click", () => setAnalyticsTab("expens
 analyticsTabSafesBtn?.addEventListener("click", () => setAnalyticsTab("safes"));
 
 accountRoleSelect?.addEventListener("change", syncAccountPrimaryControls);
+
+openMonthlyReportBtn?.addEventListener("click", openMonthlyReportView);
+closeMonthlyReportBtn?.addEventListener("click", closeMonthlyReportView);
+
+printMonthlyReportBtn?.addEventListener("click", () => {
+  window.print();
+});
 
 openCreateAccountModalBtn?.addEventListener("click", openCreateAccountModal);
 closeAccountModalBtn?.addEventListener("click", closeAccountModal);
