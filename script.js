@@ -223,6 +223,7 @@ const monthlyReportFreeValue = document.getElementById("monthlyReportFreeValue")
 const monthlyReportSavingsNetValue = document.getElementById("monthlyReportSavingsNetValue");
 const monthlyReportSavingsDepositValue = document.getElementById("monthlyReportSavingsDepositValue");
 const monthlyReportSavingsInterestValue = document.getElementById("monthlyReportSavingsInterestValue");
+const monthlyReportSavingsWithdrawalsValue = document.getElementById("monthlyReportSavingsWithdrawalsValue");
 
 const monthlyReportAchievementsList = document.getElementById("monthlyReportAchievementsList");
 
@@ -3091,7 +3092,34 @@ function getMonthlyReportMonthTransactions(monthValue) {
 }
 
 function getMonthlyReportMonthLabel(monthValue) {
-  return `Итоги ${formatMonthLabel(monthValue)}`;
+  const [yearRaw, monthRaw] = String(monthValue || "").split("-");
+  const year = Number(yearRaw) || new Date().getFullYear();
+  const monthIndex = Math.max(0, Math.min(11, (Number(monthRaw) || new Date().getMonth() + 1) - 1));
+
+  const monthNames = [
+    "января",
+    "февраля",
+    "марта",
+    "апреля",
+    "мая",
+    "июня",
+    "июля",
+    "августа",
+    "сентября",
+    "октября",
+    "ноября",
+    "декабря",
+  ];
+
+  return `Итоги ${monthNames[monthIndex]} ${year}`;
+}
+
+function formatMonthlyReportCompactMoney(value) {
+  const amount = roundToTwo(Number(value) || 0);
+
+  return `${amount.toLocaleString("ru-RU", {
+    maximumFractionDigits: 0,
+  })} ₽`;
 }
 
 function isSafeBucketAdjustment(transaction) {
