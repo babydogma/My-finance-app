@@ -10,6 +10,61 @@
     escapeHtml,
     openEditModal,
   }) {
+    function looksLikeBrokenEncoding(value) {
+      const text = String(value || "");
+
+      return (
+        /[ĐÐÑŃ�]/.test(text) ||
+        text.includes("â") ||
+        text.includes("ð") ||
+        text.includes("ñ")
+      );
+    }
+
+    function getSafeText(value, fallback = "") {
+      const text = String(value || "").trim();
+
+      if (!text) return fallback;
+
+      return looksLikeBrokenEncoding(text) ? fallback : text;
+    }
+
+    function getTransactionTitle(transaction) {
+      const rawTitle = String(transaction?.title || "").trim();
+
+      if (!rawTitle) {
+        return "Операция";
+      }
+
+      /*
+        Старые операции процентов уже могли попасть в Supabase
+        с битой кодировкой. Базу тут не трогаем, но выводим нормально.
+      */
+      if (looksLikeBrokenEncoding(rawTitle)) {
+        if (
+          transaction.type === "income" &&
+          isVaultAccountId(transaction.account_id)
+        ) {
+          return "Проценты по накоплению";
+        }
+
+        return "Операция";
+      }
+
+      return rawTitle;
+    }
+
+    function getSafeBucketLabel(bucketId) {
+      return getSafeText(getSafeBucketName(bucketId), "Накопление");
+    }
+
+    function getSafeAccountLabel(accountId, legacyName = "") {
+      return getSafeText(
+        getAccountNameById(accountId) || legacyName,
+        "Счёт"
+      );
+    }
+
     function getTransactionIconSvg(transaction) {
       if (transaction.type === "income") {
         return `
@@ -55,51 +110,53 @@
       let valueClass = "list-value";
 
       if (transaction.type === "transfer") {
-        const fromAccountName =
-          getAccountNameById(transaction.from_account_id) ||
-          transaction.from_account ||
-          "";
+        const fromAccountName = getSafeAccountLabel(
+          transaction.from_account_id,
+          transaction.from_account
+        );
 
-        const toAccountName =
-          getAccountNameById(transaction.to_account_id) ||
-          transaction.to_account ||
-          "";
+        const toAccountName = getSafeAccountLabel(
+          transaction.to_account_id,
+          transaction.to_account
+        );
 
         const fromLabel = isVaultAccountId(transaction.from_account_id)
-          ? `${fromAccountName} • ${getSafeBucketName(transaction.from_safe_bucket_id)}`
+          ? `${fromAccountName} • ${getSafeBucketLabel(transaction.from_safe_bucket_id)}`
           : fromAccountName;
 
         const toLabel = isVaultAccountId(transaction.to_account_id)
-          ? `${toAccountName} • ${getSafeBucketName(transaction.to_safe_bucket_id)}`
+          ? `${toAccountName} • ${getSafeBucketLabel(transaction.to_safe_bucket_id)}`
           : toAccountName;
 
         subtitle = `${fromLabel} → ${toLabel}`;
         signedAmount = formatMoney(transaction.amount);
         valueClass = "list-value list-value--transfer";
       } else if (transaction.type === "income") {
-        const incomeAccountName =
-          getAccountNameById(transaction.account_id) ||
-          transaction.account ||
-          "";
+        const incomeAccountName = getSafeAccountLabel(
+          transaction.account_id,
+          transaction.account
+        );
 
         const incomeBucketLabel =
           isVaultAccountId(transaction.account_id) && transaction.to_safe_bucket_id
-            ? ` • ${getSafeBucketName(transaction.to_safe_bucket_id)}`
+            ? ` • ${getSafeBucketLabel(transaction.to_safe_bucket_id)}`
             : "";
 
         subtitle = `${incomeAccountName}${incomeBucketLabel} • доход`;
         signedAmount = `+${formatMoney(transaction.amount)}`;
         valueClass = "list-value list-value--green";
       } else {
-        const expenseAccountName =
-          getAccountNameById(transaction.account_id) ||
-          transaction.account ||
-          "";
+        const expenseAccountName = getSafeAccountLabel(
+          transaction.account_id,
+          transaction.account
+        );
 
-        subtitle =
-          `${getCategoryName(transaction.category_id || UNCATEGORIZED_ID)}` +
-          ` • ${expenseAccountName}`;
+        const categoryName = getSafeText(
+          getCategoryName(transaction.category_id || UNCATEGORIZED_ID),
+          "Категория"
+        );
 
+        subtitle = `${categoryName} • ${expenseAccountName}`;
         signedAmount = `−${formatMoney(transaction.amount)}`;
         valueClass = "list-value list-value--red";
       }
@@ -107,7 +164,7 @@
       const shortDate = formatDateShort(transaction.created_at);
       const timeLabel = transaction.time_label || "";
       const caption = `${shortDate}${shortDate && timeLabel ? " • " : ""}${timeLabel}`;
-      const title = transaction.title || "Операция";
+      const title = getTransactionTitle(transaction);
 
       card.innerHTML = `
         <div class="transaction-icon" aria-hidden="true">
