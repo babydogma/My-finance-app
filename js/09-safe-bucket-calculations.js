@@ -96,20 +96,10 @@
     function isSafeAccountReference(accountId, accountName) {
       const safeAccountId = getSafeAccountId();
 
-      /*
-        Нормальная новая логика:
-        если ID есть — считаем только по ID.
-        Название не должно управлять деньгами.
-      */
       if (accountId) {
         return accountId === safeAccountId;
       }
 
-      /*
-        Legacy fallback:
-        только для старых операций, где ID пустой,
-        но текстовое название ещё осталось.
-      */
       const legacySafeAccountName = String(getSafeAccountName() || "").trim();
 
       if (!legacySafeAccountName) return false;
