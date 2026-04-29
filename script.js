@@ -427,7 +427,7 @@ getSafeBucketIcon,
     getSecondLineReserveBalance,
     getAvailableNowBalance,
     getProtectedMoneyTotal,
-    getFreeMoneyTotal,
+    getFreeMoneyTotal: getFreeMoneyTotalFromSafeModule,
   } = window.FinanceAppSafeBucketCalculations.create({
   state,
   roundToTwo,
@@ -441,6 +441,14 @@ getSafeBucketIcon,
   getProtectedAccounts,
   getFreeMoneyAccounts,
 });
+
+  function getFreeMoneyTotal() {
+    const accountsPart = getFreeMoneyAccounts().reduce((sum, account) => {
+      return sum + getAccountBalance(account.id);
+    }, 0);
+
+    return roundToTwo(Math.max(0, accountsPart));
+  }
 
   const {
     getBudgetLimitByCategoryId,
@@ -1808,42 +1816,67 @@ async function deleteAccountModalAction() {
   if (!account) return;
 
   if (account.account_kind === "vault_pool") {
-    alert("Накопительный счёт удалять нельзя");
+    alert("Сейфы Яндекса нельзя удалить как обычный счёт");
     return;
   }
 
-  const hasTransactions = state.transactions.some((transaction) => {
-    const byId =
-      transaction.account_id === account.id ||
-      transaction.from_account_id === account.id ||
-      transaction.to_account_id === account.id;
-
-    const byLegacyName =
-      (!transaction.account_id && transaction.account === account.name) ||
-      (!transaction.from_account_id && transaction.from_account === account.name) ||
-      (!transaction.to_account_id && transaction.to_account === account.name);
-
-    return byId || byLegacyName;
-  });
-
-  if (hasTransactions) {
-    alert("Нельзя удалить счёт, который уже используется в операциях");
-    return;
-  }
-
-  const ok = confirm(`Удалить счёт "${account.name}"?`);
+  const ok = confirm(`Удалить счёт "${account.name}"? Операции останутся в истории.`);
   if (!ok) return;
 
-  const { error } = await supabaseClient
+  const { error: accountDetachError } = await supabaseClient
+    .from("transactions")
+    .update({
+      account_id: null,
+      account: account.name,
+    })
+    .eq("account_id", account.id);
+
+  if (accountDetachError) {
+    alert(`Ошибка отвязки операций счёта: ${accountDetachError.message || "unknown error"}`);
+    console.error(accountDetachError);
+    return;
+  }
+
+  const { error: fromDetachError } = await supabaseClient
+    .from("transactions")
+    .update({
+      from_account_id: null,
+      from_account: account.name,
+    })
+    .eq("from_account_id", account.id);
+
+  if (fromDetachError) {
+    alert(`Ошибка отвязки переводов со счёта: ${fromDetachError.message || "unknown error"}`);
+    console.error(fromDetachError);
+    return;
+  }
+
+  const { error: toDetachError } = await supabaseClient
+    .from("transactions")
+    .update({
+      to_account_id: null,
+      to_account: account.name,
+    })
+    .eq("to_account_id", account.id);
+
+  if (toDetachError) {
+    alert(`Ошибка отвязки переводов на счёт: ${toDetachError.message || "unknown error"}`);
+    console.error(toDetachError);
+    return;
+  }
+
+  const { error: deleteError } = await supabaseClient
     .from("accounts")
     .delete()
     .eq("id", activeAccountId);
 
-  if (error) {
-    alert("Ошибка удаления счёта");
-    console.error(error);
+  if (deleteError) {
+    alert(`Ошибка удаления счёта: ${deleteError.message || "unknown error"}`);
+    console.error(deleteError);
     return;
   }
+
+  activeAccountId = null;
 
   await loadDataFromSupabase();
   renderAll();
