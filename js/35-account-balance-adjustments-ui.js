@@ -4,15 +4,31 @@
   const SELECTORS = {
     accountsList: "#accountsList",
     accountCard: ".list-card",
-    accountValue: ".list-value",
-    accountRight: ".list-right",
   };
 
-  let modalEl = null;
   let activeAccountId = null;
+  let isAccountSavePassThrough = false;
+
+  function $(id) {
+    return document.getElementById(id);
+  }
 
   function getState() {
     return window.FinanceAppState?.state || null;
+  }
+
+  function getSupabaseClient() {
+    if (window.supabaseClient) return window.supabaseClient;
+
+    try {
+      if (typeof supabaseClient !== "undefined") {
+        return supabaseClient;
+      }
+    } catch (error) {
+      return null;
+    }
+
+    return null;
   }
 
   function roundToTwo(value) {
@@ -28,27 +44,10 @@
     ) || 0;
   }
 
-  function formatMoney(value) {
+  function formatMoneyInputValue(value) {
     const rounded = roundToTwo(value);
 
-    return `${rounded.toLocaleString("ru-RU", {
-      minimumFractionDigits: rounded % 1 === 0 ? 0 : 2,
-      maximumFractionDigits: 2,
-    })} ₽`;
-  }
-
-  function getSupabaseClient() {
-    if (window.supabaseClient) return window.supabaseClient;
-
-    try {
-      if (typeof supabaseClient !== "undefined") {
-        return supabaseClient;
-      }
-    } catch (error) {
-      return null;
-    }
-
-    return null;
+    return String(rounded).replace(".", ",");
   }
 
   function getAccountById(accountId) {
@@ -177,239 +176,68 @@
     }
   }
 
-  function ensureModal() {
-    if (modalEl) return modalEl;
+  function ensureAccountBalanceField() {
+    const accountModal = $("accountModal");
+    const accountNameInput = $("accountNameInput");
 
-    modalEl = document.createElement("div");
-    modalEl.className = "modal hidden account-balance-adjustment-modal";
-    modalEl.id = "accountBalanceAdjustmentModal";
+    if (!accountModal || !accountNameInput) return null;
 
-    modalEl.innerHTML = `
-      <div class="modal-sheet account-balance-adjustment-sheet">
-        <div class="modal-handle"></div>
+    let field = $("accountModalBalanceField");
 
-        <h3 class="modal-title account-balance-adjustment-title">
-          Изменить сумму
-        </h3>
+    if (field) return field;
 
-        <div class="account-balance-adjustment-card">
-          <div class="account-balance-adjustment-card__label">
-            Счёт
-          </div>
+    field = document.createElement("div");
+    field.className = "account-modal-balance-field hidden";
+    field.id = "accountModalBalanceField";
 
-          <div class="account-balance-adjustment-card__name" id="accountBalanceAdjustmentName">
-            —
-          </div>
+    field.innerHTML = `
+      <div class="account-modal-balance-field__label">
+        Баланс
+      </div>
 
-          <div class="account-balance-adjustment-card__meta">
-            По операциям:
-            <strong id="accountBalanceAdjustmentRawValue">0 ₽</strong>
-          </div>
+      <div class="account-modal-balance-field__control">
+        <input
+          class="input account-modal-balance-field__input"
+          id="accountModalBalanceInput"
+          type="text"
+          inputmode="decimal"
+          autocomplete="off"
+          placeholder="0"
+        />
 
-          <div class="account-balance-adjustment-card__meta">
-            Сейчас показывается:
-            <strong id="accountBalanceAdjustmentCurrentValue">0 ₽</strong>
-          </div>
-        </div>
-
-        <div class="field account-balance-adjustment-field">
-          <input
-            class="input account-balance-adjustment-input"
-            id="accountBalanceAdjustmentInput"
-            type="text"
-            inputmode="decimal"
-            autocomplete="off"
-            placeholder="Новая сумма"
-          />
-          <span class="account-balance-adjustment-symbol">₽</span>
-        </div>
-
-        <div class="account-balance-adjustment-diff" id="accountBalanceAdjustmentDiff">
-          Новое число заменит старое
-        </div>
-
-        <div class="account-balance-adjustment-note">
-          Сумма счёта будет заменена на введённую. Операция не создаётся, в аналитику ничего не попадает.
-        </div>
-
-        <div class="modal-actions account-balance-adjustment-actions">
-          <button class="btn btn-secondary" type="button" id="cancelAccountBalanceAdjustmentBtn">
-            Отмена
-          </button>
-
-          <button class="btn btn-primary" type="button" id="saveAccountBalanceAdjustmentBtn">
-            Сохранить сумму
-          </button>
-
-          <button class="btn btn-danger" type="button" id="resetAccountBalanceAdjustmentBtn">
-            Вернуть расчёт по операциям
-          </button>
-        </div>
+        <span class="account-modal-balance-field__symbol">₽</span>
       </div>
     `;
 
-    document.body.appendChild(modalEl);
+    const nameField =
+      accountNameInput.closest(".field") ||
+      accountNameInput.parentElement;
 
-    modalEl.addEventListener("click", (event) => {
-      if (event.target === modalEl) {
-        closeModal();
-      }
-    });
+    if (nameField) {
+      nameField.insertAdjacentElement("afterend", field);
+    }
 
-    modalEl
-      .querySelector("#cancelAccountBalanceAdjustmentBtn")
-      ?.addEventListener("click", closeModal);
-
-    modalEl
-      .querySelector("#saveAccountBalanceAdjustmentBtn")
-      ?.addEventListener("click", saveActiveAdjustment);
-
-    modalEl
-      .querySelector("#resetAccountBalanceAdjustmentBtn")
-      ?.addEventListener("click", resetActiveAdjustment);
-
-    modalEl
-      .querySelector("#accountBalanceAdjustmentInput")
-      ?.addEventListener("input", updateDiffPreview);
-
-    return modalEl;
+    return field;
   }
 
-  function openModal(accountId) {
-    const account = getAccountById(accountId);
+  function syncAccountBalanceField() {
+    const field = ensureAccountBalanceField();
+    const input = $("accountModalBalanceInput");
+    const account = getAccountById(activeAccountId);
 
-    if (!account) return;
+    if (!field || !input) return;
 
-    activeAccountId = accountId;
-
-    const modal = ensureModal();
-    const rawBalance = getRawAccountBalance(accountId);
-    const currentBalance = getCorrectedAccountBalance(accountId);
-
-    modal.querySelector("#accountBalanceAdjustmentName").textContent = account.name;
-    modal.querySelector("#accountBalanceAdjustmentRawValue").textContent = formatMoney(rawBalance);
-    modal.querySelector("#accountBalanceAdjustmentCurrentValue").textContent = formatMoney(currentBalance);
-
-    const input = modal.querySelector("#accountBalanceAdjustmentInput");
-
-    input.value = String(currentBalance).replace(".", ",");
-    updateDiffPreview();
-
-    modal.classList.remove("hidden", "is-closing");
-
-    requestAnimationFrame(() => {
-      modal.classList.add("is-visible");
-      input.focus();
-      input.select();
-    });
-  }
-
-  function closeModal() {
-    if (!modalEl) return;
-
-    modalEl.classList.remove("is-visible");
-    modalEl.classList.add("is-closing");
-
-    setTimeout(() => {
-      modalEl.classList.add("hidden");
-      modalEl.classList.remove("is-closing");
-      activeAccountId = null;
-    }, 280);
-  }
-
-  function updateDiffPreview() {
-    if (!modalEl || !activeAccountId) return;
-
-    const input = modalEl.querySelector("#accountBalanceAdjustmentInput");
-    const diffEl = modalEl.querySelector("#accountBalanceAdjustmentDiff");
-
-    const desiredBalance = parseMoneyInput(input.value);
-    const currentBalance = getCorrectedAccountBalance(activeAccountId);
-    const differenceFromCurrent = roundToTwo(desiredBalance - currentBalance);
-
-    if (Math.abs(differenceFromCurrent) < 0.005) {
-      diffEl.textContent = "Останется текущее число";
-      diffEl.classList.remove("is-negative", "is-positive");
+    if (!account) {
+      field.classList.add("hidden");
+      input.value = "";
       return;
     }
 
-    diffEl.textContent = `Счёт станет: ${formatMoney(desiredBalance)}`;
-    diffEl.classList.toggle("is-negative", differenceFromCurrent < 0);
-    diffEl.classList.toggle("is-positive", differenceFromCurrent > 0);
+    field.classList.remove("hidden");
+    input.value = formatMoneyInputValue(getCorrectedAccountBalance(account.id));
   }
 
-  async function saveActiveAdjustment() {
-    if (!modalEl || !activeAccountId) return;
-
-    const input = modalEl.querySelector("#accountBalanceAdjustmentInput");
-    const saveBtn = modalEl.querySelector("#saveAccountBalanceAdjustmentBtn");
-
-    const desiredBalance = parseMoneyInput(input.value);
-    const rawBalance = getRawAccountBalance(activeAccountId);
-
-    /*
-      Важно:
-      здесь НЕ прибавляется новая корректировка к старой.
-      Старое значение для этого счёта заменяется новым:
-      новое_отображаемое_число - баланс_по_операциям.
-    */
-    const replacementAdjustment = roundToTwo(desiredBalance - rawBalance);
-
-    saveBtn.disabled = true;
-    saveBtn.textContent = "Сохраняю…";
-
-    try {
-      setLocalAdjustment(activeAccountId, replacementAdjustment);
-      await saveAdjustmentsToSupabase();
-
-      window.location.reload();
-    } catch (error) {
-      alert(`Не получилось сохранить сумму: ${error.message || error}`);
-      saveBtn.disabled = false;
-      saveBtn.textContent = "Сохранить сумму";
-    }
-  }
-
-  async function resetActiveAdjustment() {
-    if (!modalEl || !activeAccountId) return;
-
-    const resetBtn = modalEl.querySelector("#resetAccountBalanceAdjustmentBtn");
-
-    resetBtn.disabled = true;
-    resetBtn.textContent = "Возвращаю…";
-
-    try {
-      setLocalAdjustment(activeAccountId, 0);
-      await saveAdjustmentsToSupabase();
-
-      window.location.reload();
-    } catch (error) {
-      alert(`Не получилось вернуть расчёт по операциям: ${error.message || error}`);
-      resetBtn.disabled = false;
-      resetBtn.textContent = "Вернуть расчёт по операциям";
-    }
-  }
-
-  function createEditButton(accountId) {
-    const button = document.createElement("button");
-
-    button.className = "account-balance-edit-btn";
-    button.type = "button";
-    button.dataset.accountBalanceEditBtn = "true";
-    button.setAttribute("aria-label", "Изменить сумму счёта");
-    button.textContent = "✎";
-
-    button.addEventListener("click", (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-
-      openModal(accountId);
-    });
-
-    return button;
-  }
-
-  function syncAccountCards() {
+  function bindAccountCards() {
     const state = getState();
     const accountsList = document.querySelector(SELECTORS.accountsList);
 
@@ -424,33 +252,29 @@
 
       card.dataset.accountId = account.id;
 
-      const rightSide = card.querySelector(SELECTORS.accountRight);
-      const valueEl = card.querySelector(SELECTORS.accountValue);
+      if (card.dataset.accountBalanceInlineBound === "true") return;
 
-      if (!rightSide || !valueEl) return;
+      card.dataset.accountBalanceInlineBound = "true";
 
-      if (!rightSide.querySelector("[data-account-balance-edit-btn='true']")) {
-        rightSide.appendChild(createEditButton(account.id));
-      }
-
-      const manualAdjustment = getManualAdjustment(account.id);
-
-      card.classList.toggle(
-        "account-card--has-manual-adjustment",
-        Math.abs(manualAdjustment) >= 0.005
+      card.addEventListener(
+        "click",
+        () => {
+          activeAccountId = card.dataset.accountId || account.id;
+        },
+        true
       );
     });
   }
 
-  function startObserver() {
+  function watchAccountsList() {
     const accountsList = document.querySelector(SELECTORS.accountsList);
 
     if (!accountsList) return;
 
-    syncAccountCards();
+    bindAccountCards();
 
     const observer = new MutationObserver(() => {
-      syncAccountCards();
+      bindAccountCards();
     });
 
     observer.observe(accountsList, {
@@ -459,7 +283,83 @@
     });
   }
 
-  document.addEventListener("DOMContentLoaded", () => {
-    startObserver();
-  });
+  function watchAccountModal() {
+    const accountModal = $("accountModal");
+
+    if (!accountModal) return;
+
+    const observer = new MutationObserver(() => {
+      if (!accountModal.classList.contains("hidden")) {
+        window.requestAnimationFrame(syncAccountBalanceField);
+      } else {
+        activeAccountId = null;
+      }
+    });
+
+    observer.observe(accountModal, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+  }
+
+  async function saveInlineAccountBalanceBeforeAccountSave(event) {
+    if (isAccountSavePassThrough) return;
+
+    const accountModal = $("accountModal");
+    const input = $("accountModalBalanceInput");
+    const saveBtn = $("saveAccountModalBtn");
+
+    if (!accountModal || !input || !saveBtn) return;
+    if (accountModal.classList.contains("hidden")) return;
+
+    const account = getAccountById(activeAccountId);
+
+    if (!account) return;
+
+    event.preventDefault();
+    event.stopImmediatePropagation();
+
+    const desiredBalance = parseMoneyInput(input.value);
+    const rawBalance = getRawAccountBalance(account.id);
+    const replacementAdjustment = roundToTwo(desiredBalance - rawBalance);
+
+    try {
+      setLocalAdjustment(account.id, replacementAdjustment);
+      await saveAdjustmentsToSupabase();
+
+      isAccountSavePassThrough = true;
+      saveBtn.click();
+      isAccountSavePassThrough = false;
+    } catch (error) {
+      isAccountSavePassThrough = false;
+      alert(`Не получилось сохранить баланс счёта: ${error.message || error}`);
+    }
+  }
+
+  function bindAccountSaveButton() {
+    const saveBtn = $("saveAccountModalBtn");
+
+    if (!saveBtn || saveBtn.dataset.accountBalanceInlineBound === "true") return;
+
+    saveBtn.dataset.accountBalanceInlineBound = "true";
+
+    saveBtn.addEventListener(
+      "click",
+      saveInlineAccountBalanceBeforeAccountSave,
+      true
+    );
+  }
+
+  function boot() {
+    ensureAccountBalanceField();
+    watchAccountsList();
+    watchAccountModal();
+    bindAccountSaveButton();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", boot);
+  } else {
+    boot();
+  }
 })();
