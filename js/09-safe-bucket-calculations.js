@@ -12,116 +12,24 @@
     getProtectedAccounts,
     getFreeMoneyAccounts,
   }) {
-    const SAVINGS_BUCKET_SETTINGS_META_KEY = "savings_bucket_settings";
-
-    function parseSafeBucketsMetaObject(value, fallback = {}) {
-      if (!value) return fallback;
-
-      if (typeof value === "string") {
-        try {
-          const parsed = JSON.parse(value);
-
-          return parsed && typeof parsed === "object" ? parsed : fallback;
-        } catch (error) {
-          return fallback;
-        }
-      }
-
-      if (typeof value === "object") {
-        return value;
-      }
-
-      return fallback;
-    }
-
-    function getStateMetaValue(key, fallback = null) {
-      const possibleSources = [
-        state.appMeta,
-        state.app_meta,
-        state.meta,
-        state.settings,
-      ];
-
-      for (const source of possibleSources) {
-        if (!source) continue;
-
-        if (source instanceof Map && source.has(key)) {
-          return source.get(key);
-        }
-
-        if (Array.isArray(source)) {
-          const row = source.find((item) => {
-            return item && item.key === key;
-          });
-
-          if (row) {
-            return row.value ?? fallback;
-          }
-        }
-
-        if (typeof source === "object" && Object.prototype.hasOwnProperty.call(source, key)) {
-          return source[key];
-        }
-      }
-
-      return fallback;
-    }
-
-    function getSavingsBucketSettingsMap() {
-      return parseSafeBucketsMetaObject(
-        getStateMetaValue(SAVINGS_BUCKET_SETTINGS_META_KEY, {}),
-        {}
-      );
-    }
-
-    function getSavingsBucketSettings(bucketId) {
-      const settingsMap = getSavingsBucketSettingsMap();
-      const saved = settingsMap[bucketId];
-
-      if (!saved || typeof saved !== "object") {
-        return null;
-      }
-
-      const type = saved.type || "default";
-      const interestEnabled = Boolean(saved.interestEnabled);
-      const annualRate = interestEnabled ? Number(saved.annualRate) || 0 : 0;
-
-      return {
-        type,
-        interestEnabled,
-        annualRate,
-        includeInProtected:
-          typeof saved.includeInProtected === "boolean"
-            ? saved.includeInProtected
-            : type !== "default",
-        includeInFreeMoney:
-          typeof saved.includeInFreeMoney === "boolean"
-            ? saved.includeInFreeMoney
-            : false,
-      };
-    }
-
-    function normalizeSavingsBucketKind(value) {
+    function normalizeSavingsValue(value) {
       return String(value || "").trim().toLowerCase();
     }
 
-    function getBucketLegacyKind(bucket) {
-      return normalizeSavingsBucketKind(
+    function getLegacyBucketKind(bucket) {
+      return normalizeSavingsValue(
         bucket?.kind ||
         bucket?.bucket_kind ||
-        bucket?.type ||
         ""
       );
     }
 
-    function getBucketSavingsType(bucket) {
-      const settings = getSavingsBucketSettings(bucket?.id);
+    function getSavingsType(bucket) {
+      const type = normalizeSavingsValue(bucket?.savings_type);
 
-      if (settings?.type) {
-        return settings.type;
-      }
+      if (type) return type;
 
-      const legacyKind = getBucketLegacyKind(bucket);
+      const legacyKind = getLegacyBucketKind(bucket);
 
       if (legacyKind === "tax" || legacyKind === "housing") {
         return "required";
@@ -135,18 +43,11 @@
     }
 
     function isBucketProtected(bucket) {
-      const settings = getSavingsBucketSettings(bucket?.id);
-
-      if (settings) {
-        return settings.includeInProtected === true;
+      if (typeof bucket?.include_in_protected === "boolean") {
+        return bucket.include_in_protected;
       }
 
-      /*
-        Legacy fallback:
-        раньше защищёнными считались только tax / housing / reserve.
-        Обычные накопления без настроек не трогаем, чтобы не поменять математику старым данным.
-      */
-      const legacyKind = getBucketLegacyKind(bucket);
+      const legacyKind = getLegacyBucketKind(bucket);
 
       return ["tax", "housing", "reserve"].includes(legacyKind);
     }
@@ -154,8 +55,8 @@
     function isStrictProtectedBucket(bucket) {
       if (!isBucketProtected(bucket)) return false;
 
-      const type = getBucketSavingsType(bucket);
-      const legacyKind = getBucketLegacyKind(bucket);
+      const type = getSavingsType(bucket);
+      const legacyKind = getLegacyBucketKind(bucket);
 
       return (
         type === "required" ||
@@ -168,8 +69,8 @@
       if (!isBucketProtected(bucket)) return false;
       if (isStrictProtectedBucket(bucket)) return false;
 
-      const type = getBucketSavingsType(bucket);
-      const legacyKind = getBucketLegacyKind(bucket);
+      const type = getSavingsType(bucket);
+      const legacyKind = getLegacyBucketKind(bucket);
 
       return (
         type === "reserve" ||
@@ -196,9 +97,9 @@
       const safeAccountId = getSafeAccountId();
 
       /*
-        Новая нормальная логика:
+        Нормальная новая логика:
         если ID есть — считаем только по ID.
-        Название тут вообще не должно решать судьбу денег.
+        Название не должно управлять деньгами.
       */
       if (accountId) {
         return accountId === safeAccountId;
@@ -206,8 +107,8 @@
 
       /*
         Legacy fallback:
-        оставляем только для старых операций, где account_id / from_account_id / to_account_id пустой,
-        но сохранён текстовый account / from_account / to_account.
+        только для старых операций, где ID пустой,
+        но текстовое название ещё осталось.
       */
       const legacySafeAccountName = String(getSafeAccountName() || "").trim();
 
@@ -216,7 +117,7 @@
       return String(accountName || "").trim() === legacySafeAccountName;
     }
 
-    function getTransactionSafeBucketIncomeId(transaction) {
+    function getIncomeBucketId(transaction) {
       return (
         transaction.to_safe_bucket_id ||
         transaction.safe_bucket_id ||
@@ -224,7 +125,7 @@
       );
     }
 
-    function getTransactionSafeBucketExpenseId(transaction) {
+    function getExpenseBucketId(transaction) {
       return (
         transaction.from_safe_bucket_id ||
         transaction.safe_bucket_id ||
@@ -268,7 +169,7 @@
             transaction.account
           );
 
-          const incomeBucketId = getTransactionSafeBucketIncomeId(transaction);
+          const incomeBucketId = getIncomeBucketId(transaction);
 
           if (incomeToSafe && incomeBucketId === bucketId) {
             balance += amount;
@@ -283,7 +184,7 @@
             transaction.account
           );
 
-          const expenseBucketId = getTransactionSafeBucketExpenseId(transaction);
+          const expenseBucketId = getExpenseBucketId(transaction);
 
           if (expenseFromSafe && expenseBucketId === bucketId) {
             balance -= amount;
@@ -321,10 +222,6 @@
       });
     }
 
-    /*
-      “Не распределено” удалено из интерфейса.
-      Нераспределённый остаток накопительного счёта НЕ считается свободными деньгами.
-    */
     function getFreeSafeBalance() {
       return 0;
     }
