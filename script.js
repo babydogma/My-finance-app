@@ -592,6 +592,429 @@ toAccountSelect?.addEventListener("change", () => {
     escapeHtml,
   });
   
+    /* =========================================================
+     Savings generalization layer
+     Универсальные накопления поверх старой safe_buckets-модели
+     ========================================================= */
+
+  const SAVINGS_SECTION_TITLE_META_KEY = "savings_section_title";
+  const SAVINGS_BUCKET_SETTINGS_META_KEY = "savings_bucket_settings";
+
+  function parseSavingsMetaObject(value, fallback = {}) {
+    if (!value) return fallback;
+
+    if (typeof value === "string") {
+      try {
+        const parsed = JSON.parse(value);
+
+        return parsed && typeof parsed === "object" ? parsed : fallback;
+      } catch (error) {
+        return fallback;
+      }
+    }
+
+    if (typeof value === "object") {
+      return value;
+    }
+
+    return fallback;
+  }
+
+  function getSavingsSectionTitle() {
+    const rawTitle = getAppMetaValue(SAVINGS_SECTION_TITLE_META_KEY, "Накопления");
+    const title = String(rawTitle || "").trim();
+
+    return title || "Накопления";
+  }
+
+  function getSavingsBucketSettingsMap() {
+    return parseSavingsMetaObject(
+      getAppMetaValue(SAVINGS_BUCKET_SETTINGS_META_KEY, {}),
+      {}
+    );
+  }
+
+  function getSavingsBucketSettings(bucketId) {
+    const settingsMap = getSavingsBucketSettingsMap();
+    const saved = settingsMap[bucketId] || {};
+    const legacyAnnualRate = Number(getSafeBucketInterestAnnualRate(bucketId)) || 0;
+
+    return {
+      type: saved.type || "default",
+      interestEnabled:
+        typeof saved.interestEnabled === "boolean"
+          ? saved.interestEnabled
+          : legacyAnnualRate > 0,
+      annualRate:
+        typeof saved.annualRate === "number"
+          ? saved.annualRate
+          : legacyAnnualRate,
+      includeInProtected:
+        typeof saved.includeInProtected === "boolean"
+          ? saved.includeInProtected
+          : true,
+      includeInFreeMoney:
+        typeof saved.includeInFreeMoney === "boolean"
+          ? saved.includeInFreeMoney
+          : false,
+    };
+  }
+
+  async function saveSavingsAppMetaValue(key, value) {
+    setAppMetaLocalValue(key, value);
+
+    const storageValue =
+      typeof value === "string"
+        ? value
+        : JSON.stringify(value);
+
+    const { error } = await supabaseClient
+      .from("app_meta")
+      .upsert(
+        {
+          key,
+          value: storageValue,
+        },
+        {
+          onConflict: "key",
+        }
+      );
+
+    if (error) {
+      console.error("saveSavingsAppMetaValue error:", error);
+      throw error;
+    }
+  }
+
+  async function saveSavingsSectionTitle(nextTitle) {
+    const title = String(nextTitle || "").trim() || "Накопления";
+
+    await saveSavingsAppMetaValue(SAVINGS_SECTION_TITLE_META_KEY, title);
+    syncSavingsSectionTitleUi();
+  }
+
+  async function saveSavingsBucketSettings(bucketId, nextSettings) {
+    if (!bucketId) return;
+
+    const settingsMap = getSavingsBucketSettingsMap();
+
+    settingsMap[bucketId] = {
+      ...getSavingsBucketSettings(bucketId),
+      ...nextSettings,
+    };
+
+    await saveSavingsAppMetaValue(
+      SAVINGS_BUCKET_SETTINGS_META_KEY,
+      settingsMap
+    );
+  }
+
+  function getSavingsTypeLabel(type) {
+    const labels = {
+      default: "Обычное",
+      reserve: "Резерв",
+      required: "Обязательное",
+      asset: "Актив",
+    };
+
+    return labels[type] || labels.default;
+  }
+
+  function syncSavingsSectionTitleUi() {
+    if (safeBucketsModalTitle) {
+      safeBucketsModalTitle.textContent = getSavingsSectionTitle();
+    }
+  }
+
+  function ensureSavingsSectionTitleEditButton() {
+    if (!safeBucketsModalTitle) return;
+
+    const titleWrap = safeBucketsModalTitle.parentElement;
+
+    if (!titleWrap || document.getElementById("editSavingsSectionTitleBtn")) {
+      return;
+    }
+
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "savings-section-title-edit-btn";
+    button.id = "editSavingsSectionTitleBtn";
+    button.textContent = "Переименовать";
+
+    button.addEventListener("click", async () => {
+      const currentTitle = getSavingsSectionTitle();
+
+      const nextTitle = window.prompt(
+        "Название раздела накоплений",
+        currentTitle
+      );
+
+      if (nextTitle === null) return;
+
+      try {
+        await saveSavingsSectionTitle(nextTitle);
+        renderAll();
+      } catch (error) {
+        alert("Не получилось сохранить название раздела");
+      }
+    });
+
+    titleWrap.appendChild(button);
+  }
+
+  function ensureSavingsInputLabel(input, labelText) {
+    if (!input) return;
+
+    const field = input.closest(".field") || input.parentElement;
+
+    if (!field) return;
+
+    const alreadyExists = field.querySelector(".savings-editor-field-label");
+
+    if (alreadyExists) {
+      alreadyExists.textContent = labelText;
+      return;
+    }
+
+    const label = document.createElement("div");
+    label.className = "savings-editor-field-label";
+    label.textContent = labelText;
+
+    field.insertBefore(label, input);
+  }
+
+  function ensureSavingsEditorSettingsPanel() {
+    if (!safeBucketAmountModal) return;
+
+    ensureSavingsInputLabel(safeBucketNameInput, "Название накопления");
+    ensureSavingsInputLabel(safeBucketAmountInput, "Текущая сумма");
+    ensureSavingsInputLabel(safeBucketInterestInput, "Годовой процент");
+
+    if (document.getElementById("safeBucketGeneralSettingsPanel")) {
+      return;
+    }
+
+    const panel = document.createElement("div");
+    panel.className = "savings-editor-settings-panel";
+    panel.id = "safeBucketGeneralSettingsPanel";
+
+    panel.innerHTML = `
+      <div class="savings-editor-field-label">Тип накопления</div>
+
+      <select class="input savings-editor-type-select" id="safeBucketTypeSelect">
+        <option value="default">Обычное</option>
+        <option value="reserve">Резерв</option>
+        <option value="required">Обязательное</option>
+        <option value="asset">Актив</option>
+      </select>
+
+      <label class="savings-editor-toggle-row" for="safeBucketInterestEnabledInput">
+        <span>
+          <strong>Начислять проценты</strong>
+          <small>Отключи, если это золото, наличка, крипта или другой актив без банковской ставки</small>
+        </span>
+
+        <input
+          id="safeBucketInterestEnabledInput"
+          type="checkbox"
+        />
+
+        <i aria-hidden="true"></i>
+      </label>
+
+      <div class="savings-editor-settings-hint" id="safeBucketSettingsHint">
+        Настройки пока не ломают старые операции и сохраняются отдельно.
+      </div>
+    `;
+
+    const interestField =
+      safeBucketInterestInput?.closest(".field") ||
+      safeBucketInterestInput?.parentElement;
+
+    if (interestField) {
+      interestField.insertAdjacentElement("afterend", panel);
+    } else {
+      const modalSheet = safeBucketAmountModal.querySelector(".modal-sheet");
+
+      modalSheet?.insertBefore(panel, modalSheet.querySelector(".modal-actions"));
+    }
+
+    const checkbox = document.getElementById("safeBucketInterestEnabledInput");
+    const typeSelect = document.getElementById("safeBucketTypeSelect");
+
+    checkbox?.addEventListener("change", () => {
+      if (!checkbox.checked && safeBucketInterestInput) {
+        safeBucketInterestInput.value = "0";
+      }
+
+      syncSavingsInterestFieldState();
+    });
+
+    typeSelect?.addEventListener("change", () => {
+      syncSavingsEditorHint();
+    });
+  }
+
+  function syncSavingsInterestFieldState() {
+    const checkbox = document.getElementById("safeBucketInterestEnabledInput");
+
+    if (!checkbox || !safeBucketInterestInput) return;
+
+    const interestField =
+      safeBucketInterestInput.closest(".field") ||
+      safeBucketInterestInput.parentElement;
+
+    safeBucketInterestInput.disabled = !checkbox.checked;
+
+    interestField?.classList.toggle(
+      "savings-editor-interest-disabled",
+      !checkbox.checked
+    );
+  }
+
+  function syncSavingsEditorHint() {
+    const typeSelect = document.getElementById("safeBucketTypeSelect");
+    const hint = document.getElementById("safeBucketSettingsHint");
+
+    if (!typeSelect || !hint) return;
+
+    const type = typeSelect.value;
+
+    if (type === "asset") {
+      hint.textContent = "Актив — это золото, валюта, крипта или другое имущество. Проценты можно выключить.";
+      return;
+    }
+
+    if (type === "reserve") {
+      hint.textContent = "Резерв — деньги, которые лучше не считать свободными.";
+      return;
+    }
+
+    if (type === "required") {
+      hint.textContent = "Обязательное — деньги под платежи, налоги, квартиру или фиксированные цели.";
+      return;
+    }
+
+    hint.textContent = "Обычное накопление — цель, копилка или отдельный денежный карман.";
+  }
+
+  function syncSavingsBucketEditorUi() {
+    if (!safeBucketAmountModal || !activeSafeBucketAmountId) return;
+
+    ensureSavingsEditorSettingsPanel();
+
+    const settings = getSavingsBucketSettings(activeSafeBucketAmountId);
+    const checkbox = document.getElementById("safeBucketInterestEnabledInput");
+    const typeSelect = document.getElementById("safeBucketTypeSelect");
+
+    if (typeSelect) {
+      typeSelect.value = settings.type || "default";
+    }
+
+    if (checkbox) {
+      checkbox.checked = Boolean(settings.interestEnabled);
+    }
+
+    if (safeBucketInterestInput) {
+      const percentValue = settings.annualRate > 0
+        ? getRoundedPercentFromDecimal(settings.annualRate)
+        : 0;
+
+      if (!safeBucketInterestInput.value) {
+        safeBucketInterestInput.value = String(percentValue);
+      }
+
+      if (!settings.interestEnabled) {
+        safeBucketInterestInput.value = "0";
+      }
+    }
+
+    syncSavingsInterestFieldState();
+    syncSavingsEditorHint();
+
+    if (safeBucketAmountModalTitle) {
+      const bucket = getSafeBucketById(activeSafeBucketAmountId);
+      const bucketName = bucket?.name || "Накопление";
+      const typeLabel = getSavingsTypeLabel(settings.type);
+
+      safeBucketAmountModalTitle.textContent = bucketName;
+      safeBucketAmountModalTitle.dataset.savingsTypeLabel = typeLabel;
+    }
+  }
+
+  async function saveActiveSavingsBucketSettingsFromEditor() {
+    if (!activeSafeBucketAmountId) return;
+
+    const checkbox = document.getElementById("safeBucketInterestEnabledInput");
+    const typeSelect = document.getElementById("safeBucketTypeSelect");
+
+    const interestEnabled = Boolean(checkbox?.checked);
+    const type = typeSelect?.value || "default";
+
+    if (!interestEnabled && safeBucketInterestInput) {
+      safeBucketInterestInput.value = "0";
+    }
+
+    const percentValue = Number(
+      String(safeBucketInterestInput?.value || "0")
+        .replace(",", ".")
+        .replace("%", "")
+    ) || 0;
+
+    await saveSavingsBucketSettings(activeSafeBucketAmountId, {
+      type,
+      interestEnabled,
+      annualRate: interestEnabled ? roundToTwo(percentValue / 100) : 0,
+      includeInProtected: type !== "default" || true,
+      includeInFreeMoney: false,
+    });
+  }
+
+  function initSavingsGeneralizationUi() {
+    syncSavingsSectionTitleUi();
+    ensureSavingsSectionTitleEditButton();
+    ensureSavingsEditorSettingsPanel();
+
+    const safeBucketsObserver = new MutationObserver(() => {
+      if (!safeBucketsModal?.classList.contains("hidden")) {
+        syncSavingsSectionTitleUi();
+        ensureSavingsSectionTitleEditButton();
+      }
+    });
+
+    if (safeBucketsModal) {
+      safeBucketsObserver.observe(safeBucketsModal, {
+        attributes: true,
+        attributeFilter: ["class"],
+      });
+    }
+
+    const safeBucketEditorObserver = new MutationObserver(() => {
+      if (!safeBucketAmountModal?.classList.contains("hidden")) {
+        syncSavingsBucketEditorUi();
+      }
+    });
+
+    if (safeBucketAmountModal) {
+      safeBucketEditorObserver.observe(safeBucketAmountModal, {
+        attributes: true,
+        attributeFilter: ["class"],
+      });
+    }
+
+    saveSafeBucketAmountBtn?.addEventListener(
+      "click",
+      () => {
+        saveActiveSavingsBucketSettingsFromEditor().catch((error) => {
+          console.error("saveActiveSavingsBucketSettingsFromEditor error:", error);
+        });
+      },
+      true
+    );
+  }
+
+  initSavingsGeneralizationUi();
+  
   function syncMandatoryPaymentCategorySelectFromActivePayment() {
   if (!fillMandatoryPaymentCategorySelect) return;
 
