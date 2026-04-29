@@ -598,7 +598,8 @@ toAccountSelect?.addEventListener("change", () => {
      ========================================================= */
 
   const SAVINGS_SECTION_TITLE_META_KEY = "savings_section_title";
-  const SAVINGS_BUCKET_SETTINGS_META_KEY = "savings_bucket_settings";
+const SAVINGS_BUCKET_SETTINGS_META_KEY = "savings_bucket_settings";
+const SAFE_BUCKET_INTEREST_RATES_META_KEY = "safe_bucket_interest_rates";
 
   function parseSavingsMetaObject(value, fallback = {}) {
     if (!value) return fallback;
@@ -635,30 +636,55 @@ toAccountSelect?.addEventListener("change", () => {
   }
 
   function getSavingsBucketSettings(bucketId) {
-    const settingsMap = getSavingsBucketSettingsMap();
-    const saved = settingsMap[bucketId] || {};
-    const legacyAnnualRate = Number(getSafeBucketInterestAnnualRate(bucketId)) || 0;
+  const settingsMap = getSavingsBucketSettingsMap();
+  const saved = settingsMap[bucketId];
 
+  const legacyAnnualRate = Number(getSafeBucketInterestAnnualRate(bucketId)) || 0;
+
+  if (!saved || typeof saved !== "object") {
     return {
-      type: saved.type || "default",
-      interestEnabled:
-        typeof saved.interestEnabled === "boolean"
-          ? saved.interestEnabled
-          : legacyAnnualRate > 0,
-      annualRate:
-        typeof saved.annualRate === "number"
-          ? saved.annualRate
-          : legacyAnnualRate,
-      includeInProtected:
-        typeof saved.includeInProtected === "boolean"
-          ? saved.includeInProtected
-          : true,
-      includeInFreeMoney:
-        typeof saved.includeInFreeMoney === "boolean"
-          ? saved.includeInFreeMoney
-          : false,
+      type: "default",
+      interestEnabled: legacyAnnualRate > 0,
+      annualRate: legacyAnnualRate,
+      includeInProtected: true,
+      includeInFreeMoney: false,
     };
   }
+
+  const annualRate = Number(saved.annualRate) || 0;
+  const interestEnabled =
+    typeof saved.interestEnabled === "boolean"
+      ? saved.interestEnabled
+      : annualRate > 0;
+
+  return {
+    type: saved.type || "default",
+    interestEnabled,
+    annualRate: interestEnabled ? annualRate : 0,
+    includeInProtected:
+      typeof saved.includeInProtected === "boolean"
+        ? saved.includeInProtected
+        : true,
+    includeInFreeMoney:
+      typeof saved.includeInFreeMoney === "boolean"
+        ? saved.includeInFreeMoney
+        : false,
+  };
+}
+
+function getSavingsBucketInterestAnnualRate(bucketId) {
+  const settings = getSavingsBucketSettings(bucketId);
+
+  if (!settings.interestEnabled) {
+    return 0;
+  }
+
+  return Number(settings.annualRate) || 0;
+}
+
+function isSavingsBucketInterestEnabled(bucketId) {
+  return getSavingsBucketInterestAnnualRate(bucketId) > 0;
+}
 
   async function saveSavingsAppMetaValue(key, value) {
     setAppMetaLocalValue(key, value);
@@ -685,6 +711,27 @@ toAccountSelect?.addEventListener("change", () => {
       throw error;
     }
   }
+  
+  async function saveLegacySafeBucketInterestRate(bucketId, annualRate) {
+  if (!bucketId) return;
+
+  const ratesMap = {
+    ...getSafeBucketInterestRatesMap(),
+  };
+
+  const nextAnnualRate = Math.max(0, Number(annualRate) || 0);
+
+  if (nextAnnualRate > 0) {
+    ratesMap[bucketId] = nextAnnualRate;
+  } else {
+    delete ratesMap[bucketId];
+  }
+
+  await saveSavingsAppMetaValue(
+    SAFE_BUCKET_INTEREST_RATES_META_KEY,
+    ratesMap
+  );
+}
 
   async function saveSavingsSectionTitle(nextTitle) {
     const title = String(nextTitle || "").trim() || "Накопления";
@@ -899,76 +946,79 @@ toAccountSelect?.addEventListener("change", () => {
   }
 
   function syncSavingsBucketEditorUi() {
-    if (!safeBucketAmountModal || !activeSafeBucketAmountId) return;
+  if (!safeBucketAmountModal || !activeSafeBucketAmountId) return;
 
-    ensureSavingsEditorSettingsPanel();
+  ensureSavingsEditorSettingsPanel();
 
-    const settings = getSavingsBucketSettings(activeSafeBucketAmountId);
-    const checkbox = document.getElementById("safeBucketInterestEnabledInput");
-    const typeSelect = document.getElementById("safeBucketTypeSelect");
+  const settings = getSavingsBucketSettings(activeSafeBucketAmountId);
+  const checkbox = document.getElementById("safeBucketInterestEnabledInput");
+  const typeSelect = document.getElementById("safeBucketTypeSelect");
 
-    if (typeSelect) {
-      typeSelect.value = settings.type || "default";
-    }
-
-    if (checkbox) {
-      checkbox.checked = Boolean(settings.interestEnabled);
-    }
-
-    if (safeBucketInterestInput) {
-      const percentValue = settings.annualRate > 0
-        ? getRoundedPercentFromDecimal(settings.annualRate)
-        : 0;
-
-      if (!safeBucketInterestInput.value) {
-        safeBucketInterestInput.value = String(percentValue);
-      }
-
-      if (!settings.interestEnabled) {
-        safeBucketInterestInput.value = "0";
-      }
-    }
-
-    syncSavingsInterestFieldState();
-    syncSavingsEditorHint();
-
-    if (safeBucketAmountModalTitle) {
-      const bucket = getSafeBucketById(activeSafeBucketAmountId);
-      const bucketName = bucket?.name || "Накопление";
-      const typeLabel = getSavingsTypeLabel(settings.type);
-
-      safeBucketAmountModalTitle.textContent = bucketName;
-      safeBucketAmountModalTitle.dataset.savingsTypeLabel = typeLabel;
-    }
+  if (typeSelect) {
+    typeSelect.value = settings.type || "default";
   }
+
+  if (checkbox) {
+    checkbox.checked = Boolean(settings.interestEnabled);
+  }
+
+  if (safeBucketInterestInput) {
+    const percentValue = settings.interestEnabled
+      ? getRoundedPercentFromDecimal(settings.annualRate)
+      : 0;
+
+    safeBucketInterestInput.value = String(percentValue);
+  }
+
+  syncSavingsInterestFieldState();
+  syncSavingsEditorHint();
+
+  if (safeBucketAmountModalTitle) {
+    const bucket = getSafeBucketById(activeSafeBucketAmountId);
+    const bucketName = bucket?.name || "Накопление";
+    const typeLabel = getSavingsTypeLabel(settings.type);
+
+    safeBucketAmountModalTitle.textContent = bucketName;
+    safeBucketAmountModalTitle.dataset.savingsTypeLabel = typeLabel;
+  }
+}
 
   async function saveActiveSavingsBucketSettingsFromEditor() {
-    if (!activeSafeBucketAmountId) return;
+  if (!activeSafeBucketAmountId) return;
 
-    const checkbox = document.getElementById("safeBucketInterestEnabledInput");
-    const typeSelect = document.getElementById("safeBucketTypeSelect");
+  const checkbox = document.getElementById("safeBucketInterestEnabledInput");
+  const typeSelect = document.getElementById("safeBucketTypeSelect");
 
-    const interestEnabled = Boolean(checkbox?.checked);
-    const type = typeSelect?.value || "default";
+  const type = typeSelect?.value || "default";
+  const interestEnabled = Boolean(checkbox?.checked);
 
-    if (!interestEnabled && safeBucketInterestInput) {
-      safeBucketInterestInput.value = "0";
-    }
-
-    const percentValue = Number(
-      String(safeBucketInterestInput?.value || "0")
-        .replace(",", ".")
-        .replace("%", "")
-    ) || 0;
-
-    await saveSavingsBucketSettings(activeSafeBucketAmountId, {
-      type,
-      interestEnabled,
-      annualRate: interestEnabled ? roundToTwo(percentValue / 100) : 0,
-      includeInProtected: type !== "default" || true,
-      includeInFreeMoney: false,
-    });
+  if (!interestEnabled && safeBucketInterestInput) {
+    safeBucketInterestInput.value = "0";
   }
+
+  const percentValue = Number(
+    String(safeBucketInterestInput?.value || "0")
+      .replace(",", ".")
+      .replace("%", "")
+  ) || 0;
+
+  const annualRate = interestEnabled
+    ? roundToTwo(Math.max(0, percentValue) / 100)
+    : 0;
+
+  const includeInProtected = type !== "default";
+  const includeInFreeMoney = false;
+
+  await saveSavingsBucketSettings(activeSafeBucketAmountId, {
+    type,
+    interestEnabled,
+    annualRate,
+    includeInProtected,
+    includeInFreeMoney,
+  });
+  
+  await saveLegacySafeBucketInterestRate(activeSafeBucketAmountId, annualRate);
+}
 
   function initSavingsGeneralizationUi() {
     syncSavingsSectionTitleUi();
