@@ -202,6 +202,9 @@ const closeMonthlyReportBtn = document.getElementById("closeMonthlyReportBtn");
 const printMonthlyReportBtn = document.getElementById("printMonthlyReportBtn");
 const monthlyReportView = document.getElementById("monthlyReportView");
 
+const monthlyReportHero = document.querySelector(".monthly-report-hero");
+const monthlyReportMonthSwitch = document.getElementById("monthlyReportMonthSwitch");
+
 const monthlyReportMonthLabel = document.getElementById("monthlyReportMonthLabel");
 const monthlyReportResultValue = document.getElementById("monthlyReportResultValue");
 const monthlyReportResultText = document.getElementById("monthlyReportResultText");
@@ -209,6 +212,11 @@ const monthlyReportResultText = document.getElementById("monthlyReportResultText
 const monthlyReportIncomeValue = document.getElementById("monthlyReportIncomeValue");
 const monthlyReportExpenseValue = document.getElementById("monthlyReportExpenseValue");
 const monthlyReportDifferenceValue = document.getElementById("monthlyReportDifferenceValue");
+
+const monthlyReportIncomeFlowValue = document.getElementById("monthlyReportIncomeFlowValue");
+const monthlyReportExpenseFlowValue = document.getElementById("monthlyReportExpenseFlowValue");
+const monthlyReportIncomeBar = document.getElementById("monthlyReportIncomeBar");
+const monthlyReportExpenseBar = document.getElementById("monthlyReportExpenseBar");
 
 const monthlyReportTopCategoryName = document.getElementById("monthlyReportTopCategoryName");
 const monthlyReportTopCategoryValue = document.getElementById("monthlyReportTopCategoryValue");
@@ -3077,8 +3085,10 @@ function renderAll() {
   renderAnalytics();
 }
 
+let monthlyReportSelectedMonthValue = "";
+
 function getMonthlyReportMonthValue() {
-  return getCurrentMonthValue();
+  return monthlyReportSelectedMonthValue || getCurrentMonthValue();
 }
 
 function getMonthlyReportMonthTransactions(monthValue) {
@@ -3112,6 +3122,111 @@ function getMonthlyReportMonthLabel(monthValue) {
   ];
 
   return `Итоги ${monthNames[monthIndex]} ${year}`;
+}
+
+function getMonthlyReportMonthButtonLabel(monthIndex) {
+  return [
+    "янв",
+    "фев",
+    "март",
+    "апр",
+    "май",
+    "июнь",
+    "июль",
+    "авг",
+    "сен",
+    "окт",
+    "ноя",
+    "дек",
+  ][monthIndex];
+}
+
+function getMonthlyReportMonthValueByIndex(year, monthIndex) {
+  return `${year}-${String(monthIndex + 1).padStart(2, "0")}`;
+}
+
+function renderMonthlyReportMonthSwitch(activeMonthValue) {
+  if (!monthlyReportMonthSwitch) return;
+
+  const activeYear =
+    Number(String(activeMonthValue || "").slice(0, 4)) ||
+    new Date().getFullYear();
+
+  monthlyReportMonthSwitch.innerHTML = "";
+
+  for (let monthIndex = 0; monthIndex < 12; monthIndex += 1) {
+    const monthValue = getMonthlyReportMonthValueByIndex(activeYear, monthIndex);
+
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "monthly-report-month-btn";
+    button.textContent = getMonthlyReportMonthButtonLabel(monthIndex);
+    button.dataset.monthlyReportMonth = monthValue;
+
+    button.classList.toggle("is-active", monthValue === activeMonthValue);
+
+    button.addEventListener("click", () => {
+      monthlyReportSelectedMonthValue = monthValue;
+      renderMonthlyReport();
+    });
+
+    monthlyReportMonthSwitch.appendChild(button);
+  }
+
+  const activeButton = monthlyReportMonthSwitch.querySelector(".is-active");
+
+  activeButton?.scrollIntoView({
+    behavior: "smooth",
+    inline: "center",
+    block: "nearest",
+  });
+}
+
+function renderMonthlyReportHeroState(difference) {
+  if (!monthlyReportHero) return;
+
+  monthlyReportHero.classList.remove(
+    "monthly-report-hero--profit",
+    "monthly-report-hero--loss",
+    "monthly-report-hero--neutral"
+  );
+
+  if (difference > 0) {
+    monthlyReportHero.classList.add("monthly-report-hero--profit");
+    return;
+  }
+
+  if (difference < 0) {
+    monthlyReportHero.classList.add("monthly-report-hero--loss");
+    return;
+  }
+
+  monthlyReportHero.classList.add("monthly-report-hero--neutral");
+}
+
+function renderMonthlyReportFlow(totals) {
+  const income = Math.max(0, Number(totals.income) || 0);
+  const expense = Math.max(0, Number(totals.expense) || 0);
+  const max = Math.max(income, expense, 1);
+
+  const incomeWidth = Math.max(4, Math.round((income / max) * 100));
+  const expenseWidth = Math.max(4, Math.round((expense / max) * 100));
+
+  if (monthlyReportIncomeFlowValue) {
+    monthlyReportIncomeFlowValue.textContent = formatMoney(income);
+  }
+
+  if (monthlyReportExpenseFlowValue) {
+    monthlyReportExpenseFlowValue.textContent = formatMoney(expense);
+  }
+
+  if (monthlyReportIncomeBar) {
+    monthlyReportIncomeBar.style.width = `${incomeWidth}%`;
+  }
+
+  if (monthlyReportExpenseBar) {
+    monthlyReportExpenseBar.style.width = `${expenseWidth}%`;
+  }
 }
 
 function formatMonthlyReportCompactMoney(value) {
@@ -3516,13 +3631,17 @@ function renderMonthlyReport() {
   const repeat = getMonthlyReportRepeat(transactions);
   const savings = getMonthlyReportSavings(transactions);
   const achievements = getMonthlyReportAchievements({
-    totals,
-    topCategory,
-    repeat,
-    savings,
-  });
+  totals,
+  topCategory,
+  repeat,
+  savings,
+});
 
-  if (monthlyReportMonthLabel) {
+renderMonthlyReportMonthSwitch(monthValue);
+renderMonthlyReportHeroState(totals.difference);
+renderMonthlyReportFlow(totals);
+
+if (monthlyReportMonthLabel) {
     monthlyReportMonthLabel.textContent = getMonthlyReportMonthLabel(monthValue);
   }
 
@@ -3596,6 +3715,8 @@ function renderMonthlyReport() {
 
 function openMonthlyReportView() {
   if (!monthlyReportView) return;
+
+  monthlyReportSelectedMonthValue = getCurrentMonthValue();
 
   renderMonthlyReport();
 
