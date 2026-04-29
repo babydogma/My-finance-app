@@ -1,70 +1,388 @@
 (() => {
-  const META_KEY = "account_balance_adjustments_v1";
+  const ACCOUNT_BALANCE_ADJUSTMENTS_META_KEY = "account_balance_adjustments_v1";
 
-  const SELECTORS = {
-    accountsList: "#accountsList",
-    accountCard: ".list-card",
-    accountValue: ".list-value",
-    accountRight: ".list-right",
+  const SAVINGS_TYPES = {
+    default: {
+      label: "Обычное",
+      hint: "Обычное накопление: цель, копилка или отдельный денежный карман.",
+    },
+    reserve: {
+      label: "Резерв",
+      hint: "Резерв: деньги защищены и не должны считаться свободными.",
+    },
+    required: {
+      label: "Обязательное",
+      hint: "Обязательное: деньги под налоги, квартиру, платежи или фиксированную цель.",
+    },
+    asset: {
+      label: "Актив",
+      hint: "Актив: золото, валюта, крипта или другое имущество. Проценты можно выключить.",
+    },
   };
 
-  let modalEl = null;
-  let activeAccountId = null;
+  function $(id) {
+    return document.getElementById(id);
+  }
+
+  function getBridge() {
+    return window.FinanceAppSavingsBridge || null;
+  }
 
   function getState() {
-    return window.FinanceAppState?.state || null;
-  }
-
-  function roundToTwo(value) {
-    return Math.round((Number(value) || 0) * 100) / 100;
-  }
-
-  function parseMoneyInput(rawValue) {
-    return Number(
-      String(rawValue || "")
-        .replace(/\s/g, "")
-        .replace(",", ".")
-        .replace(/[^\d.-]/g, "")
-    ) || 0;
-  }
-
-  function formatMoney(value) {
-    const rounded = roundToTwo(value);
-
-    return `${rounded.toLocaleString("ru-RU", {
-      minimumFractionDigits: rounded % 1 === 0 ? 0 : 2,
-      maximumFractionDigits: 2,
-    })} ₽`;
+    return getBridge()?.getState?.() || window.FinanceAppState?.state || null;
   }
 
   function getSupabaseClient() {
-    if (window.supabaseClient) return window.supabaseClient;
+    return getBridge()?.getSupabaseClient?.() || null;
+  }
 
-    try {
-      if (typeof supabaseClient !== "undefined") {
-        return supabaseClient;
-      }
-    } catch (error) {
-      return null;
+  function roundToTwo(value) {
+    const bridgeRound = getBridge()?.roundToTwo;
+
+    if (typeof bridgeRound === "function") {
+      return bridgeRound(value);
     }
 
-    return null;
+    return Math.round((Number(value) || 0) * 100) / 100;
   }
 
-  function getAccountById(accountId) {
-    const state = getState();
+  function getActiveBucketId() {
+    const bridgeId = getBridge()?.getActiveBucketId?.();
 
-    if (!state || !Array.isArray(state.accounts)) return null;
+    if (bridgeId) return bridgeId;
 
-    return state.accounts.find((account) => account.id === accountId) || null;
+    const modal = $("safeBucketAmountModal");
+
+    return modal?.dataset?.bucketId || modal?.dataset?.safeBucketId || "";
   }
 
-  function getRawAccountBalance(accountId) {
+  function getBucketById(bucketId) {
+    const fromBridge = getBridge()?.getSafeBucketById?.(bucketId);
+
+    if (fromBridge) return fromBridge;
+
     const state = getState();
-    const account = getAccountById(accountId);
+
+    return state?.safeBuckets?.find((bucket) => bucket.id === bucketId) || null;
+  }
+
+  function getVaultAccount() {
+    const fromBridge = getBridge()?.getVaultAccount?.();
+
+    if (fromBridge) return fromBridge;
+
+    const state = getState();
+
+    return state?.accounts?.find((account) => account.account_kind === "vault_pool") || null;
+  }
+
+  function roundRate(value) {
+    const number = Number(value) || 0;
+
+    return Math.max(0, Math.round(number * 1000000) / 1000000);
+  }
+
+  function parsePercentInput(value) {
+    return (
+      Number(
+        String(value || "0")
+          .replace(",", ".")
+          .replace("%", "")
+          .trim()
+      ) || 0
+    );
+  }
+
+  function legacyTypeFromBucket(bucket) {
+    const kind = String(bucket?.kind || bucket?.bucket_kind || "").trim();
+
+    if (kind === "tax" || kind === "housing") return "required";
+    if (kind === "reserve") return "reserve";
+
+    return "default";
+  }
+
+  function getBucketSettings(bucket) {
+    const legacyRate = Number(bucket?.annual_rate) || 0;
+    const type = bucket?.savings_type || legacyTypeFromBucket(bucket);
+
+    return {
+      savings_type: type,
+      interest_enabled: Boolean(bucket?.interest_enabled),
+      annual_rate: Boolean(bucket?.interest_enabled) ? legacyRate : 0,
+      include_in_protected:
+        typeof bucket?.include_in_protected === "boolean"
+          ? bucket.include_in_protected
+          : type !== "default",
+      include_in_free_money:
+        typeof bucket?.include_in_free_money === "boolean"
+          ? bucket.include_in_free_money
+          : false,
+    };
+  }
+
+  function ensureFieldLabel(input, labelText) {
+    if (!input) return;
+
+    const field = input.closest(".field") || input.parentElement;
+
+    if (!field) return;
+
+    let label = field.querySelector(".savings-editor-field-label");
+
+    if (!label) {
+      label = document.createElement("div");
+      label.className = "savings-editor-field-label";
+      field.insertBefore(label, input);
+    }
+
+    label.textContent = labelText;
+  }
+
+  function ensureSettingsPanel() {
+    const modal = $("safeBucketAmountModal");
+    const interestInput = $("safeBucketInterestInput");
+
+    if (!modal || !interestInput) return;
+
+    ensureFieldLabel($("safeBucketNameInput"), "Название накопления");
+    ensureFieldLabel($("safeBucketAmountInput"), "Текущая сумма");
+    ensureFieldLabel(interestInput, "Годовой процент");
+
+    if ($("savingsColumnsSettingsPanel")) return;
+
+    const panel = document.createElement("div");
+    panel.className = "savings-editor-settings-panel";
+    panel.id = "savingsColumnsSettingsPanel";
+
+    panel.innerHTML = `
+      <div class="savings-editor-field-label">Тип накопления</div>
+
+      <select class="input savings-editor-type-select" id="savingsTypeSelect">
+        <option value="default">Обычное</option>
+        <option value="reserve">Резерв</option>
+        <option value="required">Обязательное</option>
+        <option value="asset">Актив</option>
+      </select>
+
+      <label class="savings-editor-toggle-row" for="savingsInterestEnabledInput">
+        <span>
+          <strong>Начислять проценты</strong>
+          <small>Выключи, если это золото, наличка, валюта, крипта или другой актив без банковской ставки.</small>
+        </span>
+
+        <input id="savingsInterestEnabledInput" type="checkbox" />
+
+        <i aria-hidden="true"></i>
+      </label>
+
+      <div class="savings-editor-settings-hint" id="savingsSettingsHint">
+        Настройки накопления сохраняются в Supabase.
+      </div>
+    `;
+
+    const interestField =
+      interestInput.closest(".field") ||
+      interestInput.parentElement;
+
+    if (interestField) {
+      interestField.insertAdjacentElement("afterend", panel);
+    }
+
+    $("savingsTypeSelect")?.addEventListener("change", syncHint);
+
+    $("savingsInterestEnabledInput")?.addEventListener("change", () => {
+      const checkbox = $("savingsInterestEnabledInput");
+
+      if (!checkbox?.checked && interestInput) {
+        interestInput.value = "0";
+      }
+
+      syncInterestFieldState();
+      syncHint();
+    });
+  }
+
+  function syncInterestFieldState() {
+    const checkbox = $("savingsInterestEnabledInput");
+    const interestInput = $("safeBucketInterestInput");
+
+    if (!checkbox || !interestInput) return;
+
+    const field =
+      interestInput.closest(".field") ||
+      interestInput.parentElement;
+
+    interestInput.disabled = !checkbox.checked;
+
+    field?.classList.toggle(
+      "savings-editor-interest-disabled",
+      !checkbox.checked
+    );
+  }
+
+  function syncHint() {
+    const typeSelect = $("savingsTypeSelect");
+    const checkbox = $("savingsInterestEnabledInput");
+    const hint = $("savingsSettingsHint");
+
+    if (!typeSelect || !hint) return;
+
+    const type = typeSelect.value || "default";
+    const baseHint = SAVINGS_TYPES[type]?.hint || SAVINGS_TYPES.default.hint;
+
+    hint.textContent = checkbox?.checked
+      ? `${baseHint} Проценты включены.`
+      : `${baseHint} Проценты выключены.`;
+  }
+
+  function syncEditorFromBucket() {
+    ensureSettingsPanel();
+
+    const bucketId = getActiveBucketId();
+    const bucket = getBucketById(bucketId);
+
+    if (!bucket) return;
+
+    const modal = $("safeBucketAmountModal");
+
+    if (modal) {
+      modal.dataset.bucketId = bucketId;
+    }
+
+    const settings = getBucketSettings(bucket);
+    const typeSelect = $("savingsTypeSelect");
+    const checkbox = $("savingsInterestEnabledInput");
+    const interestInput = $("safeBucketInterestInput");
+    const title = $("safeBucketAmountModalTitle");
+
+    if (typeSelect) {
+      typeSelect.value = settings.savings_type || "default";
+    }
+
+    if (checkbox) {
+      checkbox.checked = Boolean(settings.interest_enabled);
+    }
+
+    if (interestInput) {
+      const percent = settings.interest_enabled
+        ? Math.round((Number(settings.annual_rate) || 0) * 10000) / 100
+        : 0;
+
+      interestInput.value = String(percent).replace(".", ",");
+    }
+
+    if (title) {
+      title.textContent = bucket.name || "Накопление";
+    }
+
+    syncInterestFieldState();
+    syncHint();
+  }
+
+  function getSettingsFromEditor() {
+    const type = $("savingsTypeSelect")?.value || "default";
+    const interestEnabled = Boolean($("savingsInterestEnabledInput")?.checked);
+    const percent = parsePercentInput($("safeBucketInterestInput")?.value);
+    const annualRate = interestEnabled ? roundRate(percent / 100) : 0;
+
+    return {
+      savings_type: type,
+      interest_enabled: interestEnabled,
+      annual_rate: annualRate,
+      include_in_protected: type !== "default",
+      include_in_free_money: false,
+    };
+  }
+
+  function patchLocalBucket(bucketId, patch) {
+    const state = getState();
+
+    if (!state?.safeBuckets) return;
+
+    const index = state.safeBuckets.findIndex((bucket) => bucket.id === bucketId);
+
+    if (index === -1) return;
+
+    state.safeBuckets[index] = {
+      ...state.safeBuckets[index],
+      ...patch,
+    };
+  }
+
+  async function saveLegacyInterestRate(bucketId, annualRate) {
+    const supabaseClient = getSupabaseClient();
+
+    if (!supabaseClient || !bucketId) return;
+
+    const state = getState();
+    let ratesMap = {};
+
+    const metaRecord = state?.appMeta?.find((item) => item.key === "safe_bucket_interest_rates");
+
+    if (metaRecord?.value) {
+      try {
+        ratesMap = JSON.parse(metaRecord.value) || {};
+      } catch (error) {
+        ratesMap = {};
+      }
+    }
+
+    if (annualRate > 0) {
+      ratesMap[bucketId] = annualRate;
+    } else {
+      delete ratesMap[bucketId];
+    }
+
+    const setAppMetaLocalValue = getBridge()?.setAppMetaLocalValue;
+
+    if (typeof setAppMetaLocalValue === "function") {
+      setAppMetaLocalValue("safe_bucket_interest_rates", ratesMap);
+    }
+
+    await supabaseClient
+      .from("app_meta")
+      .upsert(
+        {
+          key: "safe_bucket_interest_rates",
+          value: JSON.stringify(ratesMap),
+        },
+        {
+          onConflict: "key",
+        }
+      );
+  }
+
+  async function saveSavingsColumnsFromEditor() {
+    const bucketId = getActiveBucketId();
+    const supabaseClient = getSupabaseClient();
+
+    if (!bucketId || !supabaseClient) return;
+
+    const patch = getSettingsFromEditor();
+
+    patchLocalBucket(bucketId, patch);
+
+    const { error } = await supabaseClient
+      .from("safe_buckets")
+      .update(patch)
+      .eq("id", bucketId);
+
+    if (error) {
+      console.error("saveSavingsColumnsFromEditor error:", error);
+      alert(`Не получилось сохранить настройки накопления: ${error.message || "unknown error"}`);
+      return;
+    }
+
+    await saveLegacyInterestRate(bucketId, patch.annual_rate);
+  }
+
+  function calculateRawAccountBalance(account) {
+    const state = getState();
 
     if (!state || !account) return 0;
 
+    const accountId = account.id;
     const accountName = account.name;
 
     return roundToTwo(
@@ -72,49 +390,28 @@
         const amount = roundToTwo(Number(transaction.amount) || 0);
 
         if (transaction.type === "income") {
-          const matchesById =
-            transaction.account_id && transaction.account_id === accountId;
+          const byId = transaction.account_id && transaction.account_id === accountId;
+          const legacy = !transaction.account_id && transaction.account === accountName;
 
-          const matchesLegacy =
-            !transaction.account_id && transaction.account === accountName;
-
-          if (matchesById || matchesLegacy) {
-            return sum + amount;
-          }
+          if (byId || legacy) return sum + amount;
         }
 
         if (transaction.type === "expense") {
-          const matchesById =
-            transaction.account_id && transaction.account_id === accountId;
+          const byId = transaction.account_id && transaction.account_id === accountId;
+          const legacy = !transaction.account_id && transaction.account === accountName;
 
-          const matchesLegacy =
-            !transaction.account_id && transaction.account === accountName;
-
-          if (matchesById || matchesLegacy) {
-            return sum - amount;
-          }
+          if (byId || legacy) return sum - amount;
         }
 
         if (transaction.type === "transfer") {
-          const fromMatchesById =
-            transaction.from_account_id && transaction.from_account_id === accountId;
+          const fromById = transaction.from_account_id && transaction.from_account_id === accountId;
+          const toById = transaction.to_account_id && transaction.to_account_id === accountId;
 
-          const fromMatchesLegacy =
-            !transaction.from_account_id && transaction.from_account === accountName;
+          const fromLegacy = !transaction.from_account_id && transaction.from_account === accountName;
+          const toLegacy = !transaction.to_account_id && transaction.to_account === accountName;
 
-          const toMatchesById =
-            transaction.to_account_id && transaction.to_account_id === accountId;
-
-          const toMatchesLegacy =
-            !transaction.to_account_id && transaction.to_account === accountName;
-
-          if (fromMatchesById || fromMatchesLegacy) {
-            sum -= amount;
-          }
-
-          if (toMatchesById || toMatchesLegacy) {
-            sum += amount;
-          }
+          if (fromById || fromLegacy) sum -= amount;
+          if (toById || toLegacy) sum += amount;
         }
 
         return sum;
@@ -122,44 +419,56 @@
     );
   }
 
-  function getManualAdjustment(accountId) {
+  function getBucketsTotalBalance() {
     const state = getState();
+    const getSafeBucketBalance = getBridge()?.getSafeBucketBalance;
 
-    return window.FinanceAppAccountBalanceAdjustments
-      ?.getAccountManualAdjustment(state, accountId) || 0;
+    if (!state?.safeBuckets) return 0;
+
+    return roundToTwo(
+      state.safeBuckets.reduce((sum, bucket) => {
+        const amount =
+          typeof getSafeBucketBalance === "function"
+            ? getSafeBucketBalance(bucket.id)
+            : Number(bucket.amount || bucket.balance || 0);
+
+        return sum + (Number(amount) || 0);
+      }, 0)
+    );
   }
 
-  function getCorrectedAccountBalance(accountId) {
-    return roundToTwo(getRawAccountBalance(accountId) + getManualAdjustment(accountId));
-  }
-
-  function setLocalAdjustment(accountId, adjustment) {
+  async function syncVaultAccountBalanceToBuckets() {
+    const supabaseClient = getSupabaseClient();
     const state = getState();
+    const vaultAccount = getVaultAccount();
 
-    window.FinanceAppAccountBalanceAdjustments
-      ?.setAccountManualAdjustmentLocal(state, accountId, adjustment);
-  }
+    if (!supabaseClient || !state || !vaultAccount) return;
 
-  async function saveAdjustmentsToSupabase() {
-    const state = getState();
-    const client = getSupabaseClient();
+    const bucketTotal = getBucketsTotalBalance();
 
-    if (!client) {
-      throw new Error("Supabase client не найден");
-    }
+    const rawBalanceFromBridge =
+      typeof getBridge()?.getRawAccountBalance === "function"
+        ? getBridge().getRawAccountBalance(vaultAccount.id)
+        : calculateRawAccountBalance(vaultAccount);
 
-    const adjustments =
-      window.FinanceAppAccountBalanceAdjustments
-        ?.getAccountBalanceAdjustments(state) || {};
+    const manualAdjustment = roundToTwo(bucketTotal - rawBalanceFromBridge);
 
-    const serialized = JSON.stringify(adjustments);
+    const accountAdjustmentsApi = window.FinanceAppAccountBalanceAdjustments;
 
-    const { error } = await client
+    if (!accountAdjustmentsApi?.setAccountManualAdjustmentLocal) return;
+
+    const nextAdjustments = accountAdjustmentsApi.setAccountManualAdjustmentLocal(
+      state,
+      vaultAccount.id,
+      manualAdjustment
+    );
+
+    const { error } = await supabaseClient
       .from("app_meta")
       .upsert(
         {
-          key: META_KEY,
-          value: serialized,
+          key: ACCOUNT_BALANCE_ADJUSTMENTS_META_KEY,
+          value: JSON.stringify(nextAdjustments),
         },
         {
           onConflict: "key",
@@ -167,299 +476,162 @@
       );
 
     if (error) {
-      throw error;
-    }
-
-    try {
-      window.localStorage.setItem(META_KEY, serialized);
-    } catch (error) {
-      // Не критично.
-    }
-  }
-
-  function ensureModal() {
-    if (modalEl) return modalEl;
-
-    modalEl = document.createElement("div");
-    modalEl.className = "modal hidden account-balance-adjustment-modal";
-    modalEl.id = "accountBalanceAdjustmentModal";
-
-    modalEl.innerHTML = `
-      <div class="modal-sheet account-balance-adjustment-sheet">
-        <div class="modal-handle"></div>
-
-        <h3 class="modal-title account-balance-adjustment-title">
-          Изменить сумму
-        </h3>
-
-        <div class="account-balance-adjustment-card">
-          <div class="account-balance-adjustment-card__label">
-            Счёт
-          </div>
-
-          <div class="account-balance-adjustment-card__name" id="accountBalanceAdjustmentName">
-            —
-          </div>
-
-          <div class="account-balance-adjustment-card__meta">
-            По операциям:
-            <strong id="accountBalanceAdjustmentRawValue">0 ₽</strong>
-          </div>
-
-          <div class="account-balance-adjustment-card__meta">
-            Сейчас показывается:
-            <strong id="accountBalanceAdjustmentCurrentValue">0 ₽</strong>
-          </div>
-        </div>
-
-        <div class="field account-balance-adjustment-field">
-          <input
-            class="input account-balance-adjustment-input"
-            id="accountBalanceAdjustmentInput"
-            type="text"
-            inputmode="decimal"
-            autocomplete="off"
-            placeholder="Новая сумма"
-          />
-          <span class="account-balance-adjustment-symbol">₽</span>
-        </div>
-
-        <div class="account-balance-adjustment-diff" id="accountBalanceAdjustmentDiff">
-          Новое число заменит старое
-        </div>
-
-        <div class="account-balance-adjustment-note">
-          Сумма счёта будет заменена на введённую. Операция не создаётся, в аналитику ничего не попадает.
-        </div>
-
-        <div class="modal-actions account-balance-adjustment-actions">
-          <button class="btn btn-secondary" type="button" id="cancelAccountBalanceAdjustmentBtn">
-            Отмена
-          </button>
-
-          <button class="btn btn-primary" type="button" id="saveAccountBalanceAdjustmentBtn">
-            Сохранить сумму
-          </button>
-
-          <button class="btn btn-danger" type="button" id="resetAccountBalanceAdjustmentBtn">
-            Вернуть расчёт по операциям
-          </button>
-        </div>
-      </div>
-    `;
-
-    document.body.appendChild(modalEl);
-
-    modalEl.addEventListener("click", (event) => {
-      if (event.target === modalEl) {
-        closeModal();
-      }
-    });
-
-    modalEl
-      .querySelector("#cancelAccountBalanceAdjustmentBtn")
-      ?.addEventListener("click", closeModal);
-
-    modalEl
-      .querySelector("#saveAccountBalanceAdjustmentBtn")
-      ?.addEventListener("click", saveActiveAdjustment);
-
-    modalEl
-      .querySelector("#resetAccountBalanceAdjustmentBtn")
-      ?.addEventListener("click", resetActiveAdjustment);
-
-    modalEl
-      .querySelector("#accountBalanceAdjustmentInput")
-      ?.addEventListener("input", updateDiffPreview);
-
-    return modalEl;
-  }
-
-  function openModal(accountId) {
-    const account = getAccountById(accountId);
-
-    if (!account) return;
-
-    activeAccountId = accountId;
-
-    const modal = ensureModal();
-    const rawBalance = getRawAccountBalance(accountId);
-    const currentBalance = getCorrectedAccountBalance(accountId);
-
-    modal.querySelector("#accountBalanceAdjustmentName").textContent = account.name;
-    modal.querySelector("#accountBalanceAdjustmentRawValue").textContent = formatMoney(rawBalance);
-    modal.querySelector("#accountBalanceAdjustmentCurrentValue").textContent = formatMoney(currentBalance);
-
-    const input = modal.querySelector("#accountBalanceAdjustmentInput");
-
-    input.value = String(currentBalance).replace(".", ",");
-    updateDiffPreview();
-
-    modal.classList.remove("hidden", "is-closing");
-
-    requestAnimationFrame(() => {
-      modal.classList.add("is-visible");
-      input.focus();
-      input.select();
-    });
-  }
-
-  function closeModal() {
-    if (!modalEl) return;
-
-    modalEl.classList.remove("is-visible");
-    modalEl.classList.add("is-closing");
-
-    setTimeout(() => {
-      modalEl.classList.add("hidden");
-      modalEl.classList.remove("is-closing");
-      activeAccountId = null;
-    }, 280);
-  }
-
-  function updateDiffPreview() {
-    if (!modalEl || !activeAccountId) return;
-
-    const input = modalEl.querySelector("#accountBalanceAdjustmentInput");
-    const diffEl = modalEl.querySelector("#accountBalanceAdjustmentDiff");
-
-    const desiredBalance = parseMoneyInput(input.value);
-    const currentBalance = getCorrectedAccountBalance(activeAccountId);
-    const differenceFromCurrent = roundToTwo(desiredBalance - currentBalance);
-
-    if (Math.abs(differenceFromCurrent) < 0.005) {
-      diffEl.textContent = "Останется текущее число";
-      diffEl.classList.remove("is-negative", "is-positive");
+      console.error("syncVaultAccountBalanceToBuckets error:", error);
       return;
     }
 
-    diffEl.textContent = `Счёт станет: ${formatMoney(desiredBalance)}`;
-    diffEl.classList.toggle("is-negative", differenceFromCurrent < 0);
-    diffEl.classList.toggle("is-positive", differenceFromCurrent > 0);
+    getBridge()?.renderAll?.();
   }
 
-  async function saveActiveAdjustment() {
-    if (!modalEl || !activeAccountId) return;
-
-    const input = modalEl.querySelector("#accountBalanceAdjustmentInput");
-    const saveBtn = modalEl.querySelector("#saveAccountBalanceAdjustmentBtn");
-
-    const desiredBalance = parseMoneyInput(input.value);
-    const rawBalance = getRawAccountBalance(activeAccountId);
-
-    /*
-      Важно:
-      здесь НЕ прибавляется новая корректировка к старой.
-      Старое значение для этого счёта заменяется новым:
-      новое_отображаемое_число - баланс_по_операциям.
-    */
-    const replacementAdjustment = roundToTwo(desiredBalance - rawBalance);
-
-    saveBtn.disabled = true;
-    saveBtn.textContent = "Сохраняю…";
-
-    try {
-      setLocalAdjustment(activeAccountId, replacementAdjustment);
-      await saveAdjustmentsToSupabase();
-
-      window.location.reload();
-    } catch (error) {
-      alert(`Не получилось сохранить сумму: ${error.message || error}`);
-      saveBtn.disabled = false;
-      saveBtn.textContent = "Сохранить сумму";
-    }
-  }
-
-  async function resetActiveAdjustment() {
-    if (!modalEl || !activeAccountId) return;
-
-    const resetBtn = modalEl.querySelector("#resetAccountBalanceAdjustmentBtn");
-
-    resetBtn.disabled = true;
-    resetBtn.textContent = "Возвращаю…";
-
-    try {
-      setLocalAdjustment(activeAccountId, 0);
-      await saveAdjustmentsToSupabase();
-
-      window.location.reload();
-    } catch (error) {
-      alert(`Не получилось вернуть расчёт по операциям: ${error.message || error}`);
-      resetBtn.disabled = false;
-      resetBtn.textContent = "Вернуть расчёт по операциям";
-    }
-  }
-
-  function createEditButton(accountId) {
-    const button = document.createElement("button");
-
-    button.className = "account-balance-edit-btn";
-    button.type = "button";
-    button.dataset.accountBalanceEditBtn = "true";
-    button.setAttribute("aria-label", "Изменить сумму счёта");
-    button.textContent = "✎";
-
-    button.addEventListener("click", (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-
-      openModal(accountId);
-    });
-
-    return button;
-  }
-
-  function syncAccountCards() {
+  async function renameSavingsAccountTitle(nextTitle) {
+    const supabaseClient = getSupabaseClient();
     const state = getState();
-    const accountsList = document.querySelector(SELECTORS.accountsList);
+    const vaultAccount = getVaultAccount();
 
-    if (!state || !accountsList || !Array.isArray(state.accounts)) return;
+    const title = String(nextTitle || "").trim();
 
-    const cards = Array.from(accountsList.querySelectorAll(SELECTORS.accountCard));
+    if (!title || !supabaseClient || !state || !vaultAccount) return;
 
-    cards.forEach((card, index) => {
-      const account = state.accounts[index];
+    const { error } = await supabaseClient
+      .from("accounts")
+      .update({
+        name: title,
+      })
+      .eq("id", vaultAccount.id);
 
-      if (!account || !account.id) return;
+    if (error) {
+      console.error("renameSavingsAccountTitle error:", error);
+      alert(`Не получилось переименовать накопительный счёт: ${error.message || "unknown error"}`);
+      return;
+    }
 
-      card.dataset.accountId = account.id;
+    const account = state.accounts.find((item) => item.id === vaultAccount.id);
 
-      const rightSide = card.querySelector(SELECTORS.accountRight);
-      const valueEl = card.querySelector(SELECTORS.accountValue);
+    if (account) {
+      account.name = title;
+    }
 
-      if (!rightSide || !valueEl) return;
+    const modalTitle = $("safeBucketsModalTitle");
 
-      if (!rightSide.querySelector("[data-account-balance-edit-btn='true']")) {
-        rightSide.appendChild(createEditButton(account.id));
-      }
+    if (modalTitle) {
+      modalTitle.textContent = title;
+    }
 
-      const manualAdjustment = getManualAdjustment(account.id);
-
-      card.classList.toggle(
-        "account-card--has-manual-adjustment",
-        Math.abs(manualAdjustment) >= 0.005
-      );
-    });
+    await getBridge()?.loadDataFromSupabase?.();
+    getBridge()?.renderAll?.();
   }
 
-  function startObserver() {
-    const accountsList = document.querySelector(SELECTORS.accountsList);
+  function syncSavingsSectionTitle() {
+    const modalTitle = $("safeBucketsModalTitle");
+    const vaultAccount = getVaultAccount();
 
-    if (!accountsList) return;
+    if (!modalTitle || !vaultAccount) return;
 
-    syncAccountCards();
+    modalTitle.textContent = vaultAccount.name || "Накопления";
+  }
+
+  function ensureSavingsTitleEditButton() {
+    const modalTitle = $("safeBucketsModalTitle");
+
+    if (!modalTitle) return;
+
+    const titleWrap = modalTitle.parentElement;
+
+    if (!titleWrap) return;
+
+    let button = $("editSavingsSectionTitleBtn");
+
+    if (!button) {
+      button = document.createElement("button");
+      button.type = "button";
+      button.id = "editSavingsSectionTitleBtn";
+      button.className = "savings-section-title-edit-btn";
+      button.textContent = "Переименовать";
+
+      titleWrap.appendChild(button);
+    }
+
+    button.onclick = async () => {
+      const currentTitle = getVaultAccount()?.name || "Накопления";
+
+      const nextTitle = window.prompt(
+        "Название накопительного счёта",
+        currentTitle
+      );
+
+      if (nextTitle === null) return;
+
+      await renameSavingsAccountTitle(nextTitle);
+    };
+  }
+
+  function schedulePostSaveSync() {
+    window.setTimeout(async () => {
+      try {
+        await getBridge()?.loadDataFromSupabase?.();
+        await syncVaultAccountBalanceToBuckets();
+        await getBridge()?.loadDataFromSupabase?.();
+        getBridge()?.renderAll?.();
+        syncEditorFromBucket();
+      } catch (error) {
+        console.error("schedulePostSaveSync error:", error);
+      }
+    }, 700);
+  }
+
+  function bindSavingsColumnsEditor() {
+    const modal = $("safeBucketAmountModal");
+    const saveBtn = $("saveSafeBucketAmountBtn");
+
+    if (!modal || !saveBtn) return;
 
     const observer = new MutationObserver(() => {
-      syncAccountCards();
+      if (!modal.classList.contains("hidden")) {
+        window.requestAnimationFrame(syncEditorFromBucket);
+      }
     });
 
-    observer.observe(accountsList, {
-      childList: true,
-      subtree: true,
+    observer.observe(modal, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    saveBtn.addEventListener("click", () => {
+      saveSavingsColumnsFromEditor();
+      schedulePostSaveSync();
     });
   }
 
-  document.addEventListener("DOMContentLoaded", () => {
-    startObserver();
-  });
+  function bindSavingsModalTitle() {
+    const modal = $("safeBucketsModal");
+
+    if (!modal) return;
+
+    const observer = new MutationObserver(() => {
+      if (!modal.classList.contains("hidden")) {
+        syncSavingsSectionTitle();
+        ensureSavingsTitleEditButton();
+      }
+    });
+
+    observer.observe(modal, {
+      attributes: true,
+      attributeFilter: ["class"],
+    });
+
+    syncSavingsSectionTitle();
+    ensureSavingsTitleEditButton();
+  }
+
+  function boot() {
+    ensureSettingsPanel();
+    bindSavingsColumnsEditor();
+    bindSavingsModalTitle();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", boot);
+  } else {
+    boot();
+  }
 })();
