@@ -890,12 +890,13 @@ function isSavingsBucketInterestEnabled(bucketId) {
     const typeSelect = document.getElementById("safeBucketTypeSelect");
 
     checkbox?.addEventListener("change", () => {
-      if (!checkbox.checked && safeBucketInterestInput) {
-        safeBucketInterestInput.value = "0";
-      }
+  if (!checkbox.checked && safeBucketInterestInput) {
+    safeBucketInterestInput.value = "0";
+  }
 
-      syncSavingsInterestFieldState();
-    });
+  syncSavingsInterestFieldState();
+  syncSavingsEditorHint();
+});
 
     typeSelect?.addEventListener("change", () => {
       syncSavingsEditorHint();
@@ -920,30 +921,38 @@ function isSavingsBucketInterestEnabled(bucketId) {
   }
 
   function syncSavingsEditorHint() {
-    const typeSelect = document.getElementById("safeBucketTypeSelect");
-    const hint = document.getElementById("safeBucketSettingsHint");
+  const typeSelect = document.getElementById("safeBucketTypeSelect");
+  const hint = document.getElementById("safeBucketSettingsHint");
+  const checkbox = document.getElementById("safeBucketInterestEnabledInput");
 
-    if (!typeSelect || !hint) return;
+  if (!typeSelect || !hint) return;
 
-    const type = typeSelect.value;
+  const type = typeSelect.value;
+  const interestEnabled = Boolean(checkbox?.checked);
 
-    if (type === "asset") {
-      hint.textContent = "Актив — это золото, валюта, крипта или другое имущество. Проценты можно выключить.";
-      return;
-    }
-
-    if (type === "reserve") {
-      hint.textContent = "Резерв — деньги, которые лучше не считать свободными.";
-      return;
-    }
-
-    if (type === "required") {
-      hint.textContent = "Обязательное — деньги под платежи, налоги, квартиру или фиксированные цели.";
-      return;
-    }
-
-    hint.textContent = "Обычное накопление — цель, копилка или отдельный денежный карман.";
+  if (type === "asset") {
+    hint.textContent = interestEnabled
+      ? "Актив с доходностью. Подходит для валюты, золота, крипты или других активов, если ты хочешь учитывать рост."
+      : "Актив без процентов. Подходит для золота, налички, валюты или крипты без банковской ставки.";
+    return;
   }
+
+  if (type === "reserve") {
+    hint.textContent = interestEnabled
+      ? "Резерв с доходностью. Деньги защищены и могут приносить проценты."
+      : "Резерв без процентов. Деньги защищены, но не считаются доходным вкладом.";
+    return;
+  }
+
+  if (type === "required") {
+    hint.textContent = "Обязательное накопление — деньги под платежи, налоги, квартиру или фиксированные цели.";
+    return;
+  }
+
+  hint.textContent = interestEnabled
+    ? "Обычное накопление с процентами."
+    : "Обычное накопление без процентов.";
+}
 
   function syncSavingsBucketEditorUi() {
   if (!safeBucketAmountModal || !activeSafeBucketAmountId) return;
@@ -1052,15 +1061,33 @@ function isSavingsBucketInterestEnabled(bucketId) {
       });
     }
 
-    saveSafeBucketAmountBtn?.addEventListener(
-      "click",
-      () => {
-        saveActiveSavingsBucketSettingsFromEditor().catch((error) => {
-          console.error("saveActiveSavingsBucketSettingsFromEditor error:", error);
-        });
-      },
-      true
-    );
+    let savingsSettingsSaveInProgress = false;
+
+saveSafeBucketAmountBtn?.addEventListener(
+  "click",
+  (event) => {
+    if (savingsSettingsSaveInProgress) {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopImmediatePropagation();
+
+    savingsSettingsSaveInProgress = true;
+
+    saveActiveSavingsBucketSettingsFromEditor()
+      .then(() => {
+        savingsSettingsSaveInProgress = false;
+        saveSafeBucketAmountBtn.click();
+      })
+      .catch((error) => {
+        savingsSettingsSaveInProgress = false;
+        console.error("saveActiveSavingsBucketSettingsFromEditor error:", error);
+        alert("Не получилось сохранить настройки накопления");
+      });
+  },
+  true
+);
   }
 
   initSavingsGeneralizationUi();
