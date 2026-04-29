@@ -36,6 +36,14 @@
     loadDataFromSupabase,
     renderAll,
   }) {
+    function getSafeCategoryName(categoryId) {
+      if (categoryId === "transfers") return "Переводы";
+
+      const name = getCategoryName(categoryId);
+
+      return String(name || "").trim() || "Категория";
+    }
+
     function getAnalyticsFilteredTransactions() {
       return filterTransactionsByPeriod(
         state.transactions,
@@ -58,9 +66,28 @@
       return sortTransactionsByLatest(
         items.filter((transaction) => {
           if (transaction.type !== "expense") return false;
+
           return (transaction.category_id || UNCATEGORIZED_ID) === categoryId;
         })
       );
+    }
+
+    function renderBrokenTransactionFallback(transaction) {
+      const fallback = document.createElement("div");
+
+      fallback.className = "list-card";
+      fallback.innerHTML = `
+        <div class="list-body">
+          <h3 class="list-title">Операция</h3>
+          <p class="list-subtitle">Не удалось отрисовать карточку операции</p>
+        </div>
+      `;
+
+      if (transaction?.id) {
+        fallback.dataset.transactionId = transaction.id;
+      }
+
+      return fallback;
     }
 
     function renderAnalyticsCategoryTransactions(categoryId) {
@@ -85,9 +112,16 @@
       }
 
       transactions.forEach((transaction) => {
-        analyticsCategoryTransactionsList.appendChild(
-          createTransactionCard(transaction)
-        );
+        try {
+          analyticsCategoryTransactionsList.appendChild(
+            createTransactionCard(transaction)
+          );
+        } catch (error) {
+          console.error("analytics category transaction render error:", error, transaction);
+          analyticsCategoryTransactionsList.appendChild(
+            renderBrokenTransactionFallback(transaction)
+          );
+        }
       });
     }
 
@@ -150,29 +184,40 @@
     }
 
     function openAnalyticsCategoryModal(categoryId) {
-      setActiveAnalyticsCategoryId(categoryId);
-
-      const isTransferCategory = categoryId === "transfers";
-      const title = isTransferCategory ? "Переводы" : getCategoryName(categoryId);
-      const periodLabel = getAnalyticsPeriodLabel() || "Период";
-
-      if (analyticsCategoryModalTitle) {
-        analyticsCategoryModalTitle.textContent = title;
+      if (!analyticsCategoryModal) {
+        console.error("analyticsCategoryModal not found");
+        return;
       }
 
-      if (analyticsCategoryModalPeriodLabel) {
-        analyticsCategoryModalPeriodLabel.textContent = periodLabel;
+      try {
+        setActiveAnalyticsCategoryId(categoryId);
+
+        const isTransferCategory = categoryId === "transfers";
+        const title = getSafeCategoryName(categoryId);
+        const periodLabel = getAnalyticsPeriodLabel() || "Период";
+
+        if (analyticsCategoryModalTitle) {
+          analyticsCategoryModalTitle.textContent = title;
+        }
+
+        if (analyticsCategoryModalPeriodLabel) {
+          analyticsCategoryModalPeriodLabel.textContent = periodLabel;
+        }
+
+        syncAnalyticsCategoryBudgetButton(categoryId, isTransferCategory);
+        syncAnalyticsCategoryTypeButton(categoryId, isTransferCategory);
+        renderAnalyticsCategoryTransactions(categoryId);
+
+        openAnimatedModal(analyticsCategoryModal);
+      } catch (error) {
+        console.error("openAnalyticsCategoryModal error:", error, categoryId);
+        alert("Не получилось открыть операции категории. Ошибка в данных операции.");
       }
-
-      syncAnalyticsCategoryBudgetButton(categoryId, isTransferCategory);
-      syncAnalyticsCategoryTypeButton(categoryId, isTransferCategory);
-      renderAnalyticsCategoryTransactions(categoryId);
-
-      openAnimatedModal(analyticsCategoryModal);
-      document.body.style.overflow = "hidden";
     }
 
     function closeAnalyticsCategoryModal() {
+      if (!analyticsCategoryModal) return;
+
       closeAnimatedModal(analyticsCategoryModal);
       setActiveAnalyticsCategoryId(null);
     }
