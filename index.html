@@ -35,6 +35,7 @@
 <link rel="stylesheet" href="./css/26-mandatory-payment-editor-modal.css">
 <link rel="stylesheet" href="./css/27-analytics-safes-models.css">
 <link rel="stylesheet" href="./css/28-account-balance-adjustments.css">
+<link rel="stylesheet" href="./css/29-monthly-report.css">
 </head>
 <body>
 
@@ -50,6 +51,23 @@
       <p class="balance-label">Баланс</p>
       <h1 class="balance-amount">0 ₽</h1>
     </div>
+
+    <button
+      class="monthly-report-open-btn"
+      type="button"
+      id="openMonthlyReportBtn"
+      aria-label="Открыть итоги месяца"
+      title="Итоги месяца"
+    >
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M6 19V5" />
+        <path d="M6 19h13" />
+        <path d="M10 15v-4" />
+        <path d="M14 15V8" />
+        <path d="M18 15v-6" />
+      </svg>
+      <span>Итоги</span>
+    </button>
   </div>
 
   <button class="balance-free-card" type="button">
@@ -268,6 +286,148 @@
     <div class="list transactions-preview-list" id="transactionsList"></div>
   </div>
 </section>
+</div>
+
+<!-- MONTHLY REPORT VIEW -->
+<div id="monthlyReportView" class="hidden monthly-report-view">
+  <section class="monthly-report-page">
+    <div class="monthly-report-topbar">
+      <button
+        class="manager-back-btn monthly-report-back-btn"
+        type="button"
+        id="closeMonthlyReportBtn"
+      >
+        ← Кошелёк
+      </button>
+
+      <button
+        class="monthly-report-print-btn"
+        type="button"
+        id="printMonthlyReportBtn"
+      >
+        Печать
+      </button>
+    </div>
+
+    <section class="monthly-report-hero">
+      <div class="monthly-report-hero__decor monthly-report-hero__decor--coin"></div>
+      <div class="monthly-report-hero__decor monthly-report-hero__decor--wallet"></div>
+
+      <p class="monthly-report-eyebrow">Личный финансовый отчёт</p>
+      <h2 class="monthly-report-title" id="monthlyReportMonthLabel">Итоги месяца</h2>
+
+      <div class="monthly-report-result">
+        <div class="monthly-report-result__value" id="monthlyReportResultValue">0 ₽</div>
+        <div class="monthly-report-result__text" id="monthlyReportResultText">—</div>
+      </div>
+    </section>
+
+    <section class="monthly-report-metrics">
+      <div class="monthly-report-metric">
+        <span>Доходы</span>
+        <strong id="monthlyReportIncomeValue">0 ₽</strong>
+      </div>
+
+      <div class="monthly-report-metric">
+        <span>Расходы</span>
+        <strong id="monthlyReportExpenseValue">0 ₽</strong>
+      </div>
+
+      <div class="monthly-report-metric">
+        <span>Разница</span>
+        <strong id="monthlyReportDifferenceValue">0 ₽</strong>
+      </div>
+    </section>
+
+    <section class="monthly-report-card monthly-report-card--top-category">
+      <div class="monthly-report-card__head">
+        <div>
+          <p class="monthly-report-card__eyebrow">Главная гибкая трата</p>
+          <h3 id="monthlyReportTopCategoryName">—</h3>
+        </div>
+
+        <div class="monthly-report-card__icon">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M6 17.5h12" />
+            <path d="M7.5 17.5V8.5A3.5 3.5 0 0 1 11 5h2a3.5 3.5 0 0 1 3.5 3.5v9" />
+            <path d="M9 10h6" />
+          </svg>
+        </div>
+      </div>
+
+      <div class="monthly-report-big-value" id="monthlyReportTopCategoryValue">0 ₽</div>
+    </section>
+
+    <section class="monthly-report-card">
+      <div class="monthly-report-section-head">
+        <p class="monthly-report-card__eyebrow">Недели месяца</p>
+        <h3>Куда уходили деньги</h3>
+      </div>
+
+      <div class="monthly-report-weeks" id="monthlyReportWeeksList"></div>
+    </section>
+
+    <section class="monthly-report-card monthly-report-card--habit">
+      <div class="monthly-report-card__head">
+        <div>
+          <p class="monthly-report-card__eyebrow">Повтор месяца</p>
+          <h3 id="monthlyReportRepeatName">—</h3>
+        </div>
+
+        <div class="monthly-report-card__icon monthly-report-card__icon--violet">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M17 7a7 7 0 0 0-11.6 2.8" />
+            <path d="M5 5v4.8h4.8" />
+            <path d="M7 17a7 7 0 0 0 11.6-2.8" />
+            <path d="M19 19v-4.8h-4.8" />
+          </svg>
+        </div>
+      </div>
+
+      <div class="monthly-report-repeat-value" id="monthlyReportRepeatValue">Повторов нет</div>
+    </section>
+
+    <section class="monthly-report-split">
+      <div class="monthly-report-card monthly-report-card--compact">
+        <p class="monthly-report-card__eyebrow">Финал месяца</p>
+        <h3>Баланс</h3>
+
+        <div class="monthly-report-row">
+          <span>Всего</span>
+          <strong id="monthlyReportBalanceValue">0 ₽</strong>
+        </div>
+
+        <div class="monthly-report-row">
+          <span>Свободно</span>
+          <strong id="monthlyReportFreeValue">0 ₽</strong>
+        </div>
+      </div>
+
+      <div class="monthly-report-card monthly-report-card--compact monthly-report-card--savings">
+        <p class="monthly-report-card__eyebrow">Накопления</p>
+        <h3 id="monthlyReportSavingsNetValue">0 ₽</h3>
+
+        <div class="monthly-report-row">
+          <span>Пополнено</span>
+          <strong id="monthlyReportSavingsDepositValue">0 ₽</strong>
+        </div>
+
+        <div class="monthly-report-row">
+          <span>Проценты</span>
+          <strong id="monthlyReportSavingsInterestValue">0 ₽</strong>
+        </div>
+      </div>
+    </section>
+
+    <section class="monthly-report-card monthly-report-card--achievements">
+      <div class="monthly-report-section-head">
+        <p class="monthly-report-card__eyebrow">Достижения месяца</p>
+        <h3>Финансовые метки</h3>
+      </div>
+
+      <div class="monthly-report-achievements" id="monthlyReportAchievementsList"></div>
+    </section>
+  </section>
 </div>
 
     <!-- CATEGORIES MANAGER VIEW -->
