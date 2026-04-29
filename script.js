@@ -446,14 +446,15 @@ getSafeBucketIcon,
   });
 
   const {
-    getAccountBalance,
-    getAccountRoleLabel,
-    getAccountRoleIconName,
-    getAccountRoleIconSvg,
-    canAccountBePrimary,
-    getAccountRoleFlags,
-    calculateBalance,
-  } = window.FinanceAppAccountHelpers.create({
+  getAccountBalance,
+  getRawAccountBalance,
+  getAccountRoleLabel,
+  getAccountRoleIconName,
+  getAccountRoleIconSvg,
+  canAccountBePrimary,
+  getAccountRoleFlags,
+  calculateBalance,
+} = window.FinanceAppAccountHelpers.create({
     state,
     roundToTwo,
     getAccountById,
@@ -494,6 +495,31 @@ getSafeBucketIcon,
 
     return roundToTwo(Math.max(0, accountsPart));
   }
+  
+  window.FinanceAppSavingsBridge = {
+  getState: () => state,
+  getSupabaseClient: () => supabaseClient,
+
+  getActiveBucketId: () => activeSafeBucketAmountId,
+
+  getVaultAccount: () => getVaultAccount(),
+  getVaultAccountId: () => getVaultAccountId(),
+  getVaultAccountName: () => getVaultAccountName(),
+
+  getSafeBucketById: (bucketId) => getSafeBucketById(bucketId),
+  getSafeBucketBalance: (bucketId) => getSafeBucketBalance(bucketId),
+  getAllSafeBucketsBalance: () => getAllSafeBucketsBalance(),
+
+  getRawAccountBalance: (accountId) => getRawAccountBalance(accountId),
+
+  setAppMetaLocalValue: (key, value) => setAppMetaLocalValue(key, value),
+
+  loadDataFromSupabase: () => loadDataFromSupabase(),
+  renderAll: () => renderAll(),
+
+  roundToTwo,
+  formatMoney,
+};
 
   const {
     getBudgetLimitByCategoryId,
