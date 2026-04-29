@@ -82,9 +82,11 @@
     }
 
     function getAllSafeBucketsBalance() {
-      return getRealBucketsSafe().reduce((sum, bucket) => {
-        return sum + getSafeBucketBalance(bucket.id);
-      }, 0);
+      return roundToTwo(
+        getRealBucketsSafe().reduce((sum, bucket) => {
+          return sum + getSafeBucketBalance(bucket.id);
+        }, 0)
+      );
     }
 
     function getUnassignedSafeBalance() {
@@ -101,39 +103,55 @@
     function getSafeBucketsByNames(names) {
       const normalizedNames = names.map(normalizeMoneyBucketName);
 
-      return getRealBucketsSafe().filter((bucket) =>
-        normalizedNames.includes(normalizeMoneyBucketName(bucket.name))
-      );
+      return getRealBucketsSafe().filter((bucket) => {
+        return normalizedNames.includes(normalizeMoneyBucketName(bucket.name));
+      });
     }
 
+    /*
+      ВАЖНО:
+      “Не распределено” удалено из интерфейса.
+      Значит нераспределённый остаток сейфа больше НЕ считается свободными деньгами.
+      Иначе свободные деньги становятся:
+      обычные счета + наличка + хвост сейфа,
+      что и давало кривые 762,03 ₽.
+    */
     function getFreeSafeBalance() {
-      return roundToTwo(Math.max(0, getUnassignedSafeBalance()));
+      return 0;
     }
 
     function getStrictSafeBalance() {
-      return getSafeBucketsByKind(["tax", "housing"]).reduce((sum, bucket) => {
-        return sum + getSafeBucketBalance(bucket.id);
-      }, 0);
+      return roundToTwo(
+        getSafeBucketsByKind(["tax", "housing"]).reduce((sum, bucket) => {
+          return sum + getSafeBucketBalance(bucket.id);
+        }, 0)
+      );
     }
 
     function getSoftReserveSafeBalance() {
-      return getSafeBucketsByKind(["reserve"]).reduce((sum, bucket) => {
-        return sum + getSafeBucketBalance(bucket.id);
-      }, 0);
+      return roundToTwo(
+        getSafeBucketsByKind(["reserve"]).reduce((sum, bucket) => {
+          return sum + getSafeBucketBalance(bucket.id);
+        }, 0)
+      );
     }
 
     function getCashReserveBalance() {
-      return getProtectedAccounts()
-        .filter((account) => account.account_kind === "reserve")
-        .reduce((sum, account) => sum + getAccountBalance(account.id), 0);
+      return roundToTwo(
+        getProtectedAccounts()
+          .filter((account) => account.account_kind === "reserve")
+          .reduce((sum, account) => {
+            return sum + getAccountBalance(account.id);
+          }, 0)
+      );
     }
 
     function getSecondLineReserveBalance() {
-      return getSoftReserveSafeBalance() + getCashReserveBalance();
+      return roundToTwo(getSoftReserveSafeBalance() + getCashReserveBalance());
     }
 
     function getAvailableNowBalance() {
-      return roundToTwo(getFreeSafeBalance());
+      return 0;
     }
 
     function getProtectedMoneyTotal() {
@@ -145,9 +163,7 @@
         return sum + getAccountBalance(account.id);
       }, 0);
 
-      const unassignedSafePart = getFreeSafeBalance();
-
-      return roundToTwo(Math.max(0, accountsPart + unassignedSafePart));
+      return roundToTwo(Math.max(0, accountsPart));
     }
 
     return {
