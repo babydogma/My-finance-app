@@ -587,9 +587,64 @@
     </div>
   </div>
 
-  <section class="section">
+    <section class="section">
     <div class="list" id="operationsTransactionsList"></div>
   </section>
+</div>
+
+<!-- ANALYTICS CATEGORY MODAL -->
+<div class="modal hidden" id="analyticsCategoryModal">
+  <div class="modal-sheet analytics-category-sheet">
+    <div class="modal-handle"></div>
+
+    <div class="section-head filters-sheet__head analytics-category-sheet__head">
+      <div class="analytics-category-sheet__title-wrap">
+        <h3 class="modal-title filters-sheet__title" id="analyticsCategoryModalTitle">
+          Категория
+        </h3>
+
+        <p class="list-subtitle analytics-category-sheet__period" id="analyticsCategoryModalPeriodLabel">
+          Период
+        </p>
+      </div>
+
+      <button
+        class="manager-back-btn"
+        type="button"
+        id="closeAnalyticsCategoryModalBtn"
+      >
+        Закрыть
+      </button>
+    </div>
+
+    <div class="analytics-category-extra-card">
+      <div class="analytics-category-extra-row">
+        <span class="analytics-category-extra-label">Лимит</span>
+
+        <button
+          class="analytics-category-extra-value"
+          type="button"
+          id="analyticsCategoryBudgetBtn"
+        >
+          —
+        </button>
+      </div>
+
+      <div class="analytics-category-extra-row">
+        <span class="analytics-category-extra-label">Тип</span>
+
+        <button
+          class="analytics-category-type-btn analytics-category-type-btn--flex"
+          type="button"
+          id="analyticsCategoryTypeBtn"
+        >
+          —
+        </button>
+      </div>
+    </div>
+
+    <div class="list analytics-category-transactions-list" id="analyticsCategoryTransactionsList"></div>
+  </div>
 </div>
 
 <!-- BOTTOM NAV -->
