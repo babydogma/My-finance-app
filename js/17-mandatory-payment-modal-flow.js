@@ -1,28 +1,35 @@
 (() => {
   function createMandatoryPaymentModalFlow({
-    state,
-    getActiveMandatoryPaymentId,
-    setActiveMandatoryPaymentId,
-    getSelectedMonth,
-    setSelectedMonth,
-    getCurrentMonthValue,
-    getMandatoryPaymentsActiveMonthKey,
-    buildDateFromDueDay,
-    getSafeBucketName,
+  state,
+  getActiveMandatoryPaymentId,
+  setActiveMandatoryPaymentId,
+  getSelectedMonth,
+  setSelectedMonth,
+  getCurrentMonthValue,
+  getMandatoryPaymentsActiveMonthKey,
+  buildDateFromDueDay,
+  getSafeBucketName,
 
-    mandatoryPaymentsModal,
-    mandatoryPaymentEditorModal,
-    mandatoryPaymentBucketPickerModal,
+  mandatoryPaymentsModal,
+  openMandatoryPaymentsModalBtn,
+  closeMandatoryPaymentsModalBtn,
 
-    mandatoryPaymentEditorTitle,
-    mandatoryPaymentTitleInput,
-    mandatoryPaymentAmountInput,
-    mandatoryPaymentDueDayInput,
-    mandatoryPaymentAccountSelect,
-    mandatoryPaymentLinkedSafeSelect,
-    openMandatoryPaymentBucketPickerBtn,
-    addMandatoryPaymentBtn,
-    deleteMandatoryPaymentBtn,
+  mandatoryPaymentEditorModal,
+  openMandatoryPaymentEditorBtn,
+  closeMandatoryPaymentEditorModalBtn,
+
+  mandatoryPaymentBucketPickerModal,
+  closeMandatoryPaymentBucketPickerModalBtn,
+
+  mandatoryPaymentEditorTitle,
+  mandatoryPaymentTitleInput,
+  mandatoryPaymentAmountInput,
+  mandatoryPaymentDueDayInput,
+  mandatoryPaymentAccountSelect,
+  mandatoryPaymentLinkedSafeSelect,
+  openMandatoryPaymentBucketPickerBtn,
+  addMandatoryPaymentBtn,
+  deleteMandatoryPaymentBtn,
 
     fillMandatoryPaymentAccountSelect,
     fillMandatoryPaymentSafeSelect,
@@ -169,6 +176,57 @@
 
       openAnimatedModal(mandatoryPaymentsModal);
     }
+    
+    function bindFlowButton(button, key, handler) {
+  if (!button) return;
+
+  const flag = `mandatoryFlowBound${key}`;
+
+  if (button.dataset[flag] === "true") return;
+
+  button.dataset[flag] = "true";
+
+  button.addEventListener("click", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    handler();
+  });
+}
+
+function bindMandatoryPaymentFlowButtons() {
+  bindFlowButton(
+    openMandatoryPaymentsModalBtn,
+    "OpenCalendar",
+    openMandatoryPaymentsModal
+  );
+
+  bindFlowButton(
+    closeMandatoryPaymentsModalBtn,
+    "CloseCalendar",
+    closeMandatoryPaymentsModal
+  );
+
+  bindFlowButton(
+    openMandatoryPaymentEditorBtn,
+    "OpenEditor",
+    openNewMandatoryPaymentEditor
+  );
+
+  bindFlowButton(
+    closeMandatoryPaymentEditorModalBtn,
+    "CloseEditor",
+    closeMandatoryPaymentEditorModal
+  );
+
+  bindFlowButton(
+    closeMandatoryPaymentBucketPickerModalBtn,
+    "CloseBucketPicker",
+    () => closeModalIfOpen(mandatoryPaymentBucketPickerModal)
+  );
+}
+
+bindMandatoryPaymentFlowButtons();
 
     return {
       resetMandatoryPaymentForm,
