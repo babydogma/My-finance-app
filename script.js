@@ -766,6 +766,54 @@ mandatoryPaymentAccountSelect,
     escapeHtml,
     bindMandatoryPaymentPress,
   });
+  
+  openMandatoryPaymentsModalBtn?.addEventListener("click", (event) => {
+  event.preventDefault();
+  event.stopPropagation();
+
+  openMandatoryPaymentsModal();
+});
+
+closeMandatoryPaymentsModalBtn?.addEventListener("click", (event) => {
+  event.preventDefault();
+  event.stopPropagation();
+
+  closeMandatoryPaymentsModal();
+});
+
+openMandatoryPaymentEditorBtn?.addEventListener("click", (event) => {
+  event.preventDefault();
+  event.stopPropagation();
+
+  openNewMandatoryPaymentEditor();
+});
+
+closeMandatoryPaymentEditorModalBtn?.addEventListener("click", (event) => {
+  event.preventDefault();
+  event.stopPropagation();
+
+  closeMandatoryPaymentEditorModal();
+});
+
+addMandatoryPaymentBtn?.addEventListener("click", saveMandatoryPayment);
+
+deleteMandatoryPaymentBtn?.addEventListener("click", deleteMandatoryPaymentFromEditor);
+
+mandatoryPaymentAccountSelect?.addEventListener("change", () => {
+  syncMandatoryPaymentLinkedSafeField();
+});
+
+openMandatoryPaymentBucketPickerBtn?.addEventListener("click", (event) => {
+  event.preventDefault();
+  event.stopPropagation();
+
+  renderMandatoryPaymentBucketPicker();
+  openAnimatedModal(mandatoryPaymentBucketPickerModal);
+});
+
+closeMandatoryPaymentBucketPickerModalBtn?.addEventListener("click", () => {
+  closeAnimatedModal(mandatoryPaymentBucketPickerModal);
+});
 
   const {
     setAnalyticsDraftMonthFromValue,
