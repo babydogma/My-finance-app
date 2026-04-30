@@ -666,8 +666,15 @@ if (mandatoryPaymentEditorModal) {
     buildDateFromDueDay,
     getSafeBucketName,
     mandatoryPaymentsModal,
-    mandatoryPaymentEditorModal,
-    mandatoryPaymentBucketPickerModal,
+openMandatoryPaymentsModalBtn,
+closeMandatoryPaymentsModalBtn,
+
+mandatoryPaymentEditorModal,
+openMandatoryPaymentEditorBtn,
+closeMandatoryPaymentEditorModalBtn,
+
+mandatoryPaymentBucketPickerModal,
+closeMandatoryPaymentBucketPickerModalBtn,
     mandatoryPaymentEditorTitle,
     mandatoryPaymentTitleInput,
     mandatoryPaymentAmountInput,
@@ -766,34 +773,6 @@ mandatoryPaymentAccountSelect,
     escapeHtml,
     bindMandatoryPaymentPress,
   });
-  
-  openMandatoryPaymentsModalBtn?.addEventListener("click", (event) => {
-  event.preventDefault();
-  event.stopPropagation();
-
-  openMandatoryPaymentsModal();
-});
-
-closeMandatoryPaymentsModalBtn?.addEventListener("click", (event) => {
-  event.preventDefault();
-  event.stopPropagation();
-
-  closeMandatoryPaymentsModal();
-});
-
-openMandatoryPaymentEditorBtn?.addEventListener("click", (event) => {
-  event.preventDefault();
-  event.stopPropagation();
-
-  openNewMandatoryPaymentEditor();
-});
-
-closeMandatoryPaymentEditorModalBtn?.addEventListener("click", (event) => {
-  event.preventDefault();
-  event.stopPropagation();
-
-  closeMandatoryPaymentEditorModal();
-});
 
 addMandatoryPaymentBtn?.addEventListener("click", saveMandatoryPayment);
 
