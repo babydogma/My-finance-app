@@ -13,7 +13,7 @@
 }
 
 .required-payments-head .section-title {
-  max-width: calc(100% - 56px);
+  max-width: 100%;
   font-size: 22px;
   font-weight: 720;
   line-height: 1.08;
@@ -21,7 +21,7 @@
 }
 
 .required-payments-add-btn {
-  flex: 0 0 auto;
+  display: none !important;
 }
 
 .required-payments-overview-label {
@@ -54,6 +54,21 @@
     0 3px 9px rgba(30, 42, 68, 0.028),
     inset 0 1px 0 rgba(255, 255, 255, 0.94);
   overflow: hidden;
+}
+
+.required-payment-card--clickable {
+  appearance: none;
+  -webkit-appearance: none;
+  border: 1px solid rgba(239, 91, 79, 0.11);
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.required-payment-card--clickable:active {
+  transform: scale(0.992);
 }
 
 .required-payment-card::before {
