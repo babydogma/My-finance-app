@@ -1,4 +1,161 @@
 (() => {
+  function ensureMandatoryPaymentEditorDom() {
+    if (!document.body) return false;
+
+    const calendarModal = document.getElementById("mandatoryPaymentsModal");
+
+    if (!document.getElementById("mandatoryPaymentEditorModal")) {
+      const editorHtml = `
+        <div class="modal hidden" id="mandatoryPaymentEditorModal" role="dialog" aria-modal="true" aria-label="Редактор календарного платежа">
+          <div class="modal-sheet">
+            <div class="modal-handle"></div>
+
+            <div class="section-head">
+              <h2 class="modal-title" id="mandatoryPaymentEditorTitle">Новый платёж</h2>
+
+              <button
+                class="manager-back-btn"
+                type="button"
+                id="closeMandatoryPaymentEditorModalBtn"
+              >
+                Закрыть
+              </button>
+            </div>
+
+            <div class="manager-card">
+              <div class="field">
+                <input
+                  class="input"
+                  id="mandatoryPaymentTitleInput"
+                  type="text"
+                  placeholder="Название платежа"
+                />
+              </div>
+
+              <div class="mandatory-payment-main-row">
+                <div class="field mandatory-payment-main-row__field mandatory-payment-money-field">
+                  <input
+                    class="input mandatory-payment-money-input"
+                    id="mandatoryPaymentAmountInput"
+                    type="text"
+                    inputmode="decimal"
+                    placeholder="Сумма"
+                  />
+                  <span class="mandatory-payment-money-symbol">₽</span>
+                </div>
+
+                <div class="field mandatory-payment-main-row__field mandatory-payment-date-field">
+                  <input
+                    class="input"
+                    id="mandatoryPaymentDueDayInput"
+                    type="date"
+                    required
+                  />
+                  <span class="mandatory-payment-date-placeholder">Дата платежа</span>
+                </div>
+              </div>
+
+              <div class="field mandatory-payment-category-field">
+                <select
+                  class="select"
+                  id="mandatoryPaymentCategorySelect"
+                ></select>
+              </div>
+
+              <div class="field">
+                <select
+                  class="select"
+                  id="mandatoryPaymentAccountSelect"
+                ></select>
+              </div>
+
+              <div class="field hidden" id="mandatoryPaymentLinkedSafeField">
+                <select
+                  class="select hidden"
+                  id="mandatoryPaymentLinkedSafeSelect"
+                ></select>
+
+                <button
+                  class="mandatory-linked-safe-btn"
+                  type="button"
+                  id="openMandatoryPaymentBucketPickerBtn"
+                >
+                  Выбрать накопление
+                </button>
+              </div>
+
+              <div class="modal-actions mandatory-editor-actions">
+                <button
+                  class="btn btn-primary"
+                  type="button"
+                  id="addMandatoryPaymentBtn"
+                >
+                  Добавить платёж
+                </button>
+
+                <button
+                  class="btn btn-danger hidden"
+                  type="button"
+                  id="deleteMandatoryPaymentBtn"
+                >
+                  Удалить платёж
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      if (calendarModal) {
+        calendarModal.insertAdjacentHTML("afterend", editorHtml);
+      } else {
+        document.body.insertAdjacentHTML("beforeend", editorHtml);
+      }
+    }
+
+    if (!document.getElementById("mandatoryPaymentBucketPickerModal")) {
+      const bucketPickerHtml = `
+        <div class="modal hidden" id="mandatoryPaymentBucketPickerModal" role="dialog" aria-modal="true" aria-label="Выбор накопления">
+          <div class="modal-sheet">
+            <div class="modal-handle"></div>
+
+            <div class="section-head">
+              <h2 class="modal-title">Выбрать накопление</h2>
+
+              <button
+                class="manager-back-btn"
+                type="button"
+                id="closeMandatoryPaymentBucketPickerModalBtn"
+              >
+                Закрыть
+              </button>
+            </div>
+
+            <div class="list" id="mandatoryPaymentBucketPickerList"></div>
+          </div>
+        </div>
+      `;
+
+      const editorModal = document.getElementById("mandatoryPaymentEditorModal");
+
+      if (editorModal) {
+        editorModal.insertAdjacentHTML("afterend", bucketPickerHtml);
+      } else if (calendarModal) {
+        calendarModal.insertAdjacentHTML("afterend", bucketPickerHtml);
+      } else {
+        document.body.insertAdjacentHTML("beforeend", bucketPickerHtml);
+      }
+    }
+
+    return true;
+  }
+
+  if (!ensureMandatoryPaymentEditorDom()) {
+    document.addEventListener("DOMContentLoaded", ensureMandatoryPaymentEditorDom, {
+      once: true,
+    });
+  }
+
   function createMandatoryPaymentModalFlow({
     state,
     getActiveMandatoryPaymentId,
@@ -41,20 +198,78 @@
     renderMonthStrip,
     renderModal,
   }) {
+    ensureMandatoryPaymentEditorDom();
+
+    function getEl(id, fallback = null) {
+      return document.getElementById(id) || fallback || null;
+    }
+
     function getCalendarModal() {
-      return document.getElementById("mandatoryPaymentsModal") || mandatoryPaymentsModal;
+      return getEl("mandatoryPaymentsModal", mandatoryPaymentsModal);
     }
 
     function getCalendarOpenBtn() {
-      return document.getElementById("openMandatoryPaymentsModalBtn") || openMandatoryPaymentsModalBtn;
+      return getEl("openMandatoryPaymentsModalBtn", openMandatoryPaymentsModalBtn);
     }
 
     function getCalendarCloseBtn() {
-      return document.getElementById("closeMandatoryPaymentsModalBtn") || closeMandatoryPaymentsModalBtn;
+      return getEl("closeMandatoryPaymentsModalBtn", closeMandatoryPaymentsModalBtn);
+    }
+
+    function getEditorModal() {
+      return getEl("mandatoryPaymentEditorModal", mandatoryPaymentEditorModal);
     }
 
     function getEditorOpenBtn() {
-      return document.getElementById("openMandatoryPaymentEditorBtn") || openMandatoryPaymentEditorBtn;
+      return getEl("openMandatoryPaymentEditorBtn", openMandatoryPaymentEditorBtn);
+    }
+
+    function getEditorCloseBtn() {
+      return getEl("closeMandatoryPaymentEditorModalBtn", closeMandatoryPaymentEditorModalBtn);
+    }
+
+    function getBucketPickerModal() {
+      return getEl("mandatoryPaymentBucketPickerModal", mandatoryPaymentBucketPickerModal);
+    }
+
+    function getBucketPickerCloseBtn() {
+      return getEl("closeMandatoryPaymentBucketPickerModalBtn", closeMandatoryPaymentBucketPickerModalBtn);
+    }
+
+    function getTitleInput() {
+      return getEl("mandatoryPaymentTitleInput", mandatoryPaymentTitleInput);
+    }
+
+    function getAmountInput() {
+      return getEl("mandatoryPaymentAmountInput", mandatoryPaymentAmountInput);
+    }
+
+    function getDueDayInput() {
+      return getEl("mandatoryPaymentDueDayInput", mandatoryPaymentDueDayInput);
+    }
+
+    function getAccountSelect() {
+      return getEl("mandatoryPaymentAccountSelect", mandatoryPaymentAccountSelect);
+    }
+
+    function getLinkedSafeSelect() {
+      return getEl("mandatoryPaymentLinkedSafeSelect", mandatoryPaymentLinkedSafeSelect);
+    }
+
+    function getEditorTitle() {
+      return getEl("mandatoryPaymentEditorTitle", mandatoryPaymentEditorTitle);
+    }
+
+    function getSaveBtn() {
+      return getEl("addMandatoryPaymentBtn", addMandatoryPaymentBtn);
+    }
+
+    function getDeleteBtn() {
+      return getEl("deleteMandatoryPaymentBtn", deleteMandatoryPaymentBtn);
+    }
+
+    function getBucketPickerBtn() {
+      return getEl("openMandatoryPaymentBucketPickerBtn", openMandatoryPaymentBucketPickerBtn);
     }
 
     function isModalOpen(modal) {
@@ -87,39 +302,58 @@
     function resetMandatoryPaymentForm() {
       setActiveMandatoryPaymentId(null);
 
-      if (mandatoryPaymentTitleInput) mandatoryPaymentTitleInput.value = "";
-      if (mandatoryPaymentAmountInput) mandatoryPaymentAmountInput.value = "";
-      if (mandatoryPaymentDueDayInput) mandatoryPaymentDueDayInput.value = "";
-      if (mandatoryPaymentAccountSelect) mandatoryPaymentAccountSelect.value = "";
-      if (mandatoryPaymentLinkedSafeSelect) mandatoryPaymentLinkedSafeSelect.value = "";
+      const titleInput = getTitleInput();
+      const amountInput = getAmountInput();
+      const dueDayInput = getDueDayInput();
+      const accountSelect = getAccountSelect();
+      const linkedSafeSelect = getLinkedSafeSelect();
+      const editorTitle = getEditorTitle();
+      const saveBtn = getSaveBtn();
+      const deleteBtn = getDeleteBtn();
+      const bucketPickerBtn = getBucketPickerBtn();
+
+      if (titleInput) titleInput.value = "";
+      if (amountInput) amountInput.value = "";
+      if (dueDayInput) dueDayInput.value = "";
+      if (accountSelect) accountSelect.value = "";
+      if (linkedSafeSelect) linkedSafeSelect.value = "";
 
       fillMandatoryPaymentAccountSelect?.("");
       fillMandatoryPaymentSafeSelect?.("");
 
-      if (mandatoryPaymentEditorTitle) {
-        mandatoryPaymentEditorTitle.textContent = "Новый платёж";
+      if (editorTitle) {
+        editorTitle.textContent = "Новый платёж";
       }
 
-      if (addMandatoryPaymentBtn) {
-        addMandatoryPaymentBtn.textContent = "Добавить платёж";
+      if (saveBtn) {
+        saveBtn.textContent = "Добавить платёж";
       }
 
-      if (openMandatoryPaymentBucketPickerBtn) {
-        openMandatoryPaymentBucketPickerBtn.textContent = "Выбрать накопление";
+      if (bucketPickerBtn) {
+        bucketPickerBtn.textContent = "Выбрать накопление";
       }
 
       syncMandatoryPaymentLinkedSafeField?.();
-      deleteMandatoryPaymentBtn?.classList.add("hidden");
+      deleteBtn?.classList.add("hidden");
     }
 
     function openMandatoryPaymentEditorModal() {
-      if (!mandatoryPaymentEditorModal) return;
-      openAnimatedModal(mandatoryPaymentEditorModal);
+      ensureMandatoryPaymentEditorDom();
+
+      const editorModal = getEditorModal();
+
+      if (!editorModal) {
+        console.error("mandatoryPaymentEditorModal not found");
+        return;
+      }
+
+      editorModal.classList.add("modal");
+      openAnimatedModal(editorModal);
     }
 
     function closeMandatoryPaymentEditorModal() {
-      closeModalIfOpen(mandatoryPaymentBucketPickerModal);
-      closeModalIfOpen(mandatoryPaymentEditorModal);
+      closeModalIfOpen(getBucketPickerModal());
+      closeModalIfOpen(getEditorModal());
       resetMandatoryPaymentForm();
     }
 
@@ -128,7 +362,7 @@
       openMandatoryPaymentEditorModal();
     }
 
-          function openMandatoryPaymentEditor(paymentId) {
+    function openMandatoryPaymentEditor(paymentId) {
       const item = state.mandatoryPayments.find((entry) => {
         return String(entry.id) === String(paymentId);
       });
@@ -139,17 +373,27 @@
       }
 
       setActiveMandatoryPaymentId(item.id);
-      
-      if (mandatoryPaymentTitleInput) {
-        mandatoryPaymentTitleInput.value = item.title || "";
+
+      const titleInput = getTitleInput();
+      const amountInput = getAmountInput();
+      const dueDayInput = getDueDayInput();
+      const accountSelect = getAccountSelect();
+      const linkedSafeSelect = getLinkedSafeSelect();
+      const editorTitle = getEditorTitle();
+      const saveBtn = getSaveBtn();
+      const deleteBtn = getDeleteBtn();
+      const bucketPickerBtn = getBucketPickerBtn();
+
+      if (titleInput) {
+        titleInput.value = item.title || "";
       }
 
-      if (mandatoryPaymentAmountInput) {
-        mandatoryPaymentAmountInput.value = String(Number(item.amount) || 0).replace(".", ",");
+      if (amountInput) {
+        amountInput.value = String(Number(item.amount) || 0).replace(".", ",");
       }
 
-      if (mandatoryPaymentDueDayInput) {
-        mandatoryPaymentDueDayInput.value = buildDateFromDueDay(
+      if (dueDayInput) {
+        dueDayInput.value = buildDateFromDueDay(
           item.due_day,
           item.start_period || getMandatoryPaymentsActiveMonthKey()
         );
@@ -158,30 +402,31 @@
       fillMandatoryPaymentAccountSelect?.(item.linked_account_id || "");
       fillMandatoryPaymentSafeSelect?.(item.linked_safe_bucket_id || "");
 
-      if (mandatoryPaymentAccountSelect) {
-        mandatoryPaymentAccountSelect.value = item.linked_account_id || "";
+      if (accountSelect) {
+        accountSelect.value = item.linked_account_id || "";
       }
 
-      if (mandatoryPaymentLinkedSafeSelect) {
-        mandatoryPaymentLinkedSafeSelect.value = item.linked_safe_bucket_id || "";
+      if (linkedSafeSelect) {
+        linkedSafeSelect.value = item.linked_safe_bucket_id || "";
       }
 
       syncMandatoryPaymentLinkedSafeField?.();
 
-      if (openMandatoryPaymentBucketPickerBtn) {
-        openMandatoryPaymentBucketPickerBtn.textContent =
+      if (bucketPickerBtn) {
+        bucketPickerBtn.textContent =
           getSafeBucketName(item.linked_safe_bucket_id || "") || "Выбрать накопление";
       }
 
-      if (mandatoryPaymentEditorTitle) {
-        mandatoryPaymentEditorTitle.textContent = "Редактирование платежа";
+      if (editorTitle) {
+        editorTitle.textContent = "Редактирование платежа";
       }
 
-      if (addMandatoryPaymentBtn) {
-        addMandatoryPaymentBtn.textContent = "Сохранить платёж";
+      if (saveBtn) {
+        saveBtn.textContent = "Сохранить платёж";
       }
 
-      deleteMandatoryPaymentBtn?.classList.remove("hidden");
+      deleteBtn?.classList.remove("hidden");
+
       openMandatoryPaymentEditorModal();
     }
 
@@ -199,7 +444,7 @@
       }
     }
 
-        function openMandatoryPaymentsModal() {
+    function openMandatoryPaymentsModal() {
       const modal = getCalendarModal();
 
       if (!modal) {
@@ -218,8 +463,8 @@
     }
 
     function closeMandatoryPaymentsModal() {
-      closeModalIfOpen(mandatoryPaymentBucketPickerModal);
-      closeModalIfOpen(mandatoryPaymentEditorModal);
+      closeModalIfOpen(getBucketPickerModal());
+      closeModalIfOpen(getEditorModal());
       closeModalIfOpen(getCalendarModal());
 
       resetMandatoryPaymentForm();
@@ -243,23 +488,23 @@
         event.stopImmediatePropagation();
 
         handler();
-      });
+      }, true);
     }
 
     function bindMandatoryPaymentFlowButtons() {
       bindButton(getCalendarOpenBtn(), "OpenCalendar", openMandatoryPaymentsModal);
       bindButton(getCalendarCloseBtn(), "CloseCalendar", closeMandatoryPaymentsModal);
       bindButton(getEditorOpenBtn(), "OpenEditor", openNewMandatoryPaymentEditor);
-      bindButton(closeMandatoryPaymentEditorModalBtn, "CloseEditor", closeMandatoryPaymentEditorModal);
+      bindButton(getEditorCloseBtn(), "CloseEditor", closeMandatoryPaymentEditorModal);
 
       bindButton(
-        closeMandatoryPaymentBucketPickerModalBtn,
+        getBucketPickerCloseBtn(),
         "CloseBucketPicker",
-        () => closeModalIfOpen(mandatoryPaymentBucketPickerModal)
+        () => closeModalIfOpen(getBucketPickerModal())
       );
     }
 
-        function bindModalBackdropClose() {
+    function bindModalBackdropClose() {
       const modal = getCalendarModal();
       if (!modal) return;
 
@@ -280,14 +525,14 @@
       if (list.dataset.mandatoryEditBound === "true") return;
       list.dataset.mandatoryEditBound = "true";
 
-            list.addEventListener("click", (event) => {
-                const card = event.target.closest(
+      list.addEventListener("click", (event) => {
+        const card = event.target.closest(
           "[data-payment-id], [data-id], [data-mandatory-id], [data-mandatory-payment-id], .mandatory-payment-card"
         );
 
         if (!card || !list.contains(card)) return;
 
-                const paymentId =
+        const paymentId =
           card.dataset.paymentId ||
           card.dataset.mandatoryId ||
           card.dataset.id ||
