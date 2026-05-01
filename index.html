@@ -296,10 +296,131 @@
       <div class="list" id="mandatoryPaymentsList"></div>
     </div>
 
-    <button class="mandatory-payments-add-btn" type="button" id="openMandatoryPaymentEditorBtn">
+       <button class="mandatory-payments-add-btn" type="button" id="openMandatoryPaymentEditorBtn">
       <span>+</span>
       <strong>Добавить платёж</strong>
     </button>
+  </div>
+</div>
+
+<!-- MANDATORY PAYMENT EDITOR MODAL -->
+<div class="modal hidden" id="mandatoryPaymentEditorModal" role="dialog" aria-modal="true" aria-label="Редактор календарного платежа">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+
+    <div class="section-head">
+      <h2 class="modal-title" id="mandatoryPaymentEditorTitle">Новый платёж</h2>
+
+      <button
+        class="manager-back-btn"
+        type="button"
+        id="closeMandatoryPaymentEditorModalBtn"
+      >
+        Закрыть
+      </button>
+    </div>
+
+    <div class="manager-card">
+      <div class="field">
+        <input
+          class="input"
+          id="mandatoryPaymentTitleInput"
+          type="text"
+          placeholder="Название платежа"
+        />
+      </div>
+
+      <div class="mandatory-payment-main-row">
+        <div class="field mandatory-payment-main-row__field mandatory-payment-money-field">
+          <input
+            class="input mandatory-payment-money-input"
+            id="mandatoryPaymentAmountInput"
+            type="text"
+            inputmode="decimal"
+            placeholder="Сумма"
+          />
+          <span class="mandatory-payment-money-symbol">₽</span>
+        </div>
+
+        <div class="field mandatory-payment-main-row__field mandatory-payment-date-field">
+          <input
+            class="input"
+            id="mandatoryPaymentDueDayInput"
+            type="date"
+            required
+          />
+          <span class="mandatory-payment-date-placeholder">Дата платежа</span>
+        </div>
+      </div>
+
+      <div class="field mandatory-payment-category-field">
+        <select
+          class="select"
+          id="mandatoryPaymentCategorySelect"
+        ></select>
+      </div>
+
+      <div class="field">
+        <select
+          class="select"
+          id="mandatoryPaymentAccountSelect"
+        ></select>
+      </div>
+
+      <div class="field hidden" id="mandatoryPaymentLinkedSafeField">
+        <select
+          class="select hidden"
+          id="mandatoryPaymentLinkedSafeSelect"
+        ></select>
+
+        <button
+          class="mandatory-linked-safe-btn"
+          type="button"
+          id="openMandatoryPaymentBucketPickerBtn"
+        >
+          Выбрать накопление
+        </button>
+      </div>
+
+      <div class="modal-actions mandatory-editor-actions">
+        <button
+          class="btn btn-primary"
+          type="button"
+          id="addMandatoryPaymentBtn"
+        >
+          Добавить платёж
+        </button>
+
+        <button
+          class="btn btn-danger hidden"
+          type="button"
+          id="deleteMandatoryPaymentBtn"
+        >
+          Удалить платёж
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MANDATORY PAYMENT BUCKET PICKER MODAL -->
+<div class="modal hidden" id="mandatoryPaymentBucketPickerModal" role="dialog" aria-modal="true" aria-label="Выбор накопления">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+
+    <div class="section-head">
+      <h2 class="modal-title">Выбрать накопление</h2>
+
+      <button
+        class="manager-back-btn"
+        type="button"
+        id="closeMandatoryPaymentBucketPickerModalBtn"
+      >
+        Закрыть
+      </button>
+    </div>
+
+    <div class="list" id="mandatoryPaymentBucketPickerList"></div>
   </div>
 </div>
 
