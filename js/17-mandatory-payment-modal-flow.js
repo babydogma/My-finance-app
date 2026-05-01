@@ -128,9 +128,15 @@
       openMandatoryPaymentEditorModal();
     }
 
-    function openMandatoryPaymentEditor(paymentId) {
-      const item = state.mandatoryPayments.find((entry) => entry.id === paymentId);
-      if (!item) return;
+        function openMandatoryPaymentEditor(paymentId) {
+      const item = state.mandatoryPayments.find((entry) => {
+        return String(entry.id) === String(paymentId);
+      });
+
+      if (!item) {
+        console.error("Mandatory payment not found for edit:", paymentId);
+        return;
+      }
 
       setActiveMandatoryPaymentId(paymentId);
 
@@ -274,19 +280,29 @@
       if (list.dataset.mandatoryEditBound === "true") return;
       list.dataset.mandatoryEditBound = "true";
 
-      list.addEventListener("click", (event) => {
-        const card = event.target.closest("[data-payment-id]");
+            list.addEventListener("click", (event) => {
+        const card = event.target.closest(
+          "[data-payment-id], [data-id], [data-mandatory-payment-id], .mandatory-payment-card"
+        );
 
         if (!card || !list.contains(card)) return;
 
-        const paymentId = card.dataset.paymentId;
-        if (!paymentId) return;
+        const paymentId =
+          card.dataset.paymentId ||
+          card.dataset.id ||
+          card.dataset.mandatoryPaymentId;
+
+        if (!paymentId) {
+          console.error("Mandatory payment card has no id dataset:", card);
+          return;
+        }
 
         event.preventDefault();
         event.stopPropagation();
+        event.stopImmediatePropagation();
 
         openMandatoryPaymentEditor(paymentId);
-      });
+      }, true);
     }
 
     bindMandatoryPaymentFlowButtons();
