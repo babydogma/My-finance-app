@@ -71,8 +71,9 @@
   function openAnimatedModal(modalEl) {
     if (!modalEl) return;
 
-    const existingTimer = modalCloseTimers.get(modalEl);
+    modalEl.classList.add("modal");
 
+    const existingTimer = modalCloseTimers.get(modalEl);
     if (existingTimer) {
       clearTimeout(existingTimer);
       modalCloseTimers.delete(modalEl);
