@@ -168,93 +168,39 @@
       resetMandatoryPaymentForm();
     }
 
-    function openMandatoryPaymentsModal() {
+function openMandatoryPaymentsModal() {
   if (!mandatoryPaymentsModal) {
     console.error("mandatoryPaymentsModal not found");
+    window.FinanceAppModalCore?.forceUnlockBodyScroll?.();
+    return;
+  }
+
+  mandatoryPaymentsModal.classList.add("modal");
+
+  const mandatoryPaymentsSheet = mandatoryPaymentsModal.querySelector(".modal-sheet");
+
+  if (!mandatoryPaymentsSheet) {
+    console.error("mandatoryPaymentsModal .modal-sheet not found");
+    window.FinanceAppModalCore?.forceUnlockBodyScroll?.();
     return;
   }
 
   setSelectedMonth(getSelectedMonth() || getCurrentMonthValue());
 
-  /*
-    Важно:
-    сначала открываем модалку, потом рендерим содержимое.
-    Если рендер платежей упадёт, сама модалка всё равно откроется,
-    а ошибка будет видна в консоли.
-  */
-  openAnimatedModal(mandatoryPaymentsModal);
-
   try {
     renderMonthStrip();
-  } catch (error) {
-    console.error("renderMandatoryPaymentsMonthStrip failed:", error);
-  }
-
-  try {
     renderModal();
   } catch (error) {
-    console.error("renderMandatoryPaymentsModal failed:", error);
-  }
-}
-    
-    function bindFlowButton(button, key, handler) {
-  if (!button) return;
-
-  const flag = `mandatoryFlowBound${key}`;
-
-  if (button.dataset[flag] === "true") return;
-
-  button.dataset[flag] = "true";
-
-  button.addEventListener("click", (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-
-    handler();
-  });
-}
-
-function bindMandatoryPaymentFlowButtons() {
-  bindFlowButton(
-    openMandatoryPaymentsModalBtn,
-    "OpenCalendar",
-    openMandatoryPaymentsModal
-  );
-
-  bindFlowButton(
-    closeMandatoryPaymentsModalBtn,
-    "CloseCalendar",
-    closeMandatoryPaymentsModal
-  );
-
-  bindFlowButton(
-    openMandatoryPaymentEditorBtn,
-    "OpenEditor",
-    openNewMandatoryPaymentEditor
-  );
-
-  bindFlowButton(
-    closeMandatoryPaymentEditorModalBtn,
-    "CloseEditor",
-    closeMandatoryPaymentEditorModal
-  );
-
-  bindFlowButton(
-    closeMandatoryPaymentBucketPickerModalBtn,
-    "CloseBucketPicker",
-    () => closeModalIfOpen(mandatoryPaymentBucketPickerModal)
-  );
-}
-
-bindMandatoryPaymentFlowButtons();
-
-function bindMandatoryPaymentFlowButton(buttonId, bindKey, handler) {
-  const button = document.getElementById(buttonId);
-
-  if (!button) {
-    console.error(`Mandatory payment button not found: ${buttonId}`);
+    console.error("mandatory payments modal render failed:", error);
+    window.FinanceAppModalCore?.forceUnlockBodyScroll?.();
     return;
   }
+
+  openAnimatedModal(mandatoryPaymentsModal);
+}
+    
+function bindMandatoryPaymentFlowButton(button, bindKey, handler) {
+  if (!button) return;
 
   const flag = `mandatoryFlowBound${bindKey}`;
 
@@ -273,31 +219,31 @@ function bindMandatoryPaymentFlowButton(buttonId, bindKey, handler) {
 
 function bindMandatoryPaymentFlowButtons() {
   bindMandatoryPaymentFlowButton(
-    "openMandatoryPaymentsModalBtn",
+    openMandatoryPaymentsModalBtn,
     "OpenCalendar",
     openMandatoryPaymentsModal
   );
 
   bindMandatoryPaymentFlowButton(
-    "closeMandatoryPaymentsModalBtn",
+    closeMandatoryPaymentsModalBtn,
     "CloseCalendar",
     closeMandatoryPaymentsModal
   );
 
   bindMandatoryPaymentFlowButton(
-    "openMandatoryPaymentEditorBtn",
+    openMandatoryPaymentEditorBtn,
     "OpenEditor",
     openNewMandatoryPaymentEditor
   );
 
   bindMandatoryPaymentFlowButton(
-    "closeMandatoryPaymentEditorModalBtn",
+    closeMandatoryPaymentEditorModalBtn,
     "CloseEditor",
     closeMandatoryPaymentEditorModal
   );
 
   bindMandatoryPaymentFlowButton(
-    "closeMandatoryPaymentBucketPickerModalBtn",
+    closeMandatoryPaymentBucketPickerModalBtn,
     "CloseBucketPicker",
     () => closeModalIfOpen(mandatoryPaymentBucketPickerModal)
   );
