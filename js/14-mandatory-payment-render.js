@@ -133,7 +133,9 @@
               isPaid ? " mandatory-payment-card--paid" : ""
             }`;
 
-          card.dataset.mandatoryId = item.id;
+                    card.dataset.mandatoryId = item.id;
+          card.dataset.paymentId = item.id;
+          card.dataset.mandatoryPaymentId = item.id;
           card.dataset.paid = String(isPaid);
 
           card.innerHTML = `
