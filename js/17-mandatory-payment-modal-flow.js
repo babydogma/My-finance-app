@@ -1,35 +1,35 @@
 (() => {
   function createMandatoryPaymentModalFlow({
-  state,
-  getActiveMandatoryPaymentId,
-  setActiveMandatoryPaymentId,
-  getSelectedMonth,
-  setSelectedMonth,
-  getCurrentMonthValue,
-  getMandatoryPaymentsActiveMonthKey,
-  buildDateFromDueDay,
-  getSafeBucketName,
+    state,
+    getActiveMandatoryPaymentId,
+    setActiveMandatoryPaymentId,
+    getSelectedMonth,
+    setSelectedMonth,
+    getCurrentMonthValue,
+    getMandatoryPaymentsActiveMonthKey,
+    buildDateFromDueDay,
+    getSafeBucketName,
 
-  mandatoryPaymentsModal,
-  openMandatoryPaymentsModalBtn,
-  closeMandatoryPaymentsModalBtn,
+    mandatoryPaymentsModal,
+    openMandatoryPaymentsModalBtn,
+    closeMandatoryPaymentsModalBtn,
 
-  mandatoryPaymentEditorModal,
-  openMandatoryPaymentEditorBtn,
-  closeMandatoryPaymentEditorModalBtn,
+    mandatoryPaymentEditorModal,
+    openMandatoryPaymentEditorBtn,
+    closeMandatoryPaymentEditorModalBtn,
 
-  mandatoryPaymentBucketPickerModal,
-  closeMandatoryPaymentBucketPickerModalBtn,
+    mandatoryPaymentBucketPickerModal,
+    closeMandatoryPaymentBucketPickerModalBtn,
 
-  mandatoryPaymentEditorTitle,
-  mandatoryPaymentTitleInput,
-  mandatoryPaymentAmountInput,
-  mandatoryPaymentDueDayInput,
-  mandatoryPaymentAccountSelect,
-  mandatoryPaymentLinkedSafeSelect,
-  openMandatoryPaymentBucketPickerBtn,
-  addMandatoryPaymentBtn,
-  deleteMandatoryPaymentBtn,
+    mandatoryPaymentEditorTitle,
+    mandatoryPaymentTitleInput,
+    mandatoryPaymentAmountInput,
+    mandatoryPaymentDueDayInput,
+    mandatoryPaymentAccountSelect,
+    mandatoryPaymentLinkedSafeSelect,
+    openMandatoryPaymentBucketPickerBtn,
+    addMandatoryPaymentBtn,
+    deleteMandatoryPaymentBtn,
 
     fillMandatoryPaymentAccountSelect,
     fillMandatoryPaymentSafeSelect,
@@ -41,6 +41,13 @@
     renderMonthStrip,
     renderModal,
   }) {
+    let calendarModalEl = mandatoryPaymentsModal;
+    let calendarCloseBtn = closeMandatoryPaymentsModalBtn;
+    let calendarEditorBtn = openMandatoryPaymentEditorBtn;
+    let calendarListEl = document.getElementById("mandatoryPaymentsList");
+    let calendarMonthStripEl = document.getElementById("mandatoryPaymentsMonthStrip");
+    let calendarCloseTimer = null;
+
     function isModalOpen(modal) {
       return Boolean(
         modal &&
@@ -49,9 +56,287 @@
       );
     }
 
+    function forceUnlockPageScroll() {
+      document.documentElement.classList.remove("modal-scroll-locked");
+      document.body.classList.remove("modal-scroll-locked");
+
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.left = "";
+      document.body.style.right = "";
+      document.body.style.width = "";
+      document.body.style.overflow = "";
+    }
+
     function closeModalIfOpen(modal) {
       if (!isModalOpen(modal)) return;
       closeAnimatedModal(modal);
+    }
+
+    function getCalendarModal() {
+      calendarModalEl = document.getElementById("mandatoryPaymentsModal") || calendarModalEl;
+      return calendarModalEl;
+    }
+
+    function getCalendarCloseButton() {
+      calendarCloseBtn = document.getElementById("closeMandatoryPaymentsModalBtn") || calendarCloseBtn;
+      return calendarCloseBtn;
+    }
+
+    function getCalendarEditorButton() {
+      calendarEditorBtn = document.getElementById("openMandatoryPaymentEditorBtn") || calendarEditorBtn;
+      return calendarEditorBtn;
+    }
+
+    function getCalendarList() {
+      calendarListEl = document.getElementById("mandatoryPaymentsList") || calendarListEl;
+      return calendarListEl;
+    }
+
+    function getCalendarMonthStrip() {
+      calendarMonthStripEl = document.getElementById("mandatoryPaymentsMonthStrip") || calendarMonthStripEl;
+      return calendarMonthStripEl;
+    }
+
+    function formatMoneyLocal(value) {
+      const number = Math.round((Number(value) || 0) * 100) / 100;
+
+      return new Intl.NumberFormat("ru-RU", {
+        maximumFractionDigits: number % 1 === 0 ? 0 : 2,
+      }).format(number) + " ₽";
+    }
+
+    function escapeHtmlLocal(value) {
+      return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function createFallbackCalendarModal() {
+      let modal = document.getElementById("mandatoryPaymentsModal");
+
+      if (!modal) {
+        modal = document.createElement("div");
+        modal.id = "mandatoryPaymentsModal";
+        document.body.appendChild(modal);
+      }
+
+      modal.classList.add("modal", "hidden");
+      modal.setAttribute("role", "dialog");
+      modal.setAttribute("aria-modal", "true");
+      modal.setAttribute("aria-label", "Календарные платежи");
+
+      if (!modal.querySelector(".modal-sheet")) {
+        modal.innerHTML = `
+          <div class="modal-sheet mandatory-payments-sheet--premium">
+            <div class="modal-handle"></div>
+
+            <div class="mandatory-payments-head">
+              <div class="mandatory-payments-head__text">
+                <h2 class="mandatory-payments-title">Календарные платежи</h2>
+                <p class="mandatory-payments-subtitle">
+                  Платежи, которые нужно держать под контролем каждый месяц.
+                </p>
+              </div>
+
+              <button
+                class="icon-action-btn mandatory-payments-close-btn"
+                type="button"
+                id="closeMandatoryPaymentsModalBtn"
+                aria-label="Закрыть календарные платежи"
+              >
+                ×
+              </button>
+            </div>
+
+            <div class="mandatory-payments-month-strip" id="mandatoryPaymentsMonthStrip"></div>
+
+            <div class="mandatory-payments-panel">
+              <div class="list" id="mandatoryPaymentsList"></div>
+            </div>
+
+            <button class="mandatory-payments-add-btn" type="button" id="openMandatoryPaymentEditorBtn">
+              <span>+</span>
+              <strong>Добавить платёж</strong>
+            </button>
+          </div>
+        `;
+      }
+
+      calendarModalEl = modal;
+      calendarCloseBtn = document.getElementById("closeMandatoryPaymentsModalBtn");
+      calendarEditorBtn = document.getElementById("openMandatoryPaymentEditorBtn");
+      calendarListEl = document.getElementById("mandatoryPaymentsList");
+      calendarMonthStripEl = document.getElementById("mandatoryPaymentsMonthStrip");
+
+      return modal;
+    }
+
+    function ensureCalendarModal() {
+      const modal = getCalendarModal() || createFallbackCalendarModal();
+
+      modal.classList.add("modal");
+      modal.setAttribute("role", "dialog");
+      modal.setAttribute("aria-modal", "true");
+
+      if (!modal.querySelector(".modal-sheet")) {
+        return createFallbackCalendarModal();
+      }
+
+      getCalendarCloseButton();
+      getCalendarEditorButton();
+      getCalendarList();
+      getCalendarMonthStrip();
+
+      return modal;
+    }
+
+    function renderFallbackMonthStrip() {
+      const strip = getCalendarMonthStrip();
+      if (!strip) return;
+
+      const currentMonth = getSelectedMonth() || getCurrentMonthValue();
+      const [yearRaw, monthRaw] = String(currentMonth).split("-");
+      const year = Number(yearRaw) || new Date().getFullYear();
+      const monthIndex = Math.max(0, Math.min(11, (Number(monthRaw) || new Date().getMonth() + 1) - 1));
+      const monthNames = ["Янв", "Фев", "Мар", "Апр", "Май", "Июн", "Июл", "Авг", "Сен", "Окт", "Ноя", "Дек"];
+
+      strip.innerHTML = monthNames.map((name, index) => {
+        const monthKey = `${year}-${String(index + 1).padStart(2, "0")}`;
+        const activeClass = index === monthIndex ? " is-active" : "";
+
+        return `
+          <button class="mandatory-payments-month-chip${activeClass}" type="button" data-month-key="${monthKey}">
+            ${name}
+            <small>${year}</small>
+          </button>
+        `;
+      }).join("");
+
+      strip.querySelectorAll("[data-month-key]").forEach((button) => {
+        button.addEventListener("click", () => {
+          setSelectedMonth(button.dataset.monthKey || getCurrentMonthValue());
+          renderCalendarContent();
+        });
+      });
+    }
+
+    function renderFallbackList() {
+      const list = getCalendarList();
+      if (!list) return;
+
+      const payments = Array.isArray(state?.mandatoryPayments) ? state.mandatoryPayments : [];
+
+      if (!payments.length) {
+        list.innerHTML = `
+          <div class="list-card">
+            <div class="list-body">
+              <div class="list-title-row">
+                <h3 class="list-title">Платежей пока нет</h3>
+              </div>
+              <p class="list-subtitle">Нажми «Добавить платёж», чтобы создать первый.</p>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      list.innerHTML = payments.map((item) => {
+        const title = escapeHtmlLocal(item.title || "Платёж");
+        const amount = formatMoneyLocal(item.amount);
+        const safeName = getSafeBucketName(item.linked_safe_bucket_id || "") || "Без накопления";
+        const day = Number(item.due_day) || "—";
+
+        return `
+          <button class="mandatory-payment-card" type="button" data-payment-id="${escapeHtmlLocal(item.id)}" data-paid="false">
+            <div class="list-body">
+              <div class="list-title-row">
+                <h3 class="list-title">${title}</h3>
+              </div>
+              <p class="list-subtitle">до ${day} числа · ${escapeHtmlLocal(safeName)}</p>
+            </div>
+
+            <div class="list-right">
+              <strong>${amount}</strong>
+            </div>
+          </button>
+        `;
+      }).join("");
+
+      list.querySelectorAll("[data-payment-id]").forEach((button) => {
+        button.addEventListener("click", () => {
+          openMandatoryPaymentEditor(button.dataset.paymentId);
+        });
+      });
+    }
+
+    function renderCalendarContent() {
+      try {
+        renderMonthStrip?.();
+      } catch (error) {
+        console.error("renderMandatoryPaymentsMonthStrip failed:", error);
+        renderFallbackMonthStrip();
+      }
+
+      try {
+        renderModal?.();
+      } catch (error) {
+        console.error("renderMandatoryPaymentsModal failed:", error);
+        renderFallbackList();
+      }
+
+      if (!getCalendarMonthStrip()?.children?.length) {
+        renderFallbackMonthStrip();
+      }
+
+      if (!getCalendarList()?.children?.length) {
+        renderFallbackList();
+      }
+    }
+
+    function showCalendarModal(modal) {
+      if (!modal) return;
+
+      if (calendarCloseTimer) {
+        clearTimeout(calendarCloseTimer);
+        calendarCloseTimer = null;
+      }
+
+      forceUnlockPageScroll();
+
+      modal.classList.remove("hidden", "is-visible", "is-closing");
+      void modal.offsetHeight;
+
+      requestAnimationFrame(() => {
+        modal.classList.add("is-visible");
+        forceUnlockPageScroll();
+      });
+    }
+
+    function hideCalendarModal(modal) {
+      if (!modal || modal.classList.contains("hidden")) {
+        forceUnlockPageScroll();
+        return;
+      }
+
+      if (calendarCloseTimer) {
+        clearTimeout(calendarCloseTimer);
+        calendarCloseTimer = null;
+      }
+
+      modal.classList.remove("is-visible");
+      modal.classList.add("is-closing");
+      forceUnlockPageScroll();
+
+      calendarCloseTimer = window.setTimeout(() => {
+        modal.classList.add("hidden");
+        modal.classList.remove("is-closing");
+        calendarCloseTimer = null;
+        forceUnlockPageScroll();
+      }, window.FinanceAppModalCore?.MODAL_ANIMATION_MS || 440);
     }
 
     function resetMandatoryPaymentForm() {
@@ -63,8 +348,8 @@
       if (mandatoryPaymentAccountSelect) mandatoryPaymentAccountSelect.value = "";
       if (mandatoryPaymentLinkedSafeSelect) mandatoryPaymentLinkedSafeSelect.value = "";
 
-      fillMandatoryPaymentAccountSelect("");
-      fillMandatoryPaymentSafeSelect("");
+      fillMandatoryPaymentAccountSelect?.("");
+      fillMandatoryPaymentSafeSelect?.("");
 
       if (mandatoryPaymentEditorTitle) {
         mandatoryPaymentEditorTitle.textContent = "Новый платёж";
@@ -78,18 +363,18 @@
         openMandatoryPaymentBucketPickerBtn.textContent = "Выбрать накопление";
       }
 
-      syncMandatoryPaymentLinkedSafeField();
+      syncMandatoryPaymentLinkedSafeField?.();
       deleteMandatoryPaymentBtn?.classList.add("hidden");
     }
 
     function openMandatoryPaymentEditorModal() {
+      if (!mandatoryPaymentEditorModal) return;
       openAnimatedModal(mandatoryPaymentEditorModal);
     }
 
     function closeMandatoryPaymentEditorModal() {
       closeModalIfOpen(mandatoryPaymentBucketPickerModal);
       closeModalIfOpen(mandatoryPaymentEditorModal);
-
       resetMandatoryPaymentForm();
     }
 
@@ -119,8 +404,8 @@
         );
       }
 
-      fillMandatoryPaymentAccountSelect(item.linked_account_id || "");
-      fillMandatoryPaymentSafeSelect(item.linked_safe_bucket_id || "");
+      fillMandatoryPaymentAccountSelect?.(item.linked_account_id || "");
+      fillMandatoryPaymentSafeSelect?.(item.linked_safe_bucket_id || "");
 
       if (mandatoryPaymentAccountSelect) {
         mandatoryPaymentAccountSelect.value = item.linked_account_id || "";
@@ -130,7 +415,7 @@
         mandatoryPaymentLinkedSafeSelect.value = item.linked_safe_bucket_id || "";
       }
 
-      syncMandatoryPaymentLinkedSafeField();
+      syncMandatoryPaymentLinkedSafeField?.();
 
       if (openMandatoryPaymentBucketPickerBtn) {
         openMandatoryPaymentBucketPickerBtn.textContent =
@@ -146,110 +431,104 @@
       }
 
       deleteMandatoryPaymentBtn?.classList.remove("hidden");
-
       openMandatoryPaymentEditorModal();
     }
 
     function closeMandatoryPaymentsModal() {
       closeModalIfOpen(mandatoryPaymentBucketPickerModal);
       closeModalIfOpen(mandatoryPaymentEditorModal);
-      closeModalIfOpen(mandatoryPaymentsModal);
-
-      window.setTimeout(() => {
-        if (
-          !isModalOpen(mandatoryPaymentsModal) &&
-          !isModalOpen(mandatoryPaymentEditorModal) &&
-          !isModalOpen(mandatoryPaymentBucketPickerModal)
-        ) {
-          window.FinanceAppModalCore?.forceUnlockBodyScroll?.();
-        }
-      }, window.FinanceAppModalCore?.MODAL_ANIMATION_MS + 60 || 520);
-
+      hideCalendarModal(ensureCalendarModal());
       resetMandatoryPaymentForm();
     }
 
-function openMandatoryPaymentsModal() {
-  if (!mandatoryPaymentsModal) {
-    console.error("mandatoryPaymentsModal not found");
-    window.FinanceAppModalCore?.forceUnlockBodyScroll?.();
-    return;
-  }
+    function openMandatoryPaymentsModal() {
+      const modal = ensureCalendarModal();
 
-  mandatoryPaymentsModal.classList.add("modal");
+      setSelectedMonth(getSelectedMonth() || getCurrentMonthValue());
+      renderCalendarContent();
+      showCalendarModal(modal);
+    }
 
-  const mandatoryPaymentsSheet = mandatoryPaymentsModal.querySelector(".modal-sheet");
+    function bindButton(button, bindKey, handler, capture = false) {
+      if (!button) return;
 
-  if (!mandatoryPaymentsSheet) {
-    console.error("mandatoryPaymentsModal .modal-sheet not found");
-    window.FinanceAppModalCore?.forceUnlockBodyScroll?.();
-    return;
-  }
+      const flag = `mandatoryFlowBound${bindKey}${capture ? "Capture" : ""}`;
+      if (button.dataset[flag] === "true") return;
 
-  setSelectedMonth(getSelectedMonth() || getCurrentMonthValue());
+      button.dataset[flag] = "true";
 
-  try {
-    renderMonthStrip();
-    renderModal();
-  } catch (error) {
-    console.error("mandatory payments modal render failed:", error);
-    window.FinanceAppModalCore?.forceUnlockBodyScroll?.();
-    return;
-  }
+      button.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
 
-  openAnimatedModal(mandatoryPaymentsModal);
-}
-    
-function bindMandatoryPaymentFlowButton(button, bindKey, handler) {
-  if (!button) return;
+        handler(event);
+      }, capture);
+    }
 
-  const flag = `mandatoryFlowBound${bindKey}`;
+    function bindStaticButtons() {
+      bindButton(openMandatoryPaymentsModalBtn, "OpenCalendar", openMandatoryPaymentsModal, true);
+      bindButton(getCalendarCloseButton(), "CloseCalendar", closeMandatoryPaymentsModal, true);
+      bindButton(getCalendarEditorButton(), "OpenEditor", openNewMandatoryPaymentEditor, true);
+      bindButton(closeMandatoryPaymentEditorModalBtn, "CloseEditor", closeMandatoryPaymentEditorModal, true);
 
-  if (button.dataset[flag] === "true") return;
+      bindButton(
+        closeMandatoryPaymentBucketPickerModalBtn,
+        "CloseBucketPicker",
+        () => closeModalIfOpen(mandatoryPaymentBucketPickerModal),
+        true
+      );
+    }
 
-  button.dataset[flag] = "true";
+    function bindDelegatedCalendarControls() {
+      if (document.documentElement.dataset.mandatoryCalendarDelegatedBound === "true") return;
+      document.documentElement.dataset.mandatoryCalendarDelegatedBound = "true";
 
-  button.addEventListener("click", (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    event.stopImmediatePropagation();
+      document.addEventListener("click", (event) => {
+        const openBtn = event.target.closest?.("#openMandatoryPaymentsModalBtn");
 
-    handler();
-  });
-}
+        if (openBtn) {
+          event.preventDefault();
+          event.stopPropagation();
+          event.stopImmediatePropagation();
 
-function bindMandatoryPaymentFlowButtons() {
-  bindMandatoryPaymentFlowButton(
-    openMandatoryPaymentsModalBtn,
-    "OpenCalendar",
-    openMandatoryPaymentsModal
-  );
+          openMandatoryPaymentsModal();
+          return;
+        }
 
-  bindMandatoryPaymentFlowButton(
-    closeMandatoryPaymentsModalBtn,
-    "CloseCalendar",
-    closeMandatoryPaymentsModal
-  );
+        const closeBtn = event.target.closest?.("#closeMandatoryPaymentsModalBtn");
 
-  bindMandatoryPaymentFlowButton(
-    openMandatoryPaymentEditorBtn,
-    "OpenEditor",
-    openNewMandatoryPaymentEditor
-  );
+        if (closeBtn) {
+          event.preventDefault();
+          event.stopPropagation();
+          event.stopImmediatePropagation();
 
-  bindMandatoryPaymentFlowButton(
-    closeMandatoryPaymentEditorModalBtn,
-    "CloseEditor",
-    closeMandatoryPaymentEditorModal
-  );
+          closeMandatoryPaymentsModal();
+          return;
+        }
 
-  bindMandatoryPaymentFlowButton(
-    closeMandatoryPaymentBucketPickerModalBtn,
-    "CloseBucketPicker",
-    () => closeModalIfOpen(mandatoryPaymentBucketPickerModal)
-  );
-}
+        const editorBtn = event.target.closest?.("#openMandatoryPaymentEditorBtn");
 
-bindMandatoryPaymentFlowButtons();
+        if (editorBtn) {
+          event.preventDefault();
+          event.stopPropagation();
+          event.stopImmediatePropagation();
+
+          openNewMandatoryPaymentEditor();
+        }
+      }, true);
+
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape" && isModalOpen(getCalendarModal())) {
+          closeMandatoryPaymentsModal();
+        }
+      });
+    }
+
+    ensureCalendarModal();
+    bindStaticButtons();
+    bindDelegatedCalendarControls();
+    forceUnlockPageScroll();
 
     return {
       resetMandatoryPaymentForm,
