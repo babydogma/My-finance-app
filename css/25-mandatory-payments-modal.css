@@ -5,6 +5,12 @@
 
 #mandatoryPaymentsModal {
   z-index: 142;
+  touch-action: auto;
+}
+
+#mandatoryPaymentsModal .modal-sheet {
+  touch-action: pan-y;
+  overscroll-behavior: contain;
 }
 
 #mandatoryPaymentsModal .modal-sheet.mandatory-payments-sheet--premium {
