@@ -193,7 +193,7 @@
       }
     }
 
-    function openMandatoryPaymentsModal() {
+        function openMandatoryPaymentsModal() {
       const modal = getCalendarModal();
 
       if (!modal) {
@@ -206,6 +206,7 @@
 
       setSelectedMonth(getSelectedMonth() || getCurrentMonthValue());
       renderMandatoryPaymentsContent();
+      bindPaymentCardEditOpen();
 
       openAnimatedModal(modal);
     }
@@ -252,7 +253,7 @@
       );
     }
 
-    function bindModalBackdropClose() {
+        function bindModalBackdropClose() {
       const modal = getCalendarModal();
       if (!modal) return;
 
@@ -266,8 +267,31 @@
       });
     }
 
+    function bindPaymentCardEditOpen() {
+      const list = document.getElementById("mandatoryPaymentsList");
+      if (!list) return;
+
+      if (list.dataset.mandatoryEditBound === "true") return;
+      list.dataset.mandatoryEditBound = "true";
+
+      list.addEventListener("click", (event) => {
+        const card = event.target.closest("[data-payment-id]");
+
+        if (!card || !list.contains(card)) return;
+
+        const paymentId = card.dataset.paymentId;
+        if (!paymentId) return;
+
+        event.preventDefault();
+        event.stopPropagation();
+
+        openMandatoryPaymentEditor(paymentId);
+      });
+    }
+
     bindMandatoryPaymentFlowButtons();
     bindModalBackdropClose();
+    bindPaymentCardEditOpen();
 
     return {
       resetMandatoryPaymentForm,
