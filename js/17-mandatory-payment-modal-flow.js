@@ -541,7 +541,250 @@
     };
   }
 
-  window.FinanceAppMandatoryPaymentModalFlow = {
+    window.FinanceAppMandatoryPaymentModalFlow = {
     create: createMandatoryPaymentModalFlow,
   };
+
+  /*
+    Emergency opener для календарных платежей.
+    Нужен потому что static mandatoryPaymentsModal в index.html может отсутствовать,
+    а старый modal flow иногда создаёт/показывает её только после открытия другой модалки.
+  */
+  function ensureEmergencyMandatoryPaymentsModal() {
+    let modal = document.getElementById("mandatoryPaymentsModal");
+
+    if (!modal) {
+      modal = document.createElement("div");
+      modal.id = "mandatoryPaymentsModal";
+      document.body.appendChild(modal);
+    }
+
+    modal.className = "modal hidden";
+    modal.setAttribute("role", "dialog");
+    modal.setAttribute("aria-modal", "true");
+    modal.setAttribute("aria-label", "Календарные платежи");
+
+    if (!modal.querySelector(".modal-sheet")) {
+      modal.innerHTML = `
+        <div class="modal-sheet mandatory-payments-sheet--premium">
+          <div class="modal-handle"></div>
+
+          <div class="mandatory-payments-head">
+            <div class="mandatory-payments-head__text">
+              <h2 class="mandatory-payments-title">Календарные платежи</h2>
+              <p class="mandatory-payments-subtitle">
+                Платежи, которые нужно держать под контролем каждый месяц.
+              </p>
+            </div>
+
+            <button
+              class="icon-action-btn mandatory-payments-close-btn"
+              type="button"
+              id="closeMandatoryPaymentsModalBtn"
+              aria-label="Закрыть календарные платежи"
+            >
+              ×
+            </button>
+          </div>
+
+          <div class="mandatory-payments-month-strip" id="mandatoryPaymentsMonthStrip"></div>
+
+          <div class="mandatory-payments-panel">
+            <div class="list" id="mandatoryPaymentsList"></div>
+          </div>
+
+          <button class="mandatory-payments-add-btn" type="button" id="openMandatoryPaymentEditorBtn">
+            <span>+</span>
+            <strong>Добавить платёж</strong>
+          </button>
+        </div>
+      `;
+    }
+
+    return modal;
+  }
+
+  function emergencyFormatMoney(value) {
+    const number = Math.round((Number(value) || 0) * 100) / 100;
+
+    return new Intl.NumberFormat("ru-RU", {
+      maximumFractionDigits: number % 1 === 0 ? 0 : 2,
+    }).format(number) + " ₽";
+  }
+
+  function emergencyEscapeHtml(value) {
+    return String(value ?? "")
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  function emergencyRenderMandatoryPaymentsModal() {
+    const state = window.FinanceAppState?.state;
+    const list = document.getElementById("mandatoryPaymentsList");
+    const strip = document.getElementById("mandatoryPaymentsMonthStrip");
+
+    if (strip) {
+      const now = new Date();
+      const year = now.getFullYear();
+      const activeMonth = now.getMonth();
+      const monthNames = ["Янв", "Фев", "Мар", "Апр", "Май", "Июн", "Июл", "Авг", "Сен", "Окт", "Ноя", "Дек"];
+
+      strip.innerHTML = monthNames.map((name, index) => {
+        const activeClass = index === activeMonth ? " is-active" : "";
+
+        return `
+          <button class="mandatory-payments-month-chip${activeClass}" type="button">
+            ${name}
+            <small>${year}</small>
+          </button>
+        `;
+      }).join("");
+    }
+
+    if (!list) return;
+
+    const payments = Array.isArray(state?.mandatoryPayments)
+      ? state.mandatoryPayments
+      : [];
+
+    if (!payments.length) {
+      list.innerHTML = `
+        <div class="list-card">
+          <div class="list-body">
+            <div class="list-title-row">
+              <h3 class="list-title">Платежей пока нет</h3>
+            </div>
+            <p class="list-subtitle">Нажми «Добавить платёж», чтобы создать первый.</p>
+          </div>
+        </div>
+      `;
+      return;
+    }
+
+    list.innerHTML = payments.map((item) => {
+      const title = emergencyEscapeHtml(item.title || "Платёж");
+      const amount = emergencyFormatMoney(item.amount);
+      const day = Number(item.due_day) || "—";
+
+      return `
+        <button class="mandatory-payment-card" type="button" data-payment-id="${emergencyEscapeHtml(item.id)}" data-paid="false">
+          <span class="mandatory-payment-card__progress" aria-hidden="true"></span>
+
+          <div class="list-body">
+            <div class="list-title-row">
+              <h3 class="list-title">${title}</h3>
+            </div>
+            <p class="list-subtitle">до ${day} числа</p>
+          </div>
+
+          <div class="list-right">
+            <strong>${amount}</strong>
+          </div>
+        </button>
+      `;
+    }).join("");
+  }
+
+  function emergencyUnlockScroll() {
+    document.documentElement.classList.remove("modal-scroll-locked");
+    document.body.classList.remove("modal-scroll-locked");
+
+    document.body.style.position = "";
+    document.body.style.top = "";
+    document.body.style.left = "";
+    document.body.style.right = "";
+    document.body.style.width = "";
+    document.body.style.overflow = "";
+  }
+
+  function emergencyOpenMandatoryPaymentsModal() {
+    const modal = ensureEmergencyMandatoryPaymentsModal();
+
+    emergencyRenderMandatoryPaymentsModal();
+    emergencyUnlockScroll();
+
+    modal.classList.remove("hidden", "is-closing");
+    modal.classList.add("is-visible");
+
+    modal.style.display = "flex";
+    modal.style.opacity = "1";
+    modal.style.pointerEvents = "auto";
+    modal.style.background = "rgba(20, 24, 33, 0.22)";
+    modal.style.backdropFilter = "blur(18px)";
+    modal.style.webkitBackdropFilter = "blur(18px)";
+
+    const sheet = modal.querySelector(".modal-sheet");
+
+    if (sheet) {
+      sheet.style.opacity = "1";
+      sheet.style.transform = "translate3d(0, 0, 0) scale(1)";
+    }
+
+    emergencyUnlockScroll();
+  }
+
+  function emergencyCloseMandatoryPaymentsModal() {
+    const modal = document.getElementById("mandatoryPaymentsModal");
+    if (!modal) return;
+
+    modal.classList.remove("is-visible", "is-closing");
+    modal.classList.add("hidden");
+
+    modal.style.display = "";
+    modal.style.opacity = "";
+    modal.style.pointerEvents = "";
+    modal.style.background = "";
+    modal.style.backdropFilter = "";
+    modal.style.webkitBackdropFilter = "";
+
+    const sheet = modal.querySelector(".modal-sheet");
+
+    if (sheet) {
+      sheet.style.opacity = "";
+      sheet.style.transform = "";
+    }
+
+    emergencyUnlockScroll();
+  }
+
+  document.addEventListener("click", (event) => {
+    const openTarget = event.target.closest?.(
+      "#openMandatoryPaymentsModalBtn, .required-payment-card--danger"
+    );
+
+    if (openTarget) {
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+
+      emergencyOpenMandatoryPaymentsModal();
+      return;
+    }
+
+    const closeTarget = event.target.closest?.("#closeMandatoryPaymentsModalBtn");
+
+    if (closeTarget) {
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+
+      emergencyCloseMandatoryPaymentsModal();
+      return;
+    }
+
+    const modal = document.getElementById("mandatoryPaymentsModal");
+
+    if (modal && event.target === modal) {
+      emergencyCloseMandatoryPaymentsModal();
+    }
+  }, true);
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      emergencyCloseMandatoryPaymentsModal();
+    }
+  });
 })();
