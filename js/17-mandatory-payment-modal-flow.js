@@ -128,7 +128,7 @@
       openMandatoryPaymentEditorModal();
     }
 
-        function openMandatoryPaymentEditor(paymentId) {
+          function openMandatoryPaymentEditor(paymentId) {
       const item = state.mandatoryPayments.find((entry) => {
         return String(entry.id) === String(paymentId);
       });
@@ -138,8 +138,8 @@
         return;
       }
 
-      setActiveMandatoryPaymentId(paymentId);
-
+      setActiveMandatoryPaymentId(item.id);
+      
       if (mandatoryPaymentTitleInput) {
         mandatoryPaymentTitleInput.value = item.title || "";
       }
@@ -281,14 +281,15 @@
       list.dataset.mandatoryEditBound = "true";
 
             list.addEventListener("click", (event) => {
-        const card = event.target.closest(
-          "[data-payment-id], [data-id], [data-mandatory-payment-id], .mandatory-payment-card"
+                const card = event.target.closest(
+          "[data-payment-id], [data-id], [data-mandatory-id], [data-mandatory-payment-id], .mandatory-payment-card"
         );
 
         if (!card || !list.contains(card)) return;
 
-        const paymentId =
+                const paymentId =
           card.dataset.paymentId ||
+          card.dataset.mandatoryId ||
           card.dataset.id ||
           card.dataset.mandatoryPaymentId;
 
