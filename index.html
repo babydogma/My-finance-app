@@ -167,24 +167,18 @@
 </section>
       
     <!-- MANDATORY PAYMENTS -->
-<section class="section required-payments-section">
+<<section class="section required-payments-section">
   <div class="section-head accounts-section-head required-payments-head">
     <h2 class="section-title">Календарные платежи</h2>
-
-    <button
-      class="icon-action-btn icon-action-btn--primary required-payments-add-btn"
-      type="button"
-      id="openMandatoryPaymentsModalBtn"
-      aria-label="Добавить платёж"
-      title="Добавить платёж"
-    >
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M12 5v14M5 12h14" />
-      </svg>
-    </button>
   </div>
 
-  <div class="required-payment-card required-payment-card--danger">
+  <button
+    class="required-payment-card required-payment-card--danger required-payment-card--clickable"
+    type="button"
+    id="openMandatoryPaymentsModalBtn"
+    aria-label="Открыть календарные платежи"
+    title="Открыть календарные платежи"
+  >
     <span class="required-payment-card__icon required-payment-card__icon--danger" aria-hidden="true">
       <svg viewBox="0 0 24 24">
         <path d="M12 7v6" />
@@ -200,10 +194,9 @@
     <strong class="required-payment-card__value required-payment-card__value--danger" id="analyticsPendingMandatoryValue">
       0 ₽
     </strong>
-  </div>
+    </button>
 
   <div class="required-payments-overview-label">Обзор</div>
-
   <div class="required-payments-list">
     <div class="required-payment-card required-payment-card--overview">
       <span class="required-payment-card__icon required-payment-card__icon--wallet" aria-hidden="true">
