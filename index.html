@@ -167,7 +167,7 @@
 </section>
       
     <!-- MANDATORY PAYMENTS -->
-<<section class="section required-payments-section">
+<section class="section required-payments-section">
   <div class="section-head accounts-section-head required-payments-head">
     <h2 class="section-title">Календарные платежи</h2>
   </div>
@@ -267,7 +267,44 @@
   </div>
 </section>
 
+<!-- MANDATORY PAYMENTS MODAL -->
+<div class="modal hidden" id="mandatoryPaymentsModal" role="dialog" aria-modal="true" aria-label="Календарные платежи">
+  <div class="modal-sheet mandatory-payments-sheet--premium">
+    <div class="modal-handle"></div>
+
+    <div class="mandatory-payments-head">
+      <div class="mandatory-payments-head__text">
+        <h2 class="mandatory-payments-title">Календарные платежи</h2>
+        <p class="mandatory-payments-subtitle">
+          Платежи, которые нужно держать под контролем каждый месяц.
+        </p>
+      </div>
+
+      <button
+        class="icon-action-btn mandatory-payments-close-btn"
+        type="button"
+        id="closeMandatoryPaymentsModalBtn"
+        aria-label="Закрыть календарные платежи"
+      >
+        ×
+      </button>
+    </div>
+
+    <div class="mandatory-payments-month-strip" id="mandatoryPaymentsMonthStrip"></div>
+
+    <div class="mandatory-payments-panel">
+      <div class="list" id="mandatoryPaymentsList"></div>
+    </div>
+
+    <button class="mandatory-payments-add-btn" type="button" id="openMandatoryPaymentEditorBtn">
+      <span>+</span>
+      <strong>Добавить платёж</strong>
+    </button>
+  </div>
+</div>
+
     <!-- TRANSACTIONS -->
+<section class="section transactions-preview-section">
 <section class="section transactions-preview-section">
   <div class="transactions-preview-card">
     <div class="transactions-preview-card__head">
