@@ -169,13 +169,33 @@
     }
 
     function openMandatoryPaymentsModal() {
-      setSelectedMonth(getSelectedMonth() || getCurrentMonthValue());
+  if (!mandatoryPaymentsModal) {
+    console.error("mandatoryPaymentsModal not found");
+    return;
+  }
 
-      renderMonthStrip();
-      renderModal();
+  setSelectedMonth(getSelectedMonth() || getCurrentMonthValue());
 
-      openAnimatedModal(mandatoryPaymentsModal);
-    }
+  /*
+    Важно:
+    сначала открываем модалку, потом рендерим содержимое.
+    Если рендер платежей упадёт, сама модалка всё равно откроется,
+    а ошибка будет видна в консоли.
+  */
+  openAnimatedModal(mandatoryPaymentsModal);
+
+  try {
+    renderMonthStrip();
+  } catch (error) {
+    console.error("renderMandatoryPaymentsMonthStrip failed:", error);
+  }
+
+  try {
+    renderModal();
+  } catch (error) {
+    console.error("renderMandatoryPaymentsModal failed:", error);
+  }
+}
     
     function bindFlowButton(button, key, handler) {
   if (!button) return;
@@ -221,6 +241,63 @@ function bindMandatoryPaymentFlowButtons() {
 
   bindFlowButton(
     closeMandatoryPaymentBucketPickerModalBtn,
+    "CloseBucketPicker",
+    () => closeModalIfOpen(mandatoryPaymentBucketPickerModal)
+  );
+}
+
+bindMandatoryPaymentFlowButtons();
+
+function bindMandatoryPaymentFlowButton(buttonId, bindKey, handler) {
+  const button = document.getElementById(buttonId);
+
+  if (!button) {
+    console.error(`Mandatory payment button not found: ${buttonId}`);
+    return;
+  }
+
+  const flag = `mandatoryFlowBound${bindKey}`;
+
+  if (button.dataset[flag] === "true") return;
+
+  button.dataset[flag] = "true";
+
+  button.addEventListener("click", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    event.stopImmediatePropagation();
+
+    handler();
+  });
+}
+
+function bindMandatoryPaymentFlowButtons() {
+  bindMandatoryPaymentFlowButton(
+    "openMandatoryPaymentsModalBtn",
+    "OpenCalendar",
+    openMandatoryPaymentsModal
+  );
+
+  bindMandatoryPaymentFlowButton(
+    "closeMandatoryPaymentsModalBtn",
+    "CloseCalendar",
+    closeMandatoryPaymentsModal
+  );
+
+  bindMandatoryPaymentFlowButton(
+    "openMandatoryPaymentEditorBtn",
+    "OpenEditor",
+    openNewMandatoryPaymentEditor
+  );
+
+  bindMandatoryPaymentFlowButton(
+    "closeMandatoryPaymentEditorModalBtn",
+    "CloseEditor",
+    closeMandatoryPaymentEditorModal
+  );
+
+  bindMandatoryPaymentFlowButton(
+    "closeMandatoryPaymentBucketPickerModalBtn",
     "CloseBucketPicker",
     () => closeModalIfOpen(mandatoryPaymentBucketPickerModal)
   );
