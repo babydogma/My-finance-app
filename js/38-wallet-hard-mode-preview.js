@@ -20,14 +20,37 @@
   }
 
   function cleanMoneyText(value, fallback = "0 ₽") {
-    const text = String(value || "")
-      .replace(/^Свободно\s*:\s*/i, "")
-      .replace(/^Баланс\s*:\s*/i, "")
-      .replace(/\s+/g, " ")
-      .trim();
+  const text = String(value || "")
+    .replace(/^Свободно\s*:\s*/i, "")
+    .replace(/^Баланс\s*:\s*/i, "")
+    .replace(/\s+/g, " ")
+    .trim();
 
-    return text || fallback;
-  }
+  return formatMoneyText(text || fallback);
+}
+
+function formatMoneyText(value) {
+  const source = String(value || "").trim();
+
+  if (!source) return "0 ₽";
+
+  const numeric = source
+    .replace(/\s/g, "")
+    .replace("₽", "")
+    .replace(",", ".")
+    .trim();
+
+  const amount = Number(numeric);
+
+  if (!Number.isFinite(amount)) return source;
+
+  const hasDecimals = Math.abs(amount % 1) > 0.0001;
+
+  return new Intl.NumberFormat("ru-RU", {
+    minimumFractionDigits: hasDecimals ? 2 : 0,
+    maximumFractionDigits: hasDecimals ? 2 : 0,
+  }).format(amount) + " ₽";
+}
 
   function getMoneyTextById(id, fallback = "0 ₽") {
     return cleanMoneyText(getTextById(id, fallback), fallback);
