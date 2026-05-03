@@ -1,5 +1,10 @@
 (() => {
   const STORAGE_KEY = "wallet_expected_income_v1";
+  const CHECK_STATE_KEY = "wallet_expected_income_check_v1";
+
+  const FIRST_CHECK_HOUR = 14;
+  const SECOND_CHECK_HOUR = 20;
+  const NEXT_DAY_CHECK_HOUR = 9;
 
   function parseMoney(text) {
     const normalized = String(text || "")
@@ -213,6 +218,142 @@
   function clearExpectedIncome() {
     localStorage.removeItem(STORAGE_KEY);
   }
+  
+    function getExpectedIncomeSignature(expected) {
+    if (!expected) return "";
+
+    return [
+      expected.title || "",
+      expected.amount || 0,
+      expected.date || "",
+    ].join("|");
+  }
+
+  function getCheckState() {
+    try {
+      const raw = localStorage.getItem(CHECK_STATE_KEY);
+
+      if (!raw) return null;
+
+      return JSON.parse(raw);
+    } catch (error) {
+      return null;
+    }
+  }
+
+  function saveCheckState(state) {
+    localStorage.setItem(CHECK_STATE_KEY, JSON.stringify(state));
+  }
+
+  function clearExpectedIncomeCheckState() {
+    localStorage.removeItem(CHECK_STATE_KEY);
+  }
+
+  function getDateValueFromDate(date) {
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+  }
+
+  function getDateAtHour(dateValue, hour) {
+    const date = getDateFromValue(dateValue) || getStartOfToday();
+
+    return new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate(),
+      hour,
+      0,
+      0,
+      0
+    );
+  }
+
+  function getTomorrowAtHour(hour) {
+    const today = getStartOfToday();
+
+    return new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate() + 1,
+      hour,
+      0,
+      0,
+      0
+    );
+  }
+
+  function getExpectedIncomeCheckSlot(expected) {
+    if (!expected || !expected.date) return null;
+
+    const todayValue = getTodayDateValue();
+    const currentHour = new Date().getHours();
+
+    if (expected.date > todayValue) return null;
+
+    if (expected.date === todayValue) {
+      if (currentHour < FIRST_CHECK_HOUR) return null;
+      if (currentHour < SECOND_CHECK_HOUR) return "14";
+
+      return "20";
+    }
+
+    return "overdue";
+  }
+
+  function shouldShowExpectedIncomeCheck(expected) {
+    const slot = getExpectedIncomeCheckSlot(expected);
+
+    if (!slot) return false;
+
+    const now = Date.now();
+    const signature = getExpectedIncomeSignature(expected);
+    const todayValue = getTodayDateValue();
+    const checkKey = `${signature}|${todayValue}|${slot}`;
+    const state = getCheckState();
+
+    if (state?.signature === signature && state?.snoozeUntil && now < state.snoozeUntil) {
+      return false;
+    }
+
+    if (state?.signature === signature && state?.lastShownKey === checkKey) {
+      return false;
+    }
+
+    return true;
+  }
+
+  function markExpectedIncomeCheckShown(expected) {
+    const slot = getExpectedIncomeCheckSlot(expected);
+
+    if (!slot) return;
+
+    const signature = getExpectedIncomeSignature(expected);
+    const todayValue = getTodayDateValue();
+
+    saveCheckState({
+      signature,
+      lastShownKey: `${signature}|${todayValue}|${slot}`,
+      snoozeUntil: 0,
+    });
+  }
+
+  function snoozeExpectedIncomeCheck(expected) {
+    if (!expected) return;
+
+    const slot = getExpectedIncomeCheckSlot(expected);
+    const signature = getExpectedIncomeSignature(expected);
+
+    let snoozeUntil = getTomorrowAtHour(NEXT_DAY_CHECK_HOUR).getTime();
+
+    if (expected.date === getTodayDateValue() && slot === "14") {
+      snoozeUntil = getDateAtHour(expected.date, SECOND_CHECK_HOUR).getTime();
+    }
+
+    saveCheckState({
+      signature,
+      lastShownKey: `${signature}|${getTodayDateValue()}|${slot || "manual"}`,
+      snoozeUntil,
+    });
+  }
 
   function getModalCore() {
     return window.FinanceAppModalCore || null;
@@ -264,6 +405,138 @@
       modal.classList.add("hidden");
       modal.classList.remove("is-closing");
     }, 440);
+  }
+  
+    function ensureExpectedIncomeCheckModal() {
+    if (document.getElementById("expectedIncomeCheckModal")) return;
+
+    document.body.insertAdjacentHTML("beforeend", `
+      <div class="modal hidden" id="expectedIncomeCheckModal" role="dialog" aria-modal="true" aria-label="Проверка ожидаемых денег">
+        <div class="modal-sheet">
+          <div class="modal-handle"></div>
+
+          <div class="manager-card">
+            <h2 class="modal-title">Что по деньгам?</h2>
+
+            <p class="expected-income-check-text" id="expectedIncomeCheckText">
+              Ожидаемые деньги должны были прийти.
+            </p>
+
+            <div class="modal-actions">
+              <button
+                class="btn btn-primary"
+                type="button"
+                id="expectedIncomeArrivedBtn"
+              >
+                Деньги пришли
+              </button>
+
+              <button
+                class="btn btn-danger"
+                type="button"
+                id="expectedIncomeWaitMoreBtn"
+              >
+                Жду дальше
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `);
+  }
+
+  function openExpectedIncomeCheckModal() {
+    const expected = getExpectedIncome();
+
+    if (!expected || !shouldShowExpectedIncomeCheck(expected)) return;
+
+    ensureExpectedIncomeCheckModal();
+
+    const modal = document.getElementById("expectedIncomeCheckModal");
+    const text = document.getElementById("expectedIncomeCheckText");
+
+    if (!modal) return;
+
+    if (text) {
+      const isOverdue = expected.date < getTodayDateValue();
+
+      text.textContent = isOverdue
+        ? `${expected.title} должна была прийти ${formatDateHuman(expected.date)}. Минимум: ${formatMoney(expected.amount)}.`
+        : `Сегодня ждёшь ${expected.title}. Минимум: ${formatMoney(expected.amount)}.`;
+    }
+
+    markExpectedIncomeCheckShown(expected);
+
+    const modalCore = getModalCore();
+
+    if (modalCore?.openAnimatedModal) {
+      modalCore.openAnimatedModal(modal);
+      return;
+    }
+
+    modal.classList.remove("hidden", "is-closing");
+
+    requestAnimationFrame(() => {
+      modal.classList.add("is-visible");
+    });
+  }
+
+  function closeExpectedIncomeCheckModal() {
+    const modal = document.getElementById("expectedIncomeCheckModal");
+
+    if (!modal) return;
+
+    const modalCore = getModalCore();
+
+    if (modalCore?.closeAnimatedModal) {
+      modalCore.closeAnimatedModal(modal);
+      return;
+    }
+
+    modal.classList.remove("is-visible");
+    modal.classList.add("is-closing");
+
+    window.setTimeout(() => {
+      modal.classList.add("hidden");
+      modal.classList.remove("is-closing");
+    }, 440);
+  }
+
+  function scheduleExpectedIncomeCheck() {
+    window.clearTimeout(window.__expectedIncomeCheckTimer);
+
+    const expected = getExpectedIncome();
+
+    if (!expected || !expected.date) return;
+
+    const now = Date.now();
+    const todayValue = getTodayDateValue();
+
+    let nextCheckDate = null;
+
+    if (expected.date > todayValue) {
+      nextCheckDate = getDateAtHour(expected.date, FIRST_CHECK_HOUR);
+    } else if (expected.date === todayValue) {
+      const firstCheck = getDateAtHour(expected.date, FIRST_CHECK_HOUR);
+      const secondCheck = getDateAtHour(expected.date, SECOND_CHECK_HOUR);
+
+      if (now < firstCheck.getTime()) {
+        nextCheckDate = firstCheck;
+      } else if (now < secondCheck.getTime()) {
+        nextCheckDate = secondCheck;
+      }
+    } else {
+      nextCheckDate = getTomorrowAtHour(NEXT_DAY_CHECK_HOUR);
+    }
+
+    if (!nextCheckDate) return;
+
+    const delay = Math.max(1000, nextCheckDate.getTime() - now);
+
+    window.__expectedIncomeCheckTimer = window.setTimeout(() => {
+      openExpectedIncomeCheckModal();
+      scheduleExpectedIncomeCheck();
+    }, delay);
   }
 
   function updateExpectedIncomeCard(expected) {
@@ -440,8 +713,44 @@
       const openBtn = event.target.closest("#openExpectedIncomeModalBtn");
       const closeBtn = event.target.closest("#closeExpectedIncomeModalBtn");
       const saveBtn = event.target.closest("#saveExpectedIncomeBtn");
-      const clearBtn = event.target.closest("#clearExpectedIncomeBtn");
+            const clearBtn = event.target.closest("#clearExpectedIncomeBtn");
+      const arrivedBtn = event.target.closest("#expectedIncomeArrivedBtn");
+      const waitMoreBtn = event.target.closest("#expectedIncomeWaitMoreBtn");
       const modal = document.getElementById("expectedIncomeModal");
+      
+            if (arrivedBtn) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        clearExpectedIncome();
+        clearExpectedIncomeCheckState();
+        closeExpectedIncomeCheckModal();
+        updateWalletGameHeroWithExpectedIncome();
+
+        window.setTimeout(() => {
+          openExpectedIncomeModal();
+        }, 280);
+
+        return;
+      }
+
+      if (waitMoreBtn) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const expected = getExpectedIncome();
+
+        snoozeExpectedIncomeCheck(expected);
+        closeExpectedIncomeCheckModal();
+
+        window.setTimeout(() => {
+          openExpectedIncomeModal();
+        }, 280);
+
+        scheduleExpectedIncomeCheck();
+
+        return;
+      }
 
       if (openBtn) {
         event.preventDefault();
@@ -485,8 +794,10 @@
           date,
         });
 
-        closeExpectedIncomeModal();
+                closeExpectedIncomeModal();
         updateWalletGameHeroWithExpectedIncome();
+        scheduleExpectedIncomeCheck();
+        return;
         return;
       }
 
@@ -494,9 +805,11 @@
         event.preventDefault();
         event.stopPropagation();
 
-        clearExpectedIncome();
+                clearExpectedIncome();
+        clearExpectedIncomeCheckState();
         closeExpectedIncomeModal();
         updateWalletGameHeroWithExpectedIncome();
+        scheduleExpectedIncomeCheck();
       }
     }, true);
   }
@@ -505,8 +818,11 @@
     if (window.__walletExpectedIncomeStarted) return;
     window.__walletExpectedIncomeStarted = true;
 
-    bindExpectedIncomeEvents();
+        bindExpectedIncomeEvents();
+    ensureExpectedIncomeCheckModal();
     updateWalletGameHeroWithExpectedIncome();
+    openExpectedIncomeCheckModal();
+    scheduleExpectedIncomeCheck();
 
     const observer = new MutationObserver(updateWalletGameHeroWithExpectedIncome);
 
@@ -527,8 +843,19 @@
       }
     });
 
-    window.addEventListener("focus", updateWalletGameHeroWithExpectedIncome);
-    document.addEventListener("visibilitychange", updateWalletGameHeroWithExpectedIncome);
+        window.addEventListener("focus", () => {
+      updateWalletGameHeroWithExpectedIncome();
+      openExpectedIncomeCheckModal();
+      scheduleExpectedIncomeCheck();
+    });
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) return;
+
+      updateWalletGameHeroWithExpectedIncome();
+      openExpectedIncomeCheckModal();
+      scheduleExpectedIncomeCheck();
+    });
   }
 
   if (document.readyState === "loading") {
