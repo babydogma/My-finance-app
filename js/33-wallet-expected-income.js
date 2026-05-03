@@ -61,7 +61,7 @@
     return Math.max(1, lastDay - now.getDate() + 1);
   }
 
-  function getDaysUntilDate(dateValue) {
+    function getDaysUntilDate(dateValue) {
     const targetDate = getDateFromValue(dateValue);
     const today = getStartOfToday();
 
@@ -76,6 +76,114 @@
     const diff = Math.ceil((target.getTime() - today.getTime()) / 86400000);
 
     return Math.max(1, diff);
+  }
+
+  function getCurrentMonthValue() {
+    const now = new Date();
+
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+  }
+
+  function getPaymentAmount(payment) {
+    return parseMoney(
+      payment?.amount ??
+      payment?.sum ??
+      payment?.value ??
+      0
+    );
+  }
+
+  function getPaymentPaidPeriods(payment) {
+    if (Array.isArray(payment?.paid_periods)) return payment.paid_periods;
+    if (Array.isArray(payment?.paidPeriods)) return payment.paidPeriods;
+
+    return [];
+  }
+
+  function isPaymentPaidInCurrentMonth(payment) {
+    return getPaymentPaidPeriods(payment).includes(getCurrentMonthValue());
+  }
+
+  function getPaymentDateInCurrentMonth(payment) {
+    const rawDate =
+      payment?.due_date ||
+      payment?.dueDate ||
+      payment?.date ||
+      payment?.payment_date ||
+      payment?.paymentDate ||
+      payment?.due_day ||
+      payment?.dueDay ||
+      payment?.day ||
+      "";
+
+    if (!rawDate) return null;
+
+    const rawText = String(rawDate);
+
+    if (/^\d{4}-\d{2}-\d{2}/.test(rawText)) {
+      return getDateFromValue(rawText.slice(0, 10));
+    }
+
+    const day = Number(rawText);
+
+    if (!Number.isFinite(day) || day <= 0) return null;
+
+    const now = new Date();
+
+    return new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      Math.min(31, Math.max(1, day))
+    );
+  }
+
+  function getCalendarUntilDate(totalCalendar, targetDateValue) {
+    const state = window.FinanceAppState?.state;
+    const targetDate = getDateFromValue(targetDateValue);
+
+    if (!targetDate || !state || !Array.isArray(state.mandatoryPayments)) {
+      return totalCalendar;
+    }
+
+    let hasAnyDatedPayment = false;
+    let amountBeforeTarget = 0;
+
+    state.mandatoryPayments.forEach((payment) => {
+      if (!payment || payment.enabled === false) return;
+      if (isPaymentPaidInCurrentMonth(payment)) return;
+
+      const paymentDate = getPaymentDateInCurrentMonth(payment);
+
+      if (!paymentDate) return;
+
+      hasAnyDatedPayment = true;
+
+      if (paymentDate.getTime() <= targetDate.getTime()) {
+        amountBeforeTarget += getPaymentAmount(payment);
+      }
+    });
+
+    if (!hasAnyDatedPayment) {
+      return totalCalendar;
+    }
+
+    return Math.min(totalCalendar, Math.max(0, amountBeforeTarget));
+  }
+
+  function getLimitsUntilDate(totalLimits, daysUntilIncome, daysLeftMonth) {
+    if (daysLeftMonth <= 0) return totalLimits;
+
+    const ratio = Math.min(1, Math.max(0, daysUntilIncome / daysLeftMonth));
+
+    return Math.round(totalLimits * ratio * 100) / 100;
+  }
+
+  function setPressureLabels(calendarLabel, limitsLabel) {
+    const calendarNode = document.querySelector(".wallet-game-hero__pressure > div:first-child span");
+    const limitsNode = document.querySelector(".wallet-game-hero__pressure > div:nth-child(2) span");
+
+    if (calendarNode) calendarNode.textContent = calendarLabel;
+    if (limitsNode) limitsNode.textContent = limitsLabel;
   }
 
   function getExpectedIncome() {
@@ -215,31 +323,48 @@
     const calendar = parseMoney(document.getElementById("analyticsPendingMandatoryValue")?.textContent);
     const limits = parseMoney(document.getElementById("analyticsRemainingBudgetsValue")?.textContent);
 
-    const daysLeftMonth = getDaysLeftInMonth();
+        const daysLeftMonth = getDaysLeftInMonth();
     const daysUntilIncome = expected ? getDaysUntilDate(expected.date) : daysLeftMonth;
 
-    const factPool = freeMoney - calendar - limits;
-    const factTodayUntilIncome = Math.max(0, factPool / daysUntilIncome);
-    const factTodayToMonthEnd = Math.max(0, factPool / daysLeftMonth);
+    const calendarUntilIncome = expected
+      ? getCalendarUntilDate(calendar, expected.date)
+      : calendar;
+
+    const limitsUntilIncome = expected
+      ? getLimitsUntilDate(limits, daysUntilIncome, daysLeftMonth)
+      : limits;
+
+    const factPoolToMonthEnd = freeMoney - calendar - limits;
+    const factPoolUntilIncome = freeMoney - calendarUntilIncome - limitsUntilIncome;
+
+    const factTodayUntilIncome = Math.max(0, factPoolUntilIncome / daysUntilIncome);
+    const factTodayToMonthEnd = Math.max(0, factPoolToMonthEnd / daysLeftMonth);
 
     const expectedAmount = expected ? expected.amount : 0;
-    const monthScenarioPool = factPool + expectedAmount;
+    const monthScenarioPool = factPoolToMonthEnd + expectedAmount;
     const monthScenarioToday = Math.max(0, monthScenarioPool / daysLeftMonth);
 
-    const visibleTodayCan = expected ? monthScenarioToday : factTodayToMonthEnd;
-    const visiblePool = expected ? monthScenarioPool : factPool;
-
+    const visibleTodayCan = expected ? factTodayUntilIncome : factTodayToMonthEnd;
+    const visiblePool = expected ? factPoolUntilIncome : factPoolToMonthEnd;
+    
     const meterValue = Math.max(
       0,
       Math.min(100, (visiblePool / Math.max(freeMoney + expectedAmount, 1)) * 100)
     );
 
-    setText("walletCalendarPressureValue", formatMoney(calendar));
-    setText("walletLimitsPressureValue", formatMoney(limits));
+        if (expected) {
+      setPressureLabels("Календарь до ЗП", "Лимиты до ЗП");
+      setText("walletCalendarPressureValue", formatMoney(calendarUntilIncome));
+      setText("walletLimitsPressureValue", formatMoney(limitsUntilIncome));
+    } else {
+      setPressureLabels("Календарь", "Лимиты");
+      setText("walletCalendarPressureValue", formatMoney(calendar));
+      setText("walletLimitsPressureValue", formatMoney(limits));
+    }
 
     if (expected) {
-      setHeroEyebrow("Сценарий с ожиданием");
-      setHeroTitle("До конца можно");
+            setHeroEyebrow("До ближайших денег");
+      setHeroTitle("До ЗП можно");
       setFirstStatLabel("До ЗП");
       setText("walletDaysLeftValue", `${daysUntilIncome} дн.`);
     } else {
@@ -256,33 +381,31 @@
 
     hero.classList.remove("is-good", "is-warn", "is-bad");
 
-    if (expected) {
-      if (monthScenarioPool < 0) {
+          if (factPoolUntilIncome < 0) {
         hero.classList.add("is-bad");
-        status.textContent = "Даже с ожиданием тесно";
-        hint.textContent = `До ${formatDateHuman(expected.date)} по факту — ${formatMoney(factTodayUntilIncome)}/день. Даже с минимумом ${formatMoney(expected.amount)} до конца месяца останется дыра ${formatMoney(Math.abs(monthScenarioPool))}.`;
+        status.textContent = "До ЗП стоп";
+        hint.textContent = `До ${formatDateHuman(expected.date)} не хватает ${formatMoney(Math.abs(factPoolUntilIncome))}. Если придёт минимум ${formatMoney(expected.amount)}, до конца месяца будет ${formatMoney(monthScenarioToday)}/день.`;
         return;
       }
 
-      if (monthScenarioToday < 300) {
+      if (factTodayUntilIncome < 300) {
         hero.classList.add("is-bad");
         status.textContent = "Тянуть аккуратно";
-        hint.textContent = `До ${formatDateHuman(expected.date)} по факту — ${formatMoney(factTodayUntilIncome)}/день. Если придёт минимум ${formatMoney(expected.amount)}, до конца месяца — ${formatMoney(monthScenarioToday)}/день.`;
+        hint.textContent = `До ${formatDateHuman(expected.date)} можно ${formatMoney(factTodayUntilIncome)}/день. После ожидаемых денег сценарий до конца месяца — ${formatMoney(monthScenarioToday)}/день.`;
         return;
       }
 
-      if (monthScenarioToday < 700) {
+      if (factTodayUntilIncome < 700) {
         hero.classList.add("is-warn");
         status.textContent = "Осторожно можно";
-        hint.textContent = `До ${formatDateHuman(expected.date)} по факту — ${formatMoney(factTodayUntilIncome)}/день. С ожиданием до конца месяца — ${formatMoney(monthScenarioToday)}/день.`;
+        hint.textContent = `До ${formatDateHuman(expected.date)} можно ${formatMoney(factTodayUntilIncome)}/день. Если минимум придёт, до конца месяца — ${formatMoney(monthScenarioToday)}/день.`;
         return;
       }
 
       hero.classList.add("is-good");
-      status.textContent = "С ожиданием норм";
-      hint.textContent = `До ${formatDateHuman(expected.date)} по факту — ${formatMoney(factTodayUntilIncome)}/день. Если минимум придёт, до конца месяца — ${formatMoney(monthScenarioToday)}/день.`;
+      status.textContent = "До ЗП норм";
+      hint.textContent = `До ${formatDateHuman(expected.date)} можно ${formatMoney(factTodayUntilIncome)}/день. После ожидаемых денег до конца месяца — ${formatMoney(monthScenarioToday)}/день.`;
       return;
-    }
 
     if (factPool < 0) {
       hero.classList.add("is-bad");
