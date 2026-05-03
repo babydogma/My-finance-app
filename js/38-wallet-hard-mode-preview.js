@@ -14,35 +14,37 @@
     element.textContent = value;
   }
 
-  function syncHardAnalyticsPreview() {
+  function syncHardModePreview() {
     setTextById(
-      "hardAnalyticsExpenseValue",
-      getTextById("analyticsExpenseValue", "0 ₽")
+      "hardPressureMandatoryValue",
+      getTextById("analyticsPendingMandatoryValue", "0 ₽")
     );
 
     setTextById(
-      "hardAnalyticsLimitsValue",
-      getTextById("analyticsRemainingBudgetsValue", "0 ₽")
+      "hardPressureLimitsValue",
+      getTextById("walletLimitsPressureValue", "0 ₽")
     );
 
     setTextById(
-      "hardAnalyticsInterestValue",
-      getTextById("analyticsInterestValue", "0 ₽")
+      "hardPressureFreeValue",
+      getTextById("balanceFreeMoneyValue", "0 ₽")
     );
 
     setTextById(
-      "hardAnalyticsControlValue",
+      "hardPressureControlValue",
       getTextById("walletMandatoryControlValue", "0%")
     );
   }
 
-  function bindHardAnalyticsButton() {
-    const button = document.getElementById("hardAnalyticsOpenReportBtn");
+  function bindHardPressureActions() {
+    document.addEventListener("click", (event) => {
+      const mandatoryCard = event.target.closest('[data-hard-open="mandatory"]');
 
-    if (!button) return;
+      if (!mandatoryCard) return;
 
-    button.addEventListener("click", () => {
-      document.getElementById("openMonthlyReportBtn")?.click();
+      event.preventDefault();
+
+      document.getElementById("openMandatoryPaymentsModalBtn")?.click();
     });
   }
 
@@ -51,7 +53,7 @@
 
     if (!source) return;
 
-    const observer = new MutationObserver(syncHardAnalyticsPreview);
+    const observer = new MutationObserver(syncHardModePreview);
 
     observer.observe(source, {
       childList: true,
@@ -61,22 +63,22 @@
   }
 
   function start() {
-    syncHardAnalyticsPreview();
-    bindHardAnalyticsButton();
+    syncHardModePreview();
+    bindHardPressureActions();
 
     [
-      "analyticsExpenseValue",
-      "analyticsRemainingBudgetsValue",
-      "analyticsInterestValue",
+      "analyticsPendingMandatoryValue",
+      "walletLimitsPressureValue",
+      "balanceFreeMoneyValue",
       "walletMandatoryControlValue",
     ].forEach(observeSource);
 
-    window.addEventListener("focus", syncHardAnalyticsPreview);
+    window.addEventListener("focus", syncHardModePreview);
 
     document.addEventListener("visibilitychange", () => {
       if (document.hidden) return;
 
-      syncHardAnalyticsPreview();
+      syncHardModePreview();
     });
   }
 
