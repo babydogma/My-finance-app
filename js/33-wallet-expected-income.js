@@ -379,9 +379,10 @@
 
     updateExpectedIncomeCard(expected);
 
-    hero.classList.remove("is-good", "is-warn", "is-bad");
+        hero.classList.remove("is-good", "is-warn", "is-bad");
 
-          if (factPoolUntilIncome < 0) {
+    if (expected) {
+      if (factPoolUntilIncome < 0) {
         hero.classList.add("is-bad");
         status.textContent = "До ЗП стоп";
         hint.textContent = `До ${formatDateHuman(expected.date)} не хватает ${formatMoney(Math.abs(factPoolUntilIncome))}. Если придёт минимум ${formatMoney(expected.amount)}, до конца месяца будет ${formatMoney(monthScenarioToday)}/день.`;
@@ -406,14 +407,15 @@
       status.textContent = "До ЗП норм";
       hint.textContent = `До ${formatDateHuman(expected.date)} можно ${formatMoney(factTodayUntilIncome)}/день. После ожидаемых денег до конца месяца — ${formatMoney(monthScenarioToday)}/день.`;
       return;
-
-    if (factPool < 0) {
-      hero.classList.add("is-bad");
-      status.textContent = "По факту стоп";
-      hint.textContent = `Без будущих денег дыра ${formatMoney(Math.abs(factPool))}. Ждёшь ЗП — добавь ожидание ниже.`;
-      return;
     }
 
+    if (factPoolToMonthEnd < 0) {
+      hero.classList.add("is-bad");
+      status.textContent = "По факту стоп";
+      hint.textContent = `Без будущих денег дыра ${formatMoney(Math.abs(factPoolToMonthEnd))}. Ждёшь ЗП — добавь ожидание ниже.`;
+      return;
+    }
+    
     if (factTodayToMonthEnd < 300) {
       hero.classList.add("is-bad");
       status.textContent = "Режим выживания";
