@@ -572,3 +572,29 @@
     width: 100%;
   }
 }
+
+/* =========================================================
+   Expected income check modal
+   ========================================================= */
+
+.expected-income-check-text {
+  margin: -4px 0 14px;
+  color: rgba(20, 24, 33, 0.56);
+  font-size: 15px;
+  line-height: 1.28;
+  font-weight: 620;
+  letter-spacing: -0.012em;
+  text-align: center;
+}
+
+#expectedIncomeCheckModal .modal-title {
+  margin-bottom: 12px;
+}
+
+#expectedIncomeCheckModal .btn {
+  min-height: 52px;
+  border-radius: 18px;
+  font-size: 14px;
+  font-weight: 760;
+  letter-spacing: -0.012em;
+}
