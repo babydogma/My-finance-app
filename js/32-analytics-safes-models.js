@@ -2,7 +2,17 @@
   const UNCATEGORIZED_ID = "__uncategorized__";
 
   function toNumber(value) {
-    return Number(value) || 0;
+    if (value === null || value === undefined || value === "") return 0;
+
+    if (typeof value === "number") return Number.isFinite(value) ? value : 0;
+
+    const normalized = String(value)
+      .replace(/\s/g, "")
+      .replace(",", ".");
+
+    const parsed = Number(normalized);
+
+    return Number.isFinite(parsed) ? parsed : 0;
   }
 
   function roundToTwo(value) {
@@ -36,6 +46,18 @@
     }
 
     return new Date(Number(match[1]), Number(match[2]) - 1, 1);
+  }
+
+  function getMonthValueFromDate(date) {
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+  }
+
+  function getPreviousMonthValue(monthValue) {
+    const date = getDateFromMonthValue(monthValue);
+
+    return getMonthValueFromDate(
+      new Date(date.getFullYear(), date.getMonth() - 1, 1)
+    );
   }
 
   function getMonthDays(selectedMonth) {
@@ -106,7 +128,46 @@
   }
 
   function getCategoryId(transaction) {
-    return transaction.category_id || transaction.categoryId || UNCATEGORIZED_ID;
+    return (
+      transaction.category_id ||
+      transaction.categoryId ||
+      transaction.category ||
+      UNCATEGORIZED_ID
+    );
+  }
+
+  function getCategories(state) {
+    return (
+      state.categories ||
+      state.expenseCategories ||
+      state.budgetCategories ||
+      []
+    );
+  }
+
+  function getCategoryById(state, categoryId) {
+    return getCategories(state).find((category) => {
+      return String(category.id) === String(categoryId);
+    }) || null;
+  }
+
+  function getBudgetLimitFromCategory(category) {
+    if (!category) return 0;
+
+    return toNumber(
+      category.budget_limit ??
+      category.budgetLimit ??
+      category.monthly_limit ??
+      category.monthlyLimit ??
+      category.limit ??
+      category.amount_limit ??
+      category.amountLimit ??
+      category.budget ??
+      category.plan ??
+      category.month_limit ??
+      category.monthLimit ??
+      0
+    );
   }
 
   function getPaymentStartMonth(payment) {
@@ -221,10 +282,129 @@
     return Math.round((value / base) * 100);
   }
 
+  function buildFlexibleForecast({
+    state,
+    selectedMonth,
+    currentMonthTransactions,
+    previousMonthTransactions,
+    isRequiredCategory,
+  }) {
+    const selectedIsPast = selectedMonth < getCurrentMonthValue();
+
+    if (selectedIsPast) {
+      return {
+        total: 0,
+        limitedRest: 0,
+        historyRest: 0,
+        paceRest: 0,
+        currentFlexibleSpent: 0,
+        currentFlexibleLimitedSpent: 0,
+        currentFlexibleNoLimitSpent: 0,
+        previousFlexibleNoLimitSpent: 0,
+      };
+    }
+
+    const { elapsedDays, remainingDays } = getMonthDays(selectedMonth);
+
+    const currentFlexibleByCategory = new Map();
+    const previousFlexibleByCategory = new Map();
+
+    function collectFlexibleExpense(map, transaction) {
+      const type = String(transaction.type || "").toLowerCase();
+
+      if (type !== "expense") return;
+
+      const categoryId = getCategoryId(transaction);
+      const required =
+        typeof isRequiredCategory === "function"
+          ? isRequiredCategory(categoryId)
+          : false;
+
+      if (required) return;
+
+      const amount = toNumber(transaction.amount);
+
+      if (amount <= 0) return;
+
+      map.set(categoryId, roundToTwo((map.get(categoryId) || 0) + amount));
+    }
+
+    currentMonthTransactions.forEach((transaction) => {
+      collectFlexibleExpense(currentFlexibleByCategory, transaction);
+    });
+
+    previousMonthTransactions.forEach((transaction) => {
+      collectFlexibleExpense(previousFlexibleByCategory, transaction);
+    });
+
+    const categoryIds = new Set([
+      ...currentFlexibleByCategory.keys(),
+      ...previousFlexibleByCategory.keys(),
+      ...getCategories(state).map((category) => category.id),
+    ]);
+
+    let limitedRest = 0;
+    let historyRest = 0;
+    let paceBaseCurrentNoLimitSpent = 0;
+
+    let currentFlexibleSpent = 0;
+    let currentFlexibleLimitedSpent = 0;
+    let currentFlexibleNoLimitSpent = 0;
+    let previousFlexibleNoLimitSpent = 0;
+
+    categoryIds.forEach((categoryId) => {
+      const currentSpent = toNumber(currentFlexibleByCategory.get(categoryId));
+      const previousSpent = toNumber(previousFlexibleByCategory.get(categoryId));
+      const category = getCategoryById(state, categoryId);
+      const limit = getBudgetLimitFromCategory(category);
+
+      if (currentSpent > 0) {
+        currentFlexibleSpent += currentSpent;
+      }
+
+      if (limit > 0) {
+        currentFlexibleLimitedSpent += currentSpent;
+        limitedRest += Math.max(0, limit - currentSpent);
+        return;
+      }
+
+      currentFlexibleNoLimitSpent += currentSpent;
+      previousFlexibleNoLimitSpent += previousSpent;
+
+      if (previousSpent > 0) {
+        historyRest += Math.max(0, previousSpent - currentSpent);
+      } else {
+        paceBaseCurrentNoLimitSpent += currentSpent;
+      }
+    });
+
+    const paceRest =
+      elapsedDays > 0 && remainingDays > 0
+        ? (paceBaseCurrentNoLimitSpent / elapsedDays) * remainingDays
+        : 0;
+
+    return {
+      total: roundToTwo(limitedRest + historyRest + paceRest),
+      limitedRest: roundToTwo(limitedRest),
+      historyRest: roundToTwo(historyRest),
+      paceRest: roundToTwo(paceRest),
+      currentFlexibleSpent: roundToTwo(currentFlexibleSpent),
+      currentFlexibleLimitedSpent: roundToTwo(currentFlexibleLimitedSpent),
+      currentFlexibleNoLimitSpent: roundToTwo(currentFlexibleNoLimitSpent),
+      previousFlexibleNoLimitSpent: roundToTwo(previousFlexibleNoLimitSpent),
+    };
+  }
+
   function getMonthStats(state, selectedMonth, isRequiredCategory) {
     const monthTransactions = getMonthTransactions(state, selectedMonth);
-    const calendarReserve = getCalendarReservedAmount(state, selectedMonth, monthTransactions);
-    const { elapsedDays, remainingDays } = getMonthDays(selectedMonth);
+    const previousMonth = getPreviousMonthValue(selectedMonth);
+    const previousMonthTransactions = getMonthTransactions(state, previousMonth);
+
+    const calendarReserve = getCalendarReservedAmount(
+      state,
+      selectedMonth,
+      monthTransactions
+    );
 
     let income = 0;
     let requiredFactExpense = 0;
@@ -254,19 +434,21 @@
       }
     });
 
-    const totalFactExpense = requiredFactExpense + flexibleExpense;
-    const averageFlexiblePerDay = elapsedDays > 0 ? flexibleExpense / elapsedDays : 0;
+    const flexibleForecast = buildFlexibleForecast({
+      state,
+      selectedMonth,
+      currentMonthTransactions: monthTransactions,
+      previousMonthTransactions,
+      isRequiredCategory,
+    });
 
-    const flexibleForecastRest =
-      selectedMonth === getCurrentMonthValue()
-        ? averageFlexiblePerDay * remainingDays
-        : 0;
+    const totalFactExpense = requiredFactExpense + flexibleExpense;
 
     const forecastLeft =
       income -
       totalFactExpense -
       calendarReserve -
-      flexibleForecastRest;
+      flexibleForecast.total;
 
     return {
       income: roundToTwo(income),
@@ -274,7 +456,8 @@
       flexibleExpense: roundToTwo(flexibleExpense),
       totalFactExpense: roundToTwo(totalFactExpense),
       calendarReserve: roundToTwo(calendarReserve),
-      flexibleForecastRest: roundToTwo(flexibleForecastRest),
+      flexibleForecastRest: roundToTwo(flexibleForecast.total),
+      flexibleForecast,
       forecastLeft: roundToTwo(forecastLeft),
     };
   }
@@ -369,6 +552,7 @@
   function renderForecastCard(stats, helpers) {
     const { formatMoney } = helpers;
     const forecast = getForecastStatus(stats);
+    const flexibleForecast = stats.flexibleForecast || {};
 
     const rows = [
       {
@@ -388,7 +572,7 @@
       {
         label: "Гибкие до конца месяца",
         value: formatMoney(stats.flexibleForecastRest),
-        detail: "Прогноз по текущему темпу гибких расходов",
+        detail: `Лимиты: ${formatMoney(flexibleForecast.limitedRest || 0)} · прошлый месяц: ${formatMoney(flexibleForecast.historyRest || 0)} · темп: ${formatMoney(flexibleForecast.paceRest || 0)}`,
       },
     ];
 
