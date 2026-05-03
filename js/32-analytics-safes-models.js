@@ -608,39 +608,105 @@
     };
   }
 
+    function getForecastRingSegments(stats) {
+    const flexibleForecast = stats.flexibleForecast || {};
+    const irregularFlexible =
+      toNumber(flexibleForecast.historyRest) + toNumber(flexibleForecast.paceRest);
+
+    const occupied =
+      stats.totalFactExpense +
+      stats.calendarReserve +
+      toNumber(flexibleForecast.limitedRest) +
+      irregularFlexible;
+
+    const free = Math.max(0, stats.income - occupied);
+    const base = Math.max(stats.income, occupied, 1);
+
+    return {
+      occupied: roundToTwo(occupied),
+      free: roundToTwo(free),
+      deficit: roundToTwo(Math.max(0, occupied - stats.income)),
+      base,
+      items: [
+        {
+          key: "spent",
+          label: "Уже потрачено",
+          value: roundToTwo(stats.totalFactExpense),
+          note: `Факт расходов месяца: обязательные ${roundToTwo(stats.requiredFactExpense)} ₽ + гибкие ${roundToTwo(stats.flexibleExpense)} ₽`,
+          color: "rgba(239, 91, 79, 0.88)",
+        },
+        {
+          key: "calendar",
+          label: "Календарь",
+          value: roundToTwo(stats.calendarReserve),
+          note: "Неоплаченные календарные платежи",
+          color: "rgba(242, 165, 26, 0.88)",
+        },
+        {
+          key: "planned",
+          label: "План гибких",
+          value: roundToTwo(flexibleForecast.limitedRest || 0),
+          note: "Остаток лимитов по гибким категориям",
+          color: "rgba(47, 125, 246, 0.86)",
+        },
+        {
+          key: "irregular",
+          label: "Нерегулярные",
+          value: roundToTwo(irregularFlexible),
+          note: "Гибкие без лимита, ориентир по прошлому месяцу",
+          color: "rgba(139, 92, 246, 0.82)",
+        },
+        {
+          key: "free",
+          label: "Свободно",
+          value: roundToTwo(free),
+          note: "Останется после прогноза",
+          color: "rgba(21, 151, 107, 0.86)",
+        },
+      ].filter((item) => item.value > 0),
+    };
+  }
+
+  function buildForecastRingGradient(items, base) {
+    let cursor = 0;
+
+    const parts = items.map((item) => {
+      const size = Math.max(0, (item.value / base) * 100);
+      const start = cursor;
+      const end = Math.min(100, cursor + size);
+
+      cursor = end;
+
+      return `${item.color} ${start.toFixed(2)}% ${end.toFixed(2)}%`;
+    });
+
+    if (cursor < 100) {
+      parts.push(`rgba(20, 24, 33, 0.075) ${cursor.toFixed(2)}% 100%`);
+    }
+
+    return `conic-gradient(${parts.join(", ")})`;
+  }
+
   function renderForecastCard(stats, helpers) {
     const { formatMoney } = helpers;
     const forecast = getForecastStatus(stats);
-    const flexibleForecast = stats.flexibleForecast || {};
+    const ring = getForecastRingSegments(stats);
+    const ringGradient = buildForecastRingGradient(ring.items, ring.base);
+    const resultLabel = stats.forecastLeft < 0 ? "не хватает" : "останется";
+    const occupiedPercent = stats.income > 0
+      ? Math.round((ring.occupied / stats.income) * 100)
+      : 0;
 
-    const rows = [
-      {
-        label: "Доходы",
-        value: formatMoney(stats.income),
-      },
-      {
-        label: "Уже потрачено",
-        value: formatMoney(stats.totalFactExpense),
-        detail: `Обязательные: ${formatMoney(stats.requiredFactExpense)} · гибкие: ${formatMoney(stats.flexibleExpense)}`,
-      },
-      {
-        label: "Календарь впереди",
-        value: formatMoney(stats.calendarReserve),
-        detail: "Неоплаченные календарные платежи месяца",
-      },
-      {
-        label: "Гибкие до конца месяца",
-        value: formatMoney(stats.flexibleForecastRest),
-        detail: `Лимиты: ${formatMoney(flexibleForecast.limitedRest || 0)} · прошлый месяц: ${formatMoney(flexibleForecast.historyRest || 0)} · темп: ${formatMoney(flexibleForecast.paceRest || 0)}`,
-      },
-    ];
+    const resultText = stats.forecastLeft < 0
+      ? `Дохода не хватает на ${formatMoney(ring.deficit)}.`
+      : `После всех учтённых расходов останется ${formatMoney(ring.free)}.`;
 
     return `
-      <article class="analytics-savings-scenario-card analytics-savings-scenario-card--${forecast.status}">
-        <div class="analytics-savings-scenario-card__top">
+      <article class="analytics-forecast-ring-card analytics-forecast-ring-card--${forecast.status}">
+        <div class="analytics-forecast-ring-card__head">
           <div>
-            <h4>Прогноз остатка</h4>
-            <p>${forecast.text}</p>
+            <h3>Прогноз месяца</h3>
+            <p>${resultText}</p>
           </div>
 
           <div class="analytics-savings-status-pill">
@@ -648,19 +714,51 @@
           </div>
         </div>
 
-        <div class="analytics-savings-scenario-card__result">
-          <span>Останется к концу месяца</span>
-          <strong>${formatSignedMoney(stats.forecastLeft, formatMoney)}</strong>
+        <div class="analytics-forecast-ring-layout">
+          <div
+            class="analytics-forecast-ring"
+            style="--forecast-ring-gradient: ${ringGradient};"
+            aria-hidden="true"
+          >
+            <div class="analytics-forecast-ring__center">
+              <span>${resultLabel}</span>
+              <strong>${formatSignedMoney(stats.forecastLeft, formatMoney)}</strong>
+            </div>
+          </div>
+
+          <div class="analytics-forecast-ring-summary">
+            <div>
+              <span>Доход</span>
+              <strong>${formatMoney(stats.income)}</strong>
+            </div>
+
+            <div>
+              <span>Занято</span>
+              <strong>${formatMoney(ring.occupied)}</strong>
+            </div>
+
+            <div>
+              <span>Нагрузка</span>
+              <strong>${occupiedPercent}%</strong>
+            </div>
+          </div>
         </div>
 
-        <div class="analytics-savings-scenario-card__rows">
-          ${rows
-            .map((row) => {
+        <div class="analytics-forecast-ring-list">
+          ${ring.items
+            .map((item) => {
               return `
-                <div>
-                  <span>${row.label}</span>
-                  <strong>${row.value}</strong>
-                  ${row.detail ? `<em>${row.detail}</em>` : ""}
+                <div class="analytics-forecast-ring-row analytics-forecast-ring-row--${item.key}">
+                  <span class="analytics-forecast-ring-row__dot" style="--dot-color: ${item.color};"></span>
+
+                  <div class="analytics-forecast-ring-row__body">
+                    <div class="analytics-forecast-ring-row__top">
+                      <span>${item.label}</span>
+                      <strong>${formatMoney(item.value)}</strong>
+                    </div>
+
+                    <p>${item.note}</p>
+                  </div>
                 </div>
               `;
             })
