@@ -9,6 +9,7 @@
 
   let pendingLightTransaction = null;
   let swipeStart = null;
+  let isModeSwitching = false;
 
   function getSavedMode() {
     return localStorage.getItem(MODE_KEY) || "light";
@@ -40,7 +41,7 @@
     return parseMoney(getFreeMoneyText());
   }
 
-  function setMode(mode) {
+    function setMode(mode) {
     const normalizedMode = mode === "hard" ? "hard" : "light";
     const toggleBtn = document.getElementById("walletModeToggleBtn");
 
@@ -51,7 +52,58 @@
       toggleBtn.textContent = normalizedMode === "light" ? "Полный режим" : "Лайт";
     }
 
+    if (normalizedMode === "light") {
+      window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+    }
+
     saveMode(normalizedMode);
+  }
+
+  function switchModeAnimated(nextMode) {
+    const normalizedNextMode = nextMode === "hard" ? "hard" : "light";
+    const isLightMode = document.body.classList.contains("wallet-mode-light");
+    const currentMode = isLightMode ? "light" : "hard";
+
+    if (isModeSwitching || currentMode === normalizedNextMode) return;
+
+    isModeSwitching = true;
+
+    const goingToHard = normalizedNextMode === "hard";
+
+    document.body.classList.remove(
+      "wallet-mode-enter-left",
+      "wallet-mode-enter-right",
+      "wallet-mode-leave-left",
+      "wallet-mode-leave-right"
+    );
+
+    document.body.classList.add(
+      "wallet-mode-switching",
+      goingToHard ? "wallet-mode-leave-left" : "wallet-mode-leave-right"
+    );
+
+    window.setTimeout(() => {
+      setMode(normalizedNextMode);
+
+      document.body.classList.remove(
+        "wallet-mode-leave-left",
+        "wallet-mode-leave-right"
+      );
+
+      document.body.classList.add(
+        goingToHard ? "wallet-mode-enter-right" : "wallet-mode-enter-left"
+      );
+
+      window.setTimeout(() => {
+        document.body.classList.remove(
+          "wallet-mode-switching",
+          "wallet-mode-enter-left",
+          "wallet-mode-enter-right"
+        );
+
+        isModeSwitching = false;
+      }, 280);
+    }, 180);
   }
 
   function syncLightFreeMoney() {
@@ -146,9 +198,10 @@
     document.addEventListener(
       "touchstart",
       (event) => {
+        if (isModeSwitching) return;
         if (isBlockingViewOpen()) return;
         if (isInteractiveTarget(event.target)) return;
-
+        
         const touch = event.touches?.[0];
 
         if (!touch) return;
@@ -166,6 +219,11 @@
       "touchend",
       (event) => {
         if (!swipeStart) return;
+        if (isModeSwitching) {
+          swipeStart = null;
+          return;
+        }
+
         if (isBlockingViewOpen()) {
           swipeStart = null;
           return;
@@ -192,12 +250,12 @@
         const isHardMode = document.body.classList.contains("wallet-mode-hard");
 
         if (isLightMode && deltaX < 0) {
-          setMode("hard");
+          switchModeAnimated("hard");
           return;
         }
 
         if (isHardMode && deltaX > 0) {
-          setMode("light");
+          switchModeAnimated("light");
         }
       },
       { passive: true }
