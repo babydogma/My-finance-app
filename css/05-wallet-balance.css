@@ -494,3 +494,81 @@
     max-width: 100%;
   }
 }
+
+/* =========================================================
+   Wallet expected income prototype
+   ========================================================= */
+
+.wallet-game-hero__expectation {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+  padding: 12px;
+  border-radius: 22px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(246, 248, 252, 0.96));
+  border: 1px solid rgba(22, 30, 46, 0.06);
+  box-shadow:
+    0 8px 18px rgba(30, 42, 68, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.92);
+}
+
+.wallet-game-hero__expectation span {
+  display: block;
+  margin-bottom: 5px;
+  color: rgba(20, 24, 33, 0.42);
+  font-size: 11px;
+  line-height: 1;
+  font-weight: 650;
+  letter-spacing: -0.008em;
+}
+
+.wallet-game-hero__expectation strong {
+  display: block;
+  color: #171b24;
+  font-size: 13.5px;
+  line-height: 1.12;
+  font-weight: 760;
+  letter-spacing: -0.03em;
+}
+
+.wallet-game-hero__expectation button {
+  min-height: 42px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 999px;
+  color: #2f7df6;
+  font-size: 13px;
+  font-weight: 760;
+  letter-spacing: -0.012em;
+  background:
+    linear-gradient(180deg, rgba(235, 242, 255, 0.99), rgba(221, 233, 255, 0.94));
+  box-shadow:
+    0 10px 24px rgba(47, 125, 246, 0.09),
+    inset 0 1px 0 rgba(255, 255, 255, 0.92);
+}
+
+.wallet-game-hero__expectation button:active {
+  transform: scale(0.98);
+}
+
+.wallet-game-hero.has-expected-income .wallet-game-hero__expectation {
+  border-color: rgba(47, 125, 246, 0.12);
+  background:
+    radial-gradient(circle at 0% 0%, rgba(47, 125, 246, 0.07), transparent 42%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(244, 248, 255, 0.96));
+}
+
+@media (max-width: 420px) {
+  .wallet-game-hero__expectation {
+    grid-template-columns: 1fr;
+  }
+
+  .wallet-game-hero__expectation button {
+    width: 100%;
+  }
+}
