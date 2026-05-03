@@ -57,7 +57,7 @@
     target.textContent = getFreeMoneyText();
   }
 
-  function pulseBalance(type) {
+  function playBalanceRing(type) {
     const core = document.getElementById("walletLightBalanceCore");
 
     if (!core) return;
@@ -70,92 +70,11 @@
 
     window.setTimeout(() => {
       core.classList.remove("is-income", "is-expense");
-    }, 820);
-  }
-
-  function createParticle(className, options) {
-    const layer = document.getElementById("walletLightParticles");
-
-    if (!layer) return;
-
-    const particle = document.createElement("span");
-
-    particle.className = className;
-
-    Object.entries(options).forEach(([key, value]) => {
-      particle.style.setProperty(key, value);
-    });
-
-    layer.appendChild(particle);
-
-    window.setTimeout(() => {
-      particle.remove();
-    }, 1600);
-  }
-
-  function dropMoneyIntoBalance() {
-    const count = 8;
-
-    for (let index = 0; index < count; index += 1) {
-      const startX = Math.round(-120 + Math.random() * 240);
-      const startY = Math.round(-210 - Math.random() * 70);
-      const endX = Math.round(-34 + Math.random() * 68);
-      const endY = Math.round(-30 + Math.random() * 32);
-      const delay = Math.round(index * 58 + Math.random() * 70);
-      const rotate = Math.round(260 + Math.random() * 420);
-      const size = Math.round(15 + Math.random() * 9);
-      const scale = (0.82 + Math.random() * 0.34).toFixed(2);
-
-      createParticle("wallet-light-particle wallet-light-particle--coin", {
-        "--particle-start-x": `${startX}px`,
-        "--particle-start-y": `${startY}px`,
-        "--particle-end-x": `${endX}px`,
-        "--particle-end-y": `${endY}px`,
-        "--particle-delay": `${delay}ms`,
-        "--particle-rotate": `${rotate}deg`,
-        "--particle-size": `${size}px`,
-        "--particle-scale": scale,
-      });
-    }
-
-    pulseBalance("income");
-  }
-
-  function spillMoneyFromBalance() {
-    const count = 5;
-
-    for (let index = 0; index < count; index += 1) {
-      const startX = Math.round(-42 + Math.random() * 84);
-      const startY = Math.round(-14 + Math.random() * 26);
-      const endX = Math.round(-120 + Math.random() * 240);
-      const endY = Math.round(105 + Math.random() * 68);
-      const delay = Math.round(index * 48 + Math.random() * 60);
-      const rotate = Math.round(160 + Math.random() * 320);
-      const size = Math.round(10 + Math.random() * 8);
-      const scale = (0.72 + Math.random() * 0.28).toFixed(2);
-
-      createParticle("wallet-light-particle wallet-light-particle--loss", {
-        "--particle-start-x": `${startX}px`,
-        "--particle-start-y": `${startY}px`,
-        "--particle-end-x": `${endX}px`,
-        "--particle-end-y": `${endY}px`,
-        "--particle-delay": `${delay}ms`,
-        "--particle-rotate": `${rotate}deg`,
-        "--particle-size": `${size}px`,
-        "--particle-scale": scale,
-      });
-    }
-
-    pulseBalance("expense");
+    }, 900);
   }
 
   function playSavedTransactionAnimation(type) {
-    if (type === "income") {
-      dropMoneyIntoBalance();
-      return;
-    }
-
-    spillMoneyFromBalance();
+    playBalanceRing(type);
   }
 
   function openExistingModal(buttonId) {
@@ -202,8 +121,8 @@
     window.clearTimeout(pendingLightTransaction.timeoutId);
 
     window.setTimeout(() => {
-      syncLightFreeMoney();
       playSavedTransactionAnimation(type);
+      syncLightFreeMoney();
       pendingLightTransaction = null;
     }, AFTER_SAVE_ANIMATION_DELAY_MS);
   }
@@ -246,8 +165,12 @@
     if (!source) return;
 
     const observer = new MutationObserver(() => {
+      if (pendingLightTransaction) {
+        completePendingLightTransactionIfMoneyChanged();
+        return;
+      }
+
       syncLightFreeMoney();
-      completePendingLightTransactionIfMoneyChanged();
     });
 
     observer.observe(source, {
