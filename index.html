@@ -100,7 +100,7 @@
       </div>
     </div>
 
-    <div class="wallet-game-hero__pressure">
+        <div class="wallet-game-hero__pressure">
       <div>
         <span>Календарь</span>
         <strong id="walletCalendarPressureValue">0 ₽</strong>
@@ -111,8 +111,85 @@
         <strong id="walletLimitsPressureValue">0 ₽</strong>
       </div>
     </div>
+
+    <div class="wallet-game-hero__expectation" id="walletExpectedIncomeCard">
+      <div>
+        <span id="walletExpectedIncomeLabel">Будущие деньги не учтены</span>
+        <strong id="walletExpectedIncomeValue">Добавь ожидание, если ждёшь ЗП</strong>
+      </div>
+
+      <button type="button" id="openExpectedIncomeModalBtn">
+        Жду деньги
+      </button>
+    </div>
   </div>
 </section>
+
+<!-- EXPECTED INCOME MODAL -->
+<div class="modal hidden" id="expectedIncomeModal" role="dialog" aria-modal="true" aria-label="Ожидаемый доход">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+
+    <div class="section-head">
+      <h2 class="modal-title">Жду деньги</h2>
+
+      <button
+        class="manager-back-btn"
+        type="button"
+        id="closeExpectedIncomeModalBtn"
+      >
+        Закрыть
+      </button>
+    </div>
+
+    <div class="manager-card">
+      <div class="field">
+        <input
+          class="input"
+          id="expectedIncomeTitleInput"
+          type="text"
+          placeholder="Например: Зарплата"
+        />
+      </div>
+
+      <div class="field">
+        <input
+          class="input"
+          id="expectedIncomeAmountInput"
+          type="text"
+          inputmode="decimal"
+          placeholder="Минимум ожидаю, ₽"
+        />
+      </div>
+
+      <div class="field">
+        <input
+          class="input"
+          id="expectedIncomeDateInput"
+          type="date"
+        />
+      </div>
+
+      <div class="modal-actions">
+        <button
+          class="btn btn-primary"
+          type="button"
+          id="saveExpectedIncomeBtn"
+        >
+          Учесть ожидание
+        </button>
+
+        <button
+          class="btn btn-danger"
+          type="button"
+          id="clearExpectedIncomeBtn"
+        >
+          Сбросить
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 
       <!-- ACTIONS -->
 <section class="actions">
@@ -1610,6 +1687,8 @@
 <script src="./js/36-savings-settings-columns.js"></script>
 <script>
 (() => {
+  const EXPECTED_INCOME_KEY = "wallet_expected_income_v1";
+
   function parseMoney(text) {
     const normalized = String(text || "")
       .replace(/\s/g, "")
@@ -1637,10 +1716,174 @@
     return Math.max(1, lastDay - now.getDate() + 1);
   }
 
+  function getTodayDateValue() {
+    const now = new Date();
+
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+  }
+
+  function formatDateHuman(dateValue) {
+    if (!dateValue) return "дата не указана";
+
+    const date = new Date(`${dateValue}T12:00:00`);
+
+    if (Number.isNaN(date.getTime())) return "дата не указана";
+
+    return new Intl.DateTimeFormat("ru-RU", {
+      day: "numeric",
+      month: "short",
+    }).format(date);
+  }
+
+  function getExpectedIncome() {
+    try {
+      const raw = localStorage.getItem(EXPECTED_INCOME_KEY);
+
+      if (!raw) return null;
+
+      const data = JSON.parse(raw);
+
+      if (!data || !Number(data.amount)) return null;
+
+      return {
+        title: data.title || "Ожидаемый доход",
+        amount: Number(data.amount) || 0,
+        date: data.date || "",
+      };
+    } catch (error) {
+      return null;
+    }
+  }
+
+  function saveExpectedIncome(data) {
+    localStorage.setItem(EXPECTED_INCOME_KEY, JSON.stringify(data));
+  }
+
+  function clearExpectedIncome() {
+    localStorage.removeItem(EXPECTED_INCOME_KEY);
+  }
+
   function setText(id, value) {
     const node = document.getElementById(id);
 
     if (node) node.textContent = value;
+  }
+
+  function openExpectedIncomeModal() {
+    const modal = document.getElementById("expectedIncomeModal");
+    const expected = getExpectedIncome();
+
+    if (!modal) return;
+
+    const titleInput = document.getElementById("expectedIncomeTitleInput");
+    const amountInput = document.getElementById("expectedIncomeAmountInput");
+    const dateInput = document.getElementById("expectedIncomeDateInput");
+
+    if (titleInput) titleInput.value = expected?.title || "";
+    if (amountInput) amountInput.value = expected?.amount ? String(expected.amount).replace(".", ",") : "";
+    if (dateInput) dateInput.value = expected?.date || getTodayDateValue();
+
+    modal.classList.add("modal");
+    modal.classList.remove("hidden");
+
+    requestAnimationFrame(() => {
+      modal.classList.add("is-open");
+    });
+
+    document.documentElement.classList.add("modal-scroll-locked");
+    document.body.classList.add("modal-scroll-locked");
+  }
+
+  function closeExpectedIncomeModal() {
+    const modal = document.getElementById("expectedIncomeModal");
+
+    if (!modal) return;
+
+    modal.classList.remove("is-open");
+
+    window.setTimeout(() => {
+      modal.classList.add("hidden");
+
+      document.documentElement.classList.remove("modal-scroll-locked");
+      document.body.classList.remove("modal-scroll-locked");
+    }, 260);
+  }
+
+  function bindExpectedIncomeModal() {
+    const openBtn = document.getElementById("openExpectedIncomeModalBtn");
+    const closeBtn = document.getElementById("closeExpectedIncomeModalBtn");
+    const saveBtn = document.getElementById("saveExpectedIncomeBtn");
+    const clearBtn = document.getElementById("clearExpectedIncomeBtn");
+    const modal = document.getElementById("expectedIncomeModal");
+
+    openBtn?.addEventListener("click", (event) => {
+      event.preventDefault();
+      openExpectedIncomeModal();
+    });
+
+    closeBtn?.addEventListener("click", (event) => {
+      event.preventDefault();
+      closeExpectedIncomeModal();
+    });
+
+    modal?.addEventListener("click", (event) => {
+      if (event.target === modal) {
+        closeExpectedIncomeModal();
+      }
+    });
+
+    saveBtn?.addEventListener("click", (event) => {
+      event.preventDefault();
+
+      const titleInput = document.getElementById("expectedIncomeTitleInput");
+      const amountInput = document.getElementById("expectedIncomeAmountInput");
+      const dateInput = document.getElementById("expectedIncomeDateInput");
+
+      const title = String(titleInput?.value || "").trim() || "Ожидаемый доход";
+      const amount = parseMoney(amountInput?.value || "");
+      const date = dateInput?.value || "";
+
+      if (amount <= 0) {
+        amountInput?.focus();
+        return;
+      }
+
+      saveExpectedIncome({
+        title,
+        amount,
+        date,
+      });
+
+      closeExpectedIncomeModal();
+      updateWalletGameHero();
+    });
+
+    clearBtn?.addEventListener("click", (event) => {
+      event.preventDefault();
+
+      clearExpectedIncome();
+      closeExpectedIncomeModal();
+      updateWalletGameHero();
+    });
+  }
+
+  function updateExpectedIncomeCard(expected) {
+    const hero = document.getElementById("walletGameHero");
+    const label = document.getElementById("walletExpectedIncomeLabel");
+    const value = document.getElementById("walletExpectedIncomeValue");
+
+    if (!hero || !label || !value) return;
+
+    hero.classList.toggle("has-expected-income", Boolean(expected));
+
+    if (!expected) {
+      label.textContent = "Будущие деньги не учтены";
+      value.textContent = "Добавь ожидание, если ждёшь ЗП";
+      return;
+    }
+
+    label.textContent = `Ждёшь: ${expected.title}`;
+    value.textContent = `минимум ${formatMoney(expected.amount)} · ${formatDateHuman(expected.date)}`;
   }
 
   function updateWalletGameHero() {
@@ -1652,51 +1895,95 @@
 
     if (!hero || !todayValue || !status || !hint || !meter) return;
 
+    const expected = getExpectedIncome();
+
     const freeMoney = parseMoney(document.getElementById("balanceFreeMoneyValue")?.textContent);
     const calendar = parseMoney(document.getElementById("analyticsPendingMandatoryValue")?.textContent);
     const limits = parseMoney(document.getElementById("analyticsRemainingBudgetsValue")?.textContent);
     const daysLeft = getDaysLeftInMonth();
 
-    const safePool = freeMoney - calendar - limits;
-    const todayCan = Math.max(0, safePool / daysLeft);
-    const meterValue = Math.max(0, Math.min(100, (safePool / Math.max(freeMoney, 1)) * 100));
+    const factPool = freeMoney - calendar - limits;
+    const factTodayCan = Math.max(0, factPool / daysLeft);
+
+    const expectedAmount = expected ? expected.amount : 0;
+    const scenarioPool = factPool + expectedAmount;
+    const scenarioTodayCan = Math.max(0, scenarioPool / daysLeft);
+
+    const visibleTodayCan = expected ? scenarioTodayCan : factTodayCan;
+    const visiblePool = expected ? scenarioPool : factPool;
+
+    const meterValue = Math.max(
+      0,
+      Math.min(100, (visiblePool / Math.max(freeMoney + expectedAmount, 1)) * 100)
+    );
 
     setText("walletDaysLeftValue", `${daysLeft} дн.`);
     setText("walletCalendarPressureValue", formatMoney(calendar));
     setText("walletLimitsPressureValue", formatMoney(limits));
 
-    todayValue.textContent = formatMoney(todayCan);
+    todayValue.textContent = formatMoney(visibleTodayCan);
     meter.style.width = `${meterValue}%`;
+
+    updateExpectedIncomeCard(expected);
 
     hero.classList.remove("is-good", "is-warn", "is-bad");
 
-    if (safePool < 0) {
-      hero.classList.add("is-bad");
-      status.textContent = "Стоп-режим";
-      hint.textContent = `Сначала нужно закрыть дыру: ${formatMoney(Math.abs(safePool))}. Календарь и лимиты сильнее свободных денег.`;
+    if (expected) {
+      if (scenarioPool < 0) {
+        hero.classList.add("is-bad");
+        status.textContent = "Даже с ожиданием тесно";
+        hint.textContent = `По факту сейчас ${formatMoney(factTodayCan)}/день. Даже если придёт минимум ${formatMoney(expected.amount)}, дыра останется ${formatMoney(Math.abs(scenarioPool))}.`;
+        return;
+      }
+
+      if (scenarioTodayCan < 300) {
+        hero.classList.add("is-bad");
+        status.textContent = "Живём на ожидании";
+        hint.textContent = `По факту сейчас ${formatMoney(factTodayCan)}/день. С ожидаемыми деньгами — ${formatMoney(scenarioTodayCan)}/день.`;
+        return;
+      }
+
+      if (scenarioTodayCan < 700) {
+        hero.classList.add("is-warn");
+        status.textContent = "Осторожно можно";
+        hint.textContent = `Без будущих денег было бы ${formatMoney(factTodayCan)}/день. С ожиданием — ${formatMoney(scenarioTodayCan)}/день.`;
+        return;
+      }
+
+      hero.classList.add("is-good");
+      status.textContent = "С ожиданием норм";
+      hint.textContent = `Если придёт минимум ${formatMoney(expected.amount)}, безопасно примерно ${formatMoney(scenarioTodayCan)}/день.`;
       return;
     }
 
-    if (todayCan < 300) {
+    if (factPool < 0) {
+      hero.classList.add("is-bad");
+      status.textContent = "По факту стоп";
+      hint.textContent = `Без будущих денег дыра ${formatMoney(Math.abs(factPool))}. Ждёшь ЗП — добавь ожидание ниже.`;
+      return;
+    }
+
+    if (factTodayCan < 300) {
       hero.classList.add("is-bad");
       status.textContent = "Режим выживания";
-      hint.textContent = `До конца месяца лучше не разгоняться. Безопасно в день: ${formatMoney(todayCan)}.`;
+      hint.textContent = `Безопасно в день: ${formatMoney(factTodayCan)}. Будущие деньги пока не учитываются.`;
       return;
     }
 
-    if (todayCan < 700) {
+    if (factTodayCan < 700) {
       hero.classList.add("is-warn");
       status.textContent = "Не разгоняйся";
-      hint.textContent = `Деньги есть, но запас тонкий. Безопасно в день: ${formatMoney(todayCan)}.`;
+      hint.textContent = `Деньги есть, но запас тонкий. Безопасно в день: ${formatMoney(factTodayCan)}.`;
       return;
     }
 
     hero.classList.add("is-good");
     status.textContent = "Держишься";
-    hint.textContent = `Можно жить спокойнее. Безопасно в день: ${formatMoney(todayCan)}.`;
+    hint.textContent = `Можно жить спокойнее. Безопасно в день: ${formatMoney(factTodayCan)}.`;
   }
 
   function startWalletGameHero() {
+    bindExpectedIncomeModal();
     updateWalletGameHero();
 
     const observer = new MutationObserver(updateWalletGameHero);
