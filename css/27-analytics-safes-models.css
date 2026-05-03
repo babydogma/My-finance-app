@@ -467,3 +467,279 @@
     font-size: 21px;
   }
 }
+
+/* =========================================================
+   Forecast ring rebuild
+   ========================================================= */
+
+.analytics-forecast-ring-card,
+.analytics-forecast-ring-card * {
+  box-sizing: border-box;
+}
+
+.analytics-forecast-ring-card {
+  padding: 15px;
+  border-radius: 26px;
+  background:
+    radial-gradient(circle at 0% 0%, rgba(47, 125, 246, 0.045), transparent 42%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(250, 252, 255, 0.96));
+  border: 1px solid rgba(22, 30, 46, 0.075);
+  box-shadow:
+    0 14px 32px rgba(30, 42, 68, 0.07),
+    0 3px 10px rgba(30, 42, 68, 0.03),
+    inset 0 1px 0 rgba(255, 255, 255, 0.94);
+}
+
+.analytics-forecast-ring-card--bad {
+  background:
+    radial-gradient(circle at 0% 0%, rgba(239, 91, 79, 0.07), transparent 44%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(255, 247, 244, 0.96));
+  border-color: rgba(239, 91, 79, 0.11);
+}
+
+.analytics-forecast-ring-card--warn {
+  background:
+    radial-gradient(circle at 0% 0%, rgba(242, 165, 26, 0.07), transparent 44%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(255, 251, 244, 0.96));
+  border-color: rgba(242, 165, 26, 0.11);
+}
+
+.analytics-forecast-ring-card--good {
+  background:
+    radial-gradient(circle at 0% 0%, rgba(21, 151, 107, 0.07), transparent 44%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(248, 252, 250, 0.96));
+  border-color: rgba(21, 151, 107, 0.11);
+}
+
+.analytics-forecast-ring-card__head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.analytics-forecast-ring-card__head h3 {
+  margin: 0;
+  color: var(--text);
+  font-size: 23px;
+  line-height: 1.02;
+  font-weight: 740;
+  letter-spacing: -0.045em;
+}
+
+.analytics-forecast-ring-card__head p {
+  margin: 7px 0 0;
+  color: rgba(20, 24, 33, 0.50);
+  font-size: 12.5px;
+  line-height: 1.22;
+  font-weight: 500;
+  letter-spacing: -0.008em;
+}
+
+.analytics-forecast-ring-layout {
+  display: grid;
+  grid-template-columns: 154px minmax(0, 1fr);
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.analytics-forecast-ring {
+  width: 154px;
+  height: 154px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--forecast-ring-gradient);
+  box-shadow:
+    0 16px 34px rgba(30, 42, 68, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.68);
+  position: relative;
+}
+
+.analytics-forecast-ring::before {
+  content: "";
+  position: absolute;
+  inset: 15px;
+  border-radius: inherit;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(247, 249, 253, 0.96));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.96),
+    0 4px 12px rgba(30, 42, 68, 0.045);
+}
+
+.analytics-forecast-ring__center {
+  position: relative;
+  z-index: 1;
+  width: 102px;
+  text-align: center;
+}
+
+.analytics-forecast-ring__center span {
+  display: block;
+  margin-bottom: 5px;
+  color: rgba(20, 24, 33, 0.44);
+  font-size: 10.5px;
+  line-height: 1;
+  font-weight: 620;
+  letter-spacing: -0.006em;
+}
+
+.analytics-forecast-ring__center strong {
+  display: block;
+  color: var(--text);
+  font-size: 18px;
+  line-height: 1.04;
+  font-weight: 760;
+  letter-spacing: -0.045em;
+}
+
+.analytics-forecast-ring-card--bad .analytics-forecast-ring__center strong {
+  color: var(--red);
+}
+
+.analytics-forecast-ring-card--good .analytics-forecast-ring__center strong {
+  color: var(--green);
+}
+
+.analytics-forecast-ring-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.analytics-forecast-ring-summary > div {
+  padding: 10px 11px;
+  border-radius: 17px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(246, 248, 252, 0.97));
+  border: 1px solid rgba(22, 30, 46, 0.055);
+}
+
+.analytics-forecast-ring-summary span {
+  display: block;
+  margin-bottom: 4px;
+  color: rgba(20, 24, 33, 0.44);
+  font-size: 10.5px;
+  font-weight: 560;
+  letter-spacing: -0.006em;
+}
+
+.analytics-forecast-ring-summary strong {
+  display: block;
+  color: var(--text);
+  font-size: 15px;
+  line-height: 1;
+  font-weight: 720;
+  letter-spacing: -0.035em;
+}
+
+.analytics-forecast-ring-list {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.analytics-forecast-ring-row {
+  display: grid;
+  grid-template-columns: 10px minmax(0, 1fr);
+  gap: 10px;
+  padding: 11px;
+  border-radius: 18px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(246, 248, 252, 0.97));
+  border: 1px solid rgba(22, 30, 46, 0.055);
+}
+
+.analytics-forecast-ring-row__dot {
+  width: 10px;
+  height: 10px;
+  margin-top: 4px;
+  border-radius: 999px;
+  background: var(--dot-color);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--dot-color), transparent 82%);
+}
+
+.analytics-forecast-ring-row__body {
+  min-width: 0;
+}
+
+.analytics-forecast-ring-row__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.analytics-forecast-ring-row__top span {
+  color: rgba(20, 24, 33, 0.52);
+  font-size: 12px;
+  line-height: 1.1;
+  font-weight: 620;
+  letter-spacing: -0.008em;
+}
+
+.analytics-forecast-ring-row__top strong {
+  color: var(--text);
+  font-size: 13.5px;
+  line-height: 1;
+  font-weight: 720;
+  letter-spacing: -0.03em;
+  white-space: nowrap;
+}
+
+.analytics-forecast-ring-row p {
+  margin: 6px 0 0;
+  color: rgba(20, 24, 33, 0.38);
+  font-size: 10.8px;
+  line-height: 1.18;
+  font-weight: 460;
+  letter-spacing: -0.006em;
+}
+
+@media (max-width: 420px) {
+  .analytics-forecast-ring-card {
+    padding: 14px;
+    border-radius: 25px;
+  }
+
+  .analytics-forecast-ring-card__head {
+    grid-template-columns: 1fr;
+  }
+
+  .analytics-forecast-ring-card__head h3 {
+    font-size: 22px;
+  }
+
+  .analytics-forecast-ring-layout {
+    grid-template-columns: 138px minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .analytics-forecast-ring {
+    width: 138px;
+    height: 138px;
+  }
+
+  .analytics-forecast-ring::before {
+    inset: 14px;
+  }
+
+  .analytics-forecast-ring__center {
+    width: 92px;
+  }
+
+  .analytics-forecast-ring__center strong {
+    font-size: 16px;
+  }
+
+  .analytics-forecast-ring-summary > div {
+    padding: 9px 10px;
+  }
+
+  .analytics-forecast-ring-summary strong {
+    font-size: 14px;
+  }
+}
