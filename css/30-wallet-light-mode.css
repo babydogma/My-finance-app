@@ -34,8 +34,9 @@
 
 body.wallet-mode-light {
   background:
-    radial-gradient(circle at 50% 18%, rgba(255, 202, 224, 0.34), transparent 34%),
-    linear-gradient(180deg, #fff8fb 0%, #f8f9fc 48%, #f5f7fb 100%);
+    radial-gradient(circle at 50% 26%, rgba(31, 184, 132, 0.10), transparent 28%),
+    radial-gradient(circle at 50% 68%, rgba(47, 125, 246, 0.08), transparent 34%),
+    linear-gradient(180deg, #fbfcff 0%, #f7f8fb 52%, #f4f6fa 100%);
 }
 
 body.wallet-mode-light #mainView > section:not(.wallet-light-view) {
@@ -60,94 +61,151 @@ body.wallet-mode-light .wallet-light-view {
   box-sizing: border-box;
 }
 
-.wallet-light-view__top {
+.wallet-light-balance-core {
+  position: relative;
   width: 100%;
-  text-align: center;
+  min-height: 320px;
+  margin: 0 auto 30px;
+  padding: 42px 12px 34px;
+  border-radius: 42px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  isolation: isolate;
+}
+
+.wallet-light-balance-core::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: -2;
+  width: min(78vw, 330px);
+  aspect-ratio: 1;
+  border-radius: 999px;
+  transform: translate(-50%, -50%);
+  background:
+    radial-gradient(circle at 50% 42%, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.70) 42%, rgba(255, 255, 255, 0) 68%),
+    radial-gradient(circle at 50% 50%, rgba(31, 184, 132, 0.13), rgba(47, 125, 246, 0.08) 52%, transparent 72%);
+  filter: blur(0.2px);
+}
+
+.wallet-light-balance-core::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: -1;
+  width: min(62vw, 250px);
+  aspect-ratio: 1;
+  border-radius: 999px;
+  transform: translate(-50%, -50%);
+  border: 1px solid rgba(22, 30, 46, 0.055);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(247, 249, 252, 0.52));
+  box-shadow:
+    0 24px 60px rgba(30, 42, 68, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.88);
+}
+
+.wallet-light-balance-core.is-income {
+  animation: walletBalanceIncomePulse 0.72s cubic-bezier(0.2, 0.95, 0.25, 1);
+}
+
+.wallet-light-balance-core.is-expense {
+  animation: walletBalanceExpensePulse 0.58s ease;
 }
 
 .wallet-light-view__eyebrow {
   display: block;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
   color: rgba(20, 24, 33, 0.42);
   font-size: 15px;
   line-height: 1;
-  font-weight: 700;
+  font-weight: 760;
   letter-spacing: -0.018em;
-}
-
-.wallet-light-view__money {
-  display: block;
-  width: 100%;
-  color: #171b24;
-  font-size: clamp(48px, 14vw, 72px);
-  line-height: 0.92;
-  font-weight: 820;
-  letter-spacing: -0.075em;
   text-align: center;
 }
 
-.wallet-light-piggy-wrap {
+.wallet-light-view__money {
   position: relative;
-  width: min(78vw, 330px);
-  margin: 34px auto 36px;
-  display: grid;
-  place-items: center;
-}
-
-.wallet-piggy-svg {
+  z-index: 2;
+  display: block;
   width: 100%;
-  height: auto;
-  overflow: visible;
-  filter:
-    drop-shadow(0 22px 34px rgba(171, 76, 119, 0.16))
-    drop-shadow(0 8px 16px rgba(171, 76, 119, 0.08));
-  transform-origin: 50% 75%;
+  color: #171b24;
+  font-size: clamp(52px, 15vw, 78px);
+  line-height: 0.9;
+  font-weight: 840;
+  letter-spacing: -0.085em;
+  text-align: center;
+  white-space: nowrap;
 }
 
-.wallet-light-piggy-wrap.is-happy .wallet-piggy-svg {
-  animation: walletPigHappy 0.62s cubic-bezier(0.2, 0.95, 0.25, 1);
+.wallet-light-view__hint {
+  max-width: 250px;
+  margin: 18px auto 0;
+  color: rgba(20, 24, 33, 0.40);
+  font-size: 13px;
+  line-height: 1.25;
+  font-weight: 640;
+  letter-spacing: -0.012em;
+  text-align: center;
 }
 
-.wallet-light-piggy-wrap.is-shake .wallet-piggy-svg {
-  animation: walletPigShake 0.42s ease;
-}
-
-.wallet-piggy-coins {
+.wallet-light-particles {
   position: absolute;
   inset: 0;
-  z-index: 3;
+  z-index: 5;
   pointer-events: none;
   overflow: visible;
 }
 
-.wallet-falling-coin {
+.wallet-light-particle {
   position: absolute;
   left: 50%;
-  top: -22px;
-  width: var(--coin-size, 18px);
-  height: var(--coin-size, 18px);
+  top: 50%;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.wallet-light-particle--coin {
+  width: var(--particle-size, 19px);
+  height: var(--particle-size, 19px);
   border-radius: 999px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   color: rgba(116, 73, 18, 0.66);
-  font-size: calc(var(--coin-size, 18px) * 0.58);
+  font-size: calc(var(--particle-size, 19px) * 0.58);
   font-weight: 850;
   line-height: 1;
   background:
-    radial-gradient(circle at 34% 28%, rgba(255, 255, 255, 0.95), transparent 24%),
+    radial-gradient(circle at 34% 28%, rgba(255, 255, 255, 0.96), transparent 24%),
     linear-gradient(135deg, #ffeaa8, #f4b63f);
   box-shadow:
     0 8px 14px rgba(171, 114, 24, 0.18),
     inset 0 0 0 2px rgba(130, 84, 18, 0.10);
-  transform: translateX(var(--coin-x, 0px)) translateY(-70px) rotate(0deg) scale(var(--coin-scale, 1));
-  opacity: 0;
-  animation: walletCoinFall 1.05s cubic-bezier(0.18, 0.82, 0.24, 1) forwards;
-  animation-delay: var(--coin-delay, 0ms);
+  animation: walletMoneyCoinIn 1.05s cubic-bezier(0.18, 0.82, 0.24, 1) forwards;
+  animation-delay: var(--particle-delay, 0ms);
 }
 
-.wallet-falling-coin::before {
+.wallet-light-particle--coin::before {
   content: "₽";
+}
+
+.wallet-light-particle--loss {
+  width: var(--particle-size, 15px);
+  height: var(--particle-size, 15px);
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 34% 28%, rgba(255, 255, 255, 0.86), transparent 24%),
+    linear-gradient(135deg, #ffb3ad, #ef5b4f);
+  box-shadow:
+    0 8px 14px rgba(239, 91, 79, 0.16),
+    inset 0 0 0 2px rgba(120, 32, 28, 0.08);
+  animation: walletMoneyLossOut 0.92s cubic-bezier(0.18, 0.82, 0.24, 1) forwards;
+  animation-delay: var(--particle-delay, 0ms);
 }
 
 .wallet-light-actions {
@@ -207,17 +265,38 @@ body.wallet-mode-light .wallet-light-view {
   transform: scale(0.985);
 }
 
-@keyframes walletPigHappy {
+@keyframes walletBalanceIncomePulse {
+  0% {
+    transform: scale(1);
+    filter: none;
+  }
+
+  34% {
+    transform: scale(1.025);
+    filter: drop-shadow(0 18px 34px rgba(31, 184, 132, 0.16));
+  }
+
+  68% {
+    transform: scale(0.992);
+  }
+
+  100% {
+    transform: scale(1);
+    filter: none;
+  }
+}
+
+@keyframes walletBalanceExpensePulse {
   0% {
     transform: translateY(0) scale(1);
   }
 
-  28% {
-    transform: translateY(-8px) scale(1.025);
+  24% {
+    transform: translateY(5px) scale(0.985);
   }
 
-  54% {
-    transform: translateY(2px) scale(0.992);
+  48% {
+    transform: translateY(-2px) scale(1.006);
   }
 
   100% {
@@ -225,39 +304,17 @@ body.wallet-mode-light .wallet-light-view {
   }
 }
 
-@keyframes walletPigShake {
-  0% {
-    transform: translateX(0) rotate(0deg);
-  }
-
-  20% {
-    transform: translateX(-4px) rotate(-1.2deg);
-  }
-
-  42% {
-    transform: translateX(4px) rotate(1.2deg);
-  }
-
-  66% {
-    transform: translateX(-2px) rotate(-0.6deg);
-  }
-
-  100% {
-    transform: translateX(0) rotate(0deg);
-  }
-}
-
-@keyframes walletCoinFall {
+@keyframes walletMoneyCoinIn {
   0% {
     opacity: 0;
     transform:
-      translateX(var(--coin-x, 0px))
-      translateY(-80px)
+      translateX(var(--particle-start-x, 0px))
+      translateY(var(--particle-start-y, -170px))
       rotate(0deg)
-      scale(var(--coin-scale, 1));
+      scale(var(--particle-scale, 1));
   }
 
-  14% {
+  16% {
     opacity: 1;
   }
 
@@ -268,10 +325,38 @@ body.wallet-mode-light .wallet-light-view {
   100% {
     opacity: 0;
     transform:
-      translateX(calc(var(--coin-x, 0px) * 0.34))
-      translateY(118px)
-      rotate(var(--coin-rotate, 360deg))
-      scale(0.82);
+      translateX(var(--particle-end-x, 0px))
+      translateY(var(--particle-end-y, -18px))
+      rotate(var(--particle-rotate, 360deg))
+      scale(0.72);
+  }
+}
+
+@keyframes walletMoneyLossOut {
+  0% {
+    opacity: 0;
+    transform:
+      translateX(var(--particle-start-x, 0px))
+      translateY(var(--particle-start-y, -8px))
+      rotate(0deg)
+      scale(var(--particle-scale, 1));
+  }
+
+  12% {
+    opacity: 1;
+  }
+
+  70% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+    transform:
+      translateX(var(--particle-end-x, 0px))
+      translateY(var(--particle-end-y, 132px))
+      rotate(var(--particle-rotate, 220deg))
+      scale(0.62);
   }
 }
 
@@ -281,14 +366,13 @@ body.wallet-mode-light .wallet-light-view {
     padding-right: 14px;
   }
 
-  .wallet-light-view__money {
-    font-size: clamp(46px, 13.5vw, 64px);
+  .wallet-light-balance-core {
+    min-height: 304px;
+    margin-bottom: 28px;
   }
 
-  .wallet-light-piggy-wrap {
-    width: min(82vw, 310px);
-    margin-top: 30px;
-    margin-bottom: 32px;
+  .wallet-light-view__money {
+    font-size: clamp(48px, 14vw, 68px);
   }
 
   .wallet-light-action {
