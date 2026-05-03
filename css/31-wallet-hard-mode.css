@@ -1,0 +1,583 @@
+/* =========================================================
+   31. Wallet Hard Mode
+   Generated-style single-page hard dashboard
+   ========================================================= */
+
+body.wallet-mode-hard {
+  background:
+    radial-gradient(circle at 50% 12%, rgba(47, 125, 246, 0.055), transparent 32%),
+    linear-gradient(180deg, #fbfcff 0%, #f6f8fb 52%, #f4f6fa 100%);
+}
+
+body.wallet-mode-hard .app {
+  padding-bottom: calc(env(safe-area-inset-bottom) + 26px);
+}
+
+body.wallet-mode-hard .bottom-nav {
+  display: none !important;
+}
+
+body.wallet-mode-hard #mainView {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+body.wallet-mode-hard .wallet-light-view {
+  display: none !important;
+}
+
+/* order */
+body.wallet-mode-hard .balance--game {
+  order: 1;
+}
+
+body.wallet-mode-hard .actions {
+  order: 2;
+}
+
+body.wallet-mode-hard .hard-summary-section {
+  order: 3;
+}
+
+body.wallet-mode-hard .hard-plan-section {
+  order: 4;
+}
+
+body.wallet-mode-hard .accounts-section {
+  order: 5;
+}
+
+body.wallet-mode-hard .transactions-preview-section {
+  order: 6;
+}
+
+/* shared headings */
+.hard-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 13px;
+}
+
+.hard-section-title {
+  margin: 0;
+  color: #121722;
+  font-size: clamp(30px, 8vw, 42px);
+  line-height: 0.95;
+  font-weight: 850;
+  letter-spacing: -0.075em;
+}
+
+/* hero */
+body.wallet-mode-hard .balance--game {
+  margin-top: 18px;
+}
+
+body.wallet-mode-hard .wallet-game-hero {
+  min-height: 360px;
+  padding: 28px 26px 30px;
+  border-radius: 34px;
+  background:
+    radial-gradient(circle at 105% -4%, rgba(47, 125, 246, 0.115), transparent 34%),
+    radial-gradient(circle at 95% 12%, rgba(31, 184, 132, 0.075), transparent 28%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(246, 249, 253, 0.96));
+  border: 1px solid rgba(22, 30, 46, 0.075);
+  box-shadow:
+    0 26px 60px rgba(30, 42, 68, 0.10),
+    0 10px 24px rgba(30, 42, 68, 0.045),
+    inset 0 1px 0 rgba(255, 255, 255, 0.96);
+}
+
+body.wallet-mode-hard .wallet-game-hero::before {
+  inset: -92px -84px auto auto;
+  width: 230px;
+  height: 230px;
+  background:
+    radial-gradient(circle, rgba(47, 125, 246, 0.10), rgba(47, 125, 246, 0.00) 68%);
+  filter: none;
+}
+
+body.wallet-mode-hard .wallet-game-hero__top {
+  align-items: start;
+}
+
+body.wallet-mode-hard .wallet-game-hero__eyebrow {
+  margin-bottom: 18px;
+  color: rgba(20, 24, 33, 0.50);
+  font-size: clamp(24px, 6.6vw, 32px);
+  line-height: 1;
+  font-weight: 780;
+  letter-spacing: -0.055em;
+}
+
+body.wallet-mode-hard .wallet-game-hero__title {
+  max-width: 92%;
+  color: #111724;
+  font-size: clamp(54px, 14.7vw, 74px);
+  line-height: 0.92;
+  font-weight: 880;
+  letter-spacing: -0.088em;
+}
+
+body.wallet-mode-hard .wallet-game-hero__report {
+  min-height: 58px;
+  padding: 0 20px;
+  border-radius: 999px;
+  font-size: 18px;
+  font-weight: 780;
+  letter-spacing: -0.025em;
+  box-shadow:
+    0 16px 34px rgba(30, 42, 68, 0.085),
+    inset 0 1px 0 rgba(255, 255, 255, 0.94);
+}
+
+body.wallet-mode-hard .wallet-game-hero__report svg {
+  width: 23px;
+  height: 23px;
+}
+
+body.wallet-mode-hard .wallet-game-hero__main {
+  margin-top: 26px;
+}
+
+body.wallet-mode-hard .wallet-game-hero__amount {
+  color: #2f7df6;
+  font-size: clamp(60px, 16vw, 82px);
+  line-height: 0.88;
+  font-weight: 880;
+  letter-spacing: -0.09em;
+  white-space: nowrap;
+}
+
+body.wallet-mode-hard .wallet-game-hero.is-good .wallet-game-hero__amount,
+body.wallet-mode-hard .wallet-game-hero.is-warn .wallet-game-hero__amount,
+body.wallet-mode-hard .wallet-game-hero.is-bad .wallet-game-hero__amount {
+  color: #2f7df6;
+}
+
+body.wallet-mode-hard .wallet-game-hero__amount::after {
+  content: " / день";
+  margin-left: 8px;
+  color: #2f7df6;
+  font-size: clamp(21px, 5.6vw, 28px);
+  line-height: 1;
+  font-weight: 800;
+  letter-spacing: -0.045em;
+}
+
+body.wallet-mode-hard .wallet-game-hero__status {
+  display: none;
+}
+
+body.wallet-mode-hard .wallet-game-hero__hint {
+  max-width: 96%;
+  margin-top: 28px;
+  color: rgba(20, 24, 33, 0.56);
+  font-size: clamp(20px, 5.35vw, 26px);
+  line-height: 1.28;
+  font-weight: 650;
+  letter-spacing: -0.045em;
+}
+
+body.wallet-mode-hard .wallet-game-hero__meter {
+  display: none;
+}
+
+/* actions */
+body.wallet-mode-hard .actions {
+  margin-top: 0;
+  min-height: 130px;
+  padding: 18px 18px 16px;
+  border-radius: 30px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(247, 249, 252, 0.96));
+  border: 1px solid rgba(22, 30, 46, 0.055);
+  box-shadow:
+    0 20px 46px rgba(30, 42, 68, 0.085),
+    0 7px 18px rgba(30, 42, 68, 0.035),
+    inset 0 1px 0 rgba(255, 255, 255, 0.94);
+}
+
+body.wallet-mode-hard .action-card {
+  min-height: 94px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+body.wallet-mode-hard .action-card:not(:last-child) {
+  border-right: 1px solid rgba(22, 30, 46, 0.075);
+}
+
+body.wallet-mode-hard .action-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 19px;
+}
+
+body.wallet-mode-hard .action-icon svg {
+  width: 28px;
+  height: 28px;
+}
+
+body.wallet-mode-hard .action-label {
+  margin-top: 13px;
+  color: #1f2530;
+  font-size: clamp(18px, 5vw, 24px);
+  line-height: 1;
+  font-weight: 820;
+  letter-spacing: -0.05em;
+}
+
+/* summary */
+.hard-summary-section {
+  margin: 0;
+}
+
+.hard-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 13px;
+}
+
+.hard-summary-pressure {
+  display: contents;
+}
+
+.hard-summary-card {
+  position: relative;
+  min-height: 114px;
+  padding: 20px 20px;
+  border-radius: 24px;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(247, 249, 252, 0.96));
+  border: 1px solid rgba(22, 30, 46, 0.052);
+  box-shadow:
+    0 16px 34px rgba(30, 42, 68, 0.065),
+    0 7px 16px rgba(30, 42, 68, 0.032),
+    inset 0 1px 0 rgba(255, 255, 255, 0.96);
+}
+
+.hard-summary-card span {
+  display: block;
+  margin-bottom: 14px;
+  color: rgba(20, 24, 33, 0.48);
+  font-size: clamp(18px, 4.9vw, 24px);
+  line-height: 1.05;
+  font-weight: 720;
+  letter-spacing: -0.045em;
+}
+
+.hard-summary-card strong {
+  display: block;
+  max-width: 100%;
+  color: #121722;
+  font-size: clamp(28px, 7.7vw, 36px);
+  line-height: 0.98;
+  font-weight: 850;
+  letter-spacing: -0.07em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hard-summary-card--free strong {
+  color: #2f7df6;
+}
+
+.hard-summary-card--calendar strong {
+  color: #171b24;
+}
+
+.hard-summary-card--limits strong {
+  color: #171b24;
+}
+
+.hard-hidden-stat {
+  display: none !important;
+}
+
+/* plan */
+.hard-plan-section {
+  margin: 0;
+}
+
+.hard-plan-card {
+  border-radius: 30px;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(247, 249, 252, 0.96));
+  border: 1px solid rgba(22, 30, 46, 0.052);
+  box-shadow:
+    0 20px 46px rgba(30, 42, 68, 0.08),
+    0 7px 18px rgba(30, 42, 68, 0.035),
+    inset 0 1px 0 rgba(255, 255, 255, 0.96);
+}
+
+.hard-plan-row {
+  width: 100%;
+  min-height: 104px;
+  padding: 18px 20px;
+  border: 0;
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 16px;
+  text-align: left;
+  background: transparent;
+}
+
+.hard-plan-row + .hard-plan-row {
+  border-top: 1px solid rgba(22, 30, 46, 0.075);
+}
+
+.hard-plan-row--clickable {
+  cursor: pointer;
+}
+
+.hard-plan-row__icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hard-plan-row__icon svg {
+  width: 27px;
+  height: 27px;
+  stroke: currentColor;
+  stroke-width: 2.1;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.hard-plan-row__icon--blue {
+  color: #2f7df6;
+  background: rgba(47, 125, 246, 0.11);
+}
+
+.hard-plan-row__icon--red {
+  color: #ef5b4f;
+  background: rgba(239, 91, 79, 0.11);
+}
+
+.hard-plan-row__body {
+  min-width: 0;
+}
+
+.hard-plan-row__body span,
+.hard-plan-row.wallet-game-hero__expectation span {
+  display: block;
+  margin: 0 0 6px;
+  color: rgba(20, 24, 33, 0.48);
+  font-size: clamp(17px, 4.6vw, 22px);
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+}
+
+.hard-plan-row__body strong,
+.hard-plan-row.wallet-game-hero__expectation strong {
+  display: block;
+  color: #121722;
+  font-size: clamp(20px, 5.35vw, 27px);
+  line-height: 1.05;
+  font-weight: 820;
+  letter-spacing: -0.052em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hard-plan-pill,
+.hard-plan-row.wallet-game-hero__expectation button {
+  min-height: 40px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 999px;
+  color: #2f7df6;
+  font-size: clamp(15px, 4.1vw, 19px);
+  font-weight: 760;
+  letter-spacing: -0.025em;
+  background:
+    linear-gradient(180deg, rgba(235, 242, 255, 0.99), rgba(221, 233, 255, 0.94));
+  box-shadow:
+    0 10px 22px rgba(47, 125, 246, 0.075),
+    inset 0 1px 0 rgba(255, 255, 255, 0.92);
+}
+
+.hard-plan-row__value {
+  color: #121722;
+  font-size: clamp(20px, 5.4vw, 27px);
+  line-height: 1;
+  font-weight: 850;
+  letter-spacing: -0.058em;
+  white-space: nowrap;
+}
+
+.hard-plan-row__value--danger {
+  color: #ef5b4f;
+}
+
+.hard-plan-row__chevron {
+  margin-left: -4px;
+  color: rgba(20, 24, 33, 0.42);
+  font-size: 34px;
+  line-height: 1;
+  font-weight: 340;
+}
+
+.hard-important-grid {
+  margin-top: 13px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 13px;
+}
+
+.hard-important-card {
+  min-height: 104px;
+  padding: 18px 20px;
+  border-radius: 24px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(247, 249, 252, 0.96));
+  border: 1px solid rgba(22, 30, 46, 0.052);
+  box-shadow:
+    0 16px 34px rgba(30, 42, 68, 0.055),
+    inset 0 1px 0 rgba(255, 255, 255, 0.96);
+}
+
+.hard-important-card span {
+  display: block;
+  margin-bottom: 12px;
+  color: rgba(20, 24, 33, 0.48);
+  font-size: clamp(16px, 4.4vw, 20px);
+  line-height: 1.05;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+}
+
+.hard-important-card strong {
+  display: block;
+  color: #121722;
+  font-size: clamp(25px, 6.9vw, 34px);
+  line-height: 0.98;
+  font-weight: 850;
+  letter-spacing: -0.07em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hard-important-card--control strong {
+  color: #2f7df6;
+}
+
+/* accounts temporary compaction for package 1 */
+body.wallet-mode-hard .accounts-section {
+  margin: 0;
+}
+
+body.wallet-mode-hard .accounts-section .section-title {
+  font-size: clamp(34px, 9vw, 46px);
+  line-height: 0.95;
+  font-weight: 850;
+  letter-spacing: -0.075em;
+}
+
+body.wallet-mode-hard .accounts-section-head {
+  margin-bottom: 16px;
+}
+
+body.wallet-mode-hard .accounts-list {
+  gap: 12px;
+}
+
+body.wallet-mode-hard .accounts-carousel-dots {
+  margin-top: 12px;
+}
+
+/* old required section safety */
+body.wallet-mode-hard .required-payments-section {
+  display: none !important;
+}
+
+@media (max-width: 420px) {
+  body.wallet-mode-hard #mainView {
+    gap: 22px;
+  }
+
+  body.wallet-mode-hard .wallet-game-hero {
+    min-height: 348px;
+    padding: 26px 22px 28px;
+    border-radius: 32px;
+  }
+
+  body.wallet-mode-hard .wallet-game-hero__eyebrow {
+    font-size: clamp(22px, 6.2vw, 28px);
+  }
+
+  body.wallet-mode-hard .wallet-game-hero__title {
+    font-size: clamp(50px, 14vw, 66px);
+  }
+
+  body.wallet-mode-hard .wallet-game-hero__amount {
+    font-size: clamp(54px, 15vw, 72px);
+  }
+
+  body.wallet-mode-hard .wallet-game-hero__hint {
+    font-size: clamp(18px, 5vw, 23px);
+  }
+
+  body.wallet-mode-hard .actions {
+    min-height: 122px;
+    padding: 16px;
+    border-radius: 28px;
+  }
+
+  body.wallet-mode-hard .action-icon {
+    width: 52px;
+    height: 52px;
+  }
+
+  body.wallet-mode-hard .action-label {
+    font-size: clamp(17px, 4.8vw, 22px);
+  }
+
+  .hard-summary-grid,
+  .hard-important-grid {
+    gap: 12px;
+  }
+
+  .hard-summary-card {
+    min-height: 108px;
+    padding: 18px 18px;
+  }
+
+  .hard-plan-row {
+    min-height: 98px;
+    padding: 17px 18px;
+    grid-template-columns: 54px minmax(0, 1fr) auto;
+    gap: 14px;
+  }
+
+  .hard-plan-row__icon {
+    width: 52px;
+    height: 52px;
+  }
+
+  .hard-plan-row__value {
+    font-size: clamp(18px, 5vw, 24px);
+  }
+
+  .hard-plan-row__chevron {
+    font-size: 30px;
+  }
+}
