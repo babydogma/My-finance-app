@@ -140,21 +140,44 @@ function formatMoneyText(value) {
     );
   }
 
-  function syncHeroHint() {
-    const hint = document.getElementById("walletGameHint");
-    if (!hint) return;
+  function makeNoBreakRate(value) {
+  const span = document.createElement("span");
 
-    const currentHint = hint.textContent.trim();
-    const isGeneratedHint = currentHint.startsWith("До ближайших денег можно");
-    const isInitialHint = currentHint.toLowerCase().includes("сейчас проверяю");
+  span.style.whiteSpace = "nowrap";
+  span.textContent = `${value}/день`;
 
-    if (currentHint && !isGeneratedHint && !isInitialHint) return;
+  return span;
+}
 
-    const todayCan = getMoneyTextById("walletTodayCanValue", "0 ₽");
-    const afterIncome = getMoneyTextById("walletLimitsPressureValue", "0 ₽");
+function syncHeroHint() {
+  const hint = document.getElementById("walletGameHint");
+  if (!hint) return;
 
-    hint.textContent = `До 13 мая можно ${todayCan}/день. После ожидаемых денег до конца месяца — ${afterIncome}/день.`;
-  }
+  const currentHint = hint.textContent.trim();
+
+  const isGeneratedHint =
+    currentHint.startsWith("До 13 мая можно") ||
+    currentHint.startsWith("До ближайших денег можно");
+
+  const isInitialHint = currentHint.toLowerCase().includes("сейчас проверяю");
+
+  if (currentHint && !isGeneratedHint && !isInitialHint) return;
+
+  const todayCan = getMoneyTextById("walletTodayCanValue", "0 ₽");
+  const afterIncome = getMoneyTextById("walletLimitsPressureValue", "0 ₽");
+
+  const br = document.createElement("br");
+
+  hint.replaceChildren(
+    document.createTextNode("До 13 мая можно "),
+    makeNoBreakRate(todayCan),
+    document.createTextNode("."),
+    br,
+    document.createTextNode("После ожидаемых денег до конца месяца — "),
+    makeNoBreakRate(afterIncome),
+    document.createTextNode(".")
+  );
+}
 
   function syncAccountsCount() {
     const note = document.getElementById("accountsTotal");
