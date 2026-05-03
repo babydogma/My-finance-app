@@ -44,48 +44,74 @@
     <!-- MAIN VIEW -->
     <div id="mainView">
 
-    <!-- BALANCE -->
-<section class="balance">
-  <div class="balance-topline">
-    <div>
-      <p class="balance-label">Баланс</p>
-      <h1 class="balance-amount">0 ₽</h1>
+    <!-- BALANCE / GAME HERO -->
+<section class="balance balance--game">
+  <div class="wallet-game-hero" id="walletGameHero">
+    <div class="wallet-game-hero__top">
+      <div>
+        <p class="wallet-game-hero__eyebrow">Кошелёк сегодня</p>
+        <h1 class="wallet-game-hero__title">Сегодня можно</h1>
+      </div>
+
+      <button
+        class="monthly-report-open-btn wallet-game-hero__report"
+        type="button"
+        id="openMonthlyReportBtn"
+        aria-label="Открыть итоги месяца"
+        title="Итоги месяца"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M6 19V5" />
+          <path d="M6 19h13" />
+          <path d="M10 15v-4" />
+          <path d="M14 15V8" />
+          <path d="M18 15v-6" />
+        </svg>
+        <span>Итоги</span>
+      </button>
     </div>
 
-    <button
-      class="monthly-report-open-btn"
-      type="button"
-      id="openMonthlyReportBtn"
-      aria-label="Открыть итоги месяца"
-      title="Итоги месяца"
-    >
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M6 19V5" />
-        <path d="M6 19h13" />
-        <path d="M10 15v-4" />
-        <path d="M14 15V8" />
-        <path d="M18 15v-6" />
-      </svg>
-      <span>Итоги</span>
-    </button>
+    <div class="wallet-game-hero__main">
+      <div class="wallet-game-hero__amount" id="walletTodayCanValue">0 ₽</div>
+      <div class="wallet-game-hero__status" id="walletGameStatus">Считаю…</div>
+      <p class="wallet-game-hero__hint" id="walletGameHint">
+        Сейчас проверяю свободные деньги, календарь и лимиты.
+      </p>
+    </div>
+
+    <div class="wallet-game-hero__meter" aria-hidden="true">
+      <span id="walletGameMeterFill"></span>
+    </div>
+
+    <div class="wallet-game-hero__stats">
+      <div>
+        <span>До конца</span>
+        <strong id="walletDaysLeftValue">—</strong>
+      </div>
+
+      <div>
+        <span>Свободно</span>
+        <strong id="balanceFreeMoneyValue">0 ₽</strong>
+      </div>
+
+      <div>
+        <span>Баланс</span>
+        <strong class="balance-amount">0 ₽</strong>
+      </div>
+    </div>
+
+    <div class="wallet-game-hero__pressure">
+      <div>
+        <span>Календарь</span>
+        <strong id="walletCalendarPressureValue">0 ₽</strong>
+      </div>
+
+      <div>
+        <span>Лимиты</span>
+        <strong id="walletLimitsPressureValue">0 ₽</strong>
+      </div>
+    </div>
   </div>
-
-  <button class="balance-free-card" type="button">
-    <span class="balance-free-card__icon" aria-hidden="true">
-      <svg viewBox="0 0 24 24">
-        <rect x="4" y="6.5" width="16" height="11" rx="3" />
-        <path d="M4 10h16" />
-        <path d="M8 14h3.2" />
-      </svg>
-    </span>
-
-    <span class="balance-free-card__body">
-      <span class="balance-free-card__label">Свободно</span>
-      <strong class="balance-free-card__value" id="balanceFreeMoneyValue">0 ₽</strong>
-    </span>
-
-    <span class="balance-free-card__arrow" aria-hidden="true">›</span>
-  </button>
 </section>
 
       <!-- ACTIONS -->
@@ -1582,5 +1608,126 @@
 
 <script src="./script.js"></script>
 <script src="./js/36-savings-settings-columns.js"></script>
+<script>
+(() => {
+  function parseMoney(text) {
+    const normalized = String(text || "")
+      .replace(/\s/g, "")
+      .replace(/[₽₽]/g, "")
+      .replace(",", ".")
+      .replace(/[^\d.-]/g, "");
+
+    const value = Number(normalized);
+
+    return Number.isFinite(value) ? value : 0;
+  }
+
+  function formatMoney(value) {
+    const amount = Math.round((Number(value) || 0) * 100) / 100;
+
+    return `${new Intl.NumberFormat("ru-RU", {
+      maximumFractionDigits: amount % 1 === 0 ? 0 : 2,
+    }).format(amount)} ₽`;
+  }
+
+  function getDaysLeftInMonth() {
+    const now = new Date();
+    const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+
+    return Math.max(1, lastDay - now.getDate() + 1);
+  }
+
+  function setText(id, value) {
+    const node = document.getElementById(id);
+
+    if (node) node.textContent = value;
+  }
+
+  function updateWalletGameHero() {
+    const hero = document.getElementById("walletGameHero");
+    const todayValue = document.getElementById("walletTodayCanValue");
+    const status = document.getElementById("walletGameStatus");
+    const hint = document.getElementById("walletGameHint");
+    const meter = document.getElementById("walletGameMeterFill");
+
+    if (!hero || !todayValue || !status || !hint || !meter) return;
+
+    const freeMoney = parseMoney(document.getElementById("balanceFreeMoneyValue")?.textContent);
+    const calendar = parseMoney(document.getElementById("analyticsPendingMandatoryValue")?.textContent);
+    const limits = parseMoney(document.getElementById("analyticsRemainingBudgetsValue")?.textContent);
+    const daysLeft = getDaysLeftInMonth();
+
+    const safePool = freeMoney - calendar - limits;
+    const todayCan = Math.max(0, safePool / daysLeft);
+    const meterValue = Math.max(0, Math.min(100, (safePool / Math.max(freeMoney, 1)) * 100));
+
+    setText("walletDaysLeftValue", `${daysLeft} дн.`);
+    setText("walletCalendarPressureValue", formatMoney(calendar));
+    setText("walletLimitsPressureValue", formatMoney(limits));
+
+    todayValue.textContent = formatMoney(todayCan);
+    meter.style.width = `${meterValue}%`;
+
+    hero.classList.remove("is-good", "is-warn", "is-bad");
+
+    if (safePool < 0) {
+      hero.classList.add("is-bad");
+      status.textContent = "Стоп-режим";
+      hint.textContent = `Сначала нужно закрыть дыру: ${formatMoney(Math.abs(safePool))}. Календарь и лимиты сильнее свободных денег.`;
+      return;
+    }
+
+    if (todayCan < 300) {
+      hero.classList.add("is-bad");
+      status.textContent = "Режим выживания";
+      hint.textContent = `До конца месяца лучше не разгоняться. Безопасно в день: ${formatMoney(todayCan)}.`;
+      return;
+    }
+
+    if (todayCan < 700) {
+      hero.classList.add("is-warn");
+      status.textContent = "Не разгоняйся";
+      hint.textContent = `Деньги есть, но запас тонкий. Безопасно в день: ${formatMoney(todayCan)}.`;
+      return;
+    }
+
+    hero.classList.add("is-good");
+    status.textContent = "Держишься";
+    hint.textContent = `Можно жить спокойнее. Безопасно в день: ${formatMoney(todayCan)}.`;
+  }
+
+  function startWalletGameHero() {
+    updateWalletGameHero();
+
+    const observer = new MutationObserver(updateWalletGameHero);
+
+    [
+      "balanceFreeMoneyValue",
+      "analyticsPendingMandatoryValue",
+      "analyticsRemainingBudgetsValue",
+      "analyticsMandatoryTotalValue",
+    ].forEach((id) => {
+      const node = document.getElementById(id);
+
+      if (node) {
+        observer.observe(node, {
+          childList: true,
+          characterData: true,
+          subtree: true,
+        });
+      }
+    });
+
+    window.addEventListener("focus", updateWalletGameHero);
+    document.addEventListener("visibilitychange", updateWalletGameHero);
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", startWalletGameHero);
+  } else {
+    startWalletGameHero();
+  }
+})();
+</script>
 </body>
 </html>
