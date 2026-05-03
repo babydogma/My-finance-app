@@ -23,6 +23,10 @@ body.wallet-mode-hard {
     linear-gradient(180deg, #fbfcff 0%, #f7f8fb 50%, #f4f6fa 100%);
 }
 
+.hard-source-metrics {
+  display: none !important;
+}
+
 body.wallet-mode-hard .app {
   padding: 22px 16px calc(env(safe-area-inset-bottom) + 24px);
 }
