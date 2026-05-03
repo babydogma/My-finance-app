@@ -2,40 +2,13 @@
    Wallet Light Mode
    ========================================================= */
 
-.wallet-mode-toggle {
-  position: fixed;
-  top: calc(env(safe-area-inset-top) + 12px);
-  right: 14px;
-  z-index: 80;
-  min-height: 38px;
-  padding: 0 14px;
-  border: 1px solid rgba(22, 30, 46, 0.07);
-  border-radius: 999px;
-  color: rgba(20, 24, 33, 0.68);
-  font-size: 12px;
-  font-weight: 760;
-  letter-spacing: -0.012em;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(246, 248, 252, 0.90));
-  box-shadow:
-    0 12px 26px rgba(30, 42, 68, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.92);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-}
-
-.wallet-mode-toggle:active {
-  transform: scale(0.97);
-}
-
 .wallet-light-view {
   display: none;
 }
 
 body.wallet-mode-light {
   background:
-    radial-gradient(circle at 50% 28%, rgba(47, 125, 246, 0.08), transparent 34%),
-    radial-gradient(circle at 50% 70%, rgba(31, 184, 132, 0.08), transparent 36%),
+    radial-gradient(circle at 50% 42%, rgba(47, 125, 246, 0.045), transparent 36%),
     linear-gradient(180deg, #fbfcff 0%, #f7f8fb 52%, #f4f6fa 100%);
 }
 
@@ -49,7 +22,7 @@ body.wallet-mode-light .bottom-nav {
 
 body.wallet-mode-light .wallet-light-view {
   min-height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
-  padding: calc(env(safe-area-inset-top) + 64px) 16px calc(env(safe-area-inset-bottom) + 28px);
+  padding: calc(env(safe-area-inset-top) + 48px) 16px calc(env(safe-area-inset-bottom) + 28px);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -64,141 +37,36 @@ body.wallet-mode-light .wallet-light-view {
 .wallet-light-balance-core {
   position: relative;
   width: 100%;
-  min-height: 315px;
-  margin: 0 auto 34px;
-  padding: 28px 0;
-  border-radius: 999px;
+  min-height: 150px;
+  margin: 0 auto 46px;
   display: flex;
   align-items: center;
   justify-content: center;
-  isolation: isolate;
-}
-
-.wallet-light-balance-core::before {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  z-index: -2;
-  width: min(92vw, 390px);
-  aspect-ratio: 1;
-  border-radius: 999px;
-  transform: translate(-50%, -50%);
-  background:
-    radial-gradient(circle at 50% 48%, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.42) 42%, rgba(255, 255, 255, 0) 68%),
-    radial-gradient(circle at 50% 50%, rgba(47, 125, 246, 0.10), rgba(31, 184, 132, 0.06) 55%, transparent 74%);
-}
-
-.wallet-light-balance-core::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  z-index: -1;
-  width: min(84vw, 350px);
-  aspect-ratio: 1;
-  border-radius: 999px;
-  transform: translate(-50%, -50%);
-  border: 1px solid rgba(22, 30, 46, 0.052);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.86), rgba(247, 249, 252, 0.62));
-  box-shadow:
-    0 24px 60px rgba(30, 42, 68, 0.075),
-    0 10px 24px rgba(30, 42, 68, 0.04),
-    inset 0 1px 0 rgba(255, 255, 255, 0.94);
-}
-
-.wallet-light-ring {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  z-index: 1;
-  width: min(84vw, 350px);
-  aspect-ratio: 1;
-  border-radius: 999px;
-  transform: translate(-50%, -50%);
-  opacity: 0;
-  pointer-events: none;
-}
-
-.wallet-light-ring::before {
-  content: "";
-  position: absolute;
-  inset: -5px;
-  border-radius: inherit;
-  background:
-    conic-gradient(
-      from 0deg,
-      transparent 0deg,
-      transparent 248deg,
-      rgba(31, 184, 132, 0.00) 268deg,
-      rgba(31, 184, 132, 0.95) 294deg,
-      rgba(82, 222, 170, 0.96) 318deg,
-      rgba(31, 184, 132, 0.00) 346deg,
-      transparent 360deg
-    );
-  -webkit-mask:
-    radial-gradient(farthest-side, transparent calc(100% - 11px), #000 calc(100% - 10px));
-  mask:
-    radial-gradient(farthest-side, transparent calc(100% - 11px), #000 calc(100% - 10px));
-  filter:
-    drop-shadow(0 0 12px rgba(31, 184, 132, 0.32))
-    drop-shadow(0 0 22px rgba(31, 184, 132, 0.16));
-}
-
-.wallet-light-balance-core.is-income .wallet-light-ring {
-  animation: walletLightRingClockwise 0.78s linear both;
-}
-
-.wallet-light-balance-core.is-expense .wallet-light-ring {
-  animation: walletLightRingCounterClockwise 0.78s linear both;
-}
-
-.wallet-light-balance-core.is-expense .wallet-light-ring::before {
-  background:
-    conic-gradient(
-      from 0deg,
-      transparent 0deg,
-      transparent 248deg,
-      rgba(239, 91, 79, 0.00) 268deg,
-      rgba(239, 91, 79, 0.96) 294deg,
-      rgba(255, 129, 118, 0.96) 318deg,
-      rgba(239, 91, 79, 0.00) 346deg,
-      transparent 360deg
-    );
-  filter:
-    drop-shadow(0 0 12px rgba(239, 91, 79, 0.28))
-    drop-shadow(0 0 22px rgba(239, 91, 79, 0.13));
 }
 
 .wallet-light-view__money {
-  position: relative;
-  z-index: 2;
   display: block;
   width: 100%;
-  padding: 0 18px;
+  padding: 0 12px;
   color: #171b24;
-  font-size: clamp(38px, 11vw, 54px);
+  font-size: clamp(38px, 10.7vw, 54px);
   line-height: 0.95;
   font-weight: 840;
-  letter-spacing: -0.065em;
+  letter-spacing: -0.06em;
   text-align: center;
   white-space: nowrap;
+  transform-origin: center;
 }
 
-.wallet-light-balance-core.is-income .wallet-light-view__money {
-  animation: walletLightMoneyIncome 0.52s cubic-bezier(0.2, 0.95, 0.25, 1);
-}
-
-.wallet-light-balance-core.is-expense .wallet-light-view__money {
-  animation: walletLightMoneyExpense 0.52s ease;
+.wallet-light-balance-core.is-updating .wallet-light-view__money {
+  animation: walletLightMoneyUpdate 0.46s cubic-bezier(0.2, 0.95, 0.25, 1);
 }
 
 .wallet-light-actions {
   width: 100%;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  gap: 14px;
 }
 
 .wallet-light-action {
@@ -208,7 +76,7 @@ body.wallet-mode-light .wallet-light-view {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 12px;
   color: #171b24;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(246, 248, 252, 0.92));
@@ -227,14 +95,24 @@ body.wallet-mode-light .wallet-light-view {
   justify-content: center;
   font-size: 24px;
   line-height: 1;
-  font-weight: 720;
+  font-weight: 760;
 }
 
 .wallet-light-action strong {
-  font-size: 17px;
+  font-size: 22px;
   line-height: 1;
-  font-weight: 780;
-  letter-spacing: -0.035em;
+  font-weight: 820;
+  letter-spacing: -0.045em;
+}
+
+.wallet-light-action--expense {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(255, 246, 246, 0.92));
+}
+
+.wallet-light-action--income {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(242, 252, 247, 0.92));
 }
 
 .wallet-light-action--expense span {
@@ -251,71 +129,25 @@ body.wallet-mode-light .wallet-light-view {
   transform: scale(0.985);
 }
 
-@keyframes walletLightRingClockwise {
-  0% {
-    opacity: 0;
-    transform: translate(-50%, -50%) rotate(-42deg);
-  }
-
-  14% {
-    opacity: 1;
-  }
-
-  72% {
-    opacity: 1;
-  }
-
-  100% {
-    opacity: 0;
-    transform: translate(-50%, -50%) rotate(318deg);
-  }
-}
-
-@keyframes walletLightRingCounterClockwise {
-  0% {
-    opacity: 0;
-    transform: translate(-50%, -50%) rotate(42deg);
-  }
-
-  14% {
-    opacity: 1;
-  }
-
-  72% {
-    opacity: 1;
-  }
-
-  100% {
-    opacity: 0;
-    transform: translate(-50%, -50%) rotate(-318deg);
-  }
-}
-
-@keyframes walletLightMoneyIncome {
-  0% {
-    transform: scale(1);
-  }
-
-  42% {
-    transform: scale(1.026);
-  }
-
-  100% {
-    transform: scale(1);
-  }
-}
-
-@keyframes walletLightMoneyExpense {
+@keyframes walletLightMoneyUpdate {
   0% {
     transform: translateY(0) scale(1);
+    opacity: 1;
   }
 
-  34% {
-    transform: translateY(3px) scale(0.982);
+  28% {
+    transform: translateY(-2px) scale(1.028);
+    opacity: 0.92;
+  }
+
+  58% {
+    transform: translateY(1px) scale(0.992);
+    opacity: 1;
   }
 
   100% {
     transform: translateY(0) scale(1);
+    opacity: 1;
   }
 }
 
@@ -326,17 +158,21 @@ body.wallet-mode-light .wallet-light-view {
   }
 
   .wallet-light-balance-core {
-    min-height: 300px;
-    margin-bottom: 32px;
+    min-height: 142px;
+    margin-bottom: 42px;
   }
 
   .wallet-light-view__money {
-    font-size: clamp(36px, 10.6vw, 50px);
-    letter-spacing: -0.06em;
+    font-size: clamp(36px, 10.2vw, 48px);
+    letter-spacing: -0.056em;
   }
 
   .wallet-light-action {
     min-height: 78px;
     border-radius: 26px;
+  }
+
+  .wallet-light-action strong {
+    font-size: 21px;
   }
 }
