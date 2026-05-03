@@ -1,5 +1,9 @@
 (() => {
   const MODE_KEY = "wallet_home_mode_v1";
+  const PENDING_LIFETIME_MS = 120000;
+  const AFTER_SAVE_ANIMATION_DELAY_MS = 520;
+
+  let pendingLightTransaction = null;
 
   function getSavedMode() {
     return localStorage.getItem(MODE_KEY) || "light";
@@ -7,6 +11,28 @@
 
   function saveMode(mode) {
     localStorage.setItem(MODE_KEY, mode);
+  }
+
+  function parseMoney(text) {
+    const normalized = String(text || "")
+      .replace(/\s/g, "")
+      .replace(/[₽₽]/g, "")
+      .replace(",", ".")
+      .replace(/[^\d.-]/g, "");
+
+    const value = Number(normalized);
+
+    return Number.isFinite(value) ? value : 0;
+  }
+
+  function getFreeMoneyText() {
+    const source = document.getElementById("balanceFreeMoneyValue");
+
+    return source?.textContent?.trim() || "0 ₽";
+  }
+
+  function getFreeMoneyValue() {
+    return parseMoney(getFreeMoneyText());
   }
 
   function setMode(mode) {
@@ -24,12 +50,11 @@
   }
 
   function syncLightFreeMoney() {
-    const source = document.getElementById("balanceFreeMoneyValue");
     const target = document.getElementById("walletLightFreeValue");
 
     if (!target) return;
 
-    target.textContent = source?.textContent?.trim() || "0 ₽";
+    target.textContent = getFreeMoneyText();
   }
 
   function animatePig(type) {
@@ -81,12 +106,63 @@
     animatePig("income");
   }
 
+  function playSavedTransactionAnimation(type) {
+    if (type === "income") {
+      dropCoins();
+      return;
+    }
+
+    animatePig("expense");
+  }
+
   function openExistingModal(buttonId) {
     const button = document.getElementById(buttonId);
 
     if (!button) return;
 
     button.click();
+  }
+
+  function startPendingLightTransaction(type) {
+    window.clearTimeout(pendingLightTransaction?.timeoutId);
+
+    pendingLightTransaction = {
+      type,
+      beforeValue: getFreeMoneyValue(),
+      createdAt: Date.now(),
+      animationPlayed: false,
+      timeoutId: window.setTimeout(() => {
+        pendingLightTransaction = null;
+      }, PENDING_LIFETIME_MS),
+    };
+  }
+
+  function completePendingLightTransactionIfMoneyChanged() {
+    if (!pendingLightTransaction || pendingLightTransaction.animationPlayed) return;
+
+    const now = Date.now();
+
+    if (now - pendingLightTransaction.createdAt > PENDING_LIFETIME_MS) {
+      window.clearTimeout(pendingLightTransaction.timeoutId);
+      pendingLightTransaction = null;
+      return;
+    }
+
+    const currentValue = getFreeMoneyValue();
+    const difference = Math.round((currentValue - pendingLightTransaction.beforeValue) * 100) / 100;
+
+    if (Math.abs(difference) < 0.01) return;
+
+    const type = pendingLightTransaction.type;
+
+    pendingLightTransaction.animationPlayed = true;
+    window.clearTimeout(pendingLightTransaction.timeoutId);
+
+    window.setTimeout(() => {
+      syncLightFreeMoney();
+      playSavedTransactionAnimation(type);
+      pendingLightTransaction = null;
+    }, AFTER_SAVE_ANIMATION_DELAY_MS);
   }
 
   function bindLightModeEvents() {
@@ -107,7 +183,7 @@
       if (expenseBtn) {
         event.preventDefault();
 
-        animatePig("expense");
+        startPendingLightTransaction("expense");
         openExistingModal("openExpenseModal");
         return;
       }
@@ -115,10 +191,8 @@
       if (incomeBtn) {
         event.preventDefault();
 
-        dropCoins();
-        window.setTimeout(() => {
-          openExistingModal("openIncomeModal");
-        }, 220);
+        startPendingLightTransaction("income");
+        openExistingModal("openIncomeModal");
       }
     });
   }
@@ -128,7 +202,10 @@
 
     if (!source) return;
 
-    const observer = new MutationObserver(syncLightFreeMoney);
+    const observer = new MutationObserver(() => {
+      syncLightFreeMoney();
+      completePendingLightTransactionIfMoneyChanged();
+    });
 
     observer.observe(source, {
       childList: true,
