@@ -14,6 +14,41 @@
     element.textContent = value;
   }
 
+  function extractExpectedIncomeDate(text) {
+    const source = String(text || "");
+    const match = source.match(/(\d{1,2}\s+[а-яё]+)/i);
+
+    return match?.[1] || "";
+  }
+
+  function syncExpectedIncomeCard() {
+    const label = document.getElementById("walletExpectedIncomeLabel");
+    const value = document.getElementById("walletExpectedIncomeValue");
+    const button = document.getElementById("openExpectedIncomeModalBtn");
+
+    if (!label || !value || !button) return;
+
+    const valueText = value.textContent.trim();
+    const hasExpectedIncome =
+      valueText &&
+      !valueText.toLowerCase().includes("добавь") &&
+      valueText !== "0 ₽";
+
+    if (!hasExpectedIncome) {
+      label.textContent = "Будущие деньги не учтены";
+      button.textContent = "Жду деньги";
+      return;
+    }
+
+    label.textContent = "Ждёшь деньги";
+
+    const dateLabel = extractExpectedIncomeDate(valueText);
+
+    if (dateLabel) {
+      button.textContent = dateLabel;
+    }
+  }
+
   function syncHardModePreview() {
     setTextById(
       "hardPressureMandatoryValue",
@@ -34,17 +69,29 @@
       "hardPressureControlValue",
       getTextById("walletMandatoryControlValue", "0%")
     );
+
+    syncExpectedIncomeCard();
   }
 
-  function bindHardPressureActions() {
+  function bindHardActions() {
     document.addEventListener("click", (event) => {
       const mandatoryCard = event.target.closest('[data-hard-open="mandatory"]');
+      const accountsBtn = event.target.closest("#hardScrollAccountsBtn");
 
-      if (!mandatoryCard) return;
+      if (mandatoryCard) {
+        event.preventDefault();
+        document.getElementById("openMandatoryPaymentsModalBtn")?.click();
+        return;
+      }
 
-      event.preventDefault();
+      if (accountsBtn) {
+        event.preventDefault();
 
-      document.getElementById("openMandatoryPaymentsModalBtn")?.click();
+        document.querySelector(".accounts-section")?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }
     });
   }
 
@@ -64,13 +111,15 @@
 
   function start() {
     syncHardModePreview();
-    bindHardPressureActions();
+    bindHardActions();
 
     [
       "analyticsPendingMandatoryValue",
       "walletLimitsPressureValue",
       "balanceFreeMoneyValue",
       "walletMandatoryControlValue",
+      "walletExpectedIncomeLabel",
+      "walletExpectedIncomeValue",
     ].forEach(observeSource);
 
     window.addEventListener("focus", syncHardModePreview);
