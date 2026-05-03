@@ -523,7 +523,7 @@
 <section class="section transactions-preview-section">
   <div class="transactions-preview-card">
     <div class="transactions-preview-card__head">
-      <h2 class="transactions-preview-card__title">Операции</h2>
+      <h2 class="transactions-preview-card__title">Последние операции</h2>
       <div class="transactions-preview-card__note">5 последних</div>
     </div>
 
@@ -532,43 +532,39 @@
   </div>
 </section>
 
-<!-- HARD ANALYTICS PREVIEW -->
-<section class="section hard-analytics-section">
+<!-- HARD PRESSURE -->
+<section class="section hard-pressure-section">
   <div class="hard-section-head">
-    <h2 class="hard-section-title">Аналитика</h2>
-
-    <button
-      class="hard-section-link"
-      type="button"
-      id="hardAnalyticsOpenReportBtn"
-    >
-      Итоги
-    </button>
+    <h2 class="hard-section-title">Что давит</h2>
   </div>
 
-  <div class="hard-analytics-grid">
-    <div class="hard-analytics-card hard-analytics-card--expense">
-      <span>Расходы месяца</span>
-      <strong id="hardAnalyticsExpenseValue">0 ₽</strong>
-      <small>Факт по операциям</small>
+  <div class="hard-pressure-grid">
+    <button class="hard-pressure-card hard-pressure-card--danger" type="button" data-hard-open="mandatory">
+      <span class="hard-pressure-card__icon">!</span>
+      <span class="hard-pressure-card__label">Календарь</span>
+      <strong id="hardPressureMandatoryValue">0 ₽</strong>
+      <small>ближайшие списания</small>
+    </button>
+
+    <div class="hard-pressure-card hard-pressure-card--blue">
+      <span class="hard-pressure-card__icon">▥</span>
+      <span class="hard-pressure-card__label">Лимиты</span>
+      <strong id="hardPressureLimitsValue">0 ₽</strong>
+      <small>до ближайших денег</small>
     </div>
 
-    <div class="hard-analytics-card hard-analytics-card--limits">
-      <span>Остаток лимитов</span>
-      <strong id="hardAnalyticsLimitsValue">0 ₽</strong>
-      <small>Можно тратить по категориям</small>
+    <div class="hard-pressure-card hard-pressure-card--green">
+      <span class="hard-pressure-card__icon">₽</span>
+      <span class="hard-pressure-card__label">Свободно</span>
+      <strong id="hardPressureFreeValue">0 ₽</strong>
+      <small>можно использовать</small>
     </div>
 
-    <div class="hard-analytics-card hard-analytics-card--interest">
-      <span>Проценты</span>
-      <strong id="hardAnalyticsInterestValue">0 ₽</strong>
-      <small>Доход от накоплений</small>
-    </div>
-
-    <div class="hard-analytics-card hard-analytics-card--control">
-      <span>Под контролем</span>
-      <strong id="hardAnalyticsControlValue">0%</strong>
-      <small>Обязательные платежи</small>
+    <div class="hard-pressure-card hard-pressure-card--control">
+      <span class="hard-pressure-card__icon">%</span>
+      <span class="hard-pressure-card__label">Контроль</span>
+      <strong id="hardPressureControlValue">0%</strong>
+      <small>обязательные</small>
     </div>
   </div>
 </section>
