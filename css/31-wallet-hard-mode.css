@@ -477,32 +477,22 @@ body.wallet-mode-hard .accounts-carousel-dots {
 }
 
 /* =========================================================
-   HARD MODE PACKAGE 2
-   Accounts + operations + analytics preview
+   HARD MODE PACKAGE 2.1
+   Generated-like lower dashboard
    ========================================================= */
 
-body.wallet-mode-hard .hard-analytics-section {
+body.wallet-mode-hard .hard-pressure-section {
+  order: 6;
+  margin: 0;
+}
+
+body.wallet-mode-hard .transactions-preview-section {
   order: 7;
   margin: 0;
 }
 
-/* ---------- Section link ---------- */
-
-body.wallet-mode-hard .hard-section-link {
-  min-height: 30px;
-  padding: 0 12px;
-  border: 0;
-  border-radius: 999px;
-  color: var(--hard-blue);
-  font-size: 12px;
-  line-height: 1;
-  font-weight: 760;
-  letter-spacing: -0.012em;
-  background:
-    linear-gradient(180deg, rgba(235,242,255,.99), rgba(221,233,255,.94));
-  box-shadow:
-    0 7px 14px rgba(47,125,246,.05),
-    inset 0 1px 0 rgba(255,255,255,.92);
+body.wallet-mode-hard .hard-analytics-section {
+  display: none !important;
 }
 
 /* ---------- Accounts in Hard ---------- */
@@ -626,11 +616,119 @@ body.wallet-mode-hard .accounts-carousel-dots {
   display: none !important;
 }
 
-/* ---------- Operations in Hard ---------- */
+/* ---------- What pressures now ---------- */
 
-body.wallet-mode-hard .transactions-preview-section {
-  margin: 0;
+.hard-pressure-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 7px;
 }
+
+.hard-pressure-card {
+  min-width: 0;
+  min-height: 92px;
+  padding: 10px 8px;
+  border: 0;
+  border-radius: 18px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  overflow: hidden;
+  color: var(--hard-text);
+  background: var(--hard-card);
+  border: var(--hard-border);
+  box-shadow:
+    0 9px 18px rgba(30,42,68,.04),
+    inset 0 1px 0 rgba(255,255,255,.96);
+}
+
+.hard-pressure-card__icon {
+  width: 28px;
+  height: 28px;
+  margin-bottom: 9px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  line-height: 1;
+  font-weight: 850;
+}
+
+.hard-pressure-card__label {
+  max-width: 100%;
+  margin-bottom: 5px;
+  color: rgba(20,24,33,.52);
+  font-size: 10.5px;
+  line-height: 1.05;
+  font-weight: 720;
+  letter-spacing: -0.018em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hard-pressure-card strong {
+  max-width: 100%;
+  color: var(--hard-text);
+  font-size: 13px;
+  line-height: 1;
+  font-weight: 850;
+  letter-spacing: -0.035em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hard-pressure-card small {
+  max-width: 100%;
+  margin-top: auto;
+  padding-top: 7px;
+  color: rgba(20,24,33,.36);
+  font-size: 8.8px;
+  line-height: 1.05;
+  font-weight: 620;
+  letter-spacing: -0.006em;
+}
+
+.hard-pressure-card--danger .hard-pressure-card__icon {
+  color: #ef5b4f;
+  background: rgba(239,91,79,.11);
+}
+
+.hard-pressure-card--danger strong {
+  color: #ef5b4f;
+}
+
+.hard-pressure-card--blue .hard-pressure-card__icon {
+  color: var(--hard-blue);
+  background: rgba(47,125,246,.11);
+}
+
+.hard-pressure-card--blue strong {
+  color: var(--hard-blue);
+}
+
+.hard-pressure-card--green .hard-pressure-card__icon {
+  color: #15976b;
+  background: rgba(21,151,107,.11);
+}
+
+.hard-pressure-card--green strong {
+  color: #15976b;
+}
+
+.hard-pressure-card--control .hard-pressure-card__icon {
+  color: #7b6ee6;
+  background: rgba(124,107,232,.11);
+}
+
+.hard-pressure-card--control strong {
+  color: #7b6ee6;
+}
+
+/* ---------- Operations in Hard ---------- */
 
 body.wallet-mode-hard .transactions-preview-card {
   min-height: auto;
@@ -706,70 +804,6 @@ body.wallet-mode-hard #transactionsList .list-caption {
   font-size: 9px;
 }
 
-/* ---------- Analytics preview ---------- */
-
-.hard-analytics-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 8px;
-}
-
-.hard-analytics-card {
-  min-height: 74px;
-  padding: 11px 12px;
-  border-radius: 18px;
-  background: var(--hard-card);
-  border: var(--hard-border);
-  box-shadow:
-    0 9px 18px rgba(30,42,68,.04),
-    inset 0 1px 0 rgba(255,255,255,.96);
-}
-
-.hard-analytics-card span {
-  display: block;
-  margin-bottom: 6px;
-  color: var(--hard-muted);
-  font-size: 11px;
-  line-height: 1.05;
-  font-weight: 720;
-  letter-spacing: -0.018em;
-}
-
-.hard-analytics-card strong {
-  display: block;
-  color: var(--hard-text);
-  font-size: 16px;
-  line-height: 1;
-  font-weight: 850;
-  letter-spacing: -0.038em;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.hard-analytics-card small {
-  display: block;
-  margin-top: 6px;
-  color: rgba(20,24,33,.38);
-  font-size: 9.5px;
-  line-height: 1.1;
-  font-weight: 620;
-  letter-spacing: -0.01em;
-}
-
-.hard-analytics-card--expense strong {
-  color: var(--hard-danger);
-}
-
-.hard-analytics-card--interest strong,
-.hard-analytics-card--control strong {
-  color: #15976b;
-}
-
-.hard-analytics-card--limits strong {
-  color: var(--hard-blue);
-}
-
 @media (max-width: 390px) {
   body.wallet-mode-hard #accountsList {
     gap: 7px !important;
@@ -799,7 +833,31 @@ body.wallet-mode-hard #transactionsList .list-caption {
     font-size: 11.3px !important;
   }
 
-  .hard-analytics-card {
-    min-height: 70px;
+  .hard-pressure-grid {
+    gap: 6px;
+  }
+
+  .hard-pressure-card {
+    min-height: 88px;
+    padding: 9px 7px;
+    border-radius: 17px;
+  }
+
+  .hard-pressure-card__icon {
+    width: 26px;
+    height: 26px;
+    margin-bottom: 8px;
+  }
+
+  .hard-pressure-card__label {
+    font-size: 10px;
+  }
+
+  .hard-pressure-card strong {
+    font-size: 12px;
+  }
+
+  .hard-pressure-card small {
+    font-size: 8.3px;
   }
 }
