@@ -151,6 +151,49 @@
     }) || null;
   }
 
+    function getBudgetLimits(state) {
+    return (
+      state.budgetLimits ||
+      state.budget_limits ||
+      state.categoryBudgetLimits ||
+      []
+    );
+  }
+
+  function getBudgetLimitAmountFromItem(item) {
+    if (!item) return 0;
+
+    return toNumber(
+      item.amount ??
+      item.limit_amount ??
+      item.limitAmount ??
+      item.budget_amount ??
+      item.budgetAmount ??
+      item.monthly_amount ??
+      item.monthlyAmount ??
+      item.monthly_limit ??
+      item.monthlyLimit ??
+      item.budget_limit ??
+      item.budgetLimit ??
+      item.limit ??
+      item.value ??
+      0
+    );
+  }
+
+  function getBudgetLimitCategoryId(item) {
+    if (!item) return "";
+
+    return (
+      item.category_id ||
+      item.categoryId ||
+      item.category ||
+      item.expense_category_id ||
+      item.expenseCategoryId ||
+      ""
+    );
+  }
+
   function getBudgetLimitFromCategory(category) {
     if (!category) return 0;
 
@@ -168,6 +211,22 @@
       category.monthLimit ??
       0
     );
+  }
+
+  function getBudgetLimitForCategory(state, categoryId) {
+    const fromBudgetLimits = getBudgetLimits(state).find((item) => {
+      return String(getBudgetLimitCategoryId(item)) === String(categoryId);
+    });
+
+    const budgetLimitAmount = getBudgetLimitAmountFromItem(fromBudgetLimits);
+
+    if (budgetLimitAmount > 0) {
+      return budgetLimitAmount;
+    }
+
+    const category = getCategoryById(state, categoryId);
+
+    return getBudgetLimitFromCategory(category);
   }
 
   function getPaymentStartMonth(payment) {
@@ -337,10 +396,11 @@
       collectFlexibleExpense(previousFlexibleByCategory, transaction);
     });
 
-    const categoryIds = new Set([
+        const categoryIds = new Set([
       ...currentFlexibleByCategory.keys(),
       ...previousFlexibleByCategory.keys(),
       ...getCategories(state).map((category) => category.id),
+      ...getBudgetLimits(state).map((item) => getBudgetLimitCategoryId(item)),
     ]);
 
     let limitedRest = 0;
@@ -355,8 +415,7 @@
     categoryIds.forEach((categoryId) => {
       const currentSpent = toNumber(currentFlexibleByCategory.get(categoryId));
       const previousSpent = toNumber(previousFlexibleByCategory.get(categoryId));
-      const category = getCategoryById(state, categoryId);
-      const limit = getBudgetLimitFromCategory(category);
+            const limit = getBudgetLimitForCategory(state, categoryId);
 
       if (currentSpent > 0) {
         currentFlexibleSpent += currentSpent;
