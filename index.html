@@ -102,9 +102,17 @@
       </p>
     </div>
 
-        <div class="wallet-game-hero__meter" aria-hidden="true">
-      <span id="walletGameMeterFill"></span>
-    </div>
+    <div class="wallet-game-hero__meter" aria-hidden="true">
+  <span id="walletGameMeterFill"></span>
+</div>
+
+<div class="hard-source-metrics" aria-hidden="true">
+  <span id="walletDaysLeftValue">—</span>
+  <span id="balanceFreeMoneyValue">0 ₽</span>
+  <span class="balance-amount">0 ₽</span>
+  <span id="walletCalendarPressureValue">0 ₽</span>
+  <span id="walletLimitsPressureValue">0 ₽</span>
+</div>
   </div>
 </section>
 
@@ -123,31 +131,27 @@
   </button>
 </div>
 
-  <div class="hard-summary-grid">
-    <div class="hard-summary-card hard-summary-card--free">
-      <span>Свободно</span>
-      <strong id="balanceFreeMoneyValue">0 ₽</strong>
-    </div>
+  <div class="hard-summary-card hard-summary-card--free">
+  <span>Свободно</span>
+  <strong id="hardSummaryFreeValue">0 ₽</strong>
+</div>
 
-    <div class="hard-summary-card hard-summary-card--balance">
-      <span>Баланс</span>
-      <strong class="balance-amount">0 ₽</strong>
-    </div>
+<div class="hard-summary-card hard-summary-card--balance">
+  <span>Баланс</span>
+  <strong id="hardSummaryBalanceValue">0 ₽</strong>
+</div>
 
-    <div class="wallet-game-hero__pressure hard-summary-pressure">
-      <div class="hard-summary-card hard-summary-card--calendar">
-        <span>Календарь до ЗП</span>
-        <strong id="walletCalendarPressureValue">0 ₽</strong>
-      </div>
+    <div class="hard-summary-card hard-summary-card--calendar">
+  <span>Календарь до ЗП</span>
+  <strong id="hardSummaryCalendarValue">0 ₽</strong>
+</div>
 
-      <div class="hard-summary-card hard-summary-card--limits">
-        <span>Лимиты до ЗП</span>
-        <strong id="walletLimitsPressureValue">0 ₽</strong>
-      </div>
+<div class="hard-summary-card hard-summary-card--limits">
+  <span>Лимиты до ЗП</span>
+  <strong id="hardSummaryLimitsValue">0 ₽</strong>
+</div>
     </div>
   </div>
-
-  <span class="hard-hidden-stat" id="walletDaysLeftValue">—</span>
 </section>
 
 <!-- EXPECTED INCOME MODAL -->
