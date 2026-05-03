@@ -43,544 +43,545 @@
 
        <main class="app">
 
-    <!-- MAIN VIEW -->
-    <div id="mainView">
-      
-          <!-- WALLET LIGHT VIEW -->
-    <section class="wallet-light-view" id="walletLightView">
-              <div class="wallet-light-balance-core" id="walletLightBalanceCore">
-        <strong class="wallet-light-view__money" id="walletLightFreeValue">
-          0 ₽
-        </strong>
-      </div>
+<!-- MAIN VIEW -->
+<div id="mainView">
 
-      <div class="wallet-light-actions">
-        <button class="wallet-light-action wallet-light-action--expense" type="button" id="walletLightExpenseBtn">
-          <span>−</span>
-          <strong>Расход</strong>
-        </button>
-
-        <button class="wallet-light-action wallet-light-action--income" type="button" id="walletLightIncomeBtn">
-          <span>+</span>
-          <strong>Доход</strong>
-        </button>
-      </div>
-    </section>
-
-    <!-- BALANCE / GAME HERO -->
-<section class="balance balance--game">
-  <div class="wallet-game-hero" id="walletGameHero">
-    <div class="wallet-game-hero__top">
-      <div>
-        <p class="wallet-game-hero__eyebrow">Кошелёк сегодня</p>
-        <h1 class="wallet-game-hero__title">Сегодня можно</h1>
-      </div>
-
-      <button
-        class="monthly-report-open-btn wallet-game-hero__report"
-        type="button"
-        id="openMonthlyReportBtn"
-        aria-label="Открыть итоги месяца"
-        title="Итоги месяца"
-      >
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M6 19V5" />
-          <path d="M6 19h13" />
-          <path d="M10 15v-4" />
-          <path d="M14 15V8" />
-          <path d="M18 15v-6" />
-        </svg>
-        <span>Итоги</span>
-      </button>
-    </div>
-
-    <div class="wallet-game-hero__main">
-      <div class="wallet-game-hero__amount" id="walletTodayCanValue">0 ₽</div>
-      <div class="wallet-game-hero__status" id="walletGameStatus">Считаю…</div>
-      <p class="wallet-game-hero__hint" id="walletGameHint">
-        Сейчас проверяю свободные деньги, календарь и лимиты.
-      </p>
-    </div>
-
-    <div class="wallet-game-hero__meter" aria-hidden="true">
-  <span id="walletGameMeterFill"></span>
-</div>
-
-<div class="hard-source-metrics" aria-hidden="true">
-  <span id="walletDaysLeftValue">—</span>
-  <span id="balanceFreeMoneyValue">0 ₽</span>
-  <span class="balance-amount">0 ₽</span>
-  <span id="walletCalendarPressureValue">0 ₽</span>
-  <span id="walletLimitsPressureValue">0 ₽</span>
-</div>
-  </div>
-</section>
-
-<!-- HARD SUMMARY -->
-<section class="section hard-summary-section">
-  <div class="hard-section-head">
-  <h2 class="hard-section-title">Коротко</h2>
-
-  <button
-    class="hard-section-link hard-section-link--accounts"
-    type="button"
-    id="hardScrollAccountsBtn"
-  >
-    Все счета
-    <span>›</span>
-  </button>
-</div>
-
-  <div class="hard-summary-card hard-summary-card--free">
-  <span>Свободно</span>
-  <strong id="hardSummaryFreeValue">0 ₽</strong>
-</div>
-
-<div class="hard-summary-card hard-summary-card--balance">
-  <span>Баланс</span>
-  <strong id="hardSummaryBalanceValue">0 ₽</strong>
-</div>
-
-    <div class="hard-summary-card hard-summary-card--calendar">
-  <span>Календарь до ЗП</span>
-  <strong id="hardSummaryCalendarValue">0 ₽</strong>
-</div>
-
-<div class="hard-summary-card hard-summary-card--limits">
-  <span>Лимиты до ЗП</span>
-  <strong id="hardSummaryLimitsValue">0 ₽</strong>
-</div>
-    </div>
-  </div>
-</section>
-
-<!-- EXPECTED INCOME MODAL -->
-<div class="modal hidden" id="expectedIncomeModal" role="dialog" aria-modal="true" aria-label="Ожидаемый доход">
-  <div class="modal-sheet">
-    <div class="modal-handle"></div>
-
-    <div class="section-head">
-      <h2 class="modal-title">Жду деньги</h2>
-
-      <button
-        class="manager-back-btn"
-        type="button"
-        id="closeExpectedIncomeModalBtn"
-      >
-        Закрыть
-      </button>
-    </div>
-
-    <div class="manager-card">
-      <div class="field">
-        <input
-          class="input"
-          id="expectedIncomeTitleInput"
-          type="text"
-          placeholder="Например: Зарплата"
-        />
-      </div>
-
-      <div class="field">
-        <input
-          class="input"
-          id="expectedIncomeAmountInput"
-          type="text"
-          inputmode="decimal"
-          placeholder="Минимум ожидаю, ₽"
-        />
-      </div>
-
-      <div class="field">
-        <input
-          class="input"
-          id="expectedIncomeDateInput"
-          type="date"
-        />
-      </div>
-
-      <div class="modal-actions">
-        <button
-          class="btn btn-primary"
-          type="button"
-          id="saveExpectedIncomeBtn"
-        >
-          Учесть ожидание
-        </button>
-
-        <button
-          class="btn btn-danger"
-          type="button"
-          id="clearExpectedIncomeBtn"
-        >
-          Сбросить
-        </button>
-      </div>
-    </div>
-  </div>
-</div>
-
-      <!-- ACTIONS -->
-<section class="actions">
-  <button class="action-card action-card--expense" type="button" id="openExpenseModal">
-    <div class="action-icon">
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M7 17 17 7" />
-        <path d="M9 7h8v8" />
-      </svg>
-    </div>
-    <div class="action-label">Расход</div>
-  </button>
-
-  <button class="action-card action-card--income" type="button" id="openIncomeModal">
-    <div class="action-icon">
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M17 7 7 17" />
-        <path d="M7 9v8h8" />
-      </svg>
-    </div>
-    <div class="action-label">Доход</div>
-  </button>
-
-  <button class="action-card action-card--transfer" type="button" id="openTransferModal">
-    <div class="action-icon">
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M7 17 17 7" />
-        <path d="M10 7h7v7" />
-      </svg>
-    </div>
-    <div class="action-label">Перевод</div>
-  </button>
-
-  <button class="action-card action-card--categories" type="button" id="openCategoriesManagerBtn">
-    <div class="action-icon">
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M6 8h9" />
-        <path d="M12 5l3 3-3 3" />
-        <path d="M18 16H9" />
-        <path d="M12 13l-3 3 3 3" />
-      </svg>
-    </div>
-    <div class="action-label">Категории</div>
-  </button>
-</section>
-
-      <!-- ACCOUNTS -->
-<section class="section accounts-section">
-  <div class="section-head accounts-section-head">
-    <h2 class="section-title">Счета</h2>
-
-    <div class="accounts-section-head__right">
-      <div class="section-note accounts-total-note" id="accountsTotal">Всего: 0 ₽</div>
-
-      <button
-        class="icon-action-btn icon-action-btn--primary accounts-add-btn"
-        type="button"
-        id="openCreateAccountModalBtn"
-        aria-label="Добавить счёт"
-        title="Добавить счёт"
-      >
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M12 5v14M5 12h14" />
-        </svg>
-      </button>
-    </div>
-  </div>
-
-  <div class="list accounts-list" id="accountsList"></div>
-
-  <div class="accounts-carousel-dots" aria-hidden="true">
-    <span class="is-active"></span>
-    <span></span>
-    <span></span>
-    <span></span>
-    <span></span>
-  </div>
-</section>
-      
-    <!-- HARD PLAN -->
-<section class="section hard-plan-section">
-  <div class="hard-section-head">
-    <h2 class="hard-section-title">План</h2>
-  </div>
-
-  <div class="hard-plan-card">
-    <div class="hard-plan-row hard-plan-row--expected" id="walletExpectedIncomeCard">
-      <div class="hard-plan-row__icon hard-plan-row__icon--blue" aria-hidden="true">
-        <svg viewBox="0 0 24 24">
-          <path d="M7 4v3" />
-          <path d="M17 4v3" />
-          <rect x="4" y="6" width="16" height="14" rx="4" />
-          <path d="M8 11h8" />
-        </svg>
-      </div>
-
-      <div class="hard-plan-row__body">
-        <span id="walletExpectedIncomeLabel">Будущие деньги не учтены</span>
-        <strong id="walletExpectedIncomeValue">Добавь ожидание, если ждёшь ЗП</strong>
-      </div>
-
-      <button class="hard-plan-pill" type="button" id="openExpectedIncomeModalBtn">
-        Жду деньги
-      </button>
-    </div>
-
-    <button
-      class="hard-plan-row hard-plan-row--clickable"
-      type="button"
-      id="openMandatoryPaymentsModalBtn"
-      aria-label="Открыть календарные платежи"
-      title="Открыть календарные платежи"
-    >
-      <div class="hard-plan-row__icon hard-plan-row__icon--red" aria-hidden="true">
-        <svg viewBox="0 0 24 24">
-          <path d="M12 7v6" />
-          <circle cx="12" cy="17" r="1" />
-        </svg>
-      </div>
-
-      <div class="hard-plan-row__body">
-        <span>Календарные платежи</span>
-        <strong>К вычету из свободных средств</strong>
-      </div>
-
-      <strong class="hard-plan-row__value hard-plan-row__value--danger" id="analyticsPendingMandatoryValue">
+  <!-- WALLET LIGHT VIEW -->
+  <section class="wallet-light-view" id="walletLightView">
+    <div class="wallet-light-balance-core" id="walletLightBalanceCore">
+      <strong class="wallet-light-view__money" id="walletLightFreeValue">
         0 ₽
       </strong>
-
-      <span class="hard-plan-row__chevron" aria-hidden="true">›</span>
-    </button>
-  </div>
-
-  <div class="hard-important-grid">
-    <div class="hard-important-card">
-      <span>Обязательные всего</span>
-      <strong id="analyticsMandatoryTotalValue">0 ₽</strong>
     </div>
 
-    <div class="hard-important-card">
-      <span>Покрыто накоплениями</span>
-      <strong id="analyticsMandatoryCoveredValue">0 ₽</strong>
+    <div class="wallet-light-actions">
+      <button class="wallet-light-action wallet-light-action--expense" type="button" id="walletLightExpenseBtn">
+        <span>−</span>
+        <strong>Расход</strong>
+      </button>
+
+      <button class="wallet-light-action wallet-light-action--income" type="button" id="walletLightIncomeBtn">
+        <span>+</span>
+        <strong>Доход</strong>
+      </button>
     </div>
+  </section>
 
-    <div class="hard-important-card">
-      <span>Остаток лимитов</span>
-      <strong id="analyticsRemainingBudgetsValue">0 ₽</strong>
-    </div>
+  <!-- BALANCE / GAME HERO -->
+  <section class="balance balance--game">
+    <div class="wallet-game-hero" id="walletGameHero">
+      <div class="wallet-game-hero__top">
+        <div>
+          <p class="wallet-game-hero__eyebrow">До ближайших денег</p>
+          <h1 class="wallet-game-hero__title">До ЗП можно</h1>
+        </div>
 
-    <div class="hard-important-card hard-important-card--control">
-      <span>Под контролем</span>
-      <strong id="walletMandatoryControlValue">0%</strong>
-    </div>
-  </div>
-</section>
+        <button
+          class="monthly-report-open-btn wallet-game-hero__report"
+          type="button"
+          id="openMonthlyReportBtn"
+          aria-label="Открыть итоги месяца"
+          title="Итоги месяца"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M6 19V5" />
+            <path d="M6 19h13" />
+            <path d="M10 15v-4" />
+            <path d="M14 15V8" />
+            <path d="M18 15v-6" />
+          </svg>
+          <span>Итоги</span>
+        </button>
+      </div>
 
-<!-- MANDATORY PAYMENTS MODAL -->
-<div class="modal hidden" id="mandatoryPaymentsModal" role="dialog" aria-modal="true" aria-label="Календарные платежи">
-  <div class="modal-sheet mandatory-payments-sheet--premium">
-    <div class="modal-handle"></div>
-
-    <div class="mandatory-payments-head">
-      <div class="mandatory-payments-head__text">
-        <h2 class="mandatory-payments-title">Календарные платежи</h2>
-        <p class="mandatory-payments-subtitle">
-          Платежи, которые нужно держать под контролем каждый месяц.
+      <div class="wallet-game-hero__main">
+        <div class="wallet-game-hero__amount" id="walletTodayCanValue">0 ₽</div>
+        <div class="wallet-game-hero__status" id="walletGameStatus">Считаю…</div>
+        <p class="wallet-game-hero__hint" id="walletGameHint">
+          Сейчас проверяю свободные деньги, календарь и лимиты.
         </p>
       </div>
 
-      <button
-        class="icon-action-btn mandatory-payments-close-btn"
-        type="button"
-        id="closeMandatoryPaymentsModalBtn"
-        aria-label="Закрыть календарные платежи"
-      >
-        ×
-      </button>
-    </div>
-
-    <div class="mandatory-payments-month-strip" id="mandatoryPaymentsMonthStrip"></div>
-
-    <div class="mandatory-payments-panel">
-      <div class="list" id="mandatoryPaymentsList"></div>
-    </div>
-
-       <button class="mandatory-payments-add-btn" type="button" id="openMandatoryPaymentEditorBtn">
-      <span>+</span>
-      <strong>Добавить платёж</strong>
-    </button>
-  </div>
-</div>
-
-<!-- MANDATORY PAYMENT EDITOR MODAL -->
-<div class="modal hidden" id="mandatoryPaymentEditorModal" role="dialog" aria-modal="true" aria-label="Редактор календарного платежа">
-  <div class="modal-sheet">
-    <div class="modal-handle"></div>
-
-    <div class="section-head">
-      <h2 class="modal-title" id="mandatoryPaymentEditorTitle">Новый платёж</h2>
-
-      <button
-        class="manager-back-btn"
-        type="button"
-        id="closeMandatoryPaymentEditorModalBtn"
-      >
-        Закрыть
-      </button>
-    </div>
-
-    <div class="manager-card">
-      <div class="field">
-        <input
-          class="input"
-          id="mandatoryPaymentTitleInput"
-          type="text"
-          placeholder="Название платежа"
-        />
+      <div class="wallet-game-hero__meter" aria-hidden="true">
+        <span id="walletGameMeterFill"></span>
       </div>
 
-      <div class="mandatory-payment-main-row">
-        <div class="field mandatory-payment-main-row__field mandatory-payment-money-field">
-          <input
-            class="input mandatory-payment-money-input"
-            id="mandatoryPaymentAmountInput"
-            type="text"
-            inputmode="decimal"
-            placeholder="Сумма"
-          />
-          <span class="mandatory-payment-money-symbol">₽</span>
+      <div class="hard-source-metrics" aria-hidden="true">
+        <span id="walletDaysLeftValue">—</span>
+        <span id="balanceFreeMoneyValue">0 ₽</span>
+        <span class="balance-amount">0 ₽</span>
+        <span id="walletCalendarPressureValue">0 ₽</span>
+        <span id="walletLimitsPressureValue">0 ₽</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ACTIONS -->
+  <section class="actions">
+    <button class="action-card action-card--expense" type="button" id="openExpenseModal">
+      <div class="action-icon">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M7 17 17 7" />
+          <path d="M9 7h8v8" />
+        </svg>
+      </div>
+      <div class="action-label">Расход</div>
+    </button>
+
+    <button class="action-card action-card--income" type="button" id="openIncomeModal">
+      <div class="action-icon">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M17 7 7 17" />
+          <path d="M7 9v8h8" />
+        </svg>
+      </div>
+      <div class="action-label">Доход</div>
+    </button>
+
+    <button class="action-card action-card--transfer" type="button" id="openTransferModal">
+      <div class="action-icon">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M7 17 17 7" />
+          <path d="M10 7h7v7" />
+        </svg>
+      </div>
+      <div class="action-label">Перевод</div>
+    </button>
+
+    <button class="action-card action-card--categories" type="button" id="openCategoriesManagerBtn">
+      <div class="action-icon">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M6 8h9" />
+          <path d="M12 5l3 3-3 3" />
+          <path d="M18 16H9" />
+          <path d="M12 13l-3 3 3 3" />
+        </svg>
+      </div>
+      <div class="action-label">Категории</div>
+    </button>
+  </section>
+
+  <!-- HARD SUMMARY -->
+  <section class="section hard-summary-section">
+    <div class="hard-section-head">
+      <h2 class="hard-section-title">Коротко</h2>
+
+      <button
+        class="hard-section-link hard-section-link--accounts"
+        type="button"
+        id="hardScrollAccountsBtn"
+      >
+        Все счета
+        <span>›</span>
+      </button>
+    </div>
+
+    <div class="hard-summary-grid">
+      <div class="hard-summary-card hard-summary-card--free">
+        <span>Свободно</span>
+        <strong id="hardSummaryFreeValue">0 ₽</strong>
+      </div>
+
+      <div class="hard-summary-card hard-summary-card--balance">
+        <span>Баланс</span>
+        <strong id="hardSummaryBalanceValue">0 ₽</strong>
+      </div>
+
+      <div class="hard-summary-card hard-summary-card--calendar">
+        <span>Календарь до ЗП</span>
+        <strong id="hardSummaryCalendarValue">0 ₽</strong>
+      </div>
+
+      <div class="hard-summary-card hard-summary-card--limits">
+        <span>Лимиты до ЗП</span>
+        <strong id="hardSummaryLimitsValue">0 ₽</strong>
+      </div>
+    </div>
+  </section>
+
+  <!-- HARD PLAN -->
+  <section class="section hard-plan-section">
+    <div class="hard-section-head">
+      <h2 class="hard-section-title">План</h2>
+    </div>
+
+    <div class="hard-plan-card">
+      <div class="hard-plan-row hard-plan-row--expected" id="walletExpectedIncomeCard">
+        <div class="hard-plan-row__icon hard-plan-row__icon--blue" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M7 4v3" />
+            <path d="M17 4v3" />
+            <rect x="4" y="6" width="16" height="14" rx="4" />
+            <path d="M8 11h8" />
+          </svg>
         </div>
 
-        <div class="field mandatory-payment-main-row__field mandatory-payment-date-field">
+        <div class="hard-plan-row__body">
+          <span id="walletExpectedIncomeLabel">Будущие деньги не учтены</span>
+          <strong id="walletExpectedIncomeValue">Добавь ожидание, если ждёшь ЗП</strong>
+        </div>
+
+        <button class="hard-plan-pill" type="button" id="openExpectedIncomeModalBtn">
+          Жду деньги
+        </button>
+      </div>
+
+      <button
+        class="hard-plan-row hard-plan-row--clickable"
+        type="button"
+        id="openMandatoryPaymentsModalBtn"
+        aria-label="Открыть календарные платежи"
+        title="Открыть календарные платежи"
+      >
+        <div class="hard-plan-row__icon hard-plan-row__icon--red" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 7v6" />
+            <circle cx="12" cy="17" r="1" />
+          </svg>
+        </div>
+
+        <div class="hard-plan-row__body">
+          <span>Календарные платежи</span>
+          <strong>К вычету из свободных средств</strong>
+        </div>
+
+        <strong class="hard-plan-row__value hard-plan-row__value--danger" id="analyticsPendingMandatoryValue">
+          0 ₽
+        </strong>
+
+        <span class="hard-plan-row__chevron" aria-hidden="true">›</span>
+      </button>
+    </div>
+
+    <div class="hard-important-grid">
+      <div class="hard-important-card">
+        <span>Обязательные всего</span>
+        <strong id="analyticsMandatoryTotalValue">0 ₽</strong>
+      </div>
+
+      <div class="hard-important-card">
+        <span>Покрыто накоплениями</span>
+        <strong id="analyticsMandatoryCoveredValue">0 ₽</strong>
+      </div>
+
+      <div class="hard-important-card">
+        <span>Остаток лимитов</span>
+        <strong id="analyticsRemainingBudgetsValue">0 ₽</strong>
+      </div>
+
+      <div class="hard-important-card hard-important-card--control">
+        <span>Под контролем</span>
+        <strong id="walletMandatoryControlValue">0%</strong>
+      </div>
+    </div>
+  </section>
+
+  <!-- ACCOUNTS -->
+  <section class="section accounts-section">
+    <div class="section-head accounts-section-head">
+      <h2 class="section-title">Счета</h2>
+
+      <div class="accounts-section-head__right">
+        <div class="section-note accounts-total-note" id="accountsTotal">Всего: 0 ₽</div>
+
+        <button
+          class="icon-action-btn icon-action-btn--primary accounts-add-btn"
+          type="button"
+          id="openCreateAccountModalBtn"
+          aria-label="Добавить счёт"
+          title="Добавить счёт"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 5v14M5 12h14" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="list accounts-list" id="accountsList"></div>
+
+    <div class="accounts-carousel-dots" aria-hidden="true">
+      <span class="is-active"></span>
+      <span></span>
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </section>
+
+  <!-- HARD PRESSURE -->
+  <section class="section hard-pressure-section">
+    <div class="hard-section-head">
+      <h2 class="hard-section-title">Что давит</h2>
+    </div>
+
+    <div class="hard-pressure-grid">
+      <button class="hard-pressure-card hard-pressure-card--danger" type="button" data-hard-open="mandatory">
+        <span class="hard-pressure-card__icon">!</span>
+        <span class="hard-pressure-card__label">Календарь</span>
+        <strong id="hardPressureMandatoryValue">0 ₽</strong>
+        <small>ближайшие списания</small>
+      </button>
+
+      <div class="hard-pressure-card hard-pressure-card--blue">
+        <span class="hard-pressure-card__icon">▥</span>
+        <span class="hard-pressure-card__label">Лимиты</span>
+        <strong id="hardPressureLimitsValue">0 ₽</strong>
+        <small>до ближайших денег</small>
+      </div>
+
+      <div class="hard-pressure-card hard-pressure-card--green">
+        <span class="hard-pressure-card__icon">₽</span>
+        <span class="hard-pressure-card__label">Свободно</span>
+        <strong id="hardPressureFreeValue">0 ₽</strong>
+        <small>можно использовать</small>
+      </div>
+
+      <div class="hard-pressure-card hard-pressure-card--control">
+        <span class="hard-pressure-card__icon">%</span>
+        <span class="hard-pressure-card__label">Контроль</span>
+        <strong id="hardPressureControlValue">0%</strong>
+        <small>обязательные</small>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRANSACTIONS -->
+  <section class="section transactions-preview-section">
+    <div class="transactions-preview-card">
+      <div class="transactions-preview-card__head">
+        <h2 class="transactions-preview-card__title">Последние операции</h2>
+        <div class="transactions-preview-card__note">5 последних</div>
+      </div>
+
+      <div class="transactions-preview-timeline" aria-hidden="true"></div>
+      <div class="list transactions-preview-list" id="transactionsList"></div>
+    </div>
+  </section>
+
+  <!-- EXPECTED INCOME MODAL -->
+  <div class="modal hidden" id="expectedIncomeModal" role="dialog" aria-modal="true" aria-label="Ожидаемый доход">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+
+      <div class="section-head">
+        <h2 class="modal-title">Жду деньги</h2>
+
+        <button
+          class="manager-back-btn"
+          type="button"
+          id="closeExpectedIncomeModalBtn"
+        >
+          Закрыть
+        </button>
+      </div>
+
+      <div class="manager-card">
+        <div class="field">
           <input
             class="input"
-            id="mandatoryPaymentDueDayInput"
-            type="date"
-            required
+            id="expectedIncomeTitleInput"
+            type="text"
+            placeholder="Например: Зарплата"
           />
-          <span class="mandatory-payment-date-placeholder">Дата платежа</span>
+        </div>
+
+        <div class="field">
+          <input
+            class="input"
+            id="expectedIncomeAmountInput"
+            type="text"
+            inputmode="decimal"
+            placeholder="Минимум ожидаю, ₽"
+          />
+        </div>
+
+        <div class="field">
+          <input
+            class="input"
+            id="expectedIncomeDateInput"
+            type="date"
+          />
+        </div>
+
+        <div class="modal-actions">
+          <button
+            class="btn btn-primary"
+            type="button"
+            id="saveExpectedIncomeBtn"
+          >
+            Учесть ожидание
+          </button>
+
+          <button
+            class="btn btn-danger"
+            type="button"
+            id="clearExpectedIncomeBtn"
+          >
+            Сбросить
+          </button>
         </div>
       </div>
-
-      <div class="field mandatory-payment-category-field">
-        <select
-          class="select"
-          id="mandatoryPaymentCategorySelect"
-        ></select>
-      </div>
-
-      <div class="field">
-        <select
-          class="select"
-          id="mandatoryPaymentAccountSelect"
-        ></select>
-      </div>
-
-      <div class="field hidden" id="mandatoryPaymentLinkedSafeField">
-        <select
-          class="select hidden"
-          id="mandatoryPaymentLinkedSafeSelect"
-        ></select>
-
-        <button
-          class="mandatory-linked-safe-btn"
-          type="button"
-          id="openMandatoryPaymentBucketPickerBtn"
-        >
-          Выбрать накопление
-        </button>
-      </div>
-
-      <div class="modal-actions mandatory-editor-actions">
-        <button
-          class="btn btn-primary"
-          type="button"
-          id="addMandatoryPaymentBtn"
-        >
-          Добавить платёж
-        </button>
-
-        <button
-          class="btn btn-danger hidden"
-          type="button"
-          id="deleteMandatoryPaymentBtn"
-        >
-          Удалить платёж
-        </button>
-      </div>
     </div>
   </div>
-</div>
 
-<!-- MANDATORY PAYMENT BUCKET PICKER MODAL -->
-<div class="modal hidden" id="mandatoryPaymentBucketPickerModal" role="dialog" aria-modal="true" aria-label="Выбор накопления">
-  <div class="modal-sheet">
-    <div class="modal-handle"></div>
+  <!-- MANDATORY PAYMENTS MODAL -->
+  <div class="modal hidden" id="mandatoryPaymentsModal" role="dialog" aria-modal="true" aria-label="Календарные платежи">
+    <div class="modal-sheet mandatory-payments-sheet--premium">
+      <div class="modal-handle"></div>
 
-    <div class="section-head">
-      <h2 class="modal-title">Выбрать накопление</h2>
+      <div class="mandatory-payments-head">
+        <div class="mandatory-payments-head__text">
+          <h2 class="mandatory-payments-title">Календарные платежи</h2>
+          <p class="mandatory-payments-subtitle">
+            Платежи, которые нужно держать под контролем каждый месяц.
+          </p>
+        </div>
 
-      <button
-        class="manager-back-btn"
-        type="button"
-        id="closeMandatoryPaymentBucketPickerModalBtn"
-      >
-        Закрыть
+        <button
+          class="icon-action-btn mandatory-payments-close-btn"
+          type="button"
+          id="closeMandatoryPaymentsModalBtn"
+          aria-label="Закрыть календарные платежи"
+        >
+          ×
+        </button>
+      </div>
+
+      <div class="mandatory-payments-month-strip" id="mandatoryPaymentsMonthStrip"></div>
+
+      <div class="mandatory-payments-panel">
+        <div class="list" id="mandatoryPaymentsList"></div>
+      </div>
+
+      <button class="mandatory-payments-add-btn" type="button" id="openMandatoryPaymentEditorBtn">
+        <span>+</span>
+        <strong>Добавить платёж</strong>
       </button>
     </div>
-
-    <div class="list" id="mandatoryPaymentBucketPickerList"></div>
-  </div>
-</div>
-
-    <!-- TRANSACTIONS -->
-<section class="section transactions-preview-section">
-  <div class="transactions-preview-card">
-    <div class="transactions-preview-card__head">
-      <h2 class="transactions-preview-card__title">Последние операции</h2>
-      <div class="transactions-preview-card__note">5 последних</div>
-    </div>
-
-    <div class="transactions-preview-timeline" aria-hidden="true"></div>
-    <div class="list transactions-preview-list" id="transactionsList"></div>
-  </div>
-</section>
-
-<!-- HARD PRESSURE -->
-<section class="section hard-pressure-section">
-  <div class="hard-section-head">
-    <h2 class="hard-section-title">Что давит</h2>
   </div>
 
-  <div class="hard-pressure-grid">
-    <button class="hard-pressure-card hard-pressure-card--danger" type="button" data-hard-open="mandatory">
-      <span class="hard-pressure-card__icon">!</span>
-      <span class="hard-pressure-card__label">Календарь</span>
-      <strong id="hardPressureMandatoryValue">0 ₽</strong>
-      <small>ближайшие списания</small>
-    </button>
+  <!-- MANDATORY PAYMENT EDITOR MODAL -->
+  <div class="modal hidden" id="mandatoryPaymentEditorModal" role="dialog" aria-modal="true" aria-label="Редактор календарного платежа">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
 
-    <div class="hard-pressure-card hard-pressure-card--blue">
-      <span class="hard-pressure-card__icon">▥</span>
-      <span class="hard-pressure-card__label">Лимиты</span>
-      <strong id="hardPressureLimitsValue">0 ₽</strong>
-      <small>до ближайших денег</small>
-    </div>
+      <div class="section-head">
+        <h2 class="modal-title" id="mandatoryPaymentEditorTitle">Новый платёж</h2>
 
-    <div class="hard-pressure-card hard-pressure-card--green">
-      <span class="hard-pressure-card__icon">₽</span>
-      <span class="hard-pressure-card__label">Свободно</span>
-      <strong id="hardPressureFreeValue">0 ₽</strong>
-      <small>можно использовать</small>
-    </div>
+        <button
+          class="manager-back-btn"
+          type="button"
+          id="closeMandatoryPaymentEditorModalBtn"
+        >
+          Закрыть
+        </button>
+      </div>
 
-    <div class="hard-pressure-card hard-pressure-card--control">
-      <span class="hard-pressure-card__icon">%</span>
-      <span class="hard-pressure-card__label">Контроль</span>
-      <strong id="hardPressureControlValue">0%</strong>
-      <small>обязательные</small>
+      <div class="manager-card">
+        <div class="field">
+          <input
+            class="input"
+            id="mandatoryPaymentTitleInput"
+            type="text"
+            placeholder="Название платежа"
+          />
+        </div>
+
+        <div class="mandatory-payment-main-row">
+          <div class="field mandatory-payment-main-row__field mandatory-payment-money-field">
+            <input
+              class="input mandatory-payment-money-input"
+              id="mandatoryPaymentAmountInput"
+              type="text"
+              inputmode="decimal"
+              placeholder="Сумма"
+            />
+            <span class="mandatory-payment-money-symbol">₽</span>
+          </div>
+
+          <div class="field mandatory-payment-main-row__field mandatory-payment-date-field">
+            <input
+              class="input"
+              id="mandatoryPaymentDueDayInput"
+              type="date"
+              required
+            />
+            <span class="mandatory-payment-date-placeholder">Дата платежа</span>
+          </div>
+        </div>
+
+        <div class="field mandatory-payment-category-field">
+          <select
+            class="select"
+            id="mandatoryPaymentCategorySelect"
+          ></select>
+        </div>
+
+        <div class="field">
+          <select
+            class="select"
+            id="mandatoryPaymentAccountSelect"
+          ></select>
+        </div>
+
+        <div class="field hidden" id="mandatoryPaymentLinkedSafeField">
+          <select
+            class="select hidden"
+            id="mandatoryPaymentLinkedSafeSelect"
+          ></select>
+
+          <button
+            class="mandatory-linked-safe-btn"
+            type="button"
+            id="openMandatoryPaymentBucketPickerBtn"
+          >
+            Выбрать накопление
+          </button>
+        </div>
+
+        <div class="modal-actions mandatory-editor-actions">
+          <button
+            class="btn btn-primary"
+            type="button"
+            id="addMandatoryPaymentBtn"
+          >
+            Добавить платёж
+          </button>
+
+          <button
+            class="btn btn-danger hidden"
+            type="button"
+            id="deleteMandatoryPaymentBtn"
+          >
+            Удалить платёж
+          </button>
+        </div>
+      </div>
     </div>
   </div>
-</section>
+
+  <!-- MANDATORY PAYMENT BUCKET PICKER MODAL -->
+  <div class="modal hidden" id="mandatoryPaymentBucketPickerModal" role="dialog" aria-modal="true" aria-label="Выбор накопления">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+
+      <div class="section-head">
+        <h2 class="modal-title">Выбрать накопление</h2>
+
+        <button
+          class="manager-back-btn"
+          type="button"
+          id="closeMandatoryPaymentBucketPickerModalBtn"
+        >
+          Закрыть
+        </button>
+      </div>
+
+      <div class="list" id="mandatoryPaymentBucketPickerList"></div>
+    </div>
+  </div>
+
 </div>
 
 <!-- MONTHLY REPORT VIEW -->
