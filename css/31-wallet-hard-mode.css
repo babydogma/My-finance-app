@@ -475,3 +475,331 @@ body.wallet-mode-hard .accounts-carousel-dots {
     font-size: 24px;
   }
 }
+
+/* =========================================================
+   HARD MODE PACKAGE 2
+   Accounts + operations + analytics preview
+   ========================================================= */
+
+body.wallet-mode-hard .hard-analytics-section {
+  order: 7;
+  margin: 0;
+}
+
+/* ---------- Section link ---------- */
+
+body.wallet-mode-hard .hard-section-link {
+  min-height: 30px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 999px;
+  color: var(--hard-blue);
+  font-size: 12px;
+  line-height: 1;
+  font-weight: 760;
+  letter-spacing: -0.012em;
+  background:
+    linear-gradient(180deg, rgba(235,242,255,.99), rgba(221,233,255,.94));
+  box-shadow:
+    0 7px 14px rgba(47,125,246,.05),
+    inset 0 1px 0 rgba(255,255,255,.92);
+}
+
+/* ---------- Accounts in Hard ---------- */
+
+body.wallet-mode-hard .accounts-total-note {
+  display: block;
+  color: var(--hard-muted);
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: -0.012em;
+}
+
+body.wallet-mode-hard .accounts-add-btn {
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  border-radius: 13px;
+  box-shadow:
+    0 10px 20px rgba(47,125,246,.16),
+    inset 0 1px 0 rgba(255,255,255,.22);
+}
+
+body.wallet-mode-hard .accounts-add-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+body.wallet-mode-hard #accountsList.accounts-list,
+body.wallet-mode-hard #accountsList {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 8px !important;
+  overflow: visible !important;
+  padding: 0 !important;
+  scroll-snap-type: none !important;
+}
+
+body.wallet-mode-hard #accountsList .list-card,
+body.wallet-mode-hard #accountsList .list-card:nth-child(n + 4) {
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  flex: none !important;
+  min-height: 82px !important;
+  padding: 11px 10px !important;
+  border-radius: 18px !important;
+  gap: 7px !important;
+  scroll-snap-align: unset !important;
+  background: var(--hard-card) !important;
+  border: var(--hard-border) !important;
+  box-shadow:
+    0 9px 18px rgba(30,42,68,.04),
+    inset 0 1px 0 rgba(255,255,255,.96) !important;
+}
+
+body.wallet-mode-hard #accountsList .list-card::after,
+body.wallet-mode-hard #accountsList .list-card:nth-child(n + 4)::after {
+  left: 10px !important;
+  right: 10px !important;
+  bottom: 7px !important;
+  height: 2px !important;
+}
+
+body.wallet-mode-hard #accountsList .list-icon--account,
+body.wallet-mode-hard #accountsList .list-card:nth-child(n + 4) .list-icon--account {
+  width: 30px !important;
+  height: 30px !important;
+  flex: 0 0 30px !important;
+  border-radius: 999px !important;
+}
+
+body.wallet-mode-hard #accountsList .list-icon--account svg,
+body.wallet-mode-hard #accountsList .list-card:nth-child(n + 4) .list-icon--account svg {
+  width: 16px !important;
+  height: 16px !important;
+}
+
+body.wallet-mode-hard #accountsList .list-title-row,
+body.wallet-mode-hard #accountsList .list-card:nth-child(n + 4) .list-title-row {
+  margin-bottom: 3px !important;
+}
+
+body.wallet-mode-hard #accountsList .list-title,
+body.wallet-mode-hard #accountsList .list-card:nth-child(n + 4) .list-title {
+  font-size: 11.5px !important;
+  line-height: 1.05 !important;
+  font-weight: 820 !important;
+  letter-spacing: -0.025em !important;
+}
+
+body.wallet-mode-hard #accountsList .list-subtitle,
+body.wallet-mode-hard #accountsList .list-card:nth-child(n + 4) .list-subtitle {
+  font-size: 9.5px !important;
+  line-height: 1.05 !important;
+}
+
+body.wallet-mode-hard #accountsList .list-right,
+body.wallet-mode-hard #accountsList .list-card:nth-child(n + 4) .list-right {
+  padding-bottom: 5px !important;
+}
+
+body.wallet-mode-hard #accountsList .list-value,
+body.wallet-mode-hard #accountsList .list-card:nth-child(n + 4) .list-value {
+  font-size: 12px !important;
+  line-height: 1 !important;
+  font-weight: 820 !important;
+  letter-spacing: -0.035em !important;
+}
+
+body.wallet-mode-hard #accountsList .account-balance-edit-btn,
+body.wallet-mode-hard #accountsList .list-card:nth-child(n + 4) .account-balance-edit-btn {
+  top: 7px !important;
+  right: 7px !important;
+  width: 22px !important;
+  height: 22px !important;
+  min-width: 22px !important;
+  font-size: 10px !important;
+}
+
+body.wallet-mode-hard .accounts-carousel-dots {
+  display: none !important;
+}
+
+/* ---------- Operations in Hard ---------- */
+
+body.wallet-mode-hard .transactions-preview-section {
+  margin: 0;
+}
+
+body.wallet-mode-hard .transactions-preview-card {
+  min-height: auto;
+  padding: 13px 13px 7px 14px;
+  border-radius: 22px;
+  background: var(--hard-card);
+  border: var(--hard-border);
+  box-shadow: var(--hard-shadow);
+}
+
+body.wallet-mode-hard .transactions-preview-card__head {
+  margin-bottom: 7px;
+}
+
+body.wallet-mode-hard .transactions-preview-card__title {
+  font-size: 20px;
+  line-height: 1;
+  font-weight: 850;
+  letter-spacing: -0.055em;
+}
+
+body.wallet-mode-hard .transactions-preview-card__note {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--hard-blue);
+}
+
+body.wallet-mode-hard .transactions-preview-timeline {
+  left: 22px;
+  top: 53px;
+  bottom: 14px;
+}
+
+body.wallet-mode-hard #transactionsList .transaction-card {
+  min-height: 46px;
+  padding: 7px 0 7px 32px;
+  gap: 8px;
+}
+
+body.wallet-mode-hard #transactionsList .transaction-card::before {
+  left: 3px;
+  width: 8px;
+  height: 8px;
+  box-shadow:
+    0 0 0 4px rgba(47,125,246,.08),
+    0 0 0 1px rgba(255,255,255,.95);
+}
+
+body.wallet-mode-hard #transactionsList .list-title {
+  font-size: 12px;
+  line-height: 1.08;
+  font-weight: 760;
+  letter-spacing: -0.018em;
+}
+
+body.wallet-mode-hard #transactionsList .list-subtitle {
+  font-size: 10px;
+  line-height: 1.12;
+}
+
+body.wallet-mode-hard #transactionsList .list-right {
+  min-width: 76px;
+  max-width: 42%;
+}
+
+body.wallet-mode-hard #transactionsList .list-value {
+  font-size: 12px;
+  font-weight: 780;
+}
+
+body.wallet-mode-hard #transactionsList .list-caption {
+  margin-top: 3px;
+  font-size: 9px;
+}
+
+/* ---------- Analytics preview ---------- */
+
+.hard-analytics-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.hard-analytics-card {
+  min-height: 74px;
+  padding: 11px 12px;
+  border-radius: 18px;
+  background: var(--hard-card);
+  border: var(--hard-border);
+  box-shadow:
+    0 9px 18px rgba(30,42,68,.04),
+    inset 0 1px 0 rgba(255,255,255,.96);
+}
+
+.hard-analytics-card span {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--hard-muted);
+  font-size: 11px;
+  line-height: 1.05;
+  font-weight: 720;
+  letter-spacing: -0.018em;
+}
+
+.hard-analytics-card strong {
+  display: block;
+  color: var(--hard-text);
+  font-size: 16px;
+  line-height: 1;
+  font-weight: 850;
+  letter-spacing: -0.038em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hard-analytics-card small {
+  display: block;
+  margin-top: 6px;
+  color: rgba(20,24,33,.38);
+  font-size: 9.5px;
+  line-height: 1.1;
+  font-weight: 620;
+  letter-spacing: -0.01em;
+}
+
+.hard-analytics-card--expense strong {
+  color: var(--hard-danger);
+}
+
+.hard-analytics-card--interest strong,
+.hard-analytics-card--control strong {
+  color: #15976b;
+}
+
+.hard-analytics-card--limits strong {
+  color: var(--hard-blue);
+}
+
+@media (max-width: 390px) {
+  body.wallet-mode-hard #accountsList {
+    gap: 7px !important;
+  }
+
+  body.wallet-mode-hard #accountsList .list-card,
+  body.wallet-mode-hard #accountsList .list-card:nth-child(n + 4) {
+    min-height: 78px !important;
+    padding: 10px 9px !important;
+    border-radius: 17px !important;
+  }
+
+  body.wallet-mode-hard #accountsList .list-icon--account,
+  body.wallet-mode-hard #accountsList .list-card:nth-child(n + 4) .list-icon--account {
+    width: 28px !important;
+    height: 28px !important;
+    flex-basis: 28px !important;
+  }
+
+  body.wallet-mode-hard #accountsList .list-title,
+  body.wallet-mode-hard #accountsList .list-card:nth-child(n + 4) .list-title {
+    font-size: 11px !important;
+  }
+
+  body.wallet-mode-hard #accountsList .list-value,
+  body.wallet-mode-hard #accountsList .list-card:nth-child(n + 4) .list-value {
+    font-size: 11.3px !important;
+  }
+
+  .hard-analytics-card {
+    min-height: 70px;
+  }
+}
