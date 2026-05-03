@@ -50,120 +50,18 @@
       
           <!-- WALLET LIGHT VIEW -->
     <section class="wallet-light-view" id="walletLightView">
-      <div class="wallet-light-view__top">
+            <div class="wallet-light-balance-core" id="walletLightBalanceCore">
+        <div class="wallet-light-particles" id="walletLightParticles" aria-hidden="true"></div>
+
         <span class="wallet-light-view__eyebrow">Свободно</span>
-        <strong class="wallet-light-view__money" id="walletLightFreeValue">0 ₽</strong>
-      </div>
 
-      <div class="wallet-light-piggy-wrap" aria-hidden="true">
-        <div class="wallet-piggy-coins" id="walletPiggyCoins"></div>
+        <strong class="wallet-light-view__money" id="walletLightFreeValue">
+          0 ₽
+        </strong>
 
-        <svg class="wallet-piggy-svg" viewBox="0 0 320 230">
-          <defs>
-            <linearGradient id="walletPigBodyGradient" x1="70" y1="40" x2="270" y2="205">
-              <stop offset="0" stop-color="#ffd8e8" />
-              <stop offset="0.48" stop-color="#f5a4c7" />
-              <stop offset="1" stop-color="#e985b2" />
-            </linearGradient>
-
-            <linearGradient id="walletPigHeadGradient" x1="35" y1="70" x2="115" y2="155">
-              <stop offset="0" stop-color="#ffe1ed" />
-              <stop offset="1" stop-color="#ef92bc" />
-            </linearGradient>
-
-            <linearGradient id="walletPigCoinGradient" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0" stop-color="#ffeaa8" />
-              <stop offset="1" stop-color="#f4b63f" />
-            </linearGradient>
-          </defs>
-
-          <ellipse cx="160" cy="198" rx="108" ry="16" fill="rgba(80, 40, 60, 0.10)" />
-
-          <path
-            d="M82 122
-               C82 73 124 46 178 46
-               C233 46 270 77 270 123
-               C270 159 239 183 186 187
-               L122 187
-               C96 187 82 161 82 122Z"
-            fill="url(#walletPigBodyGradient)"
-            stroke="rgba(130, 60, 90, 0.16)"
-            stroke-width="3"
-          />
-
-          <circle
-            cx="80"
-            cy="115"
-            r="43"
-            fill="url(#walletPigHeadGradient)"
-            stroke="rgba(130,60,90,.14)"
-            stroke-width="3"
-          />
-
-          <path
-            d="M63 79 C58 52 79 43 94 66 C81 65 70 70 63 79Z"
-            fill="#f6a8c7"
-            stroke="rgba(130,60,90,.13)"
-            stroke-width="3"
-          />
-
-          <ellipse
-            cx="44"
-            cy="121"
-            rx="25"
-            ry="18"
-            fill="#f2a0c1"
-            stroke="rgba(130,60,90,.13)"
-            stroke-width="3"
-          />
-
-          <circle cx="36" cy="121" r="3.7" fill="#985372" />
-          <circle cx="52" cy="121" r="3.7" fill="#985372" />
-
-          <circle cx="84" cy="101" r="5" fill="#4b2637" />
-          <circle cx="86" cy="99" r="1.6" fill="white" opacity=".9" />
-
-          <rect
-            x="154"
-            y="59"
-            width="58"
-            height="8"
-            rx="4"
-            fill="rgba(80,40,60,.34)"
-          />
-
-          <circle cx="190" cy="32" r="18" fill="url(#walletPigCoinGradient)" opacity="0.98" />
-<text
-  x="190"
-  y="39"
-  text-anchor="middle"
-  font-size="21"
-  font-weight="800"
-  fill="rgba(116, 73, 18, 0.62)"
-  style="font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;"
->
-  ₽
-</text>
-
-          <path
-            d="M268 107 C294 96 303 124 284 130 C272 134 268 119 281 118"
-            fill="none"
-            stroke="#df7fa9"
-            stroke-width="8"
-            stroke-linecap="round"
-          />
-
-          <rect x="114" y="171" width="24" height="29" rx="10" fill="#e98eb5" />
-          <rect x="211" y="171" width="24" height="29" rx="10" fill="#e98eb5" />
-
-          <path
-            d="M113 79 C139 61 187 57 222 75"
-            fill="none"
-            stroke="rgba(255,255,255,.58)"
-            stroke-width="8"
-            stroke-linecap="round"
-          />
-        </svg>
+        <p class="wallet-light-view__hint">
+          Запиши доход или расход — баланс оживёт
+        </p>
       </div>
 
       <div class="wallet-light-actions">
