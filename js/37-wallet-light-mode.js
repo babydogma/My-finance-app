@@ -3,7 +3,12 @@
   const PENDING_LIFETIME_MS = 120000;
   const AFTER_SAVE_ANIMATION_DELAY_MS = 520;
 
+  const SWIPE_MIN_X = 72;
+  const SWIPE_MAX_Y = 58;
+  const SWIPE_MAX_TIME = 750;
+
   let pendingLightTransaction = null;
+  let swipeStart = null;
 
   function getSavedMode() {
     return localStorage.getItem(MODE_KEY) || "light";
@@ -57,24 +62,20 @@
     target.textContent = getFreeMoneyText();
   }
 
-  function playBalanceRing(type) {
+  function playMoneyUpdateAnimation() {
     const core = document.getElementById("walletLightBalanceCore");
 
     if (!core) return;
 
-    core.classList.remove("is-income", "is-expense");
+    core.classList.remove("is-updating");
 
     requestAnimationFrame(() => {
-      core.classList.add(type === "income" ? "is-income" : "is-expense");
+      core.classList.add("is-updating");
     });
 
     window.setTimeout(() => {
-      core.classList.remove("is-income", "is-expense");
-    }, 900);
-  }
-
-  function playSavedTransactionAnimation(type) {
-    playBalanceRing(type);
+      core.classList.remove("is-updating");
+    }, 520);
   }
 
   function openExistingModal(buttonId) {
@@ -115,32 +116,98 @@
 
     if (Math.abs(difference) < 0.01) return;
 
-    const type = pendingLightTransaction.type;
-
     pendingLightTransaction.animationPlayed = true;
     window.clearTimeout(pendingLightTransaction.timeoutId);
 
     window.setTimeout(() => {
-      playSavedTransactionAnimation(type);
       syncLightFreeMoney();
+      playMoneyUpdateAnimation();
       pendingLightTransaction = null;
     }, AFTER_SAVE_ANIMATION_DELAY_MS);
   }
 
+  function isBlockingViewOpen() {
+    return Boolean(
+      document.querySelector(".modal:not(.hidden)") ||
+      document.querySelector("#monthlyReportView:not(.hidden)") ||
+      document.querySelector("#categoriesManagerView:not(.hidden)")
+    );
+  }
+
+  function isInteractiveTarget(target) {
+    return Boolean(
+      target?.closest?.(
+        "button, a, input, select, textarea, label, .modal, .modal-sheet"
+      )
+    );
+  }
+
+  function bindSwipeModeEvents() {
+    document.addEventListener(
+      "touchstart",
+      (event) => {
+        if (isBlockingViewOpen()) return;
+        if (isInteractiveTarget(event.target)) return;
+
+        const touch = event.touches?.[0];
+
+        if (!touch) return;
+
+        swipeStart = {
+          x: touch.clientX,
+          y: touch.clientY,
+          time: Date.now(),
+        };
+      },
+      { passive: true }
+    );
+
+    document.addEventListener(
+      "touchend",
+      (event) => {
+        if (!swipeStart) return;
+        if (isBlockingViewOpen()) {
+          swipeStart = null;
+          return;
+        }
+
+        const touch = event.changedTouches?.[0];
+
+        if (!touch) {
+          swipeStart = null;
+          return;
+        }
+
+        const deltaX = touch.clientX - swipeStart.x;
+        const deltaY = touch.clientY - swipeStart.y;
+        const elapsed = Date.now() - swipeStart.time;
+
+        swipeStart = null;
+
+        if (elapsed > SWIPE_MAX_TIME) return;
+        if (Math.abs(deltaX) < SWIPE_MIN_X) return;
+        if (Math.abs(deltaY) > SWIPE_MAX_Y) return;
+
+        const isLightMode = document.body.classList.contains("wallet-mode-light");
+        const isHardMode = document.body.classList.contains("wallet-mode-hard");
+
+        if (isLightMode && deltaX < 0) {
+          setMode("hard");
+          return;
+        }
+
+        if (isHardMode && deltaX > 0) {
+          setMode("light");
+        }
+      },
+      { passive: true }
+    );
+  }
+
   function bindLightModeEvents() {
     document.addEventListener("click", (event) => {
-      const toggleBtn = event.target.closest("#walletModeToggleBtn");
       const expenseBtn = event.target.closest("#walletLightExpenseBtn");
       const incomeBtn = event.target.closest("#walletLightIncomeBtn");
-
-      if (toggleBtn) {
-        event.preventDefault();
-
-        const isLight = document.body.classList.contains("wallet-mode-light");
-
-        setMode(isLight ? "hard" : "light");
-        return;
-      }
 
       if (expenseBtn) {
         event.preventDefault();
@@ -185,6 +252,7 @@
     syncLightFreeMoney();
     watchFreeMoney();
     bindLightModeEvents();
+    bindSwipeModeEvents();
 
     window.addEventListener("focus", syncLightFreeMoney);
 
