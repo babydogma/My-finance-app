@@ -127,6 +127,13 @@ body.wallet-mode-light .wallet-light-view {
   width: var(--coin-size, 18px);
   height: var(--coin-size, 18px);
   border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(116, 73, 18, 0.66);
+  font-size: calc(var(--coin-size, 18px) * 0.58);
+  font-weight: 850;
+  line-height: 1;
   background:
     radial-gradient(circle at 34% 28%, rgba(255, 255, 255, 0.95), transparent 24%),
     linear-gradient(135deg, #ffeaa8, #f4b63f);
@@ -137,6 +144,10 @@ body.wallet-mode-light .wallet-light-view {
   opacity: 0;
   animation: walletCoinFall 1.05s cubic-bezier(0.18, 0.82, 0.24, 1) forwards;
   animation-delay: var(--coin-delay, 0ms);
+}
+
+.wallet-falling-coin::before {
+  content: "₽";
 }
 
 .wallet-light-actions {
