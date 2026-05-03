@@ -523,12 +523,53 @@
 <section class="section transactions-preview-section">
   <div class="transactions-preview-card">
     <div class="transactions-preview-card__head">
-      <h2 class="transactions-preview-card__title">Последние операции</h2>
+      <h2 class="transactions-preview-card__title">Операции</h2>
       <div class="transactions-preview-card__note">5 последних</div>
     </div>
 
     <div class="transactions-preview-timeline" aria-hidden="true"></div>
     <div class="list transactions-preview-list" id="transactionsList"></div>
+  </div>
+</section>
+
+<!-- HARD ANALYTICS PREVIEW -->
+<section class="section hard-analytics-section">
+  <div class="hard-section-head">
+    <h2 class="hard-section-title">Аналитика</h2>
+
+    <button
+      class="hard-section-link"
+      type="button"
+      id="hardAnalyticsOpenReportBtn"
+    >
+      Итоги
+    </button>
+  </div>
+
+  <div class="hard-analytics-grid">
+    <div class="hard-analytics-card hard-analytics-card--expense">
+      <span>Расходы месяца</span>
+      <strong id="hardAnalyticsExpenseValue">0 ₽</strong>
+      <small>Факт по операциям</small>
+    </div>
+
+    <div class="hard-analytics-card hard-analytics-card--limits">
+      <span>Остаток лимитов</span>
+      <strong id="hardAnalyticsLimitsValue">0 ₽</strong>
+      <small>Можно тратить по категориям</small>
+    </div>
+
+    <div class="hard-analytics-card hard-analytics-card--interest">
+      <span>Проценты</span>
+      <strong id="hardAnalyticsInterestValue">0 ₽</strong>
+      <small>Доход от накоплений</small>
+    </div>
+
+    <div class="hard-analytics-card hard-analytics-card--control">
+      <span>Под контролем</span>
+      <strong id="hardAnalyticsControlValue">0%</strong>
+      <small>Обязательные платежи</small>
+    </div>
   </div>
 </section>
 </div>
@@ -1679,5 +1720,6 @@
 <script src="./js/33-wallet-expected-income.js"></script>
 <script src="./js/36-savings-settings-columns.js"></script>
 <script src="./js/37-wallet-light-mode.js"></script>
+<script src="./js/38-wallet-hard-mode-preview.js"></script>
 </body>
 </html>
