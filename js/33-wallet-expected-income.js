@@ -27,12 +27,26 @@
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
   }
 
-  function formatDateHuman(dateValue) {
-    if (!dateValue) return "дата не указана";
+  function getStartOfToday() {
+    const now = new Date();
+
+    return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  }
+
+  function getDateFromValue(dateValue) {
+    if (!dateValue) return null;
 
     const date = new Date(`${dateValue}T12:00:00`);
 
-    if (Number.isNaN(date.getTime())) return "дата не указана";
+    if (Number.isNaN(date.getTime())) return null;
+
+    return date;
+  }
+
+  function formatDateHuman(dateValue) {
+    const date = getDateFromValue(dateValue);
+
+    if (!date) return "дата не указана";
 
     return new Intl.DateTimeFormat("ru-RU", {
       day: "numeric",
@@ -45,6 +59,23 @@
     const lastDay = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
 
     return Math.max(1, lastDay - now.getDate() + 1);
+  }
+
+  function getDaysUntilDate(dateValue) {
+    const targetDate = getDateFromValue(dateValue);
+    const today = getStartOfToday();
+
+    if (!targetDate) return getDaysLeftInMonth();
+
+    const target = new Date(
+      targetDate.getFullYear(),
+      targetDate.getMonth(),
+      targetDate.getDate()
+    );
+
+    const diff = Math.ceil((target.getTime() - today.getTime()) / 86400000);
+
+    return Math.max(1, diff);
   }
 
   function getExpectedIncome() {
@@ -101,6 +132,7 @@
     }
 
     modal.classList.remove("hidden", "is-closing");
+
     requestAnimationFrame(() => {
       modal.classList.add("is-visible");
     });
@@ -150,6 +182,24 @@
     if (node) node.textContent = value;
   }
 
+  function setFirstStatLabel(value) {
+    const label = document.querySelector(".wallet-game-hero__stats > div:first-child span");
+
+    if (label) label.textContent = value;
+  }
+
+  function setHeroTitle(value) {
+    const title = document.querySelector(".wallet-game-hero__title");
+
+    if (title) title.textContent = value;
+  }
+
+  function setHeroEyebrow(value) {
+    const eyebrow = document.querySelector(".wallet-game-hero__eyebrow");
+
+    if (eyebrow) eyebrow.textContent = value;
+  }
+
   function updateWalletGameHeroWithExpectedIncome() {
     const hero = document.getElementById("walletGameHero");
     const todayValue = document.getElementById("walletTodayCanValue");
@@ -164,26 +214,40 @@
     const freeMoney = parseMoney(document.getElementById("balanceFreeMoneyValue")?.textContent);
     const calendar = parseMoney(document.getElementById("analyticsPendingMandatoryValue")?.textContent);
     const limits = parseMoney(document.getElementById("analyticsRemainingBudgetsValue")?.textContent);
-    const daysLeft = getDaysLeftInMonth();
+
+    const daysLeftMonth = getDaysLeftInMonth();
+    const daysUntilIncome = expected ? getDaysUntilDate(expected.date) : daysLeftMonth;
 
     const factPool = freeMoney - calendar - limits;
-    const factTodayCan = Math.max(0, factPool / daysLeft);
+    const factTodayUntilIncome = Math.max(0, factPool / daysUntilIncome);
+    const factTodayToMonthEnd = Math.max(0, factPool / daysLeftMonth);
 
     const expectedAmount = expected ? expected.amount : 0;
-    const scenarioPool = factPool + expectedAmount;
-    const scenarioTodayCan = Math.max(0, scenarioPool / daysLeft);
+    const monthScenarioPool = factPool + expectedAmount;
+    const monthScenarioToday = Math.max(0, monthScenarioPool / daysLeftMonth);
 
-    const visibleTodayCan = expected ? scenarioTodayCan : factTodayCan;
-    const visiblePool = expected ? scenarioPool : factPool;
+    const visibleTodayCan = expected ? monthScenarioToday : factTodayToMonthEnd;
+    const visiblePool = expected ? monthScenarioPool : factPool;
 
     const meterValue = Math.max(
       0,
       Math.min(100, (visiblePool / Math.max(freeMoney + expectedAmount, 1)) * 100)
     );
 
-    setText("walletDaysLeftValue", `${daysLeft} дн.`);
     setText("walletCalendarPressureValue", formatMoney(calendar));
     setText("walletLimitsPressureValue", formatMoney(limits));
+
+    if (expected) {
+      setHeroEyebrow("Сценарий с ожиданием");
+      setHeroTitle("До конца можно");
+      setFirstStatLabel("До ЗП");
+      setText("walletDaysLeftValue", `${daysUntilIncome} дн.`);
+    } else {
+      setHeroEyebrow("Кошелёк сегодня");
+      setHeroTitle("Сегодня можно");
+      setFirstStatLabel("До конца");
+      setText("walletDaysLeftValue", `${daysLeftMonth} дн.`);
+    }
 
     todayValue.textContent = formatMoney(visibleTodayCan);
     meter.style.width = `${meterValue}%`;
@@ -193,30 +257,30 @@
     hero.classList.remove("is-good", "is-warn", "is-bad");
 
     if (expected) {
-      if (scenarioPool < 0) {
+      if (monthScenarioPool < 0) {
         hero.classList.add("is-bad");
         status.textContent = "Даже с ожиданием тесно";
-        hint.textContent = `По факту сейчас ${formatMoney(factTodayCan)}/день. Даже если придёт минимум ${formatMoney(expected.amount)}, дыра останется ${formatMoney(Math.abs(scenarioPool))}.`;
+        hint.textContent = `До ${formatDateHuman(expected.date)} по факту — ${formatMoney(factTodayUntilIncome)}/день. Даже с минимумом ${formatMoney(expected.amount)} до конца месяца останется дыра ${formatMoney(Math.abs(monthScenarioPool))}.`;
         return;
       }
 
-      if (scenarioTodayCan < 300) {
+      if (monthScenarioToday < 300) {
         hero.classList.add("is-bad");
-        status.textContent = "Живём на ожидании";
-        hint.textContent = `По факту сейчас ${formatMoney(factTodayCan)}/день. С ожидаемыми деньгами — ${formatMoney(scenarioTodayCan)}/день.`;
+        status.textContent = "Тянуть аккуратно";
+        hint.textContent = `До ${formatDateHuman(expected.date)} по факту — ${formatMoney(factTodayUntilIncome)}/день. Если придёт минимум ${formatMoney(expected.amount)}, до конца месяца — ${formatMoney(monthScenarioToday)}/день.`;
         return;
       }
 
-      if (scenarioTodayCan < 700) {
+      if (monthScenarioToday < 700) {
         hero.classList.add("is-warn");
         status.textContent = "Осторожно можно";
-        hint.textContent = `Без будущих денег было бы ${formatMoney(factTodayCan)}/день. С ожиданием — ${formatMoney(scenarioTodayCan)}/день.`;
+        hint.textContent = `До ${formatDateHuman(expected.date)} по факту — ${formatMoney(factTodayUntilIncome)}/день. С ожиданием до конца месяца — ${formatMoney(monthScenarioToday)}/день.`;
         return;
       }
 
       hero.classList.add("is-good");
       status.textContent = "С ожиданием норм";
-      hint.textContent = `Если придёт минимум ${formatMoney(expected.amount)}, безопасно примерно ${formatMoney(scenarioTodayCan)}/день.`;
+      hint.textContent = `До ${formatDateHuman(expected.date)} по факту — ${formatMoney(factTodayUntilIncome)}/день. Если минимум придёт, до конца месяца — ${formatMoney(monthScenarioToday)}/день.`;
       return;
     }
 
@@ -227,23 +291,23 @@
       return;
     }
 
-    if (factTodayCan < 300) {
+    if (factTodayToMonthEnd < 300) {
       hero.classList.add("is-bad");
       status.textContent = "Режим выживания";
-      hint.textContent = `Безопасно в день: ${formatMoney(factTodayCan)}. Будущие деньги пока не учитываются.`;
+      hint.textContent = `Безопасно в день: ${formatMoney(factTodayToMonthEnd)}. Будущие деньги пока не учитываются.`;
       return;
     }
 
-    if (factTodayCan < 700) {
+    if (factTodayToMonthEnd < 700) {
       hero.classList.add("is-warn");
       status.textContent = "Не разгоняйся";
-      hint.textContent = `Деньги есть, но запас тонкий. Безопасно в день: ${formatMoney(factTodayCan)}.`;
+      hint.textContent = `Деньги есть, но запас тонкий. Безопасно в день: ${formatMoney(factTodayToMonthEnd)}.`;
       return;
     }
 
     hero.classList.add("is-good");
     status.textContent = "Держишься";
-    hint.textContent = `Можно жить спокойнее. Безопасно в день: ${formatMoney(factTodayCan)}.`;
+    hint.textContent = `Можно жить спокойнее. Безопасно в день: ${formatMoney(factTodayToMonthEnd)}.`;
   }
 
   function bindExpectedIncomeEvents() {
