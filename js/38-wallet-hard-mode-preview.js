@@ -1,6 +1,15 @@
 (() => {
+  let syncTimer = null;
+
   function getTextById(id, fallback = "0 ₽") {
     const element = document.getElementById(id);
+    const text = element?.textContent?.trim();
+
+    return text || fallback;
+  }
+
+  function getTextBySelector(selector, fallback = "0 ₽") {
+    const element = document.querySelector(selector);
     const text = element?.textContent?.trim();
 
     return text || fallback;
@@ -49,7 +58,29 @@
     }
   }
 
-  function syncHardModePreview() {
+  function syncHardSummary() {
+    setTextById(
+      "hardSummaryFreeValue",
+      getTextById("balanceFreeMoneyValue", "0 ₽")
+    );
+
+    setTextById(
+      "hardSummaryBalanceValue",
+      getTextBySelector(".hard-source-metrics .balance-amount", "0 ₽")
+    );
+
+    setTextById(
+      "hardSummaryCalendarValue",
+      getTextById("walletCalendarPressureValue", "0 ₽")
+    );
+
+    setTextById(
+      "hardSummaryLimitsValue",
+      getTextById("walletLimitsPressureValue", "0 ₽")
+    );
+  }
+
+  function syncHardPressure() {
     setTextById(
       "hardPressureMandatoryValue",
       getTextById("analyticsPendingMandatoryValue", "0 ₽")
@@ -69,8 +100,18 @@
       "hardPressureControlValue",
       getTextById("walletMandatoryControlValue", "0%")
     );
+  }
 
+  function syncHardModePreview() {
+    syncHardSummary();
+    syncHardPressure();
     syncExpectedIncomeCard();
+  }
+
+  function scheduleSync() {
+    window.clearTimeout(syncTimer);
+
+    syncTimer = window.setTimeout(syncHardModePreview, 0);
   }
 
   function bindHardActions() {
@@ -95,12 +136,12 @@
     });
   }
 
-  function observeSource(id) {
+  function observeSourceById(id) {
     const source = document.getElementById(id);
 
     if (!source) return;
 
-    const observer = new MutationObserver(syncHardModePreview);
+    const observer = new MutationObserver(scheduleSync);
 
     observer.observe(source, {
       childList: true,
@@ -109,18 +150,45 @@
     });
   }
 
-  function start() {
+  function observeSourceBySelector(selector) {
+    const source = document.querySelector(selector);
+
+    if (!source) return;
+
+    const observer = new MutationObserver(scheduleSync);
+
+    observer.observe(source, {
+      childList: true,
+      characterData: true,
+      subtree: true,
+    });
+  }
+
+  function startSyncLoop() {
     syncHardModePreview();
+
+    window.setTimeout(syncHardModePreview, 100);
+    window.setTimeout(syncHardModePreview, 350);
+    window.setTimeout(syncHardModePreview, 900);
+    window.setTimeout(syncHardModePreview, 1600);
+  }
+
+  function start() {
     bindHardActions();
 
     [
-      "analyticsPendingMandatoryValue",
-      "walletLimitsPressureValue",
       "balanceFreeMoneyValue",
+      "walletCalendarPressureValue",
+      "walletLimitsPressureValue",
+      "analyticsPendingMandatoryValue",
       "walletMandatoryControlValue",
       "walletExpectedIncomeLabel",
       "walletExpectedIncomeValue",
-    ].forEach(observeSource);
+    ].forEach(observeSourceById);
+
+    observeSourceBySelector(".hard-source-metrics .balance-amount");
+
+    startSyncLoop();
 
     window.addEventListener("focus", syncHardModePreview);
 
