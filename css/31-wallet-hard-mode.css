@@ -1240,3 +1240,227 @@ body.wallet-mode-hard .wallet-game-hero__hint {
   font-weight: 400 !important;
   letter-spacing: -0.008em !important;
 }
+
+/* ---------- hard month overview ---------- */
+
+body.wallet-mode-hard .hard-month-overview {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0 !important;
+}
+
+body.wallet-mode-hard .hard-month-overview__cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+body.wallet-mode-hard .hard-month-stat {
+  min-width: 0;
+  min-height: 112px;
+  padding: 16px 16px 15px;
+  border: 1px solid rgba(13, 24, 44, 0.045);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow:
+    0 13px 28px rgba(32, 48, 79, 0.055),
+    inset 0 1px 0 rgba(255, 255, 255, 0.96);
+}
+
+body.wallet-mode-hard .hard-month-stat__head {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 15px;
+  color: rgba(7, 16, 36, 0.86);
+  font-size: 13.5px;
+  line-height: 1;
+  font-weight: 620;
+  letter-spacing: -0.018em;
+}
+
+body.wallet-mode-hard .hard-month-stat__icon {
+  width: 27px;
+  height: 27px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+body.wallet-mode-hard .hard-month-stat__icon svg {
+  width: 15px;
+  height: 15px;
+  stroke: currentColor;
+  stroke-width: 2.35;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+body.wallet-mode-hard .hard-month-stat--income .hard-month-stat__icon {
+  color: #15996c;
+  background: rgba(21, 153, 108, 0.14);
+}
+
+body.wallet-mode-hard .hard-month-stat--expense .hard-month-stat__icon {
+  color: #f24964;
+  background: rgba(242, 73, 100, 0.14);
+}
+
+body.wallet-mode-hard .hard-month-stat strong {
+  display: block;
+  max-width: 100%;
+  color: var(--hard-text);
+  font-size: 24px;
+  line-height: 1;
+  font-weight: 650;
+  letter-spacing: -0.048em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+body.wallet-mode-hard .hard-month-stat__delta {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 13px;
+  color: rgba(7, 16, 36, 0.42);
+  font-size: 13px;
+  line-height: 1;
+  font-weight: 620;
+  letter-spacing: -0.018em;
+}
+
+body.wallet-mode-hard .hard-month-stat__delta--good {
+  color: #15996c;
+}
+
+body.wallet-mode-hard .hard-month-stat__delta--bad {
+  color: #f24964;
+}
+
+body.wallet-mode-hard .hard-month-stat__delta--neutral {
+  color: rgba(7, 16, 36, 0.38);
+}
+
+/* budget row */
+
+body.wallet-mode-hard .hard-month-budget {
+  padding: 16px 17px 15px;
+  border: 1px solid rgba(13, 24, 44, 0.045);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow:
+    0 13px 28px rgba(32, 48, 79, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.96);
+}
+
+body.wallet-mode-hard .hard-month-budget__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 13px;
+}
+
+body.wallet-mode-hard .hard-month-budget__top > div:first-child {
+  min-width: 0;
+}
+
+body.wallet-mode-hard .hard-month-budget__top strong {
+  display: block;
+  color: var(--hard-text);
+  font-size: 14px;
+  line-height: 1.1;
+  font-weight: 650;
+  letter-spacing: -0.018em;
+}
+
+body.wallet-mode-hard .hard-month-budget__top span {
+  display: block;
+  margin-top: 5px;
+  color: rgba(7, 16, 36, 0.48);
+  font-size: 12px;
+  line-height: 1.1;
+  font-weight: 430;
+  letter-spacing: -0.01em;
+}
+
+body.wallet-mode-hard .hard-month-budget__money {
+  min-width: 112px;
+  text-align: right;
+}
+
+body.wallet-mode-hard .hard-month-budget__money strong {
+  color: var(--hard-text);
+  font-size: 14px;
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+body.wallet-mode-hard .hard-month-budget__money span {
+  color: rgba(7, 16, 36, 0.48);
+  white-space: nowrap;
+}
+
+body.wallet-mode-hard .hard-month-budget__bar {
+  width: 100%;
+  height: 10px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(7, 16, 36, 0.065);
+}
+
+body.wallet-mode-hard .hard-month-budget__bar span {
+  display: block;
+  width: 0%;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #6f63ff 0%, #a45cff 100%);
+  transition: width 0.28s ease;
+}
+
+body.wallet-mode-hard .hard-month-budget__bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 9px;
+  color: rgba(7, 16, 36, 0.52);
+  font-size: 12px;
+  line-height: 1;
+  font-weight: 500;
+}
+
+body.wallet-mode-hard .hard-month-budget__bottom strong {
+  color: var(--hard-text);
+  font-size: 13px;
+  font-weight: 650;
+}
+
+@media (max-width: 390px) {
+  body.wallet-mode-hard .hard-month-overview__cards {
+    gap: 10px;
+  }
+
+  body.wallet-mode-hard .hard-month-stat {
+    min-height: 104px;
+    padding: 14px 14px 13px;
+    border-radius: 20px;
+  }
+
+  body.wallet-mode-hard .hard-month-stat strong {
+    font-size: 21px;
+  }
+
+  body.wallet-mode-hard .hard-month-stat__head {
+    margin-bottom: 13px;
+    font-size: 13px;
+  }
+
+  body.wallet-mode-hard .hard-month-budget {
+    padding: 15px 15px 14px;
+    border-radius: 20px;
+  }
+}
