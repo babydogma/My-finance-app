@@ -114,6 +114,76 @@
       </div>
     </div>
   </section>
+  
+  <!-- HARD MONTH OVERVIEW -->
+<section class="hard-month-overview" id="hardMonthOverview">
+  <div class="hard-month-overview__cards">
+    <article class="hard-month-stat hard-month-stat--income">
+      <div class="hard-month-stat__head">
+        <span class="hard-month-stat__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 5v14" />
+            <path d="M7 10l5-5 5 5" />
+          </svg>
+        </span>
+        <span>Доход</span>
+      </div>
+
+      <strong id="hardMonthIncomeValue">0 ₽</strong>
+
+      <small
+        class="hard-month-stat__delta hard-month-stat__delta--neutral"
+        id="hardMonthIncomeDelta"
+      >
+        0%
+      </small>
+    </article>
+
+    <article class="hard-month-stat hard-month-stat--expense">
+      <div class="hard-month-stat__head">
+        <span class="hard-month-stat__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 5v14" />
+            <path d="M7 14l5 5 5-5" />
+          </svg>
+        </span>
+        <span>Расход</span>
+      </div>
+
+      <strong id="hardMonthExpenseValue">0 ₽</strong>
+
+      <small
+        class="hard-month-stat__delta hard-month-stat__delta--neutral"
+        id="hardMonthExpenseDelta"
+      >
+        0%
+      </small>
+    </article>
+  </div>
+
+  <article class="hard-month-budget">
+    <div class="hard-month-budget__top">
+      <div>
+        <strong>Бюджет месяца</strong>
+        <span>лимитные категории</span>
+      </div>
+
+      <div class="hard-month-budget__money">
+        <strong id="hardMonthBudgetSpentValue">0 ₽</strong>
+        <span id="hardMonthBudgetTotalValue">из 0 ₽</span>
+      </div>
+    </div>
+
+    <div class="hard-month-budget__bar" aria-hidden="true">
+      <span id="hardMonthBudgetFill"></span>
+    </div>
+
+    <div class="hard-month-budget__bottom">
+      <span>Потрачено</span>
+      <strong id="hardMonthBudgetPercent">0%</strong>
+    </div>
+  </article>
+</section>
 
   <!-- ACTIONS -->
   <section class="actions">
