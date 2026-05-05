@@ -205,6 +205,354 @@ function syncHeroHint() {
 
     note.textContent = `Всего ${count} ${word}`;
   }
+  
+  function parseHardMoney(value) {
+  const source = String(value || "")
+    .replace(/\s/g, "")
+    .replace("₽", "")
+    .replace(",", ".")
+    .replace(/[^\d.-]/g, "");
+
+  const number = Number(source);
+
+  return Number.isFinite(number) ? number : 0;
+}
+
+function formatHardMoney(value) {
+  const amount = Number(value);
+
+  if (!Number.isFinite(amount)) return "0 ₽";
+
+  return new Intl.NumberFormat("ru-RU", {
+    minimumFractionDigits: amount % 1 ? 2 : 0,
+    maximumFractionDigits: amount % 1 ? 2 : 0,
+  }).format(amount) + " ₽";
+}
+
+function getHardDate(value) {
+  const raw =
+    value?.date ||
+    value?.created_at ||
+    value?.createdAt ||
+    value?.time ||
+    value?.timestamp;
+
+  const date = raw ? new Date(raw) : null;
+
+  return date && !Number.isNaN(date.getTime()) ? date : null;
+}
+
+function isHardSameMonth(date, baseDate) {
+  return (
+    date &&
+    date.getFullYear() === baseDate.getFullYear() &&
+    date.getMonth() === baseDate.getMonth()
+  );
+}
+
+function getHardPreviousMonthDate() {
+  const date = new Date();
+  date.setMonth(date.getMonth() - 1);
+  return date;
+}
+
+function getHardTransactionType(transaction) {
+  const type = String(
+    transaction?.type ||
+    transaction?.kind ||
+    transaction?.operationType ||
+    transaction?.direction ||
+    ""
+  ).toLowerCase();
+
+  if (
+    type.includes("transfer") ||
+    type.includes("перевод")
+  ) {
+    return "transfer";
+  }
+
+  if (
+    type.includes("income") ||
+    type.includes("доход") ||
+    type.includes("in")
+  ) {
+    return "income";
+  }
+
+  if (
+    type.includes("expense") ||
+    type.includes("расход") ||
+    type.includes("out")
+  ) {
+    return "expense";
+  }
+
+  const amount = parseHardMoney(transaction?.amount ?? transaction?.value ?? transaction?.sum);
+
+  if (amount < 0) return "expense";
+  if (amount > 0) return "income";
+
+  return "";
+}
+
+function getHardTransactionAmount(transaction) {
+  return Math.abs(
+    parseHardMoney(
+      transaction?.amount ??
+      transaction?.value ??
+      transaction?.sum ??
+      transaction?.total
+    )
+  );
+}
+
+function readHardStorageArrays() {
+  const arrays = [];
+
+  try {
+    Object.keys(localStorage).forEach((key) => {
+      const raw = localStorage.getItem(key);
+      if (!raw) return;
+
+      try {
+        const parsed = JSON.parse(raw);
+
+        if (Array.isArray(parsed)) {
+          arrays.push(parsed);
+          return;
+        }
+
+        if (Array.isArray(parsed?.transactions)) {
+          arrays.push(parsed.transactions);
+        }
+
+        if (Array.isArray(parsed?.operations)) {
+          arrays.push(parsed.operations);
+        }
+
+        if (Array.isArray(parsed?.items)) {
+          arrays.push(parsed.items);
+        }
+      } catch (_) {}
+    });
+  } catch (_) {}
+
+  return arrays;
+}
+
+function getHardTransactions() {
+  const candidates = [];
+
+  [
+    window.transactions,
+    window.operations,
+    window.appTransactions,
+    window.financeTransactions,
+    window.state?.transactions,
+    window.appState?.transactions,
+  ].forEach((value) => {
+    if (Array.isArray(value)) candidates.push(value);
+  });
+
+  readHardStorageArrays().forEach((value) => {
+    if (Array.isArray(value)) candidates.push(value);
+  });
+
+  let best = [];
+
+  candidates.forEach((list) => {
+    const valid = list.filter((item) => {
+      if (!item || typeof item !== "object") return false;
+
+      const hasAmount =
+        item.amount !== undefined ||
+        item.value !== undefined ||
+        item.sum !== undefined ||
+        item.total !== undefined;
+
+      return hasAmount && getHardDate(item);
+    });
+
+    if (valid.length > best.length) best = valid;
+  });
+
+  return best;
+}
+
+function getHardCategoryName(transaction) {
+  return String(
+    transaction?.category ||
+    transaction?.categoryName ||
+    transaction?.category_title ||
+    ""
+  ).trim();
+}
+
+function getHardLimitedCategories() {
+  const categories = [];
+
+  try {
+    Object.keys(localStorage).forEach((key) => {
+      const raw = localStorage.getItem(key);
+      if (!raw) return;
+
+      try {
+        const parsed = JSON.parse(raw);
+        const list = Array.isArray(parsed)
+          ? parsed
+          : Array.isArray(parsed?.categories)
+            ? parsed.categories
+            : [];
+
+        list.forEach((category) => {
+          if (!category || typeof category !== "object") return;
+
+          const limit = parseHardMoney(
+            category.limit ??
+            category.budget ??
+            category.monthLimit ??
+            category.monthlyLimit ??
+            category.amount
+          );
+
+          if (limit <= 0) return;
+
+          const name = String(category.name || category.title || "").trim();
+          if (!name) return;
+
+          categories.push({ name, limit });
+        });
+      } catch (_) {}
+    });
+  } catch (_) {}
+
+  const map = new Map();
+
+  categories.forEach((category) => {
+    if (!map.has(category.name)) {
+      map.set(category.name, category);
+    }
+  });
+
+  return Array.from(map.values());
+}
+
+function setHardDelta(elementId, current, previous, mode) {
+  const element = document.getElementById(elementId);
+  if (!element) return;
+
+  element.classList.remove(
+    "hard-month-stat__delta--good",
+    "hard-month-stat__delta--bad",
+    "hard-month-stat__delta--neutral"
+  );
+
+  if (previous <= 0) {
+    element.textContent = "0%";
+    element.classList.add("hard-month-stat__delta--neutral");
+    return;
+  }
+
+  const percent = ((current - previous) / previous) * 100;
+  const absPercent = Math.abs(percent);
+
+  const sign = percent > 0 ? "↑" : percent < 0 ? "↓" : "";
+  element.textContent = `${sign} ${absPercent.toFixed(1).replace(".", ",")}%`.trim();
+
+  if (percent === 0) {
+    element.classList.add("hard-month-stat__delta--neutral");
+    return;
+  }
+
+  if (mode === "expense") {
+    element.classList.add(percent > 0 ? "hard-month-stat__delta--bad" : "hard-month-stat__delta--good");
+    return;
+  }
+
+  element.classList.add(percent > 0 ? "hard-month-stat__delta--good" : "hard-month-stat__delta--bad");
+}
+
+function syncHardMonthOverview() {
+  const transactions = getHardTransactions();
+
+  const now = new Date();
+  const previous = getHardPreviousMonthDate();
+
+  let currentIncome = 0;
+  let currentExpense = 0;
+  let previousIncome = 0;
+  let previousExpense = 0;
+
+  transactions.forEach((transaction) => {
+    const date = getHardDate(transaction);
+    const type = getHardTransactionType(transaction);
+    const amount = getHardTransactionAmount(transaction);
+
+    if (!amount || type === "transfer") return;
+
+    if (isHardSameMonth(date, now)) {
+      if (type === "income") currentIncome += amount;
+      if (type === "expense") currentExpense += amount;
+    }
+
+    if (isHardSameMonth(date, previous)) {
+      if (type === "income") previousIncome += amount;
+      if (type === "expense") previousExpense += amount;
+    }
+  });
+
+  setTextById("hardMonthIncomeValue", formatHardMoney(currentIncome));
+  setTextById("hardMonthExpenseValue", formatHardMoney(currentExpense));
+
+  setHardDelta("hardMonthIncomeDelta", currentIncome, previousIncome, "income");
+  setHardDelta("hardMonthExpenseDelta", currentExpense, previousExpense, "expense");
+
+  const limitedCategories = getHardLimitedCategories();
+  const limitedNames = new Set(
+    limitedCategories.map((category) => category.name.toLowerCase())
+  );
+
+  let budgetTotal = limitedCategories.reduce((sum, category) => {
+    return sum + category.limit;
+  }, 0);
+
+  let budgetSpent = 0;
+
+  transactions.forEach((transaction) => {
+    const date = getHardDate(transaction);
+    const type = getHardTransactionType(transaction);
+    if (!isHardSameMonth(date, now) || type !== "expense") return;
+
+    const categoryName = getHardCategoryName(transaction).toLowerCase();
+
+    if (!limitedNames.size || limitedNames.has(categoryName)) {
+      budgetSpent += getHardTransactionAmount(transaction);
+    }
+  });
+
+  const remainingFromApp = parseHardMoney(
+    getTextById("analyticsRemainingBudgetsValue", "") ||
+    getTextById("hardSummaryLimitsValue", "")
+  );
+
+  if (budgetTotal <= 0 && remainingFromApp > 0) {
+    budgetTotal = budgetSpent + remainingFromApp;
+  }
+
+  const percent = budgetTotal > 0
+    ? Math.min(100, Math.round((budgetSpent / budgetTotal) * 100))
+    : 0;
+
+  setTextById("hardMonthBudgetSpentValue", formatHardMoney(budgetSpent));
+  setTextById("hardMonthBudgetTotalValue", `из ${formatHardMoney(budgetTotal)}`);
+  setTextById("hardMonthBudgetPercent", `${percent}%`);
+
+  const fill = document.getElementById("hardMonthBudgetFill");
+  if (fill) {
+    fill.style.width = `${percent}%`;
+  }
+}
 
   function syncHardMode() {
     syncHeroHint();
