@@ -188,25 +188,13 @@ body.wallet-mode-hard .wallet-game-hero__top {
 }
 
 body.wallet-mode-hard .wallet-game-hero__eyebrow {
-  margin: 0 0 16px;
+  margin: 0 0 18px;
   color: rgba(255, 255, 255, 0.82);
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
   font-size: 15px;
   line-height: 1;
   font-weight: 420;
   letter-spacing: -0.018em;
-}
-
-body.wallet-mode-hard .wallet-game-hero__title {
-  max-width: 100%;
-  margin: 0;
-  color: #ffffff;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", system-ui, sans-serif;
-  font-size: clamp(29px, 8vw, 38px);
-  line-height: 0.98;
-  font-weight: 620;
-  letter-spacing: -0.052em;
-  white-space: nowrap;
 }
 
 body.wallet-mode-hard .wallet-game-hero__report {
@@ -243,7 +231,7 @@ body.wallet-mode-hard .wallet-game-hero__report svg {
 }
 
 body.wallet-mode-hard .wallet-game-hero__main {
-  margin-top: 14px;
+  margin-top: 18px;
 }
 
 body.wallet-mode-hard .wallet-game-hero__amount {
