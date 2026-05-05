@@ -560,6 +560,7 @@ function syncHardMonthOverview() {
     syncHardPressure();
     syncExpectedIncomeCard();
     syncAccountsCount();
+    syncHardMonthOverview();
   }
 
   function scheduleSync() {
