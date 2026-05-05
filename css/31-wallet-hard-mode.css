@@ -131,31 +131,47 @@ body.wallet-mode-hard .hard-inline-link span {
 
 body.wallet-mode-hard .wallet-game-hero {
   position: relative;
-  min-height: 190px;
-  padding: 19px 22px 18px;
-  border: 1px solid rgba(13, 24, 44, 0.055);
-  border-radius: 26px;
+  min-height: 214px;
+  padding: 20px 22px 18px;
+  border: 0;
+  border-radius: 24px;
   overflow: hidden;
   background:
-    radial-gradient(circle at 91% 1%, rgba(25, 119, 243, 0.095), transparent 30%),
-    radial-gradient(circle at 92% 21%, rgba(255, 255, 255, 0.92), transparent 18%),
-    var(--hard-card);
+    linear-gradient(135deg, rgba(122, 93, 255, 0.94) 0%, rgba(91, 128, 255, 0.94) 48%, rgba(238, 98, 205, 0.88) 100%);
   box-shadow:
-    0 15px 34px rgba(32, 48, 79, 0.052),
-    0 5px 14px rgba(32, 48, 79, 0.024),
-    inset 0 1px 0 rgba(255, 255, 255, 0.95);
+    0 18px 38px rgba(92, 83, 214, 0.20),
+    0 7px 16px rgba(31, 45, 85, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.32);
 }
 
 body.wallet-mode-hard .wallet-game-hero::before {
   content: "";
   position: absolute;
-  top: -51px;
-  right: -35px;
-  width: 164px;
-  height: 164px;
+  right: -38px;
+  bottom: -48px;
+  width: 220px;
+  height: 150px;
   border-radius: 999px;
-  background: linear-gradient(135deg, rgba(25, 119, 243, 0.085), rgba(255, 255, 255, 0.18));
-  box-shadow: inset 16px 20px 38px rgba(255, 255, 255, 0.55);
+  background:
+    radial-gradient(circle at 72% 32%, rgba(255, 255, 255, 0.42), transparent 0 8px, transparent 9px),
+    linear-gradient(135deg, rgba(255,255,255,.25), rgba(255,255,255,.05));
+  opacity: 0.75;
+  transform: rotate(-12deg);
+  pointer-events: none;
+}
+
+body.wallet-mode-hard .wallet-game-hero::after {
+  content: "";
+  position: absolute;
+  right: 24px;
+  bottom: 31px;
+  width: 172px;
+  height: 76px;
+  border-radius: 999px;
+  border: 3px solid rgba(255, 255, 255, 0.30);
+  border-left-color: transparent;
+  border-top-color: transparent;
+  transform: rotate(-12deg);
   pointer-events: none;
 }
 
@@ -172,50 +188,53 @@ body.wallet-mode-hard .wallet-game-hero__top {
 }
 
 body.wallet-mode-hard .wallet-game-hero__eyebrow {
-  margin: 0 0 18px;
-  color: rgba(7, 16, 36, 0.52);
+  margin: 0 0 16px;
+  color: rgba(255, 255, 255, 0.82);
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
-  font-size: 14px;
+  font-size: 15px;
   line-height: 1;
-  font-weight: 500;
-  letter-spacing: -0.022em;
+  font-weight: 420;
+  letter-spacing: -0.018em;
 }
 
 body.wallet-mode-hard .wallet-game-hero__title {
+  max-width: 100%;
   margin: 0;
-  color: var(--hard-text);
+  color: #ffffff;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", system-ui, sans-serif;
-  font-size: clamp(33px, 9vw, 43px);
-  line-height: 0.96;
-  font-weight: 650;
-  letter-spacing: -0.058em;
+  font-size: clamp(29px, 8vw, 38px);
+  line-height: 0.98;
+  font-weight: 620;
+  letter-spacing: -0.052em;
   white-space: nowrap;
 }
 
 body.wallet-mode-hard .wallet-game-hero__report {
-  min-height: 38px;
-  padding: 0 15px;
+  min-height: 36px;
+  padding: 0 14px;
   border: 0;
   border-radius: 999px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 7px;
-  color: var(--hard-blue);
+  color: #ffffff;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
-  font-size: 13.5px;
+  font-size: 13px;
   line-height: 1;
-  font-weight: 600;
-  letter-spacing: -0.014em;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(245, 248, 253, 0.98));
+  font-weight: 560;
+  letter-spacing: -0.012em;
+  background: rgba(255, 255, 255, 0.18);
   box-shadow:
-    0 10px 22px rgba(32, 48, 79, 0.07),
-    inset 0 1px 0 rgba(255, 255, 255, 0.98);
+    inset 0 1px 0 rgba(255, 255, 255, 0.26),
+    0 8px 18px rgba(37, 34, 120, 0.10);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
 }
 
 body.wallet-mode-hard .wallet-game-hero__report svg {
-  width: 16.5px;
-  height: 16.5px;
+  width: 15.5px;
+  height: 15.5px;
   stroke: currentColor;
   stroke-width: 2.1;
   fill: none;
@@ -224,16 +243,16 @@ body.wallet-mode-hard .wallet-game-hero__report svg {
 }
 
 body.wallet-mode-hard .wallet-game-hero__main {
-  margin-top: 15px;
+  margin-top: 14px;
 }
 
 body.wallet-mode-hard .wallet-game-hero__amount {
   max-width: 100%;
-  color: var(--hard-blue) !important;
+  color: #ffffff !important;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", system-ui, sans-serif;
-  font-size: clamp(43px, 12vw, 56px);
+  font-size: clamp(41px, 11.5vw, 54px);
   line-height: 0.92;
-  font-weight: 600;
+  font-weight: 590;
   letter-spacing: -0.058em;
   white-space: nowrap;
   overflow: hidden;
@@ -243,12 +262,12 @@ body.wallet-mode-hard .wallet-game-hero__amount {
 body.wallet-mode-hard .wallet-game-hero__amount::after {
   content: " / день";
   margin-left: 7px;
-  color: var(--hard-blue);
+  color: rgba(255, 255, 255, 0.92);
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
-  font-size: clamp(14px, 4.1vw, 19px);
+  font-size: clamp(13px, 3.8vw, 17px);
   line-height: 1;
-  font-weight: 600;
-  letter-spacing: -0.026em;
+  font-weight: 520;
+  letter-spacing: -0.018em;
 }
 
 body.wallet-mode-hard .wallet-game-hero__status,
@@ -257,35 +276,37 @@ body.wallet-mode-hard .wallet-game-hero__meter {
 }
 
 body.wallet-mode-hard .wallet-game-hero__hint {
-  max-width: 96%;
-  margin: 18px 0 0;
-  color: rgba(7, 16, 36, 0.56);
+  max-width: 70%;
+  margin: 17px 0 0;
+  color: rgba(255, 255, 255, 0.82);
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
-  font-size: 13px;
+  font-size: 12.2px;
   line-height: 1.34;
   font-weight: 400;
-  letter-spacing: -0.012em;
+  letter-spacing: -0.006em;
 }
 
 /* ---------- actions ---------- */
 
 body.wallet-mode-hard .actions {
   width: 100%;
-  min-height: 99px;
-  padding: 14px 11px 12px;
-  border: 1px solid rgba(13,24,44,.055);
-  border-radius: 24px;
+  min-height: 86px;
+  padding: 12px 10px 11px;
+  border: 1px solid rgba(13, 24, 44, 0.045);
+  border-radius: 20px;
   display: grid !important;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 0;
   overflow: hidden;
-  background: var(--hard-card);
-  box-shadow: var(--hard-shadow);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow:
+    0 12px 25px rgba(32, 48, 79, 0.055),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95);
 }
 
 body.wallet-mode-hard .action-card {
   min-width: 0;
-  min-height: 72px;
+  min-height: 62px;
   padding: 0 5px;
   border: 0;
   border-radius: 0;
@@ -298,24 +319,24 @@ body.wallet-mode-hard .action-card {
 }
 
 body.wallet-mode-hard .action-card:not(:last-child) {
-  border-right: 1px solid rgba(13,24,44,.075);
+  border-right: 1px solid rgba(13, 24, 44, 0.06);
 }
 
 body.wallet-mode-hard .action-icon {
-  width: 42px;
-  height: 42px;
-  border-radius: 15px;
+  width: 36px;
+  height: 36px;
+  border-radius: 13px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.72);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
 }
 
 body.wallet-mode-hard .action-icon svg {
-  width: 22px;
-  height: 22px;
+  width: 19px;
+  height: 19px;
   stroke: currentColor;
-  stroke-width: 2.7;
+  stroke-width: 2.45;
   fill: none;
   stroke-linecap: round;
   stroke-linejoin: round;
@@ -343,12 +364,12 @@ body.wallet-mode-hard .action-card--categories .action-icon {
 
 body.wallet-mode-hard .action-label {
   max-width: 100%;
-  margin: 11px 0 0;
-  color: rgba(7,16,36,.88);
-  font-size: 14px;
+  margin: 9px 0 0;
+  color: rgba(7, 16, 36, 0.88);
+  font-size: 12.8px;
   line-height: 1;
-  font-weight: 700;
-  letter-spacing: -0.027em;
+  font-weight: 620;
+  letter-spacing: -0.02em;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -363,28 +384,52 @@ body.wallet-mode-hard .hard-summary-section {
 body.wallet-mode-hard .hard-summary-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 13px;
+  gap: 11px;
+}
+
+body.wallet-mode-hard .hard-section-head,
+body.wallet-mode-hard .section-head,
+body.wallet-mode-hard .accounts-section-head,
+body.wallet-mode-hard .transactions-preview-card__head {
+  margin-bottom: 12px;
+}
+
+body.wallet-mode-hard .hard-section-title,
+body.wallet-mode-hard .section-title,
+body.wallet-mode-hard .transactions-preview-card__title {
+  font-size: 21px;
+  line-height: 1;
+  font-weight: 650;
+  letter-spacing: -0.038em;
+}
+
+body.wallet-mode-hard .hard-section-link,
+body.wallet-mode-hard .hard-inline-link {
+  font-size: 12.8px;
+  font-weight: 560;
 }
 
 body.wallet-mode-hard .hard-summary-card {
   position: relative;
   min-width: 0;
-  min-height: 73px;
-  padding: 17px 56px 15px 15px;
-  border: 1px solid rgba(13,24,44,.05);
-  border-radius: 18px;
+  min-height: 70px;
+  padding: 13px 46px 12px 13px;
+  border: 1px solid rgba(13, 24, 44, 0.045);
+  border-radius: 16px;
   overflow: hidden;
-  background: var(--hard-card);
-  box-shadow: var(--hard-shadow-small);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow:
+    0 10px 22px rgba(32, 48, 79, 0.042),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95);
 }
 
 body.wallet-mode-hard .hard-summary-card::after {
   content: "";
   position: absolute;
-  right: 15px;
+  right: 12px;
   top: 50%;
-  width: 38px;
-  height: 38px;
+  width: 32px;
+  height: 32px;
   border-radius: 999px;
   transform: translateY(-50%);
   background: var(--hard-blue-soft);
@@ -392,19 +437,19 @@ body.wallet-mode-hard .hard-summary-card::after {
 
 body.wallet-mode-hard .hard-summary-card::before {
   position: absolute;
-  right: 24px;
+  right: 20px;
   top: 50%;
   z-index: 1;
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
   transform: translateY(-50%);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   color: var(--hard-blue);
-  font-size: 18px;
+  font-size: 15px;
   line-height: 1;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 body.wallet-mode-hard .hard-summary-card--free::before {
@@ -440,22 +485,22 @@ body.wallet-mode-hard .hard-summary-card--limits::after {
 
 body.wallet-mode-hard .hard-summary-card span {
   display: block;
-  margin: 0 0 8px;
-  color: rgba(7,16,36,.52);
-  font-size: 13px;
+  margin: 0 0 7px;
+  color: rgba(7, 16, 36, 0.52);
+  font-size: 12px;
   line-height: 1.05;
-  font-weight: 560;
-  letter-spacing: -0.018em;
+  font-weight: 440;
+  letter-spacing: -0.012em;
 }
 
 body.wallet-mode-hard .hard-summary-card strong {
   display: block;
   max-width: 100%;
   color: var(--hard-text);
-  font-size: 20px;
+  font-size: 17px;
   line-height: 1;
-  font-weight: 760;
-  letter-spacing: -0.048em;
+  font-weight: 620;
+  letter-spacing: -0.035em;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
