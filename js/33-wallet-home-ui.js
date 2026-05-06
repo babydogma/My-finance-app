@@ -500,16 +500,9 @@ function initUpcomingDetailsModal() {
   upcomingCard.setAttribute("tabindex", "0");
   upcomingCard.setAttribute("aria-label", "Открыть ближайшее");
 
-  upcomingCard.addEventListener("click", (event) => {
-    if (
-      event.target.closest("#openExpectedIncomeModalBtn") ||
-      event.target.closest("#openMandatoryPaymentsModalBtn")
-    ) {
-      return;
-    }
-
-    openUpcomingModal();
-  });
+  upcomingCard.addEventListener("click", () => {
+  openUpcomingModal();
+});
 
   upcomingCard.addEventListener("keydown", (event) => {
     if (event.key !== "Enter" && event.key !== " ") return;
