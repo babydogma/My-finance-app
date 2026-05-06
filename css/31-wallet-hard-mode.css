@@ -1767,3 +1767,95 @@ body.wallet-mode-hard .money-accounts-add-btn {
   font-weight: 650;
   letter-spacing: -0.02em;
 }
+
+/* =========================================================
+   Budget analytics modal
+   ========================================================= */
+
+body.wallet-mode-hard .hard-month-budget--clickable {
+  cursor: pointer;
+}
+
+body.wallet-mode-hard .hard-month-budget--clickable:active {
+  transform: scale(0.992);
+}
+
+body.wallet-mode-hard .budget-analytics-sheet {
+  width: calc(100vw - 12px);
+  max-width: 430px;
+  max-height: min(84vh, 780px);
+  padding: 32px 16px calc(env(safe-area-inset-bottom) + 18px);
+  border-radius: 30px 30px 24px 24px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: none;
+}
+
+body.wallet-mode-hard .budget-analytics-sheet::-webkit-scrollbar {
+  display: none;
+}
+
+body.wallet-mode-hard .budget-analytics-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 12px;
+  margin: 0 0 18px;
+}
+
+body.wallet-mode-hard .budget-analytics-title {
+  margin: 0;
+  text-align: left;
+  color: var(--hard-text);
+  font-size: 28px;
+  line-height: 1;
+  font-weight: 690;
+  letter-spacing: -0.052em;
+}
+
+body.wallet-mode-hard .budget-analytics-subtitle {
+  max-width: 240px;
+  margin: 7px 0 0;
+  color: rgba(7, 16, 36, 0.52);
+  font-size: 13px;
+  line-height: 1.18;
+  font-weight: 470;
+  letter-spacing: -0.014em;
+}
+
+body.wallet-mode-hard .budget-analytics-close-btn {
+  min-height: 38px;
+  padding: 0 15px;
+  border-radius: 999px;
+  font-size: 13px;
+  line-height: 1;
+  font-weight: 620;
+}
+
+body.wallet-mode-hard .budget-analytics-total-block {
+  margin: 0 0 4px;
+}
+
+body.wallet-mode-hard .budget-analytics-total-block .analytics-expenses-total-value {
+  font-size: 34px;
+  font-weight: 690;
+}
+
+body.wallet-mode-hard .budget-analytics-ring-zone {
+  min-height: 236px;
+  padding: 8px 0 0;
+}
+
+body.wallet-mode-hard .budget-analytics-ring-zone .analytics-expenses-ring {
+  width: min(196px, 54vw);
+  height: min(196px, 54vw);
+}
+
+body.wallet-mode-hard .budget-analytics-ring-zone .analytics-expenses-ring__inner {
+  inset: 32px;
+}
+
+body.wallet-mode-hard .budget-analytics-categories {
+  margin-top: 4px;
+  padding-bottom: 2px;
+}
