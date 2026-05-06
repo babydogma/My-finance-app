@@ -213,7 +213,7 @@
     tabindex="0"
     aria-label="Открыть ближайшее"
   >
-    <div class="hard-plan-row hard-plan-row--expected hard-upcoming-row" id="walletExpectedIncomeCard">
+    <div class="hard-plan-row hard-upcoming-row hard-upcoming-row--income" id="walletExpectedIncomeCard">
       <div class="hard-plan-row__icon hard-plan-row__icon--blue" aria-hidden="true">
         <svg viewBox="0 0 24 24">
           <path d="M7 4v3" />
@@ -228,12 +228,12 @@
         <strong id="walletExpectedIncomeValue">Ожидание пока не добавлено</strong>
       </div>
 
-      <span class="hard-plan-pill hard-plan-pill--ghost">
-        Подробнее
+      <span class="hard-upcoming-chip">
+        Детали
       </span>
     </div>
 
-    <div class="hard-plan-row hard-upcoming-row">
+    <div class="hard-plan-row hard-upcoming-row hard-upcoming-row--mandatory">
       <div class="hard-plan-row__icon hard-plan-row__icon--red" aria-hidden="true">
         <svg viewBox="0 0 24 24">
           <path d="M12 7v6" />
@@ -575,7 +575,7 @@
     <div class="upcoming-details-head">
       <div>
         <h2 class="modal-title upcoming-details-title">Ближайшее</h2>
-        <p class="upcoming-details-subtitle">Что ждёшь и что скоро спишется</p>
+        <p class="upcoming-details-subtitle">Доходы и списания до ближайших денег</p>
       </div>
 
       <button
@@ -587,11 +587,15 @@
       </button>
     </div>
 
-    <div class="upcoming-details-main">
-      <div class="upcoming-details-hero upcoming-details-hero--income">
-        <span class="upcoming-details-hero__label">Ждёшь деньги</span>
-        <strong id="upcomingDetailsIncomeValue">Ожидание не добавлено</strong>
-        <small id="upcomingDetailsIncomeLabel">Можно указать ближайшую ЗП или другой доход</small>
+    <div class="upcoming-details-stack">
+      <section class="upcoming-details-panel upcoming-details-panel--income">
+        <div class="upcoming-details-panel__top">
+          <div>
+            <span class="upcoming-details-kicker">Ожидается</span>
+            <strong id="upcomingDetailsIncomeValue">Ожидание не добавлено</strong>
+            <small id="upcomingDetailsIncomeLabel">Ближайший ожидаемый доход</small>
+          </div>
+        </div>
 
         <button
           class="upcoming-details-action upcoming-details-action--blue"
@@ -600,12 +604,16 @@
         >
           Настроить ожидание
         </button>
-      </div>
+      </section>
 
-      <div class="upcoming-details-hero upcoming-details-hero--danger">
-        <span class="upcoming-details-hero__label">К списанию</span>
-        <strong id="upcomingDetailsMandatoryValue">0 ₽</strong>
-        <small>Календарные платежи, которые нужно держать до ближайших денег</small>
+      <section class="upcoming-details-panel upcoming-details-panel--danger">
+        <div class="upcoming-details-panel__top">
+          <div>
+            <span class="upcoming-details-kicker">К списанию</span>
+            <strong id="upcomingDetailsMandatoryValue">0 ₽</strong>
+            <small>Календарные платежи до ближайших денег</small>
+          </div>
+        </div>
 
         <button
           class="upcoming-details-action upcoming-details-action--red"
@@ -614,10 +622,14 @@
         >
           Открыть календарь
         </button>
-      </div>
+      </section>
     </div>
 
-    <div class="upcoming-details-list">
+    <section class="upcoming-details-breakdown">
+      <div class="upcoming-details-breakdown__head">
+        <span>Расклад</span>
+      </div>
+
       <div class="upcoming-details-row">
         <span>Обязательные всего</span>
         <strong id="upcomingDetailsMandatoryTotalValue">0 ₽</strong>
@@ -637,7 +649,7 @@
         <span>Покрыто обязательных</span>
         <strong id="upcomingDetailsMandatoryControlValue">0%</strong>
       </div>
-    </div>
+    </section>
   </div>
 </div>
 
