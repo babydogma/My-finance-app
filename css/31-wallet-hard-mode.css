@@ -243,7 +243,7 @@ body.wallet-mode-hard .wallet-game-hero__amount {
 }
 
 body.wallet-mode-hard .wallet-game-hero__amount::after {
-  content: " / Ð´ÐµÐ½Ñ";
+  content: " / в день";
   margin-left: 7px;
   color: rgba(255, 255, 255, 0.92);
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
@@ -2449,4 +2449,335 @@ body.wallet-mode-hard .upcoming-details-breakdown--visual .upcoming-details-row 
     min-height: 50px;
     font-size: 17px;
   }
+}
+
+/* =========================================================
+   FINAL FIX: upcoming modal reference layout
+   Must be the last block in this file
+   ========================================================= */
+
+body.wallet-mode-hard #upcomingDetailsModal .upcoming-details-sheet--cards {
+  width: calc(100vw - 18px) !important;
+  max-width: 430px !important;
+  max-height: min(86vh, 780px) !important;
+  padding: 34px 24px calc(env(safe-area-inset-bottom) + 20px) !important;
+  border-radius: 34px 34px 26px 26px !important;
+  background: linear-gradient(180deg, #ffffff 0%, #f8faff 100%) !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+
+body.wallet-mode-hard #upcomingDetailsModal .upcoming-details-head--visual {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 54px !important;
+  align-items: start !important;
+  gap: 16px !important;
+  margin: 0 0 28px !important;
+}
+
+body.wallet-mode-hard #upcomingDetailsModal .upcoming-details-title {
+  margin: 0 !important;
+  text-align: left !important;
+  font-size: 38px !important;
+  line-height: 0.95 !important;
+  font-weight: 760 !important;
+  letter-spacing: -0.065em !important;
+  color: #071024 !important;
+}
+
+body.wallet-mode-hard #upcomingDetailsModal .upcoming-details-subtitle {
+  max-width: 285px !important;
+  margin: 12px 0 0 !important;
+  font-size: 18px !important;
+  line-height: 1.18 !important;
+  font-weight: 430 !important;
+  letter-spacing: -0.03em !important;
+  color: rgba(7, 16, 36, 0.56) !important;
+}
+
+body.wallet-mode-hard #upcomingDetailsModal .upcoming-details-round-close {
+  width: 54px !important;
+  min-width: 54px !important;
+  height: 54px !important;
+  border-radius: 999px !important;
+  color: rgba(7, 16, 36, 0.72) !important;
+  background: linear-gradient(180deg, #f7f8fc 0%, #eef1f7 100%) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.96),
+    0 10px 22px rgba(32, 48, 79, 0.07) !important;
+}
+
+body.wallet-mode-hard #upcomingDetailsModal .upcoming-details-round-close svg {
+  width: 25px !important;
+  height: 25px !important;
+  stroke-width: 2.2 !important;
+}
+
+/* stack */
+
+body.wallet-mode-hard #upcomingDetailsModal .upcoming-details-stack--cards {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 18px !important;
+  margin: 0 0 18px !important;
+}
+
+/* cards */
+
+body.wallet-mode-hard #upcomingDetailsModal .upcoming-details-card {
+  position: relative !important;
+  min-height: 0 !important;
+  padding: 22px 22px 22px !important;
+  border-radius: 26px !important;
+  border: 1px solid rgba(13, 24, 44, 0.08) !important;
+  overflow: hidden !important;
+  background:
+    radial-gradient(circle at 86% 25%, rgba(25, 119, 243, 0.08), transparent 0 78px),
+    linear-gradient(180deg, #ffffff 0%, #f9fbff 100%) !important;
+  box-shadow:
+    0 14px 30px rgba(32, 48, 79, 0.045),
+    inset 0 1px 0 rgba(255, 255, 255, 0.98) !important;
+}
+
+body.wallet-mode-hard #upcomingDetailsModal .upcoming-details-card--danger {
+  border-color: rgba(242, 73, 73, 0.16) !important;
+  background:
+    radial-gradient(circle at 86% 27%, rgba(242, 73, 73, 0.10), transparent 0 78px),
+    linear-gradient(180deg, #ffffff 0%, #fff8f8 100%) !important;
+}
+
+body.wallet-mode-hard #upcomingDetailsModal .upcoming-details-card__content {
+  position: relative !important;
+  z-index: 2 !important;
+  max-width: calc(100% - 105px) !important;
+}
+
+body.wallet-mode-hard #upcomingDetailsModal .upcoming-details-kicker {
+  display: block !important;
+  margin: 0 0 14px !important;
+  font-size: 18px !important;
+  line-height: 1.05 !important;
+  font-weight: 470 !important;
+  letter-spacing: -0.03em !important;
+  color: rgba(7, 16, 36, 0.56) !important;
+}
+
+/* Важно: сумма должна быть читаемой, не превращаться в “минимум...” */
+body.wallet-mode-hard #upcomingDetailsModal .upcoming-details-card strong {
+  display: block !important;
+  max-width: 100% !important;
+  font-size: clamp(36px, 8.2vw, 47px) !important;
+  line-height: 0.95 !important;
+  font-weight: 720 !important;
+  letter-spacing: -0.065em !important;
+  color: #071024 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+body.wallet-mode-hard #upcomingDetailsModal .upcoming-details-card small {
+  display: block !important;
+  max-width: 100% !important;
+  margin: 12px 0 0 !important;
+  font-size: 18px !important;
+  line-height: 1.18 !important;
+  font-weight: 430 !important;
+  letter-spacing: -0.03em !important;
+  color: rgba(7, 16, 36, 0.56) !important;
+}
+
+/* date line */
+
+body.wallet-mode-hard #upcomingDetailsModal .upcoming-details-date-line {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  margin-top: 18px !important;
+  color: rgba(7, 16, 36, 0.54) !important;
+}
+
+body.wallet-mode-hard #upcomingDetailsModal .upcoming-details-date-line svg {
+  width: 21px !important;
+  min-width: 21px !important;
+  height: 21px !important;
+  stroke-width: 2 !important;
+}
+
+/* visual icons */
+
+body.wallet-mode-hard #upcomingDetailsModal .upcoming-details-card__visual {
+  position: absolute !important;
+  top: 40px !important;
+  right: 28px !important;
+  width: 88px !important;
+  height: 88px !important;
+  border-radius: 999px !important;
+  z-index: 1 !important;
+}
+
+body.wallet-mode-hard #upcomingDetailsModal .upcoming-details-card__visual svg {
+  width: 45px !important;
+  height: 45px !important;
+  stroke-width: 1.9 !important;
+}
+
+body.wallet-mode-hard #upcomingDetailsModal .upcoming-details-card__visual--blue {
+  color: #1977f3 !important;
+  background: linear-gradient(180deg, #edf4ff 0%, #dfeaff 100%) !important;
+}
+
+body.wallet-mode-hard #upcomingDetailsModal .upcoming-details-card__visual--red {
+  color: #f24949 !important;
+  background: linear-gradient(180deg, #ffeded 0%, #ffdddd 100%) !important;
+}
+
+/* buttons */
+
+body.wallet-mode-hard #upcomingDetailsModal .upcoming-details-card .upcoming-details-action {
+  position: relative !important;
+  z-index: 2 !important;
+  width: 100% !important;
+  min-height: 56px !important;
+  margin: 26px 0 0 !important;
+  border: 0 !important;
+  border-radius: 20px !important;
+  font-size: 20px !important;
+  line-height: 1 !important;
+  font-weight: 650 !important;
+  letter-spacing: -0.035em !important;
+}
+
+body.wallet-mode-hard #upcomingDetailsModal .upcoming-details-card .upcoming-details-action--blue {
+  color: #ffffff !important;
+  background: linear-gradient(135deg, #1977f3 0%, #4c8cff 55%, #8a59ff 100%) !important;
+  box-shadow:
+    0 14px 24px rgba(25, 119, 243, 0.20),
+    inset 0 1px 0 rgba(255, 255, 255, 0.34) !important;
+}
+
+body.wallet-mode-hard #upcomingDetailsModal .upcoming-details-card .upcoming-details-action--red {
+  color: #f24949 !important;
+  background: linear-gradient(180deg, #ffebeb 0%, #ffe0e0 100%) !important;
+}
+
+/* breakdown */
+
+body.wallet-mode-hard #upcomingDetailsModal .upcoming-details-breakdown--visual {
+  padding: 22px 22px 6px !important;
+  border-radius: 26px !important;
+  border: 1px solid rgba(13, 24, 44, 0.08) !important;
+  background: linear-gradient(180deg, #ffffff 0%, #f9fbff 100%) !important;
+  box-shadow:
+    0 14px 30px rgba(32, 48, 79, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.98) !important;
+}
+
+body.wallet-mode-hard #upcomingDetailsModal .upcoming-details-breakdown__head {
+  padding: 0 0 18px !important;
+}
+
+body.wallet-mode-hard #upcomingDetailsModal .upcoming-details-breakdown__head span {
+  display: block !important;
+  font-size: 21px !important;
+  line-height: 1 !important;
+  font-weight: 720 !important;
+  letter-spacing: -0.045em !important;
+  text-transform: none !important;
+  color: #071024 !important;
+}
+
+body.wallet-mode-hard #upcomingDetailsModal .upcoming-details-breakdown--visual .upcoming-details-row {
+  min-height: 60px !important;
+  padding: 12px 0 !important;
+  display: grid !important;
+  grid-template-columns: 36px minmax(0, 1fr) auto !important;
+  align-items: center !important;
+  gap: 15px !important;
+}
+
+body.wallet-mode-hard #upcomingDetailsModal .upcoming-details-breakdown--visual .upcoming-details-row + .upcoming-details-row {
+  border-top: 1px solid rgba(13, 24, 44, 0.075) !important;
+}
+
+body.wallet-mode-hard #upcomingDetailsModal .upcoming-details-row__icon {
+  width: 34px !important;
+  height: 34px !important;
+}
+
+body.wallet-mode-hard #upcomingDetailsModal .upcoming-details-row__icon svg {
+  width: 19px !important;
+  height: 19px !important;
+  stroke-width: 2 !important;
+}
+
+body.wallet-mode-hard #upcomingDetailsModal .upcoming-details-breakdown--visual .upcoming-details-row > span:not(.upcoming-details-row__icon) {
+  font-size: 17px !important;
+  line-height: 1.12 !important;
+  font-weight: 430 !important;
+  letter-spacing: -0.03em !important;
+  color: rgba(7, 16, 36, 0.56) !important;
+}
+
+body.wallet-mode-hard #upcomingDetailsModal .upcoming-details-breakdown--visual .upcoming-details-row > strong {
+  font-size: 19px !important;
+  line-height: 1 !important;
+  font-weight: 670 !important;
+  letter-spacing: -0.045em !important;
+  color: #071024 !important;
+  white-space: nowrap !important;
+}
+
+/* main upcoming card: fix broken/ugly state */
+
+body.wallet-mode-hard .hard-upcoming-card {
+  border-radius: 22px !important;
+  overflow: hidden !important;
+}
+
+body.wallet-mode-hard .hard-upcoming-row {
+  min-height: 68px !important;
+  padding: 12px 14px !important;
+  gap: 11px !important;
+}
+
+body.wallet-mode-hard .hard-upcoming-row--income {
+  grid-template-columns: 40px minmax(0, 1fr) auto !important;
+}
+
+body.wallet-mode-hard .hard-upcoming-row--mandatory {
+  grid-template-columns: 40px minmax(0, 1fr) auto 12px !important;
+}
+
+body.wallet-mode-hard .hard-upcoming-row .hard-plan-row__icon {
+  width: 40px !important;
+  height: 40px !important;
+}
+
+body.wallet-mode-hard .hard-upcoming-row .hard-plan-row__body span {
+  font-size: 15px !important;
+  line-height: 1.05 !important;
+  font-weight: 720 !important;
+}
+
+body.wallet-mode-hard .hard-upcoming-row .hard-plan-row__body strong {
+  font-size: 12.5px !important;
+  line-height: 1.15 !important;
+  font-weight: 470 !important;
+}
+
+body.wallet-mode-hard .hard-upcoming-row .hard-plan-row__value {
+  font-size: 15.5px !important;
+  font-weight: 720 !important;
+}
+
+body.wallet-mode-hard .hard-upcoming-chip {
+  min-height: 29px !important;
+  padding: 0 12px !important;
+  border-radius: 999px !important;
+  color: #1977f3 !important;
+  font-size: 12.5px !important;
+  font-weight: 650 !important;
+  background: linear-gradient(180deg, #ebf3ff 0%, #ddeaff 100%) !important;
 }
