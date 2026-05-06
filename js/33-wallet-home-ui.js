@@ -29,14 +29,14 @@
     return `${year}-${month}-${day}`;
   }
 
-  function getTransactionDateKey(item) {
+  function getTransactionDateKey(transaction) {
     const rawValue =
-      item.date ||
-      item.transaction_date ||
-      item.operation_date ||
-      item.created_date ||
-      item.created_at ||
-      item.createdAt ||
+      transaction.date ||
+      transaction.transaction_date ||
+      transaction.operation_date ||
+      transaction.created_date ||
+      transaction.created_at ||
+      transaction.createdAt ||
       "";
 
     if (!rawValue) return "";
@@ -128,13 +128,8 @@
       maximumFractionDigits: 1,
     });
 
-    if (deltaPercent > 0) {
-      return `↑ ${formatted}%`;
-    }
-
-    if (deltaPercent < 0) {
-      return `↓ ${formatted}%`;
-    }
+    if (deltaPercent > 0) return `↑ ${formatted}%`;
+    if (deltaPercent < 0) return `↓ ${formatted}%`;
 
     return "0%";
   }
@@ -170,6 +165,14 @@
       : "var(--hard-red, #f24949)";
   }
 
+  function setTextIfChanged(el, nextText) {
+    if (!el) return;
+
+    if (el.textContent.trim() !== nextText) {
+      el.textContent = nextText;
+    }
+  }
+
   function syncHardMonthDeltasToDate() {
     const incomeDeltaEl = document.getElementById("hardMonthIncomeDelta");
     const expenseDeltaEl = document.getElementById("hardMonthExpenseDelta");
@@ -189,12 +192,12 @@
     const expenseDelta = getDeltaPercent(currentExpense, previousExpense);
 
     if (incomeDeltaEl) {
-      incomeDeltaEl.textContent = formatDeltaValue(incomeDelta);
+      setTextIfChanged(incomeDeltaEl, formatDeltaValue(incomeDelta));
       applyDeltaVisual(incomeDeltaEl, incomeDelta, "income");
     }
 
     if (expenseDeltaEl) {
-      expenseDeltaEl.textContent = formatDeltaValue(expenseDelta);
+      setTextIfChanged(expenseDeltaEl, formatDeltaValue(expenseDelta));
       applyDeltaVisual(expenseDeltaEl, expenseDelta, "expense");
     }
   }
@@ -206,29 +209,33 @@
     const valueEl = document.getElementById("balanceFreeMoneyValue");
 
     if (valueEl) {
-      const observer = new MutationObserver(() => {
+      const freeMoneyObserver = new MutationObserver(() => {
         syncFreeMoneyValue();
       });
 
-      observer.observe(valueEl, {
+      freeMoneyObserver.observe(valueEl, {
         childList: true,
         characterData: true,
         subtree: true,
       });
     }
 
-    const hardMonthObservedNodes = [
+    /*
+      ВАЖНО:
+      Наблюдаем только за исходными суммами дохода/расхода.
+      НЕ наблюдаем за hardMonthIncomeDelta / hardMonthExpenseDelta,
+      потому что мы сами меняем их текст.
+    */
+    const sourceNodes = [
       document.getElementById("hardMonthIncomeValue"),
       document.getElementById("hardMonthExpenseValue"),
-      document.getElementById("hardMonthIncomeDelta"),
-      document.getElementById("hardMonthExpenseDelta"),
     ].filter(Boolean);
 
     const hardMonthObserver = new MutationObserver(() => {
       syncHardMonthDeltasToDate();
     });
 
-    hardMonthObservedNodes.forEach((node) => {
+    sourceNodes.forEach((node) => {
       hardMonthObserver.observe(node, {
         childList: true,
         characterData: true,
