@@ -93,27 +93,53 @@ function formatMoneyText(value) {
     }
   }
 
-  function syncHardSummary() {
-    setTextById(
-      "hardSummaryFreeValue",
-      getMoneyTextById("balanceFreeMoneyValue", "0 ₽")
-    );
+  function pickHardMoneyText(ids, fallback = "0 ₽") {
+  for (const id of ids) {
+    const text = getTextById(id, "");
+    const amount = parseHardMoney(text);
 
-    setTextById(
-      "hardSummaryBalanceValue",
-      getMoneyTextBySelector(".hard-source-metrics .balance-amount", "0 ₽")
-    );
-
-    setTextById(
-      "hardSummaryCalendarValue",
-      getMoneyTextById("walletCalendarPressureValue", "0 ₽")
-    );
-
-    setTextById(
-      "hardSummaryLimitsValue",
-      getMoneyTextById("walletLimitsPressureValue", "0 ₽")
-    );
+    if (amount > 0) {
+      return formatHardMoney(amount);
+    }
   }
+
+  return fallback;
+}
+
+function syncHardSummary() {
+  setTextById(
+    "hardSummaryFreeValue",
+    pickHardMoneyText([
+      "balanceFreeMoneyValue",
+      "walletLightFreeValue",
+      "monthlyReportFreeValue",
+    ])
+  );
+
+  setTextById(
+    "hardSummaryBalanceValue",
+    pickHardMoneyText([
+      "hardSummaryBalanceValue",
+      "monthlyReportBalanceValue",
+    ], getMoneyTextBySelector(".hard-source-metrics .balance-amount", "0 ₽"))
+  );
+
+  setTextById(
+    "hardSummaryCalendarValue",
+    pickHardMoneyText([
+      "walletCalendarPressureValue",
+      "analyticsPendingMandatoryValue",
+    ])
+  );
+
+  setTextById(
+    "hardSummaryLimitsValue",
+    pickHardMoneyText([
+      "walletLimitsPressureValue",
+      "analyticsRemainingBudgetsValue",
+    ])
+  );
+}
 
   function syncHardPressure() {
     setTextById(
@@ -230,9 +256,16 @@ function formatHardMoney(value) {
   }).format(amount) + " ₽";
 }
 
-function parseHardDateString(value) {
-  const source = String(value || "").trim();
+function getHardState() {
+  return window.FinanceAppState?.state || null;
+}
 
+function parseHardDateString(value) {
+  if (value instanceof Date && !Number.isNaN(value.getTime())) {
+    return value;
+  }
+
+  const source = String(value || "").trim();
   if (!source) return null;
 
   const isoDate = new Date(source);
@@ -253,22 +286,21 @@ function parseHardDateString(value) {
   return null;
 }
 
-function getHardDate(value) {
-  const raw =
-    value?.date ||
-    value?.created_at ||
-    value?.createdAt ||
-    value?.created ||
-    value?.operationDate ||
-    value?.operation_date ||
-    value?.transactionDate ||
-    value?.transaction_date ||
-    value?.paidAt ||
-    value?.paid_at ||
-    value?.time ||
-    value?.timestamp;
-
-  return parseHardDateString(raw);
+function getHardDate(transaction) {
+  return parseHardDateString(
+    transaction?.date ||
+    transaction?.created_at ||
+    transaction?.createdAt ||
+    transaction?.created ||
+    transaction?.operationDate ||
+    transaction?.operation_date ||
+    transaction?.transactionDate ||
+    transaction?.transaction_date ||
+    transaction?.paidAt ||
+    transaction?.paid_at ||
+    transaction?.time ||
+    transaction?.timestamp
+  );
 }
 
 function isHardSameMonth(date, baseDate) {
@@ -285,19 +317,6 @@ function getHardPreviousMonthDate() {
   return date;
 }
 
-function getHardTransactionAmount(transaction) {
-  return Math.abs(
-    parseHardMoney(
-      transaction?.amount ??
-      transaction?.value ??
-      transaction?.sum ??
-      transaction?.total ??
-      transaction?.money ??
-      transaction?.price
-    )
-  );
-}
-
 function getHardTransactionSignedAmount(transaction) {
   return parseHardMoney(
     transaction?.amount ??
@@ -307,6 +326,10 @@ function getHardTransactionSignedAmount(transaction) {
     transaction?.money ??
     transaction?.price
   );
+}
+
+function getHardTransactionAmount(transaction) {
+  return Math.abs(getHardTransactionSignedAmount(transaction));
 }
 
 function getHardTransactionType(transaction) {
@@ -322,10 +345,7 @@ function getHardTransactionType(transaction) {
     ""
   ).toLowerCase();
 
-  if (
-    type.includes("transfer") ||
-    type.includes("перевод")
-  ) {
+  if (type.includes("transfer") || type.includes("перевод")) {
     return "transfer";
   }
 
@@ -355,220 +375,129 @@ function getHardTransactionType(transaction) {
   return "";
 }
 
-function collectHardArraysDeep(value, output, seen = new WeakSet()) {
-  if (!value || typeof value !== "object") return;
+function getHardTransactionsFromState() {
+  const state = getHardState();
 
-  if (seen.has(value)) return;
-  seen.add(value);
-
-  if (Array.isArray(value)) {
-    output.push(value);
-
-    value.forEach((item) => {
-      collectHardArraysDeep(item, output, seen);
-    });
-
-    return;
+  if (!state || !Array.isArray(state.transactions)) {
+    return [];
   }
 
-  Object.values(value).forEach((item) => {
-    collectHardArraysDeep(item, output, seen);
-  });
-}
+  return state.transactions
+    .map((transaction) => {
+      const date = getHardDate(transaction);
+      const type = getHardTransactionType(transaction);
+      const amount = getHardTransactionAmount(transaction);
 
-function readHardStorageArrays() {
-  const arrays = [];
-
-  try {
-    Object.keys(localStorage).forEach((key) => {
-      const raw = localStorage.getItem(key);
-      if (!raw) return;
-
-      try {
-        const parsed = JSON.parse(raw);
-        collectHardArraysDeep(parsed, arrays);
-      } catch (_) {}
-    });
-  } catch (_) {}
-
-  return arrays;
-}
-
-function getHardDomTransactions() {
-  const list = document.getElementById("transactionsList");
-  if (!list) return [];
-
-  return Array.from(list.querySelectorAll(".transaction-card, .list-card"))
-    .map((card) => {
-      const valueText =
-        card.querySelector(".list-value")?.textContent ||
-        card.querySelector(".transaction-value")?.textContent ||
-        "";
-
-      const captionText =
-        card.querySelector(".list-caption")?.textContent ||
-        card.querySelector(".transaction-date")?.textContent ||
-        "";
-
-      const titleText =
-        card.querySelector(".list-title")?.textContent ||
-        card.querySelector(".transaction-title")?.textContent ||
-        "";
-
-      const subtitleText =
-        card.querySelector(".list-subtitle")?.textContent ||
-        card.querySelector(".transaction-subtitle")?.textContent ||
-        "";
-
-      const signedAmount = parseHardMoney(valueText);
-      const date = parseHardDateString(captionText);
-
-      if (!date || !signedAmount) return null;
+      if (!date || !type || !amount) return null;
 
       return {
-        title: titleText,
-        category: subtitleText.split("•")[0]?.trim() || "",
-        amount: signedAmount,
+        ...transaction,
         date,
-        type: signedAmount < 0 ? "expense" : "income",
+        type,
+        amount,
       };
     })
     .filter(Boolean);
 }
 
-function getHardTransactions() {
-  const candidates = [];
-
-  [
-    window.transactions,
-    window.operations,
-    window.appTransactions,
-    window.financeTransactions,
-    window.state?.transactions,
-    window.appState?.transactions,
-    window.financeState?.transactions,
-  ].forEach((value) => {
-    if (Array.isArray(value)) candidates.push(value);
-  });
-
-  readHardStorageArrays().forEach((value) => {
-    if (Array.isArray(value)) candidates.push(value);
-  });
-
-  const normalized = [];
-
-  candidates.forEach((list) => {
-    list.forEach((item) => {
-      if (!item || typeof item !== "object") return;
-
-      const hasAmount =
-        item.amount !== undefined ||
-        item.value !== undefined ||
-        item.sum !== undefined ||
-        item.total !== undefined ||
-        item.money !== undefined ||
-        item.price !== undefined;
-
-      if (!hasAmount) return;
-
-      const date = getHardDate(item);
-      const type = getHardTransactionType(item);
-      const amount = getHardTransactionAmount(item);
-
-      if (!date || !type || !amount) return;
-
-      normalized.push({
-        ...item,
-        date,
-        type,
-        amount,
-      });
-    });
-  });
-
-  const domTransactions = getHardDomTransactions();
-
-  domTransactions.forEach((transaction) => {
-    normalized.push(transaction);
-  });
-
-  const unique = new Map();
-
-  normalized.forEach((transaction) => {
-    const key = [
-      transaction.date instanceof Date ? transaction.date.toISOString() : String(transaction.date),
-      transaction.type,
-      transaction.amount,
-      transaction.title || transaction.name || "",
-      transaction.category || "",
-    ].join("|");
-
-    if (!unique.has(key)) {
-      unique.set(key, transaction);
-    }
-  });
-
-  return Array.from(unique.values());
-}
-
-function getHardCategoryName(transaction) {
+function getHardCategoryId(transaction) {
   return String(
+    transaction?.category_id ||
+    transaction?.categoryId ||
     transaction?.category ||
-    transaction?.categoryName ||
-    transaction?.category_title ||
-    transaction?.categoryTitle ||
     ""
-  ).trim();
+  );
 }
 
-function getHardLimitedCategories() {
-  const categories = [];
+function getHardCategories() {
+  const state = getHardState();
 
-  try {
-    Object.keys(localStorage).forEach((key) => {
-      const raw = localStorage.getItem(key);
-      if (!raw) return;
+  if (!state || !Array.isArray(state.categories)) {
+    return [];
+  }
 
-      try {
-        const parsed = JSON.parse(raw);
-        const arrays = [];
+  return state.categories;
+}
 
-        collectHardArraysDeep(parsed, arrays);
+function getHardCategoryById(categoryId) {
+  const id = String(categoryId || "");
+  return getHardCategories().find((category) => {
+    return String(category.id || category.category_id || category.name) === id;
+  });
+}
 
-        arrays.forEach((list) => {
-          list.forEach((category) => {
-            if (!category || typeof category !== "object") return;
+function getHardCategoryLimit(category) {
+  return parseHardMoney(
+    category?.limit ??
+    category?.budget ??
+    category?.budget_limit ??
+    category?.budgetLimit ??
+    category?.monthLimit ??
+    category?.monthlyLimit ??
+    category?.amountLimit
+  );
+}
 
-            const limit = parseHardMoney(
-              category.limit ??
-              category.budget ??
-              category.monthLimit ??
-              category.monthlyLimit ??
-              category.amountLimit ??
-              category.amount
-            );
+function isHardRequiredCategory(category) {
+  const type = String(
+    category?.type ||
+    category?.kind ||
+    category?.category_type ||
+    ""
+  ).toLowerCase();
 
-            if (limit <= 0) return;
+  return (
+    category?.required === true ||
+    category?.is_required === true ||
+    category?.isRequired === true ||
+    type.includes("required") ||
+    type.includes("mandatory") ||
+    type.includes("обяз")
+  );
+}
 
-            const name = String(category.name || category.title || "").trim();
-            if (!name) return;
+function getHardMonthTotals(baseDate) {
+  const result = {
+    income: 0,
+    expense: 0,
+    flexibleExpense: 0,
+    mandatoryExpense: 0,
+  };
 
-            categories.push({ name, limit });
-          });
-        });
-      } catch (_) {}
-    });
-  } catch (_) {}
+  getHardTransactionsFromState().forEach((transaction) => {
+    if (!isHardSameMonth(transaction.date, baseDate)) return;
+    if (transaction.type === "transfer") return;
 
-  const map = new Map();
+    if (transaction.type === "income") {
+      result.income += transaction.amount;
+      return;
+    }
 
-  categories.forEach((category) => {
-    if (!map.has(category.name)) {
-      map.set(category.name, category);
+    if (transaction.type !== "expense") return;
+
+    result.expense += transaction.amount;
+
+    const category = getHardCategoryById(getHardCategoryId(transaction));
+
+    if (category && isHardRequiredCategory(category)) {
+      result.mandatoryExpense += transaction.amount;
+    } else {
+      result.flexibleExpense += transaction.amount;
     }
   });
 
-  return Array.from(map.values());
+  return result;
+}
+
+function getHardFlexibleBudgetTotal() {
+  return getHardCategories().reduce((sum, category) => {
+    if (isHardRequiredCategory(category)) return sum;
+
+    const limit = getHardCategoryLimit(category);
+    if (limit <= 0) return sum;
+
+    return sum + limit;
+  }, 0);
 }
 
 function setHardDelta(elementId, current, previous, mode) {
@@ -599,154 +528,70 @@ function setHardDelta(elementId, current, previous, mode) {
   }
 
   if (mode === "expense") {
-    element.classList.add(percent > 0 ? "hard-month-stat__delta--bad" : "hard-month-stat__delta--good");
+    element.classList.add(
+      percent > 0
+        ? "hard-month-stat__delta--bad"
+        : "hard-month-stat__delta--good"
+    );
     return;
   }
 
-  element.classList.add(percent > 0 ? "hard-month-stat__delta--good" : "hard-month-stat__delta--bad");
+  element.classList.add(
+    percent > 0
+      ? "hard-month-stat__delta--good"
+      : "hard-month-stat__delta--bad"
+  );
 }
 
 function syncHardMonthOverview() {
-  const transactions = getHardTransactions();
-
   const now = new Date();
   const previous = getHardPreviousMonthDate();
 
-  let currentIncome = 0;
-  let currentExpense = 0;
-  let previousIncome = 0;
-  let previousExpense = 0;
+  const currentTotals = getHardMonthTotals(now);
+  const previousTotals = getHardMonthTotals(previous);
 
-  transactions.forEach((transaction) => {
-    const date = transaction.date instanceof Date
-      ? transaction.date
-      : getHardDate(transaction);
+  setTextById("hardMonthIncomeValue", formatHardMoney(currentTotals.income));
+  setTextById("hardMonthExpenseValue", formatHardMoney(currentTotals.expense));
 
-    const type = transaction.type || getHardTransactionType(transaction);
-    const amount = transaction.amount || getHardTransactionAmount(transaction);
-
-    if (!amount || type === "transfer") return;
-
-    if (isHardSameMonth(date, now)) {
-      if (type === "income") currentIncome += amount;
-      if (type === "expense") currentExpense += amount;
-    }
-
-    if (isHardSameMonth(date, previous)) {
-      if (type === "income") previousIncome += amount;
-      if (type === "expense") previousExpense += amount;
-    }
-  });
-
-  setTextById("hardMonthIncomeValue", formatHardMoney(currentIncome));
-  setTextById("hardMonthExpenseValue", formatHardMoney(currentExpense));
-
-  setHardDelta("hardMonthIncomeDelta", currentIncome, previousIncome, "income");
-  setHardDelta("hardMonthExpenseDelta", currentExpense, previousExpense, "expense");
-
-  const limitedCategories = getHardLimitedCategories();
-
-  let flexibleBudgetTotal = limitedCategories.reduce((sum, category) => {
-    return sum + category.limit;
-  }, 0);
-
-  const remainingLimits = parseHardMoney(
-    getTextById("analyticsRemainingBudgetsValue", "") ||
-    getTextById("hardSummaryLimitsValue", "")
+  setHardDelta(
+    "hardMonthIncomeDelta",
+    currentTotals.income,
+    previousTotals.income,
+    "income"
   );
 
-  if (flexibleBudgetTotal <= 0) {
-    flexibleBudgetTotal = currentExpense + remainingLimits;
-  }
-
-  const mandatoryTotal = parseHardMoney(
-    getTextById("analyticsMandatoryTotalValue", "") ||
-    getTextById("analyticsPendingMandatoryValue", "")
+  setHardDelta(
+    "hardMonthExpenseDelta",
+    currentTotals.expense,
+    previousTotals.expense,
+    "expense"
   );
 
-  const budgetTotal = flexibleBudgetTotal + mandatoryTotal;
-  const budgetSpent = currentExpense;
+  const flexibleBudgetTotal = getHardFlexibleBudgetTotal();
 
-  const percent = budgetTotal > 0
-    ? Math.min(100, Math.round((budgetSpent / budgetTotal) * 100))
-    : 0;
-
-  setTextById("hardMonthBudgetSpentValue", formatHardMoney(budgetSpent));
-  setTextById("hardMonthBudgetTotalValue", `из ${formatHardMoney(budgetTotal)}`);
-  setTextById("hardMonthBudgetPercent", `${percent}%`);
-
-  const fill = document.getElementById("hardMonthBudgetFill");
-  if (fill) {
-    fill.style.width = `${percent}%`;
-  }
-}
-
-function syncHardMonthOverview() {
-  const transactions = getHardTransactions();
-
-  const now = new Date();
-  const previous = getHardPreviousMonthDate();
-
-  let currentIncome = 0;
-  let currentExpense = 0;
-  let previousIncome = 0;
-  let previousExpense = 0;
-
-  transactions.forEach((transaction) => {
-    const date = getHardDate(transaction);
-    const type = getHardTransactionType(transaction);
-    const amount = getHardTransactionAmount(transaction);
-
-    if (!amount || type === "transfer") return;
-
-    if (isHardSameMonth(date, now)) {
-      if (type === "income") currentIncome += amount;
-      if (type === "expense") currentExpense += amount;
-    }
-
-    if (isHardSameMonth(date, previous)) {
-      if (type === "income") previousIncome += amount;
-      if (type === "expense") previousExpense += amount;
-    }
-  });
-
-  setTextById("hardMonthIncomeValue", formatHardMoney(currentIncome));
-  setTextById("hardMonthExpenseValue", formatHardMoney(currentExpense));
-
-  setHardDelta("hardMonthIncomeDelta", currentIncome, previousIncome, "income");
-  setHardDelta("hardMonthExpenseDelta", currentExpense, previousExpense, "expense");
-
-  const limitedCategories = getHardLimitedCategories();
-  const limitedNames = new Set(
-    limitedCategories.map((category) => category.name.toLowerCase())
+  const remainingFlexible = Math.max(
+    0,
+    parseHardMoney(getTextById("analyticsRemainingBudgetsValue", "")) ||
+    parseHardMoney(getTextById("hardSummaryLimitsValue", "")) ||
+    parseHardMoney(getTextById("walletLimitsPressureValue", ""))
   );
 
-  let budgetTotal = limitedCategories.reduce((sum, category) => {
-    return sum + category.limit;
-  }, 0);
-
-  let budgetSpent = 0;
-
-  transactions.forEach((transaction) => {
-    const date = getHardDate(transaction);
-    const type = getHardTransactionType(transaction);
-    if (!isHardSameMonth(date, now) || type !== "expense") return;
-
-    const categoryName = getHardCategoryName(transaction).toLowerCase();
-
-    if (!limitedNames.size || limitedNames.has(categoryName)) {
-      budgetSpent += getHardTransactionAmount(transaction);
-    }
-  });
-
-  const remainingFromApp = parseHardMoney(
-    getTextById("analyticsRemainingBudgetsValue", "") ||
-    getTextById("hardSummaryLimitsValue", "")
+  const pendingMandatory = Math.max(
+    0,
+    parseHardMoney(getTextById("analyticsPendingMandatoryValue", "")) ||
+    parseHardMoney(getTextById("walletCalendarPressureValue", ""))
   );
 
-  if (budgetTotal <= 0 && remainingFromApp > 0) {
-    budgetTotal = budgetSpent + remainingFromApp;
-  }
+  const flexibleTotal = flexibleBudgetTotal > 0
+    ? flexibleBudgetTotal
+    : currentTotals.flexibleExpense + remainingFlexible;
+
+  const budgetSpent = currentTotals.expense;
+
+  const budgetTotal = Math.max(
+    budgetSpent,
+    flexibleTotal + pendingMandatory + currentTotals.mandatoryExpense
+  );
 
   const percent = budgetTotal > 0
     ? Math.min(100, Math.round((budgetSpent / budgetTotal) * 100))
@@ -822,20 +667,34 @@ function syncHardMonthOverview() {
   }
 
   function startSyncLoop() {
+  syncHardMode();
+
+  window.setTimeout(syncHardMode, 100);
+  window.setTimeout(syncHardMode, 350);
+  window.setTimeout(syncHardMode, 900);
+  window.setTimeout(syncHardMode, 1600);
+  window.setTimeout(syncHardMode, 2600);
+  window.setTimeout(syncHardMode, 4200);
+  window.setTimeout(syncHardMode, 6500);
+
+  let attempts = 0;
+
+  const intervalId = window.setInterval(() => {
+    attempts += 1;
     syncHardMode();
 
-    window.setTimeout(syncHardMode, 100);
-    window.setTimeout(syncHardMode, 350);
-    window.setTimeout(syncHardMode, 900);
-    window.setTimeout(syncHardMode, 1600);
-  }
+    if (attempts >= 20) {
+      window.clearInterval(intervalId);
+    }
+  }, 750);
+}
 
   function start() {
     bindHardActions();
 
     [
-      [
   "walletTodayCanValue",
+  "walletLightFreeValue",
   "balanceFreeMoneyValue",
   "walletCalendarPressureValue",
   "walletLimitsPressureValue",
@@ -848,6 +707,10 @@ function syncHardMonthOverview() {
   "accountsList",
   "transactionsList",
   "hardSummaryLimitsValue",
+  "monthlyReportIncomeFlowValue",
+  "monthlyReportExpenseFlowValue",
+  "monthlyReportBalanceValue",
+  "monthlyReportFreeValue",
 ].forEach(observeById);
 
     observeBySelector(".hard-source-metrics .balance-amount");
