@@ -1998,3 +1998,190 @@ body.wallet-mode-hard .hard-upcoming-row .hard-plan-pill {
   font-size: 13px;
   font-weight: 650;
 }
+
+/* =========================================================
+   Package 2: upcoming details modal
+   ========================================================= */
+
+body.wallet-mode-hard .hard-upcoming-card {
+  cursor: pointer;
+}
+
+body.wallet-mode-hard .hard-upcoming-card:active {
+  transform: scale(0.992);
+}
+
+body.wallet-mode-hard .upcoming-details-sheet {
+  width: calc(100vw - 12px);
+  max-width: 430px;
+  max-height: min(82vh, 760px);
+  padding: 32px 16px calc(env(safe-area-inset-bottom) + 18px);
+  border-radius: 30px 30px 24px 24px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+body.wallet-mode-hard .upcoming-details-sheet::-webkit-scrollbar {
+  display: none;
+}
+
+body.wallet-mode-hard .upcoming-details-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 12px;
+  margin: 0 0 18px;
+}
+
+body.wallet-mode-hard .upcoming-details-title {
+  margin: 0;
+  text-align: left;
+  color: var(--hard-text);
+  font-size: 28px;
+  line-height: 1;
+  font-weight: 690;
+  letter-spacing: -0.052em;
+}
+
+body.wallet-mode-hard .upcoming-details-subtitle {
+  max-width: 230px;
+  margin: 7px 0 0;
+  color: rgba(7, 16, 36, 0.52);
+  font-size: 13px;
+  line-height: 1.18;
+  font-weight: 470;
+  letter-spacing: -0.014em;
+}
+
+body.wallet-mode-hard .upcoming-details-close-btn {
+  min-height: 38px;
+  padding: 0 15px;
+  border-radius: 999px;
+  font-size: 13px;
+  line-height: 1;
+  font-weight: 620;
+}
+
+body.wallet-mode-hard .upcoming-details-main {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin: 0 0 14px;
+}
+
+body.wallet-mode-hard .upcoming-details-hero {
+  min-width: 0;
+  padding: 17px 16px 16px;
+  border: 1px solid rgba(13, 24, 44, 0.06);
+  border-radius: 22px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(249, 251, 255, 0.96));
+  box-shadow:
+    0 10px 22px rgba(32, 48, 79, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.96);
+}
+
+body.wallet-mode-hard .upcoming-details-hero__label {
+  display: block;
+  margin: 0 0 7px;
+  color: rgba(7, 16, 36, 0.48);
+  font-size: 13px;
+  line-height: 1;
+  font-weight: 560;
+  letter-spacing: -0.016em;
+}
+
+body.wallet-mode-hard .upcoming-details-hero strong {
+  display: block;
+  max-width: 100%;
+  color: var(--hard-text);
+  font-size: 25px;
+  line-height: 1;
+  font-weight: 720;
+  letter-spacing: -0.052em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+body.wallet-mode-hard .upcoming-details-hero--danger strong {
+  color: var(--hard-red);
+}
+
+body.wallet-mode-hard .upcoming-details-hero small {
+  display: block;
+  margin: 8px 0 14px;
+  color: rgba(7, 16, 36, 0.50);
+  font-size: 13px;
+  line-height: 1.25;
+  font-weight: 470;
+  letter-spacing: -0.012em;
+}
+
+body.wallet-mode-hard .upcoming-details-action {
+  width: 100%;
+  min-height: 44px;
+  border: 0;
+  border-radius: 16px;
+  font-size: 14px;
+  line-height: 1;
+  font-weight: 670;
+  letter-spacing: -0.018em;
+}
+
+body.wallet-mode-hard .upcoming-details-action--blue {
+  color: #ffffff;
+  background: linear-gradient(180deg, #5b96ff 0%, #1977f3 100%);
+  box-shadow:
+    0 10px 20px rgba(25, 119, 243, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.32);
+}
+
+body.wallet-mode-hard .upcoming-details-action--red {
+  color: var(--hard-red);
+  background: var(--hard-red-soft);
+}
+
+body.wallet-mode-hard .upcoming-details-list {
+  border: 1px solid rgba(13, 24, 44, 0.06);
+  border-radius: 22px;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(249, 251, 255, 0.96));
+  box-shadow:
+    0 10px 22px rgba(32, 48, 79, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.96);
+}
+
+body.wallet-mode-hard .upcoming-details-row {
+  min-height: 54px;
+  padding: 14px 16px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 14px;
+}
+
+body.wallet-mode-hard .upcoming-details-row + .upcoming-details-row {
+  border-top: 1px solid rgba(13, 24, 44, 0.065);
+}
+
+body.wallet-mode-hard .upcoming-details-row span {
+  min-width: 0;
+  color: rgba(7, 16, 36, 0.52);
+  font-size: 13.5px;
+  line-height: 1.15;
+  font-weight: 520;
+  letter-spacing: -0.014em;
+}
+
+body.wallet-mode-hard .upcoming-details-row strong {
+  color: var(--hard-text);
+  font-size: 15px;
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  white-space: nowrap;
+}
