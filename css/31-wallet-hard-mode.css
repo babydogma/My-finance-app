@@ -2185,3 +2185,74 @@ body.wallet-mode-hard .upcoming-details-row strong {
   letter-spacing: -0.035em;
   white-space: nowrap;
 }
+
+/* =========================================================
+   Package 3: upcoming as single entry point
+   ========================================================= */
+
+body.wallet-mode-hard .hard-upcoming-card {
+  cursor: pointer;
+}
+
+body.wallet-mode-hard .hard-upcoming-card:focus {
+  outline: none;
+}
+
+body.wallet-mode-hard .hard-upcoming-card:focus-visible {
+  box-shadow:
+    0 0 0 3px rgba(25, 119, 243, 0.16),
+    0 14px 30px rgba(32, 48, 79, 0.055),
+    inset 0 1px 0 rgba(255, 255, 255, 0.96);
+}
+
+body.wallet-mode-hard .hard-upcoming-proxy-actions {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  overflow: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+body.wallet-mode-hard .hard-upcoming-proxy-actions button {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+body.wallet-mode-hard .hard-plan-pill--ghost {
+  min-height: 31px;
+  padding: 0 13px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--hard-blue);
+  font-size: 13px;
+  line-height: 1;
+  font-weight: 650;
+  letter-spacing: -0.018em;
+  background: linear-gradient(180deg, rgba(235, 243, 255, 1), rgba(221, 234, 255, 0.96));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.86);
+  pointer-events: none;
+}
+
+body.wallet-mode-hard .hard-upcoming-row {
+  grid-template-columns: 44px minmax(0, 1fr) auto;
+}
+
+body.wallet-mode-hard .hard-upcoming-row .hard-plan-row__chevron {
+  margin-left: 2px;
+}
+
+body.wallet-mode-hard .hard-upcoming-card:hover {
+  transform: none;
+}
+
+body.wallet-mode-hard .hard-upcoming-card:active {
+  transform: scale(0.992);
+}
