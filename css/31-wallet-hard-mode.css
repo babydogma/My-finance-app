@@ -1914,3 +1914,33 @@ body.wallet-mode-hard .budget-analytics-period-rail [data-budget-analytics-perio
   background:
     linear-gradient(180deg, rgba(226, 248, 240, 0.99), rgba(205, 240, 227, 0.94));
 }
+
+/* =========================================================
+   Budget analytics modal visibility fix
+   ========================================================= */
+
+body.wallet-mode-hard #budgetAnalyticsModal .budget-analytics-sheet {
+  max-height: calc(100dvh - 24px);
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+body.wallet-mode-hard #budgetAnalyticsModal .budget-analytics-sheet::-webkit-scrollbar {
+  display: none;
+}
+
+body.wallet-mode-hard #budgetAnalyticsModal .budget-analytics-ring-zone {
+  min-height: 250px;
+  padding-top: 2px;
+  padding-bottom: 2px;
+}
+
+body.wallet-mode-hard #budgetAnalyticsModal .budget-analytics-categories {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 14px;
+  padding-bottom: 24px;
+}
