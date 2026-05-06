@@ -245,7 +245,12 @@
     <h2 class="hard-section-title">Ближайшее</h2>
   </div>
 
-  <div class="hard-plan-card hard-upcoming-card">
+  <div
+    class="hard-plan-card hard-upcoming-card"
+    role="button"
+    tabindex="0"
+    aria-label="Открыть ближайшее"
+  >
     <div class="hard-plan-row hard-plan-row--expected hard-upcoming-row" id="walletExpectedIncomeCard">
       <div class="hard-plan-row__icon hard-plan-row__icon--blue" aria-hidden="true">
         <svg viewBox="0 0 24 24">
@@ -261,18 +266,12 @@
         <strong id="walletExpectedIncomeValue">Ожидание пока не добавлено</strong>
       </div>
 
-      <button class="hard-plan-pill" type="button" id="openExpectedIncomeModalBtn">
-        Настроить
-      </button>
+      <span class="hard-plan-pill hard-plan-pill--ghost">
+        Подробнее
+      </span>
     </div>
 
-    <button
-      class="hard-plan-row hard-plan-row--clickable hard-upcoming-row"
-      type="button"
-      id="openMandatoryPaymentsModalBtn"
-      aria-label="Открыть календарные платежи"
-      title="Открыть календарные платежи"
-    >
+    <div class="hard-plan-row hard-upcoming-row">
       <div class="hard-plan-row__icon hard-plan-row__icon--red" aria-hidden="true">
         <svg viewBox="0 0 24 24">
           <path d="M12 7v6" />
@@ -290,7 +289,22 @@
       </strong>
 
       <span class="hard-plan-row__chevron" aria-hidden="true">›</span>
-    </button>
+    </div>
+  </div>
+
+  <!-- Hidden proxy buttons. Нужны для старых обработчиков JS. Не удалять. -->
+  <div class="hard-upcoming-proxy-actions" aria-hidden="true">
+    <button
+      type="button"
+      id="openExpectedIncomeModalBtn"
+      tabindex="-1"
+    ></button>
+
+    <button
+      type="button"
+      id="openMandatoryPaymentsModalBtn"
+      tabindex="-1"
+    ></button>
   </div>
 
   <div class="hard-important-grid">
