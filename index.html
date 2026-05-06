@@ -72,7 +72,7 @@
     <div class="wallet-game-hero" id="walletGameHero">
       <div class="wallet-game-hero__top">
         <div>
-          <p class="wallet-game-hero__eyebrow">До ближайших денег</p>
+          <p class="wallet-game-hero__eyebrow">Деньги</p>
         </div>
 
         <button
@@ -392,6 +392,38 @@
       <div class="list transactions-preview-list" id="transactionsList"></div>
     </div>
   </section>
+  
+  <!-- MONEY ACCOUNTS MODAL -->
+<div class="modal hidden" id="moneyAccountsModal" role="dialog" aria-modal="true" aria-label="Все деньги">
+  <div class="modal-sheet money-accounts-sheet">
+    <div class="modal-handle"></div>
+
+    <div class="section-head">
+      <div>
+        <h2 class="modal-title">Деньги</h2>
+        <p class="money-accounts-subtitle">Все счета в одном месте</p>
+      </div>
+
+      <button
+        class="manager-back-btn"
+        type="button"
+        id="closeMoneyAccountsModalBtn"
+      >
+        Закрыть
+      </button>
+    </div>
+
+    <div class="money-accounts-list" id="moneyAccountsList"></div>
+
+    <button
+      class="btn btn-primary money-accounts-add-btn"
+      type="button"
+      id="moneyAccountsAddBtn"
+    >
+      + Добавить счёт
+    </button>
+  </div>
+</div>
 
   <!-- EXPECTED INCOME MODAL -->
   <div class="modal hidden" id="expectedIncomeModal" role="dialog" aria-modal="true" aria-label="Ожидаемый доход">
