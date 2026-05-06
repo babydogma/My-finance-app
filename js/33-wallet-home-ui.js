@@ -202,7 +202,9 @@
     }
   }
   
-  function openHardModal(modal) {
+
+
+function openHardModal(modal) {
   if (!modal) return;
 
   modal.classList.remove("hidden", "is-closing");
@@ -234,12 +236,64 @@ function getAccountCardText(card, selector, fallback = "") {
   return card.querySelector(selector)?.textContent?.trim() || fallback;
 }
 
+function parseMoneyFromText(rawText) {
+  return Number(
+    String(rawText || "")
+      .replace(/\s/g, "")
+      .replace(",", ".")
+      .replace(/[^\d.-]/g, "")
+  ) || 0;
+}
+
+function formatMoneyCompact(value) {
+  const number = roundToTwo(value);
+
+  return `${number.toLocaleString("ru-RU", {
+    minimumFractionDigits: number % 1 === 0 ? 0 : 2,
+    maximumFractionDigits: 2,
+  })} ₽`;
+}
+
+function createMoneyAccountIcon(card) {
+  const originalIcon = card.querySelector(".list-icon--account");
+
+  if (!originalIcon) {
+    const fallbackIcon = document.createElement("span");
+    fallbackIcon.className = "money-accounts-row__fallback-icon";
+    fallbackIcon.textContent = "₽";
+
+    return fallbackIcon;
+  }
+
+  const icon = originalIcon.cloneNode(true);
+
+  icon.classList.add("money-accounts-row__icon");
+
+  return icon;
+}
+
 function renderMoneyAccountsModalList() {
   const list = document.getElementById("moneyAccountsList");
+  const totalEl = document.getElementById("moneyAccountsTotalValue");
+  const countEl = document.getElementById("moneyAccountsCountValue");
 
   if (!list) return;
 
   const cards = getRenderedAccountCards();
+
+  if (totalEl) {
+    const total = cards.reduce((sum, card) => {
+      const value = getAccountCardText(card, ".list-value", "0 ₽");
+
+      return sum + parseMoneyFromText(value);
+    }, 0);
+
+    totalEl.textContent = formatMoneyCompact(total);
+  }
+
+  if (countEl) {
+    countEl.textContent = String(cards.length);
+  }
 
   if (!cards.length) {
     list.innerHTML = `
@@ -260,14 +314,40 @@ function renderMoneyAccountsModalList() {
     const row = document.createElement("button");
     row.type = "button";
     row.className = "money-accounts-row";
-    row.innerHTML = `
-      <span class="money-accounts-row__name">
-        <strong>${title}</strong>
-        ${subtitle ? `<span>${subtitle}</span>` : ""}
-      </span>
+    row.dataset.accountIndex = String(index);
 
-      <strong class="money-accounts-row__value">${value}</strong>
-    `;
+    const iconWrap = document.createElement("span");
+    iconWrap.className = "money-accounts-row__icon-wrap";
+    iconWrap.appendChild(createMoneyAccountIcon(card));
+
+    const nameWrap = document.createElement("span");
+    nameWrap.className = "money-accounts-row__name";
+
+    const titleEl = document.createElement("strong");
+    titleEl.textContent = title;
+
+    const subtitleEl = document.createElement("span");
+    subtitleEl.textContent = subtitle;
+
+    nameWrap.appendChild(titleEl);
+
+    if (subtitle) {
+      nameWrap.appendChild(subtitleEl);
+    }
+
+    const valueEl = document.createElement("strong");
+    valueEl.className = "money-accounts-row__value";
+    valueEl.textContent = value;
+
+    const chevron = document.createElement("span");
+    chevron.className = "money-accounts-row__chevron";
+    chevron.setAttribute("aria-hidden", "true");
+    chevron.textContent = "›";
+
+    row.appendChild(iconWrap);
+    row.appendChild(nameWrap);
+    row.appendChild(valueEl);
+    row.appendChild(chevron);
 
     row.addEventListener("click", () => {
       const modal = document.getElementById("moneyAccountsModal");
