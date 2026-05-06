@@ -171,7 +171,13 @@
 </button>
   </div>
 
-  <article class="hard-month-budget">
+  <article
+  class="hard-month-budget hard-month-budget--clickable"
+  id="openBudgetAnalyticsModalBtn"
+  role="button"
+  tabindex="0"
+  aria-label="Открыть аналитику бюджета месяца"
+>
     <div class="hard-month-budget__top">
       <div>
         <strong>Бюджет месяца</strong>
@@ -434,6 +440,64 @@
     >
       + Добавить счёт
     </button>
+  </div>
+</div>
+
+<!-- BUDGET ANALYTICS MODAL -->
+<div class="modal hidden" id="budgetAnalyticsModal" role="dialog" aria-modal="true" aria-label="Бюджет месяца">
+  <div class="modal-sheet budget-analytics-sheet">
+    <div class="modal-handle"></div>
+
+    <div class="budget-analytics-head">
+      <div>
+        <h2 class="modal-title budget-analytics-title">Бюджет месяца</h2>
+        <p class="budget-analytics-subtitle">Куда уходят лимитные расходы</p>
+      </div>
+
+      <button
+        class="manager-back-btn budget-analytics-close-btn"
+        type="button"
+        id="closeBudgetAnalyticsModalBtn"
+      >
+        Закрыть
+      </button>
+    </div>
+
+    <div class="analytics-expenses-total-block budget-analytics-total-block">
+      <div class="analytics-expenses-total-value" id="budgetAnalyticsExpenseValue">
+        0 ₽
+      </div>
+      <div class="analytics-expenses-total-note" id="budgetAnalyticsPeriodNote">
+        за месяц
+      </div>
+    </div>
+
+    <div class="analytics-expenses-ring-zone budget-analytics-ring-zone">
+      <div class="analytics-expenses-ring" id="budgetAnalyticsRing">
+        <div class="analytics-expenses-ring__inner">
+          <div
+            class="analytics-expenses-ring__center-value"
+            id="budgetAnalyticsRingCenterValue"
+          >
+            0%
+          </div>
+
+          <div
+            class="analytics-expenses-ring__center-label"
+            id="budgetAnalyticsRingCenterLabel"
+          >
+            Нет расходов
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="analytics-expenses-month-strip" id="budgetAnalyticsMonthStrip"></div>
+
+    <div
+      class="analytics-expenses-categories budget-analytics-categories"
+      id="budgetAnalyticsCategoriesList"
+    ></div>
   </div>
 </div>
 
