@@ -1464,3 +1464,30 @@ body.wallet-mode-hard .hard-month-budget__bottom strong {
     border-radius: 20px;
   }
 }
+
+/* =========================================================
+   Clickable income / expense cards
+   ========================================================= */
+
+body.wallet-mode-hard .hard-month-stat--clickable {
+  width: 100%;
+  border: 1px solid rgba(13, 24, 44, 0.052);
+  text-align: left;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+body.wallet-mode-hard .hard-month-stat--clickable:active {
+  transform: scale(0.985);
+}
+
+body.wallet-mode-hard .hard-month-stat--clickable:focus {
+  outline: none;
+}
+
+body.wallet-mode-hard .hard-month-stat--clickable:focus-visible {
+  box-shadow:
+    0 0 0 3px rgba(25, 119, 243, 0.16),
+    var(--hard-shadow-small);
+}
