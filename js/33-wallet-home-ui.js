@@ -436,10 +436,144 @@ function initMoneyAccountsModal() {
   }
 }
 
+function syncUpcomingDetailsModal() {
+  const incomeLabelSource = document.getElementById("walletExpectedIncomeLabel");
+  const incomeValueSource = document.getElementById("walletExpectedIncomeValue");
+  const mandatoryValueSource = document.getElementById("analyticsPendingMandatoryValue");
+  const mandatoryTotalSource = document.getElementById("analyticsMandatoryTotalValue");
+  const mandatoryCoveredSource = document.getElementById("analyticsMandatoryCoveredValue");
+  const remainingLimitsSource = document.getElementById("analyticsRemainingBudgetsValue");
+  const mandatoryControlSource = document.getElementById("walletMandatoryControlValue");
+
+  const incomeLabelTarget = document.getElementById("upcomingDetailsIncomeLabel");
+  const incomeValueTarget = document.getElementById("upcomingDetailsIncomeValue");
+  const mandatoryValueTarget = document.getElementById("upcomingDetailsMandatoryValue");
+  const mandatoryTotalTarget = document.getElementById("upcomingDetailsMandatoryTotalValue");
+  const mandatoryCoveredTarget = document.getElementById("upcomingDetailsMandatoryCoveredValue");
+  const remainingLimitsTarget = document.getElementById("upcomingDetailsRemainingLimitsValue");
+  const mandatoryControlTarget = document.getElementById("upcomingDetailsMandatoryControlValue");
+
+  if (incomeValueTarget && incomeValueSource) {
+    incomeValueTarget.textContent = incomeValueSource.textContent.trim() || "Ожидание не добавлено";
+  }
+
+  if (incomeLabelTarget && incomeLabelSource) {
+    incomeLabelTarget.textContent = incomeLabelSource.textContent.trim() || "Ближайший ожидаемый доход";
+  }
+
+  if (mandatoryValueTarget && mandatoryValueSource) {
+    mandatoryValueTarget.textContent = mandatoryValueSource.textContent.trim() || "0 ₽";
+  }
+
+  if (mandatoryTotalTarget && mandatoryTotalSource) {
+    mandatoryTotalTarget.textContent = mandatoryTotalSource.textContent.trim() || "0 ₽";
+  }
+
+  if (mandatoryCoveredTarget && mandatoryCoveredSource) {
+    mandatoryCoveredTarget.textContent = mandatoryCoveredSource.textContent.trim() || "0 ₽";
+  }
+
+  if (remainingLimitsTarget && remainingLimitsSource) {
+    remainingLimitsTarget.textContent = remainingLimitsSource.textContent.trim() || "0 ₽";
+  }
+
+  if (mandatoryControlTarget && mandatoryControlSource) {
+    mandatoryControlTarget.textContent = mandatoryControlSource.textContent.trim() || "0%";
+  }
+}
+
+function initUpcomingDetailsModal() {
+  const upcomingCard = document.querySelector(".hard-upcoming-card");
+  const modal = document.getElementById("upcomingDetailsModal");
+  const closeBtn = document.getElementById("closeUpcomingDetailsModalBtn");
+  const incomeBtn = document.getElementById("upcomingDetailsIncomeBtn");
+  const mandatoryBtn = document.getElementById("upcomingDetailsMandatoryBtn");
+
+  if (!upcomingCard || !modal) return;
+
+  function openUpcomingModal() {
+    syncUpcomingDetailsModal();
+    openHardModal(modal);
+  }
+
+  upcomingCard.setAttribute("role", "button");
+  upcomingCard.setAttribute("tabindex", "0");
+  upcomingCard.setAttribute("aria-label", "Открыть ближайшее");
+
+  upcomingCard.addEventListener("click", (event) => {
+    if (
+      event.target.closest("#openExpectedIncomeModalBtn") ||
+      event.target.closest("#openMandatoryPaymentsModalBtn")
+    ) {
+      return;
+    }
+
+    openUpcomingModal();
+  });
+
+  upcomingCard.addEventListener("keydown", (event) => {
+    if (event.key !== "Enter" && event.key !== " ") return;
+
+    event.preventDefault();
+    openUpcomingModal();
+  });
+
+  closeBtn?.addEventListener("click", () => {
+    closeHardModal(modal);
+  });
+
+  modal.addEventListener("click", (event) => {
+    if (event.target === modal) {
+      closeHardModal(modal);
+    }
+  });
+
+  incomeBtn?.addEventListener("click", () => {
+    closeHardModal(modal);
+
+    window.setTimeout(() => {
+      document.getElementById("openExpectedIncomeModalBtn")?.click();
+    }, 180);
+  });
+
+  mandatoryBtn?.addEventListener("click", () => {
+    closeHardModal(modal);
+
+    window.setTimeout(() => {
+      document.getElementById("openMandatoryPaymentsModalBtn")?.click();
+    }, 180);
+  });
+
+  const observedNodes = [
+    document.getElementById("walletExpectedIncomeLabel"),
+    document.getElementById("walletExpectedIncomeValue"),
+    document.getElementById("analyticsPendingMandatoryValue"),
+    document.getElementById("analyticsMandatoryTotalValue"),
+    document.getElementById("analyticsMandatoryCoveredValue"),
+    document.getElementById("analyticsRemainingBudgetsValue"),
+    document.getElementById("walletMandatoryControlValue"),
+  ].filter(Boolean);
+
+  const observer = new MutationObserver(() => {
+    if (!modal.classList.contains("hidden")) {
+      syncUpcomingDetailsModal();
+    }
+  });
+
+  observedNodes.forEach((node) => {
+    observer.observe(node, {
+      childList: true,
+      characterData: true,
+      subtree: true,
+    });
+  });
+}
+
   document.addEventListener("DOMContentLoaded", () => {
     syncFreeMoneyValue();
     syncHardMonthDeltasToDate();
     initMoneyAccountsModal();
+    initUpcomingDetailsModal();
 
     const valueEl = document.getElementById("balanceFreeMoneyValue");
 
