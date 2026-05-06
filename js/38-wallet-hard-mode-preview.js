@@ -206,10 +206,11 @@ function syncHeroHint() {
     note.textContent = `Всего ${count} ${word}`;
   }
   
-  function parseHardMoney(value) {
+function parseHardMoney(value) {
   const source = String(value || "")
     .replace(/\s/g, "")
     .replace("₽", "")
+    .replace(/−|–|—/g, "-")
     .replace(",", ".")
     .replace(/[^\d.-]/g, "");
 
@@ -224,9 +225,32 @@ function formatHardMoney(value) {
   if (!Number.isFinite(amount)) return "0 ₽";
 
   return new Intl.NumberFormat("ru-RU", {
-    minimumFractionDigits: amount % 1 ? 2 : 0,
-    maximumFractionDigits: amount % 1 ? 2 : 0,
+    minimumFractionDigits: Math.abs(amount % 1) > 0.0001 ? 2 : 0,
+    maximumFractionDigits: Math.abs(amount % 1) > 0.0001 ? 2 : 0,
   }).format(amount) + " ₽";
+}
+
+function parseHardDateString(value) {
+  const source = String(value || "").trim();
+
+  if (!source) return null;
+
+  const isoDate = new Date(source);
+  if (!Number.isNaN(isoDate.getTime())) return isoDate;
+
+  const ruMatch = source.match(/(\d{1,2})\.(\d{1,2})\.(\d{2,4})/);
+  if (ruMatch) {
+    const day = Number(ruMatch[1]);
+    const month = Number(ruMatch[2]) - 1;
+    let year = Number(ruMatch[3]);
+
+    if (year < 100) year += 2000;
+
+    const date = new Date(year, month, day);
+    return Number.isNaN(date.getTime()) ? null : date;
+  }
+
+  return null;
 }
 
 function getHardDate(value) {
@@ -234,12 +258,17 @@ function getHardDate(value) {
     value?.date ||
     value?.created_at ||
     value?.createdAt ||
+    value?.created ||
+    value?.operationDate ||
+    value?.operation_date ||
+    value?.transactionDate ||
+    value?.transaction_date ||
+    value?.paidAt ||
+    value?.paid_at ||
     value?.time ||
     value?.timestamp;
 
-  const date = raw ? new Date(raw) : null;
-
-  return date && !Number.isNaN(date.getTime()) ? date : null;
+  return parseHardDateString(raw);
 }
 
 function isHardSameMonth(date, baseDate) {
@@ -256,12 +285,40 @@ function getHardPreviousMonthDate() {
   return date;
 }
 
+function getHardTransactionAmount(transaction) {
+  return Math.abs(
+    parseHardMoney(
+      transaction?.amount ??
+      transaction?.value ??
+      transaction?.sum ??
+      transaction?.total ??
+      transaction?.money ??
+      transaction?.price
+    )
+  );
+}
+
+function getHardTransactionSignedAmount(transaction) {
+  return parseHardMoney(
+    transaction?.amount ??
+    transaction?.value ??
+    transaction?.sum ??
+    transaction?.total ??
+    transaction?.money ??
+    transaction?.price
+  );
+}
+
 function getHardTransactionType(transaction) {
   const type = String(
     transaction?.type ||
     transaction?.kind ||
     transaction?.operationType ||
+    transaction?.operation_type ||
+    transaction?.transactionType ||
+    transaction?.transaction_type ||
     transaction?.direction ||
+    transaction?.mode ||
     ""
   ).toLowerCase();
 
@@ -275,7 +332,8 @@ function getHardTransactionType(transaction) {
   if (
     type.includes("income") ||
     type.includes("доход") ||
-    type.includes("in")
+    type === "in" ||
+    type === "plus"
   ) {
     return "income";
   }
@@ -283,28 +341,39 @@ function getHardTransactionType(transaction) {
   if (
     type.includes("expense") ||
     type.includes("расход") ||
-    type.includes("out")
+    type === "out" ||
+    type === "minus"
   ) {
     return "expense";
   }
 
-  const amount = parseHardMoney(transaction?.amount ?? transaction?.value ?? transaction?.sum);
+  const signedAmount = getHardTransactionSignedAmount(transaction);
 
-  if (amount < 0) return "expense";
-  if (amount > 0) return "income";
+  if (signedAmount < 0) return "expense";
+  if (signedAmount > 0) return "income";
 
   return "";
 }
 
-function getHardTransactionAmount(transaction) {
-  return Math.abs(
-    parseHardMoney(
-      transaction?.amount ??
-      transaction?.value ??
-      transaction?.sum ??
-      transaction?.total
-    )
-  );
+function collectHardArraysDeep(value, output, seen = new WeakSet()) {
+  if (!value || typeof value !== "object") return;
+
+  if (seen.has(value)) return;
+  seen.add(value);
+
+  if (Array.isArray(value)) {
+    output.push(value);
+
+    value.forEach((item) => {
+      collectHardArraysDeep(item, output, seen);
+    });
+
+    return;
+  }
+
+  Object.values(value).forEach((item) => {
+    collectHardArraysDeep(item, output, seen);
+  });
 }
 
 function readHardStorageArrays() {
@@ -317,28 +386,54 @@ function readHardStorageArrays() {
 
       try {
         const parsed = JSON.parse(raw);
-
-        if (Array.isArray(parsed)) {
-          arrays.push(parsed);
-          return;
-        }
-
-        if (Array.isArray(parsed?.transactions)) {
-          arrays.push(parsed.transactions);
-        }
-
-        if (Array.isArray(parsed?.operations)) {
-          arrays.push(parsed.operations);
-        }
-
-        if (Array.isArray(parsed?.items)) {
-          arrays.push(parsed.items);
-        }
+        collectHardArraysDeep(parsed, arrays);
       } catch (_) {}
     });
   } catch (_) {}
 
   return arrays;
+}
+
+function getHardDomTransactions() {
+  const list = document.getElementById("transactionsList");
+  if (!list) return [];
+
+  return Array.from(list.querySelectorAll(".transaction-card, .list-card"))
+    .map((card) => {
+      const valueText =
+        card.querySelector(".list-value")?.textContent ||
+        card.querySelector(".transaction-value")?.textContent ||
+        "";
+
+      const captionText =
+        card.querySelector(".list-caption")?.textContent ||
+        card.querySelector(".transaction-date")?.textContent ||
+        "";
+
+      const titleText =
+        card.querySelector(".list-title")?.textContent ||
+        card.querySelector(".transaction-title")?.textContent ||
+        "";
+
+      const subtitleText =
+        card.querySelector(".list-subtitle")?.textContent ||
+        card.querySelector(".transaction-subtitle")?.textContent ||
+        "";
+
+      const signedAmount = parseHardMoney(valueText);
+      const date = parseHardDateString(captionText);
+
+      if (!date || !signedAmount) return null;
+
+      return {
+        title: titleText,
+        category: subtitleText.split("•")[0]?.trim() || "",
+        amount: signedAmount,
+        date,
+        type: signedAmount < 0 ? "expense" : "income",
+      };
+    })
+    .filter(Boolean);
 }
 
 function getHardTransactions() {
@@ -351,6 +446,7 @@ function getHardTransactions() {
     window.financeTransactions,
     window.state?.transactions,
     window.appState?.transactions,
+    window.financeState?.transactions,
   ].forEach((value) => {
     if (Array.isArray(value)) candidates.push(value);
   });
@@ -359,25 +455,60 @@ function getHardTransactions() {
     if (Array.isArray(value)) candidates.push(value);
   });
 
-  let best = [];
+  const normalized = [];
 
   candidates.forEach((list) => {
-    const valid = list.filter((item) => {
-      if (!item || typeof item !== "object") return false;
+    list.forEach((item) => {
+      if (!item || typeof item !== "object") return;
 
       const hasAmount =
         item.amount !== undefined ||
         item.value !== undefined ||
         item.sum !== undefined ||
-        item.total !== undefined;
+        item.total !== undefined ||
+        item.money !== undefined ||
+        item.price !== undefined;
 
-      return hasAmount && getHardDate(item);
+      if (!hasAmount) return;
+
+      const date = getHardDate(item);
+      const type = getHardTransactionType(item);
+      const amount = getHardTransactionAmount(item);
+
+      if (!date || !type || !amount) return;
+
+      normalized.push({
+        ...item,
+        date,
+        type,
+        amount,
+      });
     });
-
-    if (valid.length > best.length) best = valid;
   });
 
-  return best;
+  const domTransactions = getHardDomTransactions();
+
+  domTransactions.forEach((transaction) => {
+    normalized.push(transaction);
+  });
+
+  const unique = new Map();
+
+  normalized.forEach((transaction) => {
+    const key = [
+      transaction.date instanceof Date ? transaction.date.toISOString() : String(transaction.date),
+      transaction.type,
+      transaction.amount,
+      transaction.title || transaction.name || "",
+      transaction.category || "",
+    ].join("|");
+
+    if (!unique.has(key)) {
+      unique.set(key, transaction);
+    }
+  });
+
+  return Array.from(unique.values());
 }
 
 function getHardCategoryName(transaction) {
@@ -385,6 +516,7 @@ function getHardCategoryName(transaction) {
     transaction?.category ||
     transaction?.categoryName ||
     transaction?.category_title ||
+    transaction?.categoryTitle ||
     ""
   ).trim();
 }
@@ -399,29 +531,30 @@ function getHardLimitedCategories() {
 
       try {
         const parsed = JSON.parse(raw);
-        const list = Array.isArray(parsed)
-          ? parsed
-          : Array.isArray(parsed?.categories)
-            ? parsed.categories
-            : [];
+        const arrays = [];
 
-        list.forEach((category) => {
-          if (!category || typeof category !== "object") return;
+        collectHardArraysDeep(parsed, arrays);
 
-          const limit = parseHardMoney(
-            category.limit ??
-            category.budget ??
-            category.monthLimit ??
-            category.monthlyLimit ??
-            category.amount
-          );
+        arrays.forEach((list) => {
+          list.forEach((category) => {
+            if (!category || typeof category !== "object") return;
 
-          if (limit <= 0) return;
+            const limit = parseHardMoney(
+              category.limit ??
+              category.budget ??
+              category.monthLimit ??
+              category.monthlyLimit ??
+              category.amountLimit ??
+              category.amount
+            );
 
-          const name = String(category.name || category.title || "").trim();
-          if (!name) return;
+            if (limit <= 0) return;
 
-          categories.push({ name, limit });
+            const name = String(category.name || category.title || "").trim();
+            if (!name) return;
+
+            categories.push({ name, limit });
+          });
         });
       } catch (_) {}
     });
@@ -456,8 +589,8 @@ function setHardDelta(elementId, current, previous, mode) {
 
   const percent = ((current - previous) / previous) * 100;
   const absPercent = Math.abs(percent);
-
   const sign = percent > 0 ? "↑" : percent < 0 ? "↓" : "";
+
   element.textContent = `${sign} ${absPercent.toFixed(1).replace(".", ",")}%`.trim();
 
   if (percent === 0) {
@@ -471,6 +604,81 @@ function setHardDelta(elementId, current, previous, mode) {
   }
 
   element.classList.add(percent > 0 ? "hard-month-stat__delta--good" : "hard-month-stat__delta--bad");
+}
+
+function syncHardMonthOverview() {
+  const transactions = getHardTransactions();
+
+  const now = new Date();
+  const previous = getHardPreviousMonthDate();
+
+  let currentIncome = 0;
+  let currentExpense = 0;
+  let previousIncome = 0;
+  let previousExpense = 0;
+
+  transactions.forEach((transaction) => {
+    const date = transaction.date instanceof Date
+      ? transaction.date
+      : getHardDate(transaction);
+
+    const type = transaction.type || getHardTransactionType(transaction);
+    const amount = transaction.amount || getHardTransactionAmount(transaction);
+
+    if (!amount || type === "transfer") return;
+
+    if (isHardSameMonth(date, now)) {
+      if (type === "income") currentIncome += amount;
+      if (type === "expense") currentExpense += amount;
+    }
+
+    if (isHardSameMonth(date, previous)) {
+      if (type === "income") previousIncome += amount;
+      if (type === "expense") previousExpense += amount;
+    }
+  });
+
+  setTextById("hardMonthIncomeValue", formatHardMoney(currentIncome));
+  setTextById("hardMonthExpenseValue", formatHardMoney(currentExpense));
+
+  setHardDelta("hardMonthIncomeDelta", currentIncome, previousIncome, "income");
+  setHardDelta("hardMonthExpenseDelta", currentExpense, previousExpense, "expense");
+
+  const limitedCategories = getHardLimitedCategories();
+
+  let flexibleBudgetTotal = limitedCategories.reduce((sum, category) => {
+    return sum + category.limit;
+  }, 0);
+
+  const remainingLimits = parseHardMoney(
+    getTextById("analyticsRemainingBudgetsValue", "") ||
+    getTextById("hardSummaryLimitsValue", "")
+  );
+
+  if (flexibleBudgetTotal <= 0) {
+    flexibleBudgetTotal = currentExpense + remainingLimits;
+  }
+
+  const mandatoryTotal = parseHardMoney(
+    getTextById("analyticsMandatoryTotalValue", "") ||
+    getTextById("analyticsPendingMandatoryValue", "")
+  );
+
+  const budgetTotal = flexibleBudgetTotal + mandatoryTotal;
+  const budgetSpent = currentExpense;
+
+  const percent = budgetTotal > 0
+    ? Math.min(100, Math.round((budgetSpent / budgetTotal) * 100))
+    : 0;
+
+  setTextById("hardMonthBudgetSpentValue", formatHardMoney(budgetSpent));
+  setTextById("hardMonthBudgetTotalValue", `из ${formatHardMoney(budgetTotal)}`);
+  setTextById("hardMonthBudgetPercent", `${percent}%`);
+
+  const fill = document.getElementById("hardMonthBudgetFill");
+  if (fill) {
+    fill.style.width = `${percent}%`;
+  }
 }
 
 function syncHardMonthOverview() {
@@ -626,17 +834,21 @@ function syncHardMonthOverview() {
     bindHardActions();
 
     [
-      "walletTodayCanValue",
-      "balanceFreeMoneyValue",
-      "walletCalendarPressureValue",
-      "walletLimitsPressureValue",
-      "analyticsPendingMandatoryValue",
-      "analyticsRemainingBudgetsValue",
-      "walletMandatoryControlValue",
-      "walletExpectedIncomeLabel",
-      "walletExpectedIncomeValue",
-      "accountsList",
-    ].forEach(observeById);
+      [
+  "walletTodayCanValue",
+  "balanceFreeMoneyValue",
+  "walletCalendarPressureValue",
+  "walletLimitsPressureValue",
+  "analyticsPendingMandatoryValue",
+  "analyticsMandatoryTotalValue",
+  "analyticsRemainingBudgetsValue",
+  "walletMandatoryControlValue",
+  "walletExpectedIncomeLabel",
+  "walletExpectedIncomeValue",
+  "accountsList",
+  "transactionsList",
+  "hardSummaryLimitsValue",
+].forEach(observeById);
 
     observeBySelector(".hard-source-metrics .balance-amount");
 
