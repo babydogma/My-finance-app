@@ -2445,3 +2445,238 @@ body.wallet-mode-hard .upcoming-details-row strong {
   font-weight: 670 !important;
   letter-spacing: -0.032em !important;
 }
+
+/* =========================================================
+   Upcoming modal: card visual architecture
+   Размер текста/цифр не трогаем
+   ========================================================= */
+
+body.wallet-mode-hard .upcoming-details-sheet--cards {
+  width: calc(100vw - 12px);
+  max-width: 430px;
+  max-height: min(86vh, 780px);
+  padding: 30px 15px calc(env(safe-area-inset-bottom) + 16px);
+  border-radius: 32px 32px 24px 24px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+body.wallet-mode-hard .upcoming-details-sheet--cards::-webkit-scrollbar {
+  display: none;
+}
+
+body.wallet-mode-hard .upcoming-details-head--visual {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+body.wallet-mode-hard .upcoming-details-round-close {
+  width: 38px;
+  min-width: 38px;
+  height: 38px;
+  border: 0;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(7, 16, 36, 0.72);
+  background:
+    linear-gradient(180deg, rgba(247, 248, 252, 0.98), rgba(236, 239, 246, 0.96));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.92),
+    0 8px 18px rgba(32, 48, 79, 0.06);
+}
+
+body.wallet-mode-hard .upcoming-details-round-close svg {
+  width: 20px;
+  height: 20px;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+body.wallet-mode-hard .upcoming-details-stack--cards {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+body.wallet-mode-hard .upcoming-details-card {
+  position: relative;
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid rgba(13, 24, 44, 0.075);
+  border-radius: 22px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 88% 22%, rgba(47, 125, 246, 0.08), transparent 0 78px),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(249, 251, 255, 0.96));
+  box-shadow:
+    0 12px 26px rgba(32, 48, 79, 0.045),
+    inset 0 1px 0 rgba(255, 255, 255, 0.98);
+}
+
+body.wallet-mode-hard .upcoming-details-card--danger {
+  border-color: rgba(242, 73, 73, 0.14);
+  background:
+    radial-gradient(circle at 88% 25%, rgba(242, 73, 73, 0.09), transparent 0 78px),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(255, 248, 248, 0.96));
+}
+
+body.wallet-mode-hard .upcoming-details-card__content {
+  position: relative;
+  z-index: 1;
+  max-width: calc(100% - 84px);
+}
+
+body.wallet-mode-hard .upcoming-details-card__visual {
+  position: absolute;
+  top: 30px;
+  right: 22px;
+  width: 70px;
+  height: 70px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+body.wallet-mode-hard .upcoming-details-card__visual svg {
+  width: 38px;
+  height: 38px;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+body.wallet-mode-hard .upcoming-details-card__visual--blue {
+  color: var(--hard-blue);
+  background:
+    linear-gradient(180deg, rgba(232, 240, 255, 0.98), rgba(218, 231, 255, 0.94));
+}
+
+body.wallet-mode-hard .upcoming-details-card__visual--red {
+  color: var(--hard-red);
+  background:
+    linear-gradient(180deg, rgba(255, 236, 236, 0.98), rgba(255, 222, 222, 0.92));
+}
+
+body.wallet-mode-hard .upcoming-details-date-line {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  margin-top: 10px;
+  color: rgba(7, 16, 36, 0.50);
+}
+
+body.wallet-mode-hard .upcoming-details-date-line svg {
+  width: 18px;
+  height: 18px;
+  min-width: 18px;
+  stroke: currentColor;
+  stroke-width: 2;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+body.wallet-mode-hard .upcoming-details-card .upcoming-details-action {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  margin-top: 18px;
+  border: 0;
+}
+
+body.wallet-mode-hard .upcoming-details-card .upcoming-details-action--blue {
+  color: #ffffff;
+  background:
+    linear-gradient(135deg, #1977f3 0%, #4c8cff 56%, #8a59ff 100%);
+  box-shadow:
+    0 12px 22px rgba(25, 119, 243, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.34);
+}
+
+body.wallet-mode-hard .upcoming-details-card .upcoming-details-action--red {
+  color: var(--hard-red);
+  background:
+    linear-gradient(180deg, rgba(255, 235, 235, 0.98), rgba(255, 224, 224, 0.94));
+}
+
+body.wallet-mode-hard .upcoming-details-breakdown--visual {
+  padding: 16px 18px 2px;
+  border: 1px solid rgba(13, 24, 44, 0.075);
+  border-radius: 22px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(249, 251, 255, 0.96));
+  box-shadow:
+    0 12px 26px rgba(32, 48, 79, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.98);
+}
+
+body.wallet-mode-hard .upcoming-details-breakdown--visual .upcoming-details-breakdown__head {
+  padding: 0 0 8px;
+}
+
+body.wallet-mode-hard .upcoming-details-breakdown--visual .upcoming-details-row {
+  min-height: 50px;
+  padding: 10px 0;
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+}
+
+body.wallet-mode-hard .upcoming-details-breakdown--visual .upcoming-details-row + .upcoming-details-row {
+  border-top: 1px solid rgba(13, 24, 44, 0.07);
+}
+
+body.wallet-mode-hard .upcoming-details-row__icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+body.wallet-mode-hard .upcoming-details-row__icon svg {
+  width: 17px;
+  height: 17px;
+  stroke: currentColor;
+  stroke-width: 2;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+body.wallet-mode-hard .upcoming-details-row__icon--blue {
+  color: var(--hard-blue);
+  background: var(--hard-blue-soft);
+}
+
+body.wallet-mode-hard .upcoming-details-row__icon--green {
+  color: var(--hard-green);
+  background: var(--hard-green-soft);
+}
+
+body.wallet-mode-hard .upcoming-details-row__icon--violet {
+  color: var(--hard-violet);
+  background: var(--hard-violet-soft);
+}
+
+body.wallet-mode-hard .upcoming-details-row__icon--orange {
+  color: var(--hard-yellow);
+  background: var(--hard-yellow-soft);
+}
