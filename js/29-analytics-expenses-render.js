@@ -966,14 +966,31 @@
     function resetAnalyticsExpenseCategoryFilter() {
       analyticsExpenseCategoryFilter = "all";
     }
+    
+    function setAnalyticsExpenseKindFilter(nextKind = "all") {
+  const allowedKinds = ["all", "flexible", "required"];
+
+  analyticsExpenseKindFilter = allowedKinds.includes(nextKind)
+    ? nextKind
+    : "all";
+
+  analyticsExpenseCategoryFilter = "all";
+  syncAnalyticsExpenseKindRail();
+}
+
+function getAnalyticsExpenseKindFilter() {
+  return analyticsExpenseKindFilter;
+}
 
     return {
-      getAnalyticsExpensesPeriodNote,
-      getAnalyticsExpenseColor,
-      getAnalyticsExpenseItems,
-      renderAnalyticsExpensesByCategory,
-      resetAnalyticsExpenseCategoryFilter,
-    };
+  getAnalyticsExpensesPeriodNote,
+  getAnalyticsExpenseColor,
+  getAnalyticsExpenseItems,
+  renderAnalyticsExpensesByCategory,
+  resetAnalyticsExpenseCategoryFilter,
+  setAnalyticsExpenseKindFilter,
+  getAnalyticsExpenseKindFilter,
+};
   }
 
   window.FinanceAppAnalyticsExpensesRender = {
