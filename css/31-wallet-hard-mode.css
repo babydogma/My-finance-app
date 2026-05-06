@@ -1491,3 +1491,117 @@ body.wallet-mode-hard .hard-month-stat--clickable:focus-visible {
     0 0 0 3px rgba(25, 119, 243, 0.16),
     var(--hard-shadow-small);
 }
+
+/* =========================================================
+   Money accounts modal
+   ========================================================= */
+
+body.wallet-mode-hard .wallet-game-hero {
+  cursor: pointer;
+}
+
+body.wallet-mode-hard .wallet-game-hero:active {
+  transform: scale(0.992);
+}
+
+body.wallet-mode-hard .accounts-section {
+  display: none !important;
+}
+
+body.wallet-mode-hard .money-accounts-sheet {
+  max-height: min(78vh, 720px);
+}
+
+body.wallet-mode-hard .money-accounts-subtitle {
+  margin: 6px 0 0;
+  color: rgba(7, 16, 36, 0.48);
+  font-size: 14px;
+  line-height: 1.2;
+  font-weight: 520;
+  letter-spacing: -0.018em;
+}
+
+body.wallet-mode-hard .money-accounts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 18px 0 16px;
+}
+
+body.wallet-mode-hard .money-accounts-row {
+  width: 100%;
+  min-height: 66px;
+  padding: 14px 16px;
+  border: 1px solid rgba(13, 24, 44, 0.06);
+  border-radius: 19px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+  color: var(--hard-text);
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow:
+    0 10px 22px rgba(32, 48, 79, 0.045),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+body.wallet-mode-hard .money-accounts-row:active {
+  transform: scale(0.987);
+}
+
+body.wallet-mode-hard .money-accounts-row__name {
+  min-width: 0;
+}
+
+body.wallet-mode-hard .money-accounts-row__name strong {
+  display: block;
+  max-width: 100%;
+  color: var(--hard-text);
+  font-size: 17px;
+  line-height: 1.06;
+  font-weight: 760;
+  letter-spacing: -0.035em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+body.wallet-mode-hard .money-accounts-row__name span {
+  display: block;
+  margin-top: 5px;
+  color: rgba(7, 16, 36, 0.48);
+  font-size: 13px;
+  line-height: 1.1;
+  font-weight: 520;
+  letter-spacing: -0.014em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+body.wallet-mode-hard .money-accounts-row__value {
+  color: var(--hard-text);
+  font-size: 17px;
+  line-height: 1;
+  font-weight: 780;
+  letter-spacing: -0.04em;
+  white-space: nowrap;
+}
+
+body.wallet-mode-hard .money-accounts-empty {
+  padding: 18px 16px;
+  border-radius: 18px;
+  color: rgba(7, 16, 36, 0.46);
+  font-size: 14px;
+  line-height: 1.35;
+  font-weight: 560;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.74);
+}
+
+body.wallet-mode-hard .money-accounts-add-btn {
+  width: 100%;
+}
