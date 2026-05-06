@@ -569,32 +569,53 @@
 
 <!-- UPCOMING DETAILS MODAL -->
 <div class="modal hidden" id="upcomingDetailsModal" role="dialog" aria-modal="true" aria-label="Ближайшее">
-  <div class="modal-sheet upcoming-details-sheet">
+  <div class="modal-sheet upcoming-details-sheet upcoming-details-sheet--cards">
     <div class="modal-handle"></div>
 
-    <div class="upcoming-details-head">
+    <div class="upcoming-details-head upcoming-details-head--visual">
       <div>
         <h2 class="modal-title upcoming-details-title">Ближайшее</h2>
         <p class="upcoming-details-subtitle">Доходы и списания до ближайших денег</p>
       </div>
 
       <button
-        class="manager-back-btn upcoming-details-close-btn"
+        class="upcoming-details-round-close"
         type="button"
         id="closeUpcomingDetailsModalBtn"
+        aria-label="Закрыть"
       >
-        Закрыть
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M6 6l12 12" />
+          <path d="M18 6L6 18" />
+        </svg>
       </button>
     </div>
 
-    <div class="upcoming-details-stack">
-      <section class="upcoming-details-panel upcoming-details-panel--income">
-        <div class="upcoming-details-panel__top">
-          <div>
-            <span class="upcoming-details-kicker">Ожидается</span>
-            <strong id="upcomingDetailsIncomeValue">Ожидание не добавлено</strong>
+    <div class="upcoming-details-stack upcoming-details-stack--cards">
+      <section class="upcoming-details-card upcoming-details-card--income">
+        <div class="upcoming-details-card__content">
+          <span class="upcoming-details-kicker">Ожидается минимум</span>
+
+          <strong id="upcomingDetailsIncomeValue">Ожидание не добавлено</strong>
+
+          <div class="upcoming-details-date-line">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M7 4v3" />
+              <path d="M17 4v3" />
+              <path d="M5 9h14" />
+              <rect x="4" y="6" width="16" height="14" rx="4" />
+              <path d="M8 13h3" />
+            </svg>
             <small id="upcomingDetailsIncomeLabel">Ближайший ожидаемый доход</small>
           </div>
+        </div>
+
+        <div class="upcoming-details-card__visual upcoming-details-card__visual--blue" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M4 8.5h15.5a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H4.8A2.8 2.8 0 0 1 2 15.7V7.2A2.2 2.2 0 0 1 4.2 5h13.3" />
+            <path d="M17 12h4.5" />
+            <circle cx="17" cy="15" r="1" />
+          </svg>
         </div>
 
         <button
@@ -606,13 +627,25 @@
         </button>
       </section>
 
-      <section class="upcoming-details-panel upcoming-details-panel--danger">
-        <div class="upcoming-details-panel__top">
-          <div>
-            <span class="upcoming-details-kicker">К списанию</span>
-            <strong id="upcomingDetailsMandatoryValue">0 ₽</strong>
-            <small>Календарные платежи до ближайших денег</small>
-          </div>
+      <section class="upcoming-details-card upcoming-details-card--danger">
+        <div class="upcoming-details-card__content">
+          <span class="upcoming-details-kicker">К списанию</span>
+
+          <strong id="upcomingDetailsMandatoryValue">0 ₽</strong>
+
+          <small>Календарные платежи до ближайших денег</small>
+        </div>
+
+        <div class="upcoming-details-card__visual upcoming-details-card__visual--red" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M7 4v3" />
+            <path d="M17 4v3" />
+            <path d="M5 9h14" />
+            <rect x="4" y="6" width="16" height="14" rx="4" />
+            <circle cx="9" cy="14" r="1" />
+            <circle cx="15" cy="14" r="1" />
+            <path d="M9 18h6" />
+          </svg>
         </div>
 
         <button
@@ -625,27 +658,57 @@
       </section>
     </div>
 
-    <section class="upcoming-details-breakdown">
+    <section class="upcoming-details-breakdown upcoming-details-breakdown--visual">
       <div class="upcoming-details-breakdown__head">
         <span>Расклад</span>
       </div>
 
       <div class="upcoming-details-row">
+        <span class="upcoming-details-row__icon upcoming-details-row__icon--blue" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 3l7 3v5c0 4.6-2.9 8.4-7 10-4.1-1.6-7-5.4-7-10V6l7-3Z" />
+            <path d="M9 12l2 2 4-5" />
+          </svg>
+        </span>
+
         <span>Обязательные всего</span>
         <strong id="upcomingDetailsMandatoryTotalValue">0 ₽</strong>
       </div>
 
       <div class="upcoming-details-row">
+        <span class="upcoming-details-row__icon upcoming-details-row__icon--green" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <ellipse cx="12" cy="7" rx="6" ry="3" />
+            <path d="M6 7v4c0 1.7 2.7 3 6 3s6-1.3 6-3V7" />
+            <path d="M6 11v4c0 1.7 2.7 3 6 3s6-1.3 6-3v-4" />
+          </svg>
+        </span>
+
         <span>Покрыто накоплениями</span>
         <strong id="upcomingDetailsMandatoryCoveredValue">0 ₽</strong>
       </div>
 
       <div class="upcoming-details-row">
+        <span class="upcoming-details-row__icon upcoming-details-row__icon--violet" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M12 3v9h9" />
+            <path d="M21 12a9 9 0 1 1-9-9" />
+          </svg>
+        </span>
+
         <span>Остаток лимитов</span>
         <strong id="upcomingDetailsRemainingLimitsValue">0 ₽</strong>
       </div>
 
       <div class="upcoming-details-row">
+        <span class="upcoming-details-row__icon upcoming-details-row__icon--orange" aria-hidden="true">
+          <svg viewBox="0 0 24 24">
+            <path d="M19 5L5 19" />
+            <circle cx="7.5" cy="7.5" r="2.5" />
+            <circle cx="16.5" cy="16.5" r="2.5" />
+          </svg>
+        </span>
+
         <span>Покрыто обязательных</span>
         <strong id="upcomingDetailsMandatoryControlValue">0%</strong>
       </div>
