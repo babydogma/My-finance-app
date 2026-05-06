@@ -239,82 +239,82 @@
     </div>
   </section>
 
-  <!-- HARD PLAN -->
-  <section class="section hard-plan-section">
-    <div class="hard-section-head">
-      <h2 class="hard-section-title">План</h2>
-    </div>
+<!-- HARD UPCOMING -->
+<section class="section hard-plan-section hard-upcoming-section">
+  <div class="hard-section-head">
+    <h2 class="hard-section-title">Ближайшее</h2>
+  </div>
 
-    <div class="hard-plan-card">
-      <div class="hard-plan-row hard-plan-row--expected" id="walletExpectedIncomeCard">
-        <div class="hard-plan-row__icon hard-plan-row__icon--blue" aria-hidden="true">
-          <svg viewBox="0 0 24 24">
-            <path d="M7 4v3" />
-            <path d="M17 4v3" />
-            <rect x="4" y="6" width="16" height="14" rx="4" />
-            <path d="M8 11h8" />
-          </svg>
-        </div>
-
-        <div class="hard-plan-row__body">
-          <span id="walletExpectedIncomeLabel">Будущие деньги не учтены</span>
-          <strong id="walletExpectedIncomeValue">Добавь ожидание, если ждёшь ЗП</strong>
-        </div>
-
-        <button class="hard-plan-pill" type="button" id="openExpectedIncomeModalBtn">
-          Жду деньги
-        </button>
+  <div class="hard-plan-card hard-upcoming-card">
+    <div class="hard-plan-row hard-plan-row--expected hard-upcoming-row" id="walletExpectedIncomeCard">
+      <div class="hard-plan-row__icon hard-plan-row__icon--blue" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <path d="M7 4v3" />
+          <path d="M17 4v3" />
+          <rect x="4" y="6" width="16" height="14" rx="4" />
+          <path d="M8 11h8" />
+        </svg>
       </div>
 
-      <button
-        class="hard-plan-row hard-plan-row--clickable"
-        type="button"
-        id="openMandatoryPaymentsModalBtn"
-        aria-label="Открыть календарные платежи"
-        title="Открыть календарные платежи"
-      >
-        <div class="hard-plan-row__icon hard-plan-row__icon--red" aria-hidden="true">
-          <svg viewBox="0 0 24 24">
-            <path d="M12 7v6" />
-            <circle cx="12" cy="17" r="1" />
-          </svg>
-        </div>
+      <div class="hard-plan-row__body">
+        <span id="walletExpectedIncomeLabel">Ждёшь деньги</span>
+        <strong id="walletExpectedIncomeValue">Ожидание пока не добавлено</strong>
+      </div>
 
-        <div class="hard-plan-row__body">
-          <span>Календарные платежи</span>
-          <strong>К вычету из свободных средств</strong>
-        </div>
-
-        <strong class="hard-plan-row__value hard-plan-row__value--danger" id="analyticsPendingMandatoryValue">
-          0 ₽
-        </strong>
-
-        <span class="hard-plan-row__chevron" aria-hidden="true">›</span>
+      <button class="hard-plan-pill" type="button" id="openExpectedIncomeModalBtn">
+        Настроить
       </button>
     </div>
 
-    <div class="hard-important-grid">
-      <div class="hard-important-card">
-        <span>Обязательные всего</span>
-        <strong id="analyticsMandatoryTotalValue">0 ₽</strong>
+    <button
+      class="hard-plan-row hard-plan-row--clickable hard-upcoming-row"
+      type="button"
+      id="openMandatoryPaymentsModalBtn"
+      aria-label="Открыть календарные платежи"
+      title="Открыть календарные платежи"
+    >
+      <div class="hard-plan-row__icon hard-plan-row__icon--red" aria-hidden="true">
+        <svg viewBox="0 0 24 24">
+          <path d="M12 7v6" />
+          <circle cx="12" cy="17" r="1" />
+        </svg>
       </div>
 
-      <div class="hard-important-card">
-        <span>Покрыто накоплениями</span>
-        <strong id="analyticsMandatoryCoveredValue">0 ₽</strong>
+      <div class="hard-plan-row__body">
+        <span>К списанию</span>
+        <strong>Календарные платежи до ближайших денег</strong>
       </div>
 
-      <div class="hard-important-card">
-        <span>Остаток лимитов</span>
-        <strong id="analyticsRemainingBudgetsValue">0 ₽</strong>
-      </div>
+      <strong class="hard-plan-row__value hard-plan-row__value--danger" id="analyticsPendingMandatoryValue">
+        0 ₽
+      </strong>
 
-      <div class="hard-important-card hard-important-card--control">
-        <span>Под контролем</span>
-        <strong id="walletMandatoryControlValue">0%</strong>
-      </div>
+      <span class="hard-plan-row__chevron" aria-hidden="true">›</span>
+    </button>
+  </div>
+
+  <div class="hard-important-grid">
+    <div class="hard-important-card">
+      <span>Обязательные всего</span>
+      <strong id="analyticsMandatoryTotalValue">0 ₽</strong>
     </div>
-  </section>
+
+    <div class="hard-important-card">
+      <span>Покрыто накоплениями</span>
+      <strong id="analyticsMandatoryCoveredValue">0 ₽</strong>
+    </div>
+
+    <div class="hard-important-card">
+      <span>Остаток лимитов</span>
+      <strong id="analyticsRemainingBudgetsValue">0 ₽</strong>
+    </div>
+
+    <div class="hard-important-card hard-important-card--control">
+      <span>Под контролем</span>
+      <strong id="walletMandatoryControlValue">0%</strong>
+    </div>
+  </div>
+</section>
 
   <!-- ACCOUNTS -->
   <section class="section accounts-section">
