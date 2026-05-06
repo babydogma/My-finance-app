@@ -467,127 +467,164 @@
       <div class="analytics-expenses-total-value" id="budgetAnalyticsExpenseValue">
         0 ₽
       </div>
+
       <div class="analytics-expenses-total-note" id="budgetAnalyticsPeriodNote">
         за месяц
       </div>
     </div>
 
     <div class="analytics-expenses-ring-zone analytics-expenses-ring-zone--with-rail budget-analytics-ring-zone">
-  <div class="analytics-expenses-ring-layout budget-analytics-ring-layout">
+      <div class="analytics-expenses-ring-layout budget-analytics-ring-layout">
 
-    <div class="analytics-expense-kind-rail budget-analytics-kind-rail">
-      <button
-        class="analytics-expense-kind-rail__btn"
-        type="button"
-        data-budget-analytics-kind="all"
-        aria-label="Все расходы"
-      >
-        <svg class="analytics-expense-kind-rail__icon" viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M4 7h16" />
-          <path d="M4 12h16" />
-          <path d="M4 17h16" />
-        </svg>
-      </button>
+        <div class="analytics-expense-kind-rail budget-analytics-kind-rail">
+          <button
+            class="analytics-expense-kind-rail__btn"
+            type="button"
+            data-budget-analytics-kind="all"
+            aria-label="Все расходы"
+          >
+            <svg class="analytics-expense-kind-rail__icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 7h16" />
+              <path d="M4 12h16" />
+              <path d="M4 17h16" />
+            </svg>
+          </button>
 
-      <button
-        class="analytics-expense-kind-rail__btn"
-        type="button"
-        data-budget-analytics-kind="flexible"
-        aria-label="Гибкие расходы"
-      >
-        <svg class="analytics-expense-kind-rail__icon" viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M7 12c2.2-5.2 7.8-5.2 10 0" />
-          <path d="M7 12c2.2 5.2 7.8 5.2 10 0" />
-        </svg>
-      </button>
+          <button
+            class="analytics-expense-kind-rail__btn"
+            type="button"
+            data-budget-analytics-kind="flexible"
+            aria-label="Гибкие расходы"
+          >
+            <svg class="analytics-expense-kind-rail__icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M7 12c2.2-5.2 7.8-5.2 10 0" />
+              <path d="M7 12c2.2 5.2 7.8 5.2 10 0" />
+            </svg>
+          </button>
 
-      <button
-        class="analytics-expense-kind-rail__btn analytics-expense-kind-rail__btn--required"
-        type="button"
-        data-budget-analytics-kind="required"
-        aria-label="Обязательные расходы"
-      >
-        <svg class="analytics-expense-kind-rail__icon" viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M12 4v10" />
-          <path d="M12 18h.01" />
-        </svg>
-      </button>
-    </div>
-
-    <div class="analytics-expenses-ring" id="budgetAnalyticsRing">
-      <div class="analytics-expenses-ring__inner">
-        <div
-          class="analytics-expenses-ring__center-value"
-          id="budgetAnalyticsRingCenterValue"
-        >
-          0%
+          <button
+            class="analytics-expense-kind-rail__btn analytics-expense-kind-rail__btn--required"
+            type="button"
+            data-budget-analytics-kind="required"
+            aria-label="Обязательные расходы"
+          >
+            <svg class="analytics-expense-kind-rail__icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 4v10" />
+              <path d="M12 18h.01" />
+            </svg>
+          </button>
         </div>
 
-        <div
-          class="analytics-expenses-ring__center-label"
-          id="budgetAnalyticsRingCenterLabel"
-        >
-          Нет расходов
+        <div class="analytics-expenses-ring" id="budgetAnalyticsRing">
+          <div class="analytics-expenses-ring__inner">
+            <div
+              class="analytics-expenses-ring__center-value"
+              id="budgetAnalyticsRingCenterValue"
+            >
+              0%
+            </div>
+
+            <div
+              class="analytics-expenses-ring__center-label"
+              id="budgetAnalyticsRingCenterLabel"
+            >
+              Нет расходов
+            </div>
+          </div>
         </div>
+
+        <div class="analytics-period-rail budget-analytics-period-rail">
+          <button
+            class="analytics-period-rail__btn"
+            type="button"
+            data-budget-analytics-period="today"
+            aria-label="Сегодня"
+          >
+            <svg class="analytics-period-rail__icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M7 4v3" />
+              <path d="M17 4v3" />
+              <path d="M5 9h14" />
+              <path d="M8 13h4" />
+            </svg>
+          </button>
+
+          <button
+            class="analytics-period-rail__btn"
+            type="button"
+            data-budget-analytics-period="7"
+            aria-label="Неделя"
+          >
+            <svg class="analytics-period-rail__icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 19h16" />
+              <path d="M7 16v-4" />
+              <path d="M12 16V8" />
+              <path d="M17 16v-6" />
+            </svg>
+          </button>
+
+          <button
+            class="analytics-period-rail__btn is-active"
+            type="button"
+            data-budget-analytics-period="month"
+            aria-label="Месяц"
+          >
+            <svg class="analytics-period-rail__icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M7 4v3" />
+              <path d="M17 4v3" />
+              <path d="M5 9h14" />
+              <path d="M6 6h12a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1Z" />
+            </svg>
+          </button>
+
+          <button
+            class="analytics-period-rail__btn analytics-period-rail__btn--range"
+            type="button"
+            data-budget-analytics-period="range"
+            aria-label="Период"
+          >
+            <svg class="analytics-period-rail__icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M8 7h8" />
+              <path d="M7 12h10" />
+              <path d="M9 17h6" />
+            </svg>
+          </button>
+        </div>
+
       </div>
     </div>
 
-    <div class="analytics-period-rail budget-analytics-period-rail">
-      <button
-        class="analytics-period-rail__btn"
-        type="button"
-        data-budget-analytics-period="today"
-        aria-label="Сегодня"
-      >
-        <svg class="analytics-period-rail__icon" viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M7 4v3" />
-          <path d="M17 4v3" />
-          <path d="M5 9h14" />
-          <path d="M8 13h4" />
-        </svg>
-      </button>
+    <div class="analytics-expenses-month-strip" id="budgetAnalyticsMonthStrip"></div>
 
-      <button
-        class="analytics-period-rail__btn"
-        type="button"
-        data-budget-analytics-period="7"
-        aria-label="Неделя"
-      >
-        <svg class="analytics-period-rail__icon" viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M4 19h16" />
-          <path d="M7 16v-4" />
-          <path d="M12 16V8" />
-          <path d="M17 16v-6" />
-        </svg>
-      </button>
+    <div class="analytics-range-dock budget-analytics-range-dock hidden" id="budgetAnalyticsRangeDock">
+      <div class="analytics-range-dock__summary">
+        <label class="analytics-range-dock__date">
+          <span>С</span>
+          <input class="input" type="date" id="budgetAnalyticsRangeFromInput" />
+        </label>
 
-      <button
-        class="analytics-period-rail__btn is-active"
-        type="button"
-        data-budget-analytics-period="month"
-        aria-label="Месяц"
-      >
-        <svg class="analytics-period-rail__icon" viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M7 4v3" />
-          <path d="M17 4v3" />
-          <path d="M5 9h14" />
-          <path d="M6 6h12a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1Z" />
-        </svg>
-      </button>
+        <div class="analytics-range-dock__arrow">→</div>
 
-      <button
-        class="analytics-period-rail__btn analytics-period-rail__btn--range"
-        type="button"
-        data-budget-analytics-period="range"
-        aria-label="Период"
-      >
-        <svg class="analytics-period-rail__icon" viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M8 7h8" />
-          <path d="M7 12h10" />
-          <path d="M9 17h6" />
-        </svg>
-      </button>
+        <label class="analytics-range-dock__date">
+          <span>По</span>
+          <input class="input" type="date" id="budgetAnalyticsRangeToInput" />
+        </label>
+      </div>
+
+      <div class="analytics-range-dock__actions">
+        <button
+          class="analytics-range-dock__apply"
+          type="button"
+          id="budgetAnalyticsRangeApplyBtn"
+        >
+          Применить период
+        </button>
+      </div>
     </div>
+
+    <div
+      class="analytics-expenses-categories budget-analytics-categories"
+      id="budgetAnalyticsCategoriesList"
+    ></div>
   </div>
 </div>
 
