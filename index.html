@@ -628,6 +628,80 @@
   </div>
 </div>
 
+<!-- UPCOMING DETAILS MODAL -->
+<div class="modal hidden" id="upcomingDetailsModal" role="dialog" aria-modal="true" aria-label="Ближайшее">
+  <div class="modal-sheet upcoming-details-sheet">
+    <div class="modal-handle"></div>
+
+    <div class="upcoming-details-head">
+      <div>
+        <h2 class="modal-title upcoming-details-title">Ближайшее</h2>
+        <p class="upcoming-details-subtitle">Что ждёшь и что скоро спишется</p>
+      </div>
+
+      <button
+        class="manager-back-btn upcoming-details-close-btn"
+        type="button"
+        id="closeUpcomingDetailsModalBtn"
+      >
+        Закрыть
+      </button>
+    </div>
+
+    <div class="upcoming-details-main">
+      <div class="upcoming-details-hero upcoming-details-hero--income">
+        <span class="upcoming-details-hero__label">Ждёшь деньги</span>
+        <strong id="upcomingDetailsIncomeValue">Ожидание не добавлено</strong>
+        <small id="upcomingDetailsIncomeLabel">Можно указать ближайшую ЗП или другой доход</small>
+
+        <button
+          class="upcoming-details-action upcoming-details-action--blue"
+          type="button"
+          id="upcomingDetailsIncomeBtn"
+        >
+          Настроить ожидание
+        </button>
+      </div>
+
+      <div class="upcoming-details-hero upcoming-details-hero--danger">
+        <span class="upcoming-details-hero__label">К списанию</span>
+        <strong id="upcomingDetailsMandatoryValue">0 ₽</strong>
+        <small>Календарные платежи, которые нужно держать до ближайших денег</small>
+
+        <button
+          class="upcoming-details-action upcoming-details-action--red"
+          type="button"
+          id="upcomingDetailsMandatoryBtn"
+        >
+          Открыть календарь
+        </button>
+      </div>
+    </div>
+
+    <div class="upcoming-details-list">
+      <div class="upcoming-details-row">
+        <span>Обязательные всего</span>
+        <strong id="upcomingDetailsMandatoryTotalValue">0 ₽</strong>
+      </div>
+
+      <div class="upcoming-details-row">
+        <span>Покрыто накоплениями</span>
+        <strong id="upcomingDetailsMandatoryCoveredValue">0 ₽</strong>
+      </div>
+
+      <div class="upcoming-details-row">
+        <span>Остаток лимитов</span>
+        <strong id="upcomingDetailsRemainingLimitsValue">0 ₽</strong>
+      </div>
+
+      <div class="upcoming-details-row">
+        <span>Покрыто обязательных</span>
+        <strong id="upcomingDetailsMandatoryControlValue">0%</strong>
+      </div>
+    </div>
+  </div>
+</div>
+
   <!-- EXPECTED INCOME MODAL -->
   <div class="modal hidden" id="expectedIncomeModal" role="dialog" aria-modal="true" aria-label="Ожидаемый доход">
     <div class="modal-sheet">
