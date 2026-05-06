@@ -982,7 +982,7 @@ closeMandatoryPaymentBucketPickerModalBtn?.addEventListener("click", () => {
     openAnalyticsCategoryModal,
   });
   
-  const budgetAnalyticsModal = document.getElementById("budgetAnalyticsModal");
+const budgetAnalyticsModal = document.getElementById("budgetAnalyticsModal");
 const openBudgetAnalyticsModalBtn = document.getElementById("openBudgetAnalyticsModalBtn");
 const closeBudgetAnalyticsModalBtn = document.getElementById("closeBudgetAnalyticsModalBtn");
 
@@ -994,279 +994,165 @@ const budgetAnalyticsRingCenterLabel = document.getElementById("budgetAnalyticsR
 const budgetAnalyticsMonthStrip = document.getElementById("budgetAnalyticsMonthStrip");
 const budgetAnalyticsCategoriesList = document.getElementById("budgetAnalyticsCategoriesList");
 
-function getBudgetAnalyticsMonthDate(value) {
-  const normalized = String(value || getCurrentMonthValue());
-  const match = normalized.match(/^(\d{4})-(\d{2})$/);
+const budgetAnalyticsRangeDock = document.getElementById("budgetAnalyticsRangeDock");
+const budgetAnalyticsRangeFromInput = document.getElementById("budgetAnalyticsRangeFromInput");
+const budgetAnalyticsRangeToInput = document.getElementById("budgetAnalyticsRangeToInput");
+const budgetAnalyticsRangeApplyBtn = document.getElementById("budgetAnalyticsRangeApplyBtn");
 
-  if (!match) {
-    const fallback = getCurrentMonthValue().match(/^(\d{4})-(\d{2})$/);
-    return new Date(Number(fallback[1]), Number(fallback[2]) - 1, 1);
+let budgetAnalyticsKindFilter = "flexible";
+let budgetAnalyticsFilterPeriod = "month";
+let budgetAnalyticsSelectedMonth = getCurrentMonthValue();
+let budgetAnalyticsRangeStart = "";
+let budgetAnalyticsRangeEnd = "";
+
+const budgetAnalyticsExpensesRenderer = window.FinanceAppAnalyticsExpensesRender.create({
+  state,
+  UNCATEGORIZED_ID,
+  roundToTwo,
+  filterTransactionsByPeriod,
+  getCurrentMonthValue,
+  getCategoryName,
+  isRequiredCategory,
+  formatMoney,
+  escapeHtml,
+
+  getFilterPeriod: () => budgetAnalyticsFilterPeriod,
+  setFilterPeriod: (period) => {
+    budgetAnalyticsFilterPeriod = period;
+
+    window.setTimeout(() => {
+      syncBudgetAnalyticsControls();
+      updateBudgetAnalyticsPeriodNote();
+    }, 0);
+  },
+
+  getSelectedMonth: () => budgetAnalyticsSelectedMonth,
+  setSelectedMonth: (month) => {
+    budgetAnalyticsSelectedMonth = month || getCurrentMonthValue();
+
+    window.setTimeout(() => {
+      syncBudgetAnalyticsControls();
+      updateBudgetAnalyticsPeriodNote();
+    }, 0);
+  },
+
+  getRangeStart: () => budgetAnalyticsRangeStart,
+  getRangeEnd: () => budgetAnalyticsRangeEnd,
+
+  analyticsExpenseValue: budgetAnalyticsExpenseValue,
+  analyticsExpensesPeriodNote: budgetAnalyticsPeriodNote,
+  analyticsExpensesCategoriesList: budgetAnalyticsCategoriesList,
+  analyticsExpensesRing: budgetAnalyticsRing,
+  analyticsExpensesRingCenterValue: budgetAnalyticsRingCenterValue,
+  analyticsExpensesRingCenterLabel: budgetAnalyticsRingCenterLabel,
+
+  analyticsExpenseValuePremium: null,
+  analyticsExpensesPeriodNotePremium: null,
+  analyticsExpensesCategoriesListPremium: null,
+  analyticsExpensesRingPremium: null,
+  analyticsExpensesRingCenterValuePremium: null,
+  analyticsExpensesRingCenterLabelPremium: null,
+
+  analyticsExpensesMonthStrip: budgetAnalyticsMonthStrip,
+  analyticsExpensesTotalRowValue: null,
+
+  openAnalyticsCategoryModal: (categoryId) => {
+    closeAnimatedModal(budgetAnalyticsModal);
+
+    window.setTimeout(() => {
+      openAnalyticsCategoryModal?.(categoryId);
+    }, 140);
+  },
+});
+
+function getBudgetAnalyticsPeriodNote() {
+  if (budgetAnalyticsFilterPeriod === "today") {
+    return `${getBudgetAnalyticsKindLabel()} за сегодня`;
   }
 
-  return new Date(Number(match[1]), Number(match[2]) - 1, 1);
+  if (budgetAnalyticsFilterPeriod === "7") {
+    return `${getBudgetAnalyticsKindLabel()} за 7 дней`;
+  }
+
+  if (budgetAnalyticsFilterPeriod === "range") {
+    if (budgetAnalyticsRangeStart && budgetAnalyticsRangeEnd) {
+      return `${getBudgetAnalyticsKindLabel()} за выбранный период`;
+    }
+
+    return `${getBudgetAnalyticsKindLabel()} за период`;
+  }
+
+  return `${getBudgetAnalyticsKindLabel()} за ${formatMonthLabel(budgetAnalyticsSelectedMonth)}`;
 }
 
-function getBudgetAnalyticsMonthKey(date) {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
+function getBudgetAnalyticsKindLabel() {
+  if (budgetAnalyticsKindFilter === "all") return "все расходы";
+  if (budgetAnalyticsKindFilter === "required") return "обязательные расходы";
 
-  return `${year}-${month}`;
+  return "гибкие расходы";
 }
 
-function getBudgetAnalyticsMonthLabel(monthKey) {
-  return getBudgetAnalyticsMonthDate(monthKey)
-    .toLocaleDateString("ru-RU", { month: "short" })
-    .replace(".", "");
-}
-
-function isBudgetAnalyticsFlexibleExpense(transaction) {
-  if (!transaction || transaction.type !== "expense") return false;
-
-  const categoryId = transaction.category_id || UNCATEGORIZED_ID;
-
-  if (categoryId === UNCATEGORIZED_ID) return true;
-
-  return !isRequiredCategory(categoryId);
-}
-
-function getBudgetAnalyticsTransactions(monthKey = analyticsSelectedMonth) {
-  const normalizedMonth = String(monthKey || getCurrentMonthValue());
-
-  return filterTransactionsByPeriod(
-    state.transactions,
-    "month",
-    normalizedMonth,
-    "",
-    ""
-  ).filter(isBudgetAnalyticsFlexibleExpense);
-}
-
-function getBudgetAnalyticsMonthItems() {
-  const selectedDate = getBudgetAnalyticsMonthDate(analyticsSelectedMonth);
-  const year = selectedDate.getFullYear();
-  const items = [];
-
-  for (let monthIndex = 0; monthIndex < 12; monthIndex += 1) {
-    const date = new Date(year, monthIndex, 1);
-    const monthKey = getBudgetAnalyticsMonthKey(date);
-
-    const total = roundToTwo(
-      getBudgetAnalyticsTransactions(monthKey).reduce((sum, transaction) => {
-        return sum + (Number(transaction.amount) || 0);
-      }, 0)
+function syncBudgetAnalyticsControls() {
+  document.querySelectorAll("[data-budget-analytics-kind]").forEach((button) => {
+    button.classList.toggle(
+      "is-active",
+      button.dataset.budgetAnalyticsKind === budgetAnalyticsKindFilter
     );
-
-    items.push({
-      monthKey,
-      label: getBudgetAnalyticsMonthLabel(monthKey),
-      total,
-    });
-  }
-
-  return items;
-}
-
-function formatBudgetAnalyticsPercent(value) {
-  const percent = Number(value) || 0;
-
-  if (percent > 0 && percent < 1) return "<1%";
-
-  return `${Math.round(percent)}%`;
-}
-
-function buildBudgetAnalyticsRingGradient(items, total) {
-  if (!budgetAnalyticsRing) return "";
-
-  if (!total || total <= 0 || !items.length) {
-    return "conic-gradient(rgba(47, 125, 246, 0.14) 0deg 360deg)";
-  }
-
-  let cursor = 0;
-
-  const parts = items
-    .filter((item) => item.amount > 0.01)
-    .flatMap((item) => {
-      const percent = Math.max(0, Math.min(100, (item.amount / total) * 100));
-      const start = cursor;
-      const end = Math.min(100, cursor + percent);
-
-      cursor = end;
-
-      return [`${item.color} ${start.toFixed(2)}% ${end.toFixed(2)}%`];
-    });
-
-  if (!parts.length) {
-    return "conic-gradient(rgba(47, 125, 246, 0.14) 0deg 360deg)";
-  }
-
-  if (cursor < 100) {
-    parts.push(`rgba(20, 24, 33, 0.08) ${cursor.toFixed(2)}% 100%`);
-  }
-
-  return `conic-gradient(${parts.join(", ")})`;
-}
-
-function renderBudgetAnalyticsRing(items, total) {
-  if (!budgetAnalyticsRing) return;
-
-  const topItem = items[0] || null;
-  const topPercent = topItem && total > 0 ? (topItem.amount / total) * 100 : 0;
-  const gradient = buildBudgetAnalyticsRingGradient(items, total);
-
-  budgetAnalyticsRing.style.background = gradient;
-  budgetAnalyticsRing.style.setProperty("--analytics-ring-gradient", gradient);
-
-  if (budgetAnalyticsRingCenterValue) {
-    budgetAnalyticsRingCenterValue.textContent = formatBudgetAnalyticsPercent(topPercent);
-  }
-
-  if (budgetAnalyticsRingCenterLabel) {
-    budgetAnalyticsRingCenterLabel.textContent = topItem ? topItem.name : "Нет расходов";
-  }
-}
-
-function renderBudgetAnalyticsMonthStrip() {
-  if (!budgetAnalyticsMonthStrip) return;
-
-  const items = getBudgetAnalyticsMonthItems();
-  const selectedMonth = analyticsSelectedMonth || getCurrentMonthValue();
-  const maxTotal = Math.max(...items.map((item) => item.total), 1);
-
-  budgetAnalyticsMonthStrip.innerHTML = "";
-
-  items.forEach((item) => {
-    const percent = item.total > 0 ? item.total / maxTotal : 0;
-    const height = Math.max(4, Math.round(44 * percent));
-
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className =
-      `analytics-expenses-month-item${
-        item.monthKey === selectedMonth ? " is-active" : ""
-      }`;
-
-    button.innerHTML = `
-      <div
-        class="analytics-expenses-month-item__bar"
-        style="height: ${height}px"
-      ></div>
-
-      <div class="analytics-expenses-month-item__label">
-        ${escapeHtml(item.label)}
-      </div>
-    `;
-
-    button.addEventListener("click", () => {
-      analyticsSelectedMonth = item.monthKey;
-      analyticsFilterPeriod = "month";
-      renderBudgetAnalyticsModal();
-    });
-
-    budgetAnalyticsMonthStrip.appendChild(button);
   });
+
+  document.querySelectorAll("[data-budget-analytics-period]").forEach((button) => {
+    button.classList.toggle(
+      "is-active",
+      button.dataset.budgetAnalyticsPeriod === budgetAnalyticsFilterPeriod
+    );
+  });
+
+  budgetAnalyticsRangeDock?.classList.toggle(
+    "hidden",
+    budgetAnalyticsFilterPeriod !== "range"
+  );
+
+  budgetAnalyticsMonthStrip?.classList.toggle(
+    "is-hidden-for-range",
+    budgetAnalyticsFilterPeriod !== "month"
+  );
 }
 
-function renderBudgetAnalyticsCategories(items, total) {
-  if (!budgetAnalyticsCategoriesList) return;
+function updateBudgetAnalyticsPeriodNote() {
+  if (!budgetAnalyticsPeriodNote) return;
 
-  budgetAnalyticsCategoriesList.innerHTML = "";
-
-  if (!total || total <= 0 || !items.length) {
-    budgetAnalyticsCategoriesList.innerHTML = `
-      <div class="analytics-expenses-empty">
-        За выбранный месяц лимитных расходов нет
-      </div>
-    `;
-    return;
-  }
-
-  items.forEach((item) => {
-    const rawPercent = total > 0 ? (item.amount / total) * 100 : 0;
-    const percentForBar = rawPercent > 0 && rawPercent < 1
-      ? 1
-      : Math.round(rawPercent);
-
-    const row = document.createElement("button");
-    row.className =
-      "analytics-expense-category-row analytics-expense-category-row--premium";
-    row.type = "button";
-
-    row.innerHTML = `
-      <div
-        class="analytics-expense-category-row__icon"
-        style="--category-color: ${item.color}"
-      >
-        <span>${escapeHtml(item.name.slice(0, 1).toUpperCase())}</span>
-      </div>
-
-      <div class="analytics-expense-category-row__main">
-        <div class="analytics-expense-category-row__top">
-          <div class="analytics-expense-category-row__name">
-            ${escapeHtml(item.name)}
-          </div>
-
-          <div class="analytics-expense-category-row__amount">
-            ${formatMoney(item.amount)}
-          </div>
-        </div>
-
-        <div class="analytics-expense-category-row__bottom">
-          <div class="analytics-expense-category-row__bar">
-            <div
-              class="analytics-expense-category-row__bar-fill"
-              style="width: ${Math.max(2, percentForBar)}%; background: ${item.color}; color: ${item.color};"
-            ></div>
-          </div>
-
-          <div class="analytics-expense-category-row__percent">
-            ${formatBudgetAnalyticsPercent(rawPercent)}
-          </div>
-        </div>
-      </div>
-    `;
-
-    row.addEventListener("click", () => {
-      closeAnimatedModal(budgetAnalyticsModal);
-
-      window.setTimeout(() => {
-        openAnalyticsCategoryModal?.(item.categoryId);
-      }, 140);
-    });
-
-    budgetAnalyticsCategoriesList.appendChild(row);
-  });
+  budgetAnalyticsPeriodNote.textContent = getBudgetAnalyticsPeriodNote();
 }
 
 function renderBudgetAnalyticsModal() {
-  analyticsFilterPeriod = "month";
+  budgetAnalyticsExpensesRenderer.setAnalyticsExpenseKindFilter?.(budgetAnalyticsKindFilter);
+  budgetAnalyticsExpensesRenderer.renderAnalyticsExpensesByCategory();
 
-  const transactions = getBudgetAnalyticsTransactions(analyticsSelectedMonth);
-  const total = roundToTwo(
-    transactions.reduce((sum, transaction) => {
-      return sum + (Number(transaction.amount) || 0);
-    }, 0)
-  );
-
-  const items = getAnalyticsExpenseItems(transactions);
-
-  if (budgetAnalyticsExpenseValue) {
-    budgetAnalyticsExpenseValue.textContent = formatMoney(total);
-  }
-
-  if (budgetAnalyticsPeriodNote) {
-    budgetAnalyticsPeriodNote.textContent = `за ${formatMonthLabel(analyticsSelectedMonth)}`;
-  }
-
-  renderBudgetAnalyticsRing(items, total);
-  renderBudgetAnalyticsMonthStrip();
-  renderBudgetAnalyticsCategories(items, total);
+  syncBudgetAnalyticsControls();
+  updateBudgetAnalyticsPeriodNote();
 }
 
 function openBudgetAnalyticsModal() {
   if (!budgetAnalyticsModal) return;
 
-  analyticsSelectedMonth = getCurrentMonthValue();
-  analyticsFilterPeriod = "month";
+  budgetAnalyticsKindFilter = "flexible";
+  budgetAnalyticsFilterPeriod = "month";
+  budgetAnalyticsSelectedMonth = getCurrentMonthValue();
+
+  const today = new Date();
+  const todayValue = today.toISOString().slice(0, 10);
+
+  if (!budgetAnalyticsRangeFromInput?.value) {
+    budgetAnalyticsRangeFromInput.value = todayValue;
+  }
+
+  if (!budgetAnalyticsRangeToInput?.value) {
+    budgetAnalyticsRangeToInput.value = todayValue;
+  }
+
+  budgetAnalyticsRangeStart = budgetAnalyticsRangeFromInput?.value || "";
+  budgetAnalyticsRangeEnd = budgetAnalyticsRangeToInput?.value || "";
+
   resetAnalyticsExpenseCategoryFilter?.();
 
   renderBudgetAnalyticsModal();
@@ -1277,8 +1163,39 @@ function closeBudgetAnalyticsModal() {
   closeAnimatedModal(budgetAnalyticsModal);
 }
 
+document.querySelectorAll("[data-budget-analytics-kind]").forEach((button) => {
+  button.addEventListener("click", () => {
+    budgetAnalyticsKindFilter = button.dataset.budgetAnalyticsKind || "flexible";
+    renderBudgetAnalyticsModal();
+  });
+});
+
+document.querySelectorAll("[data-budget-analytics-period]").forEach((button) => {
+  button.addEventListener("click", () => {
+    const nextPeriod = button.dataset.budgetAnalyticsPeriod || "month";
+
+    budgetAnalyticsFilterPeriod = nextPeriod;
+
+    if (nextPeriod === "range") {
+      budgetAnalyticsRangeStart = budgetAnalyticsRangeFromInput?.value || "";
+      budgetAnalyticsRangeEnd = budgetAnalyticsRangeToInput?.value || "";
+    }
+
+    renderBudgetAnalyticsModal();
+  });
+});
+
+budgetAnalyticsRangeApplyBtn?.addEventListener("click", () => {
+  budgetAnalyticsFilterPeriod = "range";
+  budgetAnalyticsRangeStart = budgetAnalyticsRangeFromInput?.value || "";
+  budgetAnalyticsRangeEnd = budgetAnalyticsRangeToInput?.value || "";
+
+  renderBudgetAnalyticsModal();
+});
+
 openBudgetAnalyticsModalBtn?.addEventListener("click", (event) => {
   event.preventDefault();
+  renderBudgetAnalyticsModal();
   openBudgetAnalyticsModal();
 });
 
