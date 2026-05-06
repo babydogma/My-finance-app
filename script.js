@@ -1040,18 +1040,18 @@ const budgetAnalyticsExpensesRenderer = window.FinanceAppAnalyticsExpensesRender
   getRangeEnd: () => budgetAnalyticsRangeEnd,
 
   analyticsExpenseValue: budgetAnalyticsExpenseValue,
-  analyticsExpensesPeriodNote: budgetAnalyticsPeriodNote,
-  analyticsExpensesCategoriesList: budgetAnalyticsCategoriesList,
-  analyticsExpensesRing: budgetAnalyticsRing,
-  analyticsExpensesRingCenterValue: budgetAnalyticsRingCenterValue,
-  analyticsExpensesRingCenterLabel: budgetAnalyticsRingCenterLabel,
+analyticsExpensesPeriodNote: budgetAnalyticsPeriodNote,
+analyticsExpensesCategoriesList: budgetAnalyticsCategoriesList,
+analyticsExpensesRing: budgetAnalyticsRing,
+analyticsExpensesRingCenterValue: budgetAnalyticsRingCenterValue,
+analyticsExpensesRingCenterLabel: budgetAnalyticsRingCenterLabel,
 
-  analyticsExpenseValuePremium: null,
-  analyticsExpensesPeriodNotePremium: null,
-  analyticsExpensesCategoriesListPremium: null,
-  analyticsExpensesRingPremium: null,
-  analyticsExpensesRingCenterValuePremium: null,
-  analyticsExpensesRingCenterLabelPremium: null,
+analyticsExpenseValuePremium: budgetAnalyticsExpenseValue,
+analyticsExpensesPeriodNotePremium: budgetAnalyticsPeriodNote,
+analyticsExpensesCategoriesListPremium: budgetAnalyticsCategoriesList,
+analyticsExpensesRingPremium: budgetAnalyticsRing,
+analyticsExpensesRingCenterValuePremium: budgetAnalyticsRingCenterValue,
+analyticsExpensesRingCenterLabelPremium: budgetAnalyticsRingCenterLabel,
 
   analyticsExpensesMonthStrip: budgetAnalyticsMonthStrip,
   analyticsExpensesTotalRowValue: null,
@@ -1195,7 +1195,6 @@ budgetAnalyticsRangeApplyBtn?.addEventListener("click", () => {
 
 openBudgetAnalyticsModalBtn?.addEventListener("click", (event) => {
   event.preventDefault();
-  renderBudgetAnalyticsModal();
   openBudgetAnalyticsModal();
 });
 
