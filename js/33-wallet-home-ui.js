@@ -249,27 +249,27 @@ function formatMoneyCompact(value) {
   const number = roundToTwo(value);
 
   return `${number.toLocaleString("ru-RU", {
-    minimumFractionDigits: number % 1 === 0 ? 0 : 2,
+    minimumFractionDigits: 0,
     maximumFractionDigits: 2,
   })} ₽`;
 }
 
-function createMoneyAccountIcon(card) {
-  const originalIcon = card.querySelector(".list-icon--account");
+function createMoneyAccountIcon(card, index = 0) {
+  const iconWrap = document.createElement("span");
+  iconWrap.className = "money-accounts-row__icon";
+  iconWrap.dataset.accountIndex = String(index);
 
-  if (!originalIcon) {
-    const fallbackIcon = document.createElement("span");
-    fallbackIcon.className = "money-accounts-row__fallback-icon";
-    fallbackIcon.textContent = "₽";
+  const sourceSvg = card.querySelector(".list-icon--account svg");
 
-    return fallbackIcon;
+  if (sourceSvg) {
+    const svg = sourceSvg.cloneNode(true);
+    svg.removeAttribute("class");
+    iconWrap.appendChild(svg);
+    return iconWrap;
   }
 
-  const icon = originalIcon.cloneNode(true);
-
-  icon.classList.add("money-accounts-row__icon");
-
-  return icon;
+  iconWrap.textContent = "₽";
+  return iconWrap;
 }
 
 function renderMoneyAccountsModalList() {
@@ -281,13 +281,12 @@ function renderMoneyAccountsModalList() {
 
   const cards = getRenderedAccountCards();
 
+  const total = cards.reduce((sum, card) => {
+    const value = getAccountCardText(card, ".list-value", "0 ₽");
+    return sum + parseMoneyFromText(value);
+  }, 0);
+
   if (totalEl) {
-    const total = cards.reduce((sum, card) => {
-      const value = getAccountCardText(card, ".list-value", "0 ₽");
-
-      return sum + parseMoneyFromText(value);
-    }, 0);
-
     totalEl.textContent = formatMoneyCompact(total);
   }
 
@@ -316,9 +315,7 @@ function renderMoneyAccountsModalList() {
     row.className = "money-accounts-row";
     row.dataset.accountIndex = String(index);
 
-    const iconWrap = document.createElement("span");
-    iconWrap.className = "money-accounts-row__icon-wrap";
-    iconWrap.appendChild(createMoneyAccountIcon(card));
+    const icon = createMoneyAccountIcon(card, index);
 
     const nameWrap = document.createElement("span");
     nameWrap.className = "money-accounts-row__name";
@@ -326,12 +323,11 @@ function renderMoneyAccountsModalList() {
     const titleEl = document.createElement("strong");
     titleEl.textContent = title;
 
-    const subtitleEl = document.createElement("span");
-    subtitleEl.textContent = subtitle;
-
     nameWrap.appendChild(titleEl);
 
     if (subtitle) {
+      const subtitleEl = document.createElement("span");
+      subtitleEl.textContent = subtitle;
       nameWrap.appendChild(subtitleEl);
     }
 
@@ -344,7 +340,7 @@ function renderMoneyAccountsModalList() {
     chevron.setAttribute("aria-hidden", "true");
     chevron.textContent = "›";
 
-    row.appendChild(iconWrap);
+    row.appendChild(icon);
     row.appendChild(nameWrap);
     row.appendChild(valueEl);
     row.appendChild(chevron);
