@@ -1509,8 +1509,10 @@ body.wallet-mode-hard .accounts-section {
 }
 
 body.wallet-mode-hard .money-accounts-sheet {
+  width: calc(100% - 22px);
   max-height: min(82vh, 760px);
-  padding-bottom: calc(env(safe-area-inset-bottom) + 20px);
+  padding: 34px 18px calc(env(safe-area-inset-bottom) + 18px);
+  border-radius: 32px 32px 26px 26px;
   overflow: hidden;
 }
 
@@ -1519,32 +1521,36 @@ body.wallet-mode-hard .money-accounts-head {
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: start;
   gap: 14px;
-  margin: 0 0 18px;
+  margin: 0 0 20px;
 }
 
 body.wallet-mode-hard .money-accounts-title {
   margin: 0;
+  text-align: left;
   color: var(--hard-text);
-  font-size: 34px;
-  line-height: 0.98;
-  font-weight: 760;
-  letter-spacing: -0.06em;
+  font-size: 32px;
+  line-height: 0.96;
+  font-weight: 740;
+  letter-spacing: -0.055em;
 }
 
 body.wallet-mode-hard .money-accounts-subtitle {
+  max-width: 260px;
   margin: 8px 0 0;
-  color: rgba(7, 16, 36, 0.50);
+  text-align: left;
+  color: rgba(7, 16, 36, 0.52);
   font-size: 15px;
   line-height: 1.18;
-  font-weight: 520;
-  letter-spacing: -0.02em;
+  font-weight: 500;
+  letter-spacing: -0.018em;
 }
 
 body.wallet-mode-hard .money-accounts-close-btn {
   min-height: 42px;
-  padding: 0 18px;
+  padding: 0 17px;
   border-radius: 999px;
   font-size: 15px;
+  line-height: 1;
   font-weight: 650;
 }
 
@@ -1558,24 +1564,24 @@ body.wallet-mode-hard .money-accounts-stats {
 body.wallet-mode-hard .money-accounts-stat {
   min-width: 0;
   min-height: 76px;
-  padding: 16px 17px 14px;
+  padding: 15px 15px 14px;
   border: 1px solid rgba(13, 24, 44, 0.065);
   border-radius: 21px;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(249, 251, 255, 0.94));
   box-shadow:
-    0 10px 22px rgba(32, 48, 79, 0.042),
+    0 10px 22px rgba(32, 48, 79, 0.04),
     inset 0 1px 0 rgba(255, 255, 255, 0.95);
 }
 
 body.wallet-mode-hard .money-accounts-stat span {
   display: block;
-  margin: 0 0 8px;
+  margin: 0 0 9px;
   color: rgba(7, 16, 36, 0.46);
   font-size: 13px;
   line-height: 1;
   font-weight: 560;
-  letter-spacing: -0.015em;
+  letter-spacing: -0.016em;
 }
 
 body.wallet-mode-hard .money-accounts-stat strong {
@@ -1584,8 +1590,8 @@ body.wallet-mode-hard .money-accounts-stat strong {
   color: var(--hard-text);
   font-size: 21px;
   line-height: 1;
-  font-weight: 760;
-  letter-spacing: -0.05em;
+  font-weight: 720;
+  letter-spacing: -0.048em;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1601,12 +1607,12 @@ body.wallet-mode-hard .money-accounts-list {
 body.wallet-mode-hard .money-accounts-row {
   position: relative;
   width: 100%;
-  min-height: 92px;
-  padding: 16px 42px 18px 15px;
-  border: 1px solid rgba(13, 24, 44, 0.06);
+  min-height: 86px;
+  padding: 14px 38px 17px 15px;
+  border: 1px solid rgba(13, 24, 44, 0.058);
   border-radius: 22px;
   display: grid;
-  grid-template-columns: 56px minmax(0, 1fr) auto;
+  grid-template-columns: 50px minmax(0, 1fr) auto;
   align-items: center;
   gap: 14px;
   text-align: left;
@@ -1614,8 +1620,8 @@ body.wallet-mode-hard .money-accounts-row {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(250, 252, 255, 0.96));
   box-shadow:
-    0 12px 26px rgba(32, 48, 79, 0.05),
-    inset 0 1px 0 rgba(255, 255, 255, 0.95);
+    0 10px 22px rgba(32, 48, 79, 0.045),
+    inset 0 1px 0 rgba(255, 255, 255, 0.96);
   appearance: none;
   -webkit-appearance: none;
   overflow: hidden;
@@ -1625,7 +1631,7 @@ body.wallet-mode-hard .money-accounts-row::after {
   content: "";
   position: absolute;
   left: 15px;
-  right: 40px;
+  right: 38px;
   bottom: 9px;
   height: 3px;
   border-radius: 999px;
@@ -1641,44 +1647,46 @@ body.wallet-mode-hard .money-accounts-row:nth-child(3)::after {
 }
 
 body.wallet-mode-hard .money-accounts-row:active {
-  transform: scale(0.987);
+  transform: scale(0.988);
 }
 
-body.wallet-mode-hard .money-accounts-row__icon-wrap {
-  width: 56px;
-  height: 56px;
-  min-width: 56px;
-  border-radius: 999px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-body.wallet-mode-hard .money-accounts-row__icon-wrap .list-icon--account,
 body.wallet-mode-hard .money-accounts-row__icon {
-  width: 56px !important;
-  height: 56px !important;
-  min-width: 56px !important;
-  margin: 0 !important;
-  border-radius: 999px !important;
-}
-
-body.wallet-mode-hard .money-accounts-row__icon-wrap svg {
-  width: 25px !important;
-  height: 25px !important;
-}
-
-body.wallet-mode-hard .money-accounts-row__fallback-icon {
-  width: 56px;
-  height: 56px;
+  width: 50px;
+  height: 50px;
+  min-width: 50px;
   border-radius: 999px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--hard-blue);
-  font-size: 20px;
-  font-weight: 800;
-  background: var(--hard-blue-soft);
+  color: #ffffff;
+  background: linear-gradient(180deg, #73a5ff 0%, #3f7ff2 100%);
+  box-shadow:
+    0 10px 20px rgba(25, 119, 243, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.30);
+}
+
+body.wallet-mode-hard .money-accounts-row__icon[data-account-index="1"] {
+  background: linear-gradient(180deg, #9f8cff 0%, #7460f4 100%);
+  box-shadow:
+    0 10px 20px rgba(123, 97, 255, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.30);
+}
+
+body.wallet-mode-hard .money-accounts-row__icon[data-account-index="2"] {
+  background: linear-gradient(180deg, #87dfc0 0%, #29a97d 100%);
+  box-shadow:
+    0 10px 20px rgba(21, 153, 108, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.30);
+}
+
+body.wallet-mode-hard .money-accounts-row__icon svg {
+  width: 23px;
+  height: 23px;
+  stroke: currentColor;
+  stroke-width: 2;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 body.wallet-mode-hard .money-accounts-row__name {
@@ -1689,10 +1697,10 @@ body.wallet-mode-hard .money-accounts-row__name strong {
   display: block;
   max-width: 100%;
   color: var(--hard-text);
-  font-size: 20px;
-  line-height: 1.02;
-  font-weight: 780;
-  letter-spacing: -0.048em;
+  font-size: 19px;
+  line-height: 1.04;
+  font-weight: 720;
+  letter-spacing: -0.044em;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1700,12 +1708,13 @@ body.wallet-mode-hard .money-accounts-row__name strong {
 
 body.wallet-mode-hard .money-accounts-row__name span {
   display: block;
-  margin-top: 7px;
-  color: rgba(7, 16, 36, 0.48);
-  font-size: 15px;
+  margin-top: 6px;
+  max-width: 100%;
+  color: rgba(7, 16, 36, 0.50);
+  font-size: 14px;
   line-height: 1.05;
-  font-weight: 540;
-  letter-spacing: -0.02em;
+  font-weight: 500;
+  letter-spacing: -0.018em;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1714,10 +1723,10 @@ body.wallet-mode-hard .money-accounts-row__name span {
 body.wallet-mode-hard .money-accounts-row__value {
   max-width: 128px;
   color: var(--hard-text);
-  font-size: 21px;
+  font-size: 19px;
   line-height: 1;
-  font-weight: 780;
-  letter-spacing: -0.05em;
+  font-weight: 720;
+  letter-spacing: -0.048em;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1725,11 +1734,11 @@ body.wallet-mode-hard .money-accounts-row__value {
 
 body.wallet-mode-hard .money-accounts-row__chevron {
   position: absolute;
-  right: 17px;
+  right: 15px;
   top: 50%;
   transform: translateY(-50%);
   color: rgba(7, 16, 36, 0.30);
-  font-size: 34px;
+  font-size: 31px;
   line-height: 1;
   font-weight: 300;
 }
@@ -1750,6 +1759,7 @@ body.wallet-mode-hard .money-accounts-add-btn {
   min-height: 58px;
   border-radius: 20px;
   font-size: 17px;
-  font-weight: 720;
+  line-height: 1;
+  font-weight: 700;
   letter-spacing: -0.025em;
 }
