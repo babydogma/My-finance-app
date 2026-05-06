@@ -370,7 +370,6 @@ function initMoneyAccountsModal() {
   const closeBtn = document.getElementById("closeMoneyAccountsModalBtn");
   const addBtn = document.getElementById("moneyAccountsAddBtn");
   const accountsList = document.getElementById("accountsList");
-  const summaryAccountsBtn = document.getElementById("hardScrollAccountsBtn");
 
   if (!hero || !modal) return;
 
@@ -393,13 +392,6 @@ function initMoneyAccountsModal() {
     if (event.key !== "Enter" && event.key !== " ") return;
 
     event.preventDefault();
-    openMoneyModal();
-  });
-
-  summaryAccountsBtn?.addEventListener("click", (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-
     openMoneyModal();
   });
 
