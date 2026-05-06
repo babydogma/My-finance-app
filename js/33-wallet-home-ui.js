@@ -428,6 +428,34 @@ function initMoneyAccountsModal() {
   }
 }
 
+function splitExpectedIncomeDetails(rawText) {
+  const text = String(rawText || "").trim();
+
+  if (!text || text === "Ожидание пока не добавлено") {
+    return {
+      value: "Ожидание не добавлено",
+      note: "Можно указать ближайшую ЗП или другой доход",
+    };
+  }
+
+  const parts = text
+    .split(/\s*[·•]\s*/)
+    .map((part) => part.trim())
+    .filter(Boolean);
+
+  if (parts.length >= 2) {
+    return {
+      value: parts[0],
+      note: parts.slice(1).join(" · "),
+    };
+  }
+
+  return {
+    value: text,
+    note: "Ближайший ожидаемый доход",
+  };
+}
+
 function syncUpcomingDetailsModal() {
   const incomeLabelSource = document.getElementById("walletExpectedIncomeLabel");
   const incomeValueSource = document.getElementById("walletExpectedIncomeValue");
@@ -445,13 +473,17 @@ function syncUpcomingDetailsModal() {
   const remainingLimitsTarget = document.getElementById("upcomingDetailsRemainingLimitsValue");
   const mandatoryControlTarget = document.getElementById("upcomingDetailsMandatoryControlValue");
 
-  if (incomeValueTarget && incomeValueSource) {
-    incomeValueTarget.textContent = incomeValueSource.textContent.trim() || "Ожидание не добавлено";
+  if (incomeValueSource) {
+  const expectedDetails = splitExpectedIncomeDetails(incomeValueSource.textContent);
+
+  if (incomeValueTarget) {
+    incomeValueTarget.textContent = expectedDetails.value;
   }
 
-  if (incomeLabelTarget && incomeLabelSource) {
-    incomeLabelTarget.textContent = incomeLabelSource.textContent.trim() || "Ближайший ожидаемый доход";
+  if (incomeLabelTarget) {
+    incomeLabelTarget.textContent = expectedDetails.note;
   }
+}
 
   if (mandatoryValueTarget && mandatoryValueSource) {
     mandatoryValueTarget.textContent = mandatoryValueSource.textContent.trim() || "0 ₽";
