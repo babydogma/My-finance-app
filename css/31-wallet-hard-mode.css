@@ -1944,3 +1944,57 @@ body.wallet-mode-hard #budgetAnalyticsModal .budget-analytics-categories {
   margin-top: 14px;
   padding-bottom: 24px;
 }
+
+/* =========================================================
+   Package 1: main screen architecture cleanup
+   ========================================================= */
+
+/* Убираем дублирующие блоки с главной.
+   HTML не удаляем, чтобы не ломать JS-ссылки и расчёты. */
+body.wallet-mode-hard .hard-summary-section,
+body.wallet-mode-hard .hard-pressure-section {
+  display: none !important;
+}
+
+/* Новый смысловой блок вместо старого “План” */
+body.wallet-mode-hard .hard-upcoming-section {
+  padding-top: 2px;
+}
+
+body.wallet-mode-hard .hard-upcoming-card {
+  border-radius: 24px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(248, 250, 254, 0.96));
+  box-shadow:
+    0 14px 30px rgba(32, 48, 79, 0.055),
+    inset 0 1px 0 rgba(255, 255, 255, 0.96);
+}
+
+body.wallet-mode-hard .hard-upcoming-row {
+  min-height: 74px;
+  padding: 14px 15px;
+}
+
+body.wallet-mode-hard .hard-upcoming-row .hard-plan-row__body span {
+  font-size: 16px;
+  font-weight: 720;
+  letter-spacing: -0.032em;
+}
+
+body.wallet-mode-hard .hard-upcoming-row .hard-plan-row__body strong {
+  font-size: 12.8px;
+  font-weight: 470;
+  color: rgba(7, 16, 36, 0.50);
+}
+
+body.wallet-mode-hard .hard-upcoming-row .hard-plan-row__value {
+  font-size: 17px;
+  font-weight: 720;
+}
+
+body.wallet-mode-hard .hard-upcoming-row .hard-plan-pill {
+  min-height: 31px;
+  padding: 0 13px;
+  font-size: 13px;
+  font-weight: 650;
+}
