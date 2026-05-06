@@ -1859,3 +1859,58 @@ body.wallet-mode-hard .budget-analytics-categories {
   margin-top: 4px;
   padding-bottom: 2px;
 }
+
+/* =========================================================
+   Budget analytics modal controls
+   ========================================================= */
+
+body.wallet-mode-hard .budget-analytics-ring-layout {
+  width: 100%;
+}
+
+body.wallet-mode-hard .budget-analytics-kind-rail,
+body.wallet-mode-hard .budget-analytics-period-rail {
+  align-self: center;
+}
+
+body.wallet-mode-hard .budget-analytics-range-dock {
+  margin-top: 0;
+  margin-bottom: 16px;
+}
+
+body.wallet-mode-hard .budget-analytics-kind-rail [data-budget-analytics-kind="flexible"].is-active {
+  color: var(--accent);
+  border-color: rgba(47, 125, 246, 0.16);
+  background:
+    linear-gradient(180deg, rgba(232, 240, 255, 0.99), rgba(218, 231, 255, 0.94));
+}
+
+body.wallet-mode-hard .budget-analytics-kind-rail [data-budget-analytics-kind="all"].is-active {
+  color: var(--green);
+  border-color: rgba(21, 151, 107, 0.16);
+  background:
+    linear-gradient(180deg, rgba(226, 248, 240, 0.99), rgba(205, 240, 227, 0.94));
+}
+
+body.wallet-mode-hard .budget-analytics-kind-rail [data-budget-analytics-kind="required"].is-active {
+  color: var(--red);
+  border-color: rgba(239, 91, 79, 0.16);
+  background:
+    linear-gradient(180deg, rgba(255, 236, 233, 0.99), rgba(255, 224, 220, 0.94));
+}
+
+body.wallet-mode-hard .budget-analytics-period-rail [data-budget-analytics-period="today"].is-active,
+body.wallet-mode-hard .budget-analytics-period-rail [data-budget-analytics-period="7"].is-active,
+body.wallet-mode-hard .budget-analytics-period-rail [data-budget-analytics-period="month"].is-active {
+  color: var(--accent);
+  border-color: rgba(47, 125, 246, 0.16);
+  background:
+    linear-gradient(180deg, rgba(232, 240, 255, 0.99), rgba(218, 231, 255, 0.94));
+}
+
+body.wallet-mode-hard .budget-analytics-period-rail [data-budget-analytics-period="range"].is-active {
+  color: var(--green);
+  border-color: rgba(21, 151, 107, 0.16);
+  background:
+    linear-gradient(180deg, rgba(226, 248, 240, 0.99), rgba(205, 240, 227, 0.94));
+}
