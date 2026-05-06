@@ -433,8 +433,8 @@ function splitExpectedIncomeDetails(rawText) {
 
   if (!text || text === "Ожидание пока не добавлено") {
     return {
-      value: "Ожидание не добавлено",
-      note: "Можно указать ближайшую ЗП или другой доход",
+      value: "0 ₽",
+      note: "Ожидание не добавлено",
     };
   }
 
@@ -443,16 +443,26 @@ function splitExpectedIncomeDetails(rawText) {
     .map((part) => part.trim())
     .filter(Boolean);
 
-  if (parts.length >= 2) {
-    return {
-      value: parts[0],
-      note: parts.slice(1).join(" · "),
-    };
+  let value = parts[0] || text;
+  let note = parts.slice(1).join(" · ");
+
+  value = value
+    .replace(/^минимум\s+/i, "")
+    .replace(/^ожидается\s+минимум\s+/i, "")
+    .replace(/^жду\s+/i, "")
+    .trim();
+
+  if (!note) {
+    const dateMatch = text.match(/\b\d{1,2}\s+[а-яё]+\.?\b/i);
+
+    if (dateMatch) {
+      note = dateMatch[0].replace(".", "");
+    }
   }
 
   return {
-    value: text,
-    note: "Ближайший ожидаемый доход",
+    value: value || "0 ₽",
+    note: note || "Ближайший ожидаемый доход",
   };
 }
 
