@@ -201,10 +201,169 @@
       applyDeltaVisual(expenseDeltaEl, expenseDelta, "expense");
     }
   }
+  
+  function openHardModal(modal) {
+  if (!modal) return;
+
+  modal.classList.remove("hidden", "is-closing");
+
+  requestAnimationFrame(() => {
+    modal.classList.add("is-visible");
+  });
+}
+
+function closeHardModal(modal) {
+  if (!modal) return;
+
+  modal.classList.remove("is-visible");
+  modal.classList.add("is-closing");
+
+  window.setTimeout(() => {
+    modal.classList.remove("is-closing");
+    modal.classList.add("hidden");
+  }, 260);
+}
+
+function getRenderedAccountCards() {
+  return Array.from(
+    document.querySelectorAll("#accountsList .list-card")
+  );
+}
+
+function getAccountCardText(card, selector, fallback = "") {
+  return card.querySelector(selector)?.textContent?.trim() || fallback;
+}
+
+function renderMoneyAccountsModalList() {
+  const list = document.getElementById("moneyAccountsList");
+
+  if (!list) return;
+
+  const cards = getRenderedAccountCards();
+
+  if (!cards.length) {
+    list.innerHTML = `
+      <div class="money-accounts-empty">
+        Счета ещё не загрузились
+      </div>
+    `;
+    return;
+  }
+
+  list.innerHTML = "";
+
+  cards.forEach((card, index) => {
+    const title = getAccountCardText(card, ".list-title", "Счёт");
+    const subtitle = getAccountCardText(card, ".list-subtitle", "");
+    const value = getAccountCardText(card, ".list-value", "0 ₽");
+
+    const row = document.createElement("button");
+    row.type = "button";
+    row.className = "money-accounts-row";
+    row.innerHTML = `
+      <span class="money-accounts-row__name">
+        <strong>${title}</strong>
+        ${subtitle ? `<span>${subtitle}</span>` : ""}
+      </span>
+
+      <strong class="money-accounts-row__value">${value}</strong>
+    `;
+
+    row.addEventListener("click", () => {
+      const modal = document.getElementById("moneyAccountsModal");
+
+      closeHardModal(modal);
+
+      window.setTimeout(() => {
+        const freshCards = getRenderedAccountCards();
+        const targetCard = freshCards[index];
+
+        if (targetCard) {
+          targetCard.click();
+        }
+      }, 180);
+    });
+
+    list.appendChild(row);
+  });
+}
+
+function initMoneyAccountsModal() {
+  const hero = document.getElementById("walletGameHero");
+  const modal = document.getElementById("moneyAccountsModal");
+  const closeBtn = document.getElementById("closeMoneyAccountsModalBtn");
+  const addBtn = document.getElementById("moneyAccountsAddBtn");
+  const accountsList = document.getElementById("accountsList");
+  const summaryAccountsBtn = document.getElementById("hardScrollAccountsBtn");
+
+  if (!hero || !modal) return;
+
+  hero.setAttribute("role", "button");
+  hero.setAttribute("tabindex", "0");
+  hero.setAttribute("aria-label", "Открыть все деньги");
+
+  function openMoneyModal() {
+    renderMoneyAccountsModalList();
+    openHardModal(modal);
+  }
+
+  hero.addEventListener("click", (event) => {
+    if (event.target.closest("#openMonthlyReportBtn")) return;
+
+    openMoneyModal();
+  });
+
+  hero.addEventListener("keydown", (event) => {
+    if (event.key !== "Enter" && event.key !== " ") return;
+
+    event.preventDefault();
+    openMoneyModal();
+  });
+
+  summaryAccountsBtn?.addEventListener("click", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    openMoneyModal();
+  });
+
+  closeBtn?.addEventListener("click", () => {
+    closeHardModal(modal);
+  });
+
+  modal.addEventListener("click", (event) => {
+    if (event.target === modal) {
+      closeHardModal(modal);
+    }
+  });
+
+  addBtn?.addEventListener("click", () => {
+    closeHardModal(modal);
+
+    window.setTimeout(() => {
+      document.getElementById("openCreateAccountModalBtn")?.click();
+    }, 180);
+  });
+
+  if (accountsList) {
+    const observer = new MutationObserver(() => {
+      if (!modal.classList.contains("hidden")) {
+        renderMoneyAccountsModalList();
+      }
+    });
+
+    observer.observe(accountsList, {
+      childList: true,
+      subtree: true,
+      characterData: true,
+    });
+  }
+}
 
   document.addEventListener("DOMContentLoaded", () => {
     syncFreeMoneyValue();
     syncHardMonthDeltasToDate();
+    initMoneyAccountsModal();
 
     const valueEl = document.getElementById("balanceFreeMoneyValue");
 
