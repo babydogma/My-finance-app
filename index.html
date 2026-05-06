@@ -118,47 +118,57 @@
   <!-- HARD MONTH OVERVIEW -->
 <section class="hard-month-overview" id="hardMonthOverview">
   <div class="hard-month-overview__cards">
-    <article class="hard-month-stat hard-month-stat--income">
-      <div class="hard-month-stat__head">
-        <span class="hard-month-stat__icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24">
-            <path d="M12 5v14" />
-            <path d="M7 10l5-5 5 5" />
-          </svg>
-        </span>
-        <span>Доход</span>
-      </div>
+    <button
+  class="hard-month-stat hard-month-stat--income hard-month-stat--clickable"
+  type="button"
+  id="openIncomeModal"
+  aria-label="Добавить доход"
+>
+  <div class="hard-month-stat__head">
+    <span class="hard-month-stat__icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24">
+        <path d="M12 5v14" />
+        <path d="M7 10l5-5 5 5" />
+      </svg>
+    </span>
+    <span>Доход</span>
+  </div>
 
-      <strong id="hardMonthIncomeValue">0 ₽</strong>
+  <strong id="hardMonthIncomeValue">0 ₽</strong>
 
-      <small
-        class="hard-month-stat__delta hard-month-stat__delta--neutral"
-        id="hardMonthIncomeDelta"
-      >
-        0%
-      </small>
-    </article>
+  <small
+    class="hard-month-stat__delta hard-month-stat__delta--neutral"
+    id="hardMonthIncomeDelta"
+  >
+    0%
+  </small>
+</button>
 
-    <article class="hard-month-stat hard-month-stat--expense">
-      <div class="hard-month-stat__head">
-        <span class="hard-month-stat__icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24">
-            <path d="M12 5v14" />
-            <path d="M7 14l5 5 5-5" />
-          </svg>
-        </span>
-        <span>Расход</span>
-      </div>
+    <button
+  class="hard-month-stat hard-month-stat--expense hard-month-stat--clickable"
+  type="button"
+  id="openExpenseModal"
+  aria-label="Добавить расход"
+>
+  <div class="hard-month-stat__head">
+    <span class="hard-month-stat__icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24">
+        <path d="M12 5v14" />
+        <path d="M7 14l5 5 5-5" />
+      </svg>
+    </span>
+    <span>Расход</span>
+  </div>
 
-      <strong id="hardMonthExpenseValue">0 ₽</strong>
+  <strong id="hardMonthExpenseValue">0 ₽</strong>
 
-      <small
-        class="hard-month-stat__delta hard-month-stat__delta--neutral"
-        id="hardMonthExpenseDelta"
-      >
-        0%
-      </small>
-    </article>
+  <small
+    class="hard-month-stat__delta hard-month-stat__delta--neutral"
+    id="hardMonthExpenseDelta"
+  >
+    0%
+  </small>
+</button>
   </div>
 
   <article class="hard-month-budget">
@@ -184,51 +194,6 @@
     </div>
   </article>
 </section>
-
-  <!-- ACTIONS -->
-  <section class="actions">
-    <button class="action-card action-card--expense" type="button" id="openExpenseModal">
-      <div class="action-icon">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M7 17 17 7" />
-          <path d="M9 7h8v8" />
-        </svg>
-      </div>
-      <div class="action-label">Расход</div>
-    </button>
-
-    <button class="action-card action-card--income" type="button" id="openIncomeModal">
-      <div class="action-icon">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M17 7 7 17" />
-          <path d="M7 9v8h8" />
-        </svg>
-      </div>
-      <div class="action-label">Доход</div>
-    </button>
-
-    <button class="action-card action-card--transfer" type="button" id="openTransferModal">
-      <div class="action-icon">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M7 17 17 7" />
-          <path d="M10 7h7v7" />
-        </svg>
-      </div>
-      <div class="action-label">Перевод</div>
-    </button>
-
-    <button class="action-card action-card--categories" type="button" id="openCategoriesManagerBtn">
-      <div class="action-icon">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M6 8h9" />
-          <path d="M12 5l3 3-3 3" />
-          <path d="M18 16H9" />
-          <path d="M12 13l-3 3 3 3" />
-        </svg>
-      </div>
-      <div class="action-label">Категории</div>
-    </button>
-  </section>
 
   <!-- HARD SUMMARY -->
   <section class="section hard-summary-section">
