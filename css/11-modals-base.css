@@ -67,17 +67,17 @@
   overflow: hidden;
   overscroll-behavior: contain;
   opacity: 0;
-  transform: translate3d(0, 96px, 0) scale(0.94);
-  transform-origin: center bottom;
-  will-change: transform, opacity;
+transform: translate3d(0, 42px, 0) scale(0.985);
+transform-origin: center bottom;
+will-change: transform, opacity;
 }
 
 .modal.is-visible .modal-sheet {
-  animation: modalSheetEnterLight 0.46s cubic-bezier(0.18, 1.12, 0.22, 1) both;
+  animation: modalSheetEnterLight 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .modal.is-closing .modal-sheet {
-  animation: modalSheetExitLight 0.26s cubic-bezier(0.4, 0, 0.2, 1) both;
+  animation: modalSheetExitLight 0.22s cubic-bezier(0.4, 0, 0.2, 1) both;
 }
 
 .modal-handle {
@@ -151,12 +151,7 @@ body.modal-scroll-locked {
 @keyframes modalSheetEnterLight {
   0% {
     opacity: 0;
-    transform: translate3d(0, 96px, 0) scale(0.94);
-  }
-
-  62% {
-    opacity: 1;
-    transform: translate3d(0, -6px, 0) scale(1.008);
+    transform: translate3d(0, 42px, 0) scale(0.985);
   }
 
   100% {
@@ -173,7 +168,7 @@ body.modal-scroll-locked {
 
   100% {
     opacity: 0;
-    transform: translate3d(0, 52px, 0) scale(0.972);
+    transform: translate3d(0, 34px, 0) scale(0.985);
   }
 }
 
