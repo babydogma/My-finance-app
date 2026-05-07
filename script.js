@@ -1057,12 +1057,8 @@ analyticsExpensesRingCenterLabelPremium: budgetAnalyticsRingCenterLabel,
   analyticsExpensesTotalRowValue: null,
 
   openAnalyticsCategoryModal: (categoryId) => {
-    closeAnimatedModal(budgetAnalyticsModal);
-
-    window.setTimeout(() => {
-      openAnalyticsCategoryModal?.(categoryId);
-    }, 140);
-  },
+  openAnalyticsCategoryModal?.(categoryId);
+},
 });
 
 function getBudgetAnalyticsPeriodNote() {
