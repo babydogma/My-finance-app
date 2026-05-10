@@ -62,7 +62,7 @@
 
   function formatDateRangeLabel(fromValue, toValue) {
     if (!fromValue || !toValue) return "";
-    return `${formatDateShort(fromValue)} — ${formatDateShort(toValue)}`;
+    return `${formatDateShort(fromValue)} â ${formatDateShort(toValue)}`;
   }
 
   function getStartOfTodayTime() {
@@ -71,97 +71,85 @@
   }
 
   function getTransactionMainDateValue(item) {
-  return (
-    item.date ||
-    item.transaction_date ||
-    item.operation_date ||
-    item.created_date ||
-    item.created_at ||
-    item.createdAt ||
-    ""
-  );
-}
-
-function getTransactionMainDateValue(item) {
-  return (
-    item.date ||
-    item.transaction_date ||
-    item.operation_date ||
-    item.created_date ||
-    item.created_at ||
-    item.createdAt ||
-    ""
-  );
-}
-
-function getTransactionDateKey(item) {
-  const rawValue = getTransactionMainDateValue(item);
-
-  if (!rawValue) return "";
-
-  const rawText = String(rawValue);
-
-  if (/^\d{4}-\d{2}-\d{2}/.test(rawText)) {
-    return rawText.slice(0, 10);
+    return (
+      item.date ||
+      item.transaction_date ||
+      item.operation_date ||
+      item.created_date ||
+      item.created_at ||
+      item.createdAt ||
+      ""
+    );
   }
 
-  const parsedDate = new Date(rawText);
+  function getTransactionDateKey(item) {
+    const rawValue = getTransactionMainDateValue(item);
 
-  if (!Number.isNaN(parsedDate.getTime())) {
-    return getDateOnlyString(parsedDate);
+    if (!rawValue) return "";
+
+    const rawText = String(rawValue);
+
+    if (/^\d{4}-\d{2}-\d{2}/.test(rawText)) {
+      return rawText.slice(0, 10);
+    }
+
+    const parsedDate = new Date(rawText);
+
+    if (!Number.isNaN(parsedDate.getTime())) {
+      return getDateOnlyString(parsedDate);
+    }
+
+    return "";
   }
 
-  return "";
-}
-
-function getTransactionTime(item) {
-  const dateKey = getTransactionDateKey(item);
-
-  if (!dateKey) return 0;
-
-  const [year, month, day] = dateKey.split("-").map(Number);
-
-  if (!year || !month || !day) return 0;
-
-  return new Date(year, month - 1, day).getTime();
-}
-
-function filterTransactionsByPeriod(items, period, selectedMonth, rangeStart, rangeEnd) {
-  const todayKey = getTodayDateValue();
-  const currentMonth = selectedMonth || getCurrentMonthValue();
-  const startOfToday = getStartOfTodayTime();
-  const sevenDaysStartKey = getDateOnlyString(
-    new Date(startOfToday - 6 * 24 * 60 * 60 * 1000)
-  );
-
-  return items.filter((item) => {
+  function getTransactionTime(item) {
     const dateKey = getTransactionDateKey(item);
 
-    if (!dateKey) return false;
+    if (!dateKey) return 0;
 
-    if (period === "month") {
-      return dateKey.slice(0, 7) === currentMonth;
-    }
+    const [year, month, day] = dateKey.split("-").map(Number);
 
-    if (period === "today") {
-      return dateKey === todayKey;
-    }
+    if (!year || !month || !day) return 0;
 
-    if (period === "7") {
-      return dateKey >= sevenDaysStartKey && dateKey <= todayKey;
-    }
+    return new Date(year, month - 1, day).getTime();
+  }
 
-    if (period === "range") {
-  if (!rangeStart && !rangeEnd) return true;
-  if (rangeStart && !rangeEnd) return dateKey >= rangeStart;
-  if (!rangeStart && rangeEnd) return dateKey <= rangeEnd;
+  function filterTransactionsByPeriod(items, period, selectedMonth, rangeStart, rangeEnd) {
+    const todayKey = getTodayDateValue();
+    const currentMonth = selectedMonth || getCurrentMonthValue();
+    const startOfToday = getStartOfTodayTime();
+    const sevenDaysStartKey = getDateOnlyString(
+      new Date(startOfToday - 6 * 24 * 60 * 60 * 1000)
+    );
 
-  return dateKey >= rangeStart && dateKey <= rangeEnd;
-}
+    return items.filter((item) => {
+      const dateKey = getTransactionDateKey(item);
 
-    return true;
-  });
-}
+      if (!dateKey) return false;
+
+      if (period === "month") {
+        return dateKey.slice(0, 7) === currentMonth;
+      }
+
+      if (period === "today") {
+        return dateKey === todayKey;
+      }
+
+      if (period === "7") {
+        return dateKey >= sevenDaysStartKey && dateKey <= todayKey;
+      }
+
+      if (period === "range") {
+        if (!rangeStart && !rangeEnd) return true;
+        if (rangeStart && !rangeEnd) return dateKey >= rangeStart;
+        if (!rangeStart && rangeEnd) return dateKey <= rangeEnd;
+
+        return dateKey >= rangeStart && dateKey <= rangeEnd;
+      }
+
+      return true;
+    });
+  }
 
   function getCurrentTime() {
     const now = new Date();
@@ -173,7 +161,7 @@ function filterTransactionsByPeriod(items, period, selectedMonth, rangeStart, ra
   }
 
   function formatMoney(value) {
-    return `${new Intl.NumberFormat("ru-RU").format(Number(value) || 0)} ₽`;
+    return `${new Intl.NumberFormat("ru-RU").format(Number(value) || 0)} â½`;
   }
 
   function formatDateShort(dateValue) {
@@ -211,10 +199,10 @@ function filterTransactionsByPeriod(items, period, selectedMonth, rangeStart, ra
   }
 
   function formatMonthButtonLabel(monthValue) {
-    if (!monthValue) return "Месяц";
+    if (!monthValue) return "ÐÐµÑÑÑ";
 
     const [year, month] = monthValue.split("-").map(Number);
-    if (!year || !month) return "Месяц";
+    if (!year || !month) return "ÐÐµÑÑÑ";
 
     const date = new Date(year, month - 1, 1);
     const monthLabel = date.toLocaleDateString("ru-RU", { month: "long" });
@@ -224,18 +212,18 @@ function filterTransactionsByPeriod(items, period, selectedMonth, rangeStart, ra
 
   function getRussianMonthNames() {
     return [
-      "Январь",
-      "Февраль",
-      "Март",
-      "Апрель",
-      "Май",
-      "Июнь",
-      "Июль",
-      "Август",
-      "Сентябрь",
-      "Октябрь",
-      "Ноябрь",
-      "Декабрь",
+      "Ð¯Ð½Ð²Ð°ÑÑ",
+      "Ð¤ÐµÐ²ÑÐ°Ð»Ñ",
+      "ÐÐ°ÑÑ",
+      "ÐÐ¿ÑÐµÐ»Ñ",
+      "ÐÐ°Ð¹",
+      "ÐÑÐ½Ñ",
+      "ÐÑÐ»Ñ",
+      "ÐÐ²Ð³ÑÑÑ",
+      "Ð¡ÐµÐ½ÑÑÐ±ÑÑ",
+      "ÐÐºÑÑÐ±ÑÑ",
+      "ÐÐ¾ÑÐ±ÑÑ",
+      "ÐÐµÐºÐ°Ð±ÑÑ",
     ];
   }
 
