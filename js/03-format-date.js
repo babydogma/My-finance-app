@@ -62,7 +62,7 @@
 
   function formatDateRangeLabel(fromValue, toValue) {
     if (!fromValue || !toValue) return "";
-    return `${formatDateShort(fromValue)} â ${formatDateShort(toValue)}`;
+    return `${formatDateShort(fromValue)} \u2014 ${formatDateShort(toValue)}`;
   }
 
   function getStartOfTodayTime() {
@@ -161,7 +161,7 @@
   }
 
   function formatMoney(value) {
-    return `${new Intl.NumberFormat("ru-RU").format(Number(value) || 0)} â½`;
+    return `${new Intl.NumberFormat("ru-RU").format(Number(value) || 0)} \u20bd`;
   }
 
   function formatDateShort(dateValue) {
@@ -199,10 +199,10 @@
   }
 
   function formatMonthButtonLabel(monthValue) {
-    if (!monthValue) return "ÐÐµÑÑÑ";
+    if (!monthValue) return "\u041c\u0435\u0441\u044f\u0446";
 
     const [year, month] = monthValue.split("-").map(Number);
-    if (!year || !month) return "ÐÐµÑÑÑ";
+    if (!year || !month) return "\u041c\u0435\u0441\u044f\u0446";
 
     const date = new Date(year, month - 1, 1);
     const monthLabel = date.toLocaleDateString("ru-RU", { month: "long" });
@@ -212,18 +212,18 @@
 
   function getRussianMonthNames() {
     return [
-      "Ð¯Ð½Ð²Ð°ÑÑ",
-      "Ð¤ÐµÐ²ÑÐ°Ð»Ñ",
-      "ÐÐ°ÑÑ",
-      "ÐÐ¿ÑÐµÐ»Ñ",
-      "ÐÐ°Ð¹",
-      "ÐÑÐ½Ñ",
-      "ÐÑÐ»Ñ",
-      "ÐÐ²Ð³ÑÑÑ",
-      "Ð¡ÐµÐ½ÑÑÐ±ÑÑ",
-      "ÐÐºÑÑÐ±ÑÑ",
-      "ÐÐ¾ÑÐ±ÑÑ",
-      "ÐÐµÐºÐ°Ð±ÑÑ",
+      "\u042f\u043d\u0432\u0430\u0440\u044c",
+      "\u0424\u0435\u0432\u0440\u0430\u043b\u044c",
+      "\u041c\u0430\u0440\u0442",
+      "\u0410\u043f\u0440\u0435\u043b\u044c",
+      "\u041c\u0430\u0439",
+      "\u0418\u044e\u043d\u044c",
+      "\u0418\u044e\u043b\u044c",
+      "\u0410\u0432\u0433\u0443\u0441\u0442",
+      "\u0421\u0435\u043d\u0442\u044f\u0431\u0440\u044c",
+      "\u041e\u043a\u0442\u044f\u0431\u0440\u044c",
+      "\u041d\u043e\u044f\u0431\u0440\u044c",
+      "\u0414\u0435\u043a\u0430\u0431\u0440\u044c",
     ];
   }
 
