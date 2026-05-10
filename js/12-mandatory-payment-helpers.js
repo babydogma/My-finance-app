@@ -173,10 +173,41 @@
     }
 
     function getMandatoryPaymentsCoverageStats(monthKey = getCurrentMonthKey()) {
-      const unpaidItems = state.mandatoryPayments.filter((item) => {
-        if (!isMandatoryPaymentVisibleInMonth(item, monthKey)) return false;
-        return !isMandatoryPaymentPaidInMonth(item, monthKey);
-      });
+      const unpaidItems = state.mandatoryPayments
+        .filter((item) => {
+          if (!isMandatoryPaymentVisibleInMonth(item, monthKey)) return false;
+          return !isMandatoryPaymentPaidInMonth(item, monthKey);
+        })
+        .sort((a, b) => {
+          return buildMandatoryPaymentDate(monthKey, a.due_day)
+            .localeCompare(buildMandatoryPaymentDate(monthKey, b.due_day));
+        });
+
+      const safeBalanceLeftById = new Map();
+
+      function getLinkedSafeBalanceLeft(bucketId) {
+        if (!bucketId) return 0;
+
+        if (!safeBalanceLeftById.has(bucketId)) {
+          safeBalanceLeftById.set(
+            bucketId,
+            Math.max(0, roundToTwo(getSafeBucketBalance(bucketId)))
+          );
+        }
+
+        return safeBalanceLeftById.get(bucketId) || 0;
+      }
+
+      function consumeLinkedSafe(bucketId, amount) {
+        if (!bucketId || amount <= 0) return 0;
+
+        const balanceLeft = getLinkedSafeBalanceLeft(bucketId);
+        const covered = Math.min(amount, balanceLeft);
+
+        safeBalanceLeftById.set(bucketId, roundToTwo(balanceLeft - covered));
+
+        return roundToTwo(covered);
+      }
 
       let total = 0;
       let coveredByLinkedSafes = 0;
@@ -186,32 +217,21 @@
 
       unpaidItems.forEach((item) => {
         const amount = roundToTwo(Number(item.amount) || 0);
+        if (amount <= 0) return;
+
         total += amount;
 
         const linkedSafeId = item.linked_safe_bucket_id || "";
-        const linkedSafeBalance = linkedSafeId
-          ? Math.max(0, roundToTwo(getSafeBucketBalance(linkedSafeId)))
-          : 0;
-
-        const coveredByThisSafe = Math.min(amount, linkedSafeBalance);
-        coveredByLinkedSafes += coveredByThisSafe;
-
-        const coveredByProtected =
-          linkedSafeId && isProtectedSafeBucket(linkedSafeId)
-            ? coveredByThisSafe
-            : 0;
-
-        coveredByProtectedSafes += coveredByProtected;
-
+        const coveredByThisSafe = consumeLinkedSafe(linkedSafeId, amount);
         const uncoveredAfterLinked = Math.max(0, roundToTwo(amount - coveredByThisSafe));
+
+        coveredByLinkedSafes += coveredByThisSafe;
         uncoveredAfterLinkedSafes += uncoveredAfterLinked;
+        chargeToFreeMoney += uncoveredAfterLinked;
 
-        const toChargeFromFreeMoney = Math.max(
-          0,
-          roundToTwo(amount - coveredByProtected)
-        );
-
-        chargeToFreeMoney += toChargeFromFreeMoney;
+        if (linkedSafeId && isProtectedSafeBucket(linkedSafeId)) {
+          coveredByProtectedSafes += coveredByThisSafe;
+        }
       });
 
       return {
