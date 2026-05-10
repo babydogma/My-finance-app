@@ -98,7 +98,7 @@ body.wallet-mode-light .wallet-light-view {
 }
 
 .wallet-light-balance-core.is-updating .wallet-light-view__money {
-  animation: walletLightMoneyUpdate 0.46s cubic-bezier(0.2, 0.95, 0.25, 1);
+  animation: walletLightMoneyUpdate 0.28s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .wallet-light-actions {
@@ -170,23 +170,13 @@ body.wallet-mode-light .wallet-light-view {
 
 @keyframes walletLightMoneyUpdate {
   0% {
-    transform: translateY(0) scale(1);
-    opacity: 1;
-  }
-
-  28% {
-    transform: translateY(-2px) scale(1.028);
-    opacity: 0.92;
-  }
-
-  58% {
-    transform: translateY(1px) scale(0.992);
-    opacity: 1;
+    opacity: 0.72;
+    transform: translate3d(0, 6px, 0);
   }
 
   100% {
-    transform: translateY(0) scale(1);
     opacity: 1;
+    transform: translate3d(0, 0, 0);
   }
 }
 
