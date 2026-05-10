@@ -463,12 +463,12 @@
     }
 
     function closeMandatoryPaymentsModal() {
-  closeModalIfOpen(getBucketPickerModal());
-  closeModalIfOpen(getEditorModal());
-  closeModalIfOpen(getCalendarModal());
+      closeModalIfOpen(getBucketPickerModal());
+      closeModalIfOpen(getEditorModal());
+      closeModalIfOpen(getCalendarModal());
 
-  resetMandatoryPaymentForm();
-}
+      resetMandatoryPaymentForm();
+    }
 
     function bindButton(button, key, handler) {
       if (!button) return;
