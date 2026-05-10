@@ -167,43 +167,30 @@ function syncHardSummary() {
   }
 
   function makeNoBreakRate(value) {
-  const span = document.createElement("span");
+    const span = document.createElement("span");
 
-  span.style.whiteSpace = "nowrap";
-  span.textContent = `${value}/день`;
+    span.style.whiteSpace = "nowrap";
+    span.textContent = `${value}/день`;
 
-  return span;
-}
+    return span;
+  }
 
-function syncHeroHint() {
-  const hint = document.getElementById("walletGameHint");
-  if (!hint) return;
+  function syncHeroHint() {
+    const hint = document.getElementById("walletGameHint");
+    if (!hint) return;
 
-  const currentHint = hint.textContent.trim();
+    const currentHint = hint.textContent.trim();
+    const isInitialHint = currentHint.toLowerCase().includes("сейчас проверяю");
 
-  const isGeneratedHint =
-    currentHint.startsWith("До 13 мая можно") ||
-    currentHint.startsWith("До ближайших денег можно");
+    if (currentHint && !isInitialHint) return;
 
-  const isInitialHint = currentHint.toLowerCase().includes("сейчас проверяю");
-
-  if (currentHint && !isGeneratedHint && !isInitialHint) return;
-
-  const todayCan = getMoneyTextById("walletTodayCanValue", "0 ₽");
-  const afterIncome = getMoneyTextById("walletLimitsPressureValue", "0 ₽");
-
-  const br = document.createElement("br");
-
-  hint.replaceChildren(
-    document.createTextNode("До 13 мая можно "),
-    makeNoBreakRate(todayCan),
-    document.createTextNode("."),
-    br,
-    document.createTextNode("После ожидаемых денег до конца месяца — "),
-    makeNoBreakRate(afterIncome),
-    document.createTextNode(".")
-  );
-}
+    const todayCan = getMoneyTextById("walletTodayCanValue", "0 ₽");
+    hint.replaceChildren(
+      document.createTextNode("До конца месяца можно "),
+      makeNoBreakRate(todayCan),
+      document.createTextNode(". Данные обновятся после загрузки операций.")
+    );
+  }
 
   function syncAccountsCount() {
     const note = document.getElementById("accountsTotal");
