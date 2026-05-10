@@ -136,7 +136,21 @@
     }
 
     function getProtectedSafeBuckets() {
-      return getRealSafeBuckets().filter((bucket) => bucket.is_protected === true);
+      return getRealSafeBuckets().filter((bucket) => {
+        if (typeof bucket.include_in_protected === "boolean") {
+          return bucket.include_in_protected;
+        }
+
+        if (typeof bucket.is_protected === "boolean") {
+          return bucket.is_protected;
+        }
+
+        const kind = String(bucket.kind || bucket.bucket_kind || "")
+          .trim()
+          .toLowerCase();
+
+        return ["tax", "housing", "reserve"].includes(kind);
+      });
     }
 
     function getSpendableAccounts() {
