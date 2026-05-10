@@ -243,7 +243,7 @@ body.wallet-mode-hard .wallet-game-hero__amount {
 }
 
 body.wallet-mode-hard .wallet-game-hero__amount::after {
-  content: " / в день";
+  content: " / Ð² Ð´ÐµÐ½Ñ";
   margin-left: 7px;
   color: rgba(255, 255, 255, 0.92);
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
