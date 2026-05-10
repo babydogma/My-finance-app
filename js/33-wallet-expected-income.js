@@ -18,6 +18,10 @@
     return Number.isFinite(value) ? value : 0;
   }
 
+  function roundMoney(value) {
+    return Math.round((Number(value) || 0) * 100) / 100;
+  }
+
   function formatMoney(value) {
     const amount = Math.round((Number(value) || 0) * 100) / 100;
 
@@ -66,7 +70,7 @@
     return Math.max(1, lastDay - now.getDate() + 1);
   }
 
-    function getDaysUntilDate(dateValue) {
+  function getDaysUntilDate(dateValue) {
     const targetDate = getDateFromValue(dateValue);
     const today = getStartOfToday();
 
@@ -134,11 +138,16 @@
     if (!Number.isFinite(day) || day <= 0) return null;
 
     const now = new Date();
+    const lastDayOfMonth = new Date(
+      now.getFullYear(),
+      now.getMonth() + 1,
+      0
+    ).getDate();
 
     return new Date(
       now.getFullYear(),
       now.getMonth(),
-      Math.min(31, Math.max(1, day))
+      Math.min(lastDayOfMonth, Math.max(1, day))
     );
   }
 
@@ -539,6 +548,30 @@
     }, delay);
   }
 
+  function isDateInCurrentMonth(dateValue) {
+    const date = getDateFromValue(dateValue);
+    const today = getStartOfToday();
+
+    return Boolean(
+      date &&
+      date.getTime() >= today.getTime() &&
+      date.getFullYear() === today.getFullYear() &&
+      date.getMonth() === today.getMonth()
+    );
+  }
+
+  function getSpendStatus(dailyAmount, pool) {
+    if (pool < 0) return "bad";
+    if (dailyAmount < 300) return "bad";
+    if (dailyAmount < 700) return "warn";
+    return "good";
+  }
+
+  function applyHeroStatus(hero, statusName) {
+    hero.classList.remove("is-good", "is-warn", "is-bad");
+    hero.classList.add(`is-${statusName}`);
+  }
+
   function updateExpectedIncomeCard(expected) {
     const hero = document.getElementById("walletGameHero");
     const label = document.getElementById("walletExpectedIncomeLabel");
@@ -591,121 +624,137 @@
     if (!hero || !todayValue || !status || !hint || !meter) return;
 
     const expected = getExpectedIncome();
+    const expectedInCurrentMonth = Boolean(
+      expected && isDateInCurrentMonth(expected.date)
+    );
 
     const freeMoney = parseMoney(document.getElementById("balanceFreeMoneyValue")?.textContent);
     const calendar = parseMoney(document.getElementById("analyticsPendingMandatoryValue")?.textContent);
     const limits = parseMoney(document.getElementById("analyticsRemainingBudgetsValue")?.textContent);
 
-        const daysLeftMonth = getDaysLeftInMonth();
-    const daysUntilIncome = expected ? getDaysUntilDate(expected.date) : daysLeftMonth;
+    const daysLeftMonth = getDaysLeftInMonth();
+    const daysUntilIncome = expectedInCurrentMonth
+      ? getDaysUntilDate(expected.date)
+      : daysLeftMonth;
 
-    const calendarUntilIncome = expected
+    const calendarUntilIncome = expectedInCurrentMonth
       ? getCalendarUntilDate(calendar, expected.date)
       : calendar;
 
-    const limitsUntilIncome = expected
+    const limitsUntilIncome = expectedInCurrentMonth
       ? getLimitsUntilDate(limits, daysUntilIncome, daysLeftMonth)
       : limits;
 
-    const factPoolToMonthEnd = freeMoney - calendar - limits;
-    const factPoolUntilIncome = freeMoney - calendarUntilIncome - limitsUntilIncome;
+    const factPoolToMonthEnd = roundMoney(freeMoney - calendar - limits);
+    const factPoolUntilIncome = roundMoney(
+      freeMoney - calendarUntilIncome - limitsUntilIncome
+    );
 
     const factTodayUntilIncome = Math.max(0, factPoolUntilIncome / daysUntilIncome);
     const factTodayToMonthEnd = Math.max(0, factPoolToMonthEnd / daysLeftMonth);
 
-    const expectedAmount = expected ? expected.amount : 0;
-    const monthScenarioPool = factPoolToMonthEnd + expectedAmount;
+    const expectedAmount = expectedInCurrentMonth ? expected.amount : 0;
+    const monthScenarioPool = roundMoney(factPoolToMonthEnd + expectedAmount);
     const monthScenarioToday = Math.max(0, monthScenarioPool / daysLeftMonth);
 
-    const visibleTodayCan = expected ? factTodayUntilIncome : factTodayToMonthEnd;
-    const visiblePool = expected ? factPoolUntilIncome : factPoolToMonthEnd;
-    
+    const visibleTodayCan = expectedInCurrentMonth
+      ? monthScenarioToday
+      : factTodayToMonthEnd;
+
+    const visiblePool = expectedInCurrentMonth
+      ? monthScenarioPool
+      : factPoolToMonthEnd;
+
+    const meterBase = Math.max(freeMoney + expectedAmount, 1);
     const meterValue = Math.max(
       0,
-      Math.min(100, (visiblePool / Math.max(freeMoney + expectedAmount, 1)) * 100)
+      Math.min(100, (visiblePool / meterBase) * 100)
     );
 
-        if (expected) {
-      setPressureLabels("Календарь до ЗП", "Лимиты до ЗП");
-      setText("walletCalendarPressureValue", formatMoney(calendarUntilIncome));
-      setText("walletLimitsPressureValue", formatMoney(limitsUntilIncome));
-    } else {
-      setPressureLabels("Календарь", "Лимиты");
-      setText("walletCalendarPressureValue", formatMoney(calendar));
-      setText("walletLimitsPressureValue", formatMoney(limits));
-    }
+    setPressureLabels("Календарь", "Лимиты");
+    setText("walletCalendarPressureValue", formatMoney(calendar));
+    setText("walletLimitsPressureValue", formatMoney(limits));
 
-    if (expected) {
-            setHeroEyebrow("До ближайших денег");
-      setHeroTitle("До ЗП можно");
-      setFirstStatLabel("До ЗП");
-      setText("walletDaysLeftValue", `${daysUntilIncome} дн.`);
-    } else {
-      setHeroEyebrow("Кошелёк сегодня");
-      setHeroTitle("Сегодня можно");
-      setFirstStatLabel("До конца");
-      setText("walletDaysLeftValue", `${daysLeftMonth} дн.`);
-    }
+    setHeroEyebrow("До конца месяца");
+    setHeroTitle("Можно тратить");
+    setFirstStatLabel("До конца");
+    setText("walletDaysLeftValue", `${daysLeftMonth} дн.`);
 
     todayValue.textContent = formatMoney(visibleTodayCan);
     meter.style.width = `${meterValue}%`;
 
     updateExpectedIncomeCard(expected);
 
-        hero.classList.remove("is-good", "is-warn", "is-bad");
+    let statusName = getSpendStatus(visibleTodayCan, visiblePool);
 
-    if (expected) {
+    if (expectedInCurrentMonth && factPoolUntilIncome < 0) {
+      statusName = "bad";
+    }
+
+    applyHeroStatus(hero, statusName);
+
+    if (expectedInCurrentMonth) {
+      const expectedLabel = formatMoney(expected.amount);
+      const monthRate = formatMoney(monthScenarioToday);
+      const beforeIncomeRate = formatMoney(factTodayUntilIncome);
+
+      if (monthScenarioPool < 0) {
+        status.textContent = "Месяц не сходится";
+        hint.textContent = `Даже с ожидаемыми ${expectedLabel} до конца месяца не хватает ${formatMoney(Math.abs(monthScenarioPool))}.`;
+        return;
+      }
+
       if (factPoolUntilIncome < 0) {
-        hero.classList.add("is-bad");
-        status.textContent = "До ЗП стоп";
-        hint.textContent = `До ${formatDateHuman(expected.date)} не хватает ${formatMoney(Math.abs(factPoolUntilIncome))}. Если придёт минимум ${formatMoney(expected.amount)}, до конца месяца будет ${formatMoney(monthScenarioToday)}/день.`;
+        status.textContent = "До поступления стоп";
+        hint.textContent = `До ${formatDateHuman(expected.date)} не хватает ${formatMoney(Math.abs(factPoolUntilIncome))}. После ожидаемых ${expectedLabel} до конца месяца — ${monthRate}/день.`;
         return;
       }
 
-      if (factTodayUntilIncome < 300) {
-        hero.classList.add("is-bad");
-        status.textContent = "Тянуть аккуратно";
-        hint.textContent = `До ${formatDateHuman(expected.date)} можно ${formatMoney(factTodayUntilIncome)}/день. После ожидаемых денег сценарий до конца месяца — ${formatMoney(monthScenarioToday)}/день.`;
+      if (monthScenarioToday < 300) {
+        status.textContent = "Режим выживания";
+        hint.textContent = `С учётом ожидаемых ${expectedLabel} до конца месяца — ${monthRate}/день. До ${formatDateHuman(expected.date)} без поступления — ${beforeIncomeRate}/день.`;
         return;
       }
 
-      if (factTodayUntilIncome < 700) {
-        hero.classList.add("is-warn");
+      if (monthScenarioToday < 700) {
         status.textContent = "Осторожно можно";
-        hint.textContent = `До ${formatDateHuman(expected.date)} можно ${formatMoney(factTodayUntilIncome)}/день. Если минимум придёт, до конца месяца — ${formatMoney(monthScenarioToday)}/день.`;
+        hint.textContent = `С учётом ожидаемых ${expectedLabel} до конца месяца — ${monthRate}/день. До ${formatDateHuman(expected.date)} без поступления — ${beforeIncomeRate}/день.`;
         return;
       }
 
-      hero.classList.add("is-good");
-      status.textContent = "До ЗП норм";
-      hint.textContent = `До ${formatDateHuman(expected.date)} можно ${formatMoney(factTodayUntilIncome)}/день. После ожидаемых денег до конца месяца — ${formatMoney(monthScenarioToday)}/день.`;
+      status.textContent = "Месяц держится";
+      hint.textContent = `С учётом ожидаемых ${expectedLabel} до конца месяца — ${monthRate}/день. До ${formatDateHuman(expected.date)} без поступления — ${beforeIncomeRate}/день.`;
+      return;
+    }
+
+    if (expected && !expectedInCurrentMonth) {
+      status.textContent = factPoolToMonthEnd < 0
+        ? "По месяцу стоп"
+        : "Без учёта будущих";
+      hint.textContent = `Ожидаемые ${formatMoney(expected.amount)} не в текущем месяце, поэтому тут не учитываются. До конца месяца — ${formatMoney(factTodayToMonthEnd)}/день.`;
       return;
     }
 
     if (factPoolToMonthEnd < 0) {
-      hero.classList.add("is-bad");
       status.textContent = "По факту стоп";
       hint.textContent = `Без будущих денег дыра ${formatMoney(Math.abs(factPoolToMonthEnd))}. Ждёшь ЗП — добавь ожидание ниже.`;
       return;
     }
-    
+
     if (factTodayToMonthEnd < 300) {
-      hero.classList.add("is-bad");
       status.textContent = "Режим выживания";
-      hint.textContent = `Безопасно в день: ${formatMoney(factTodayToMonthEnd)}. Будущие деньги пока не учитываются.`;
+      hint.textContent = `До конца месяца безопасно: ${formatMoney(factTodayToMonthEnd)}/день. Будущие деньги пока не учитываются.`;
       return;
     }
 
     if (factTodayToMonthEnd < 700) {
-      hero.classList.add("is-warn");
       status.textContent = "Не разгоняйся";
-      hint.textContent = `Деньги есть, но запас тонкий. Безопасно в день: ${formatMoney(factTodayToMonthEnd)}.`;
+      hint.textContent = `Запас тонкий. До конца месяца безопасно: ${formatMoney(factTodayToMonthEnd)}/день.`;
       return;
     }
 
-    hero.classList.add("is-good");
     status.textContent = "Держишься";
-    hint.textContent = `Можно жить спокойнее. Безопасно в день: ${formatMoney(factTodayToMonthEnd)}.`;
+    hint.textContent = `Можно жить спокойнее. До конца месяца безопасно: ${formatMoney(factTodayToMonthEnd)}/день.`;
   }
 
   function bindExpectedIncomeEvents() {
@@ -713,12 +762,12 @@
       const openBtn = event.target.closest("#openExpectedIncomeModalBtn");
       const closeBtn = event.target.closest("#closeExpectedIncomeModalBtn");
       const saveBtn = event.target.closest("#saveExpectedIncomeBtn");
-            const clearBtn = event.target.closest("#clearExpectedIncomeBtn");
+      const clearBtn = event.target.closest("#clearExpectedIncomeBtn");
       const arrivedBtn = event.target.closest("#expectedIncomeArrivedBtn");
       const waitMoreBtn = event.target.closest("#expectedIncomeWaitMoreBtn");
       const modal = document.getElementById("expectedIncomeModal");
-      
-            if (arrivedBtn) {
+
+      if (arrivedBtn) {
         event.preventDefault();
         event.stopPropagation();
 
