@@ -44,12 +44,12 @@
             linked_safe_bucket_id: item.linked_safe_bucket_id || "",
             enabled: item.enabled !== false,
 
-            // legacy, \u0447\u0442\u043e\u0431\u044b \u0441\u0442\u0430\u0440\u044b\u0435 \u0434\u0430\u043d\u043d\u044b\u0435 \u043d\u0435 \u0440\u0430\u0437\u0432\u0430\u043b\u0438\u043b\u0438\u0441\u044c
+            // legacy, чтобы старые данные не развалились
             last_paid_period: legacyLastPaidPeriod,
           };
         });
       } catch (error) {
-        console.error("\u041e\u0448\u0438\u0431\u043a\u0430 mandatory_payments", error);
+        console.error("Ошибка mandatory_payments", error);
         return [];
       }
     }
