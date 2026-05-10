@@ -1,5 +1,5 @@
 (() => {
-  const MODAL_ANIMATION_MS = 440;
+  const MODAL_ANIMATION_MS = 260;
   const modalCloseTimers = new WeakMap();
 
   let lockedScrollY = 0;
