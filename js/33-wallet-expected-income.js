@@ -93,27 +93,56 @@
     return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
   }
 
+  function getState() {
+    return window.FinanceAppState?.state || null;
+  }
+
   function getPaymentAmount(payment) {
-    return parseMoney(
-      payment?.amount ??
-      payment?.sum ??
-      payment?.value ??
-      0
+    return roundMoney(
+      parseMoney(
+        payment?.amount ??
+        payment?.sum ??
+        payment?.value ??
+        0
+      )
     );
   }
 
   function getPaymentPaidPeriods(payment) {
-    if (Array.isArray(payment?.paid_periods)) return payment.paid_periods;
-    if (Array.isArray(payment?.paidPeriods)) return payment.paidPeriods;
+    const periods = [];
 
-    return [];
+    if (Array.isArray(payment?.paid_periods)) {
+      periods.push(...payment.paid_periods);
+    }
+
+    if (Array.isArray(payment?.paidPeriods)) {
+      periods.push(...payment.paidPeriods);
+    }
+
+    if (payment?.last_paid_period) {
+      periods.push(payment.last_paid_period);
+    }
+
+    return periods.filter(Boolean);
   }
 
-  function isPaymentPaidInCurrentMonth(payment) {
-    return getPaymentPaidPeriods(payment).includes(getCurrentMonthValue());
+  function isPaymentPaidInMonth(payment, monthKey = getCurrentMonthValue()) {
+    return getPaymentPaidPeriods(payment).includes(monthKey);
   }
 
-  function getPaymentDateInCurrentMonth(payment) {
+  function isPaymentVisibleInMonth(payment, monthKey = getCurrentMonthValue()) {
+    if (!payment || payment.enabled === false) return false;
+
+    const startPeriod =
+      payment.start_period ||
+      payment.due_period ||
+      payment.period ||
+      monthKey;
+
+    return String(startPeriod) <= String(monthKey);
+  }
+
+  function getPaymentDateInMonth(payment, monthKey = getCurrentMonthValue()) {
     const rawDate =
       payment?.due_date ||
       payment?.dueDate ||
@@ -133,55 +162,197 @@
       return getDateFromValue(rawText.slice(0, 10));
     }
 
+    const [rawYear, rawMonth] = String(monthKey).split("-");
+    const year = Number(rawYear);
+    const month = Number(rawMonth);
     const day = Number(rawText);
 
-    if (!Number.isFinite(day) || day <= 0) return null;
+    if (
+      !Number.isFinite(year) ||
+      !Number.isFinite(month) ||
+      !Number.isFinite(day)
+    ) {
+      return null;
+    }
 
-    const now = new Date();
-    const lastDayOfMonth = new Date(
-      now.getFullYear(),
-      now.getMonth() + 1,
-      0
-    ).getDate();
+    const lastDayOfMonth = new Date(year, month, 0).getDate();
 
     return new Date(
-      now.getFullYear(),
-      now.getMonth(),
+      year,
+      month - 1,
       Math.min(lastDayOfMonth, Math.max(1, day))
     );
   }
 
-  function getCalendarUntilDate(totalCalendar, targetDateValue) {
-    const state = window.FinanceAppState?.state;
-    const targetDate = getDateFromValue(targetDateValue);
+  function getSafeBucketById(bucketId) {
+    const state = getState();
 
-    if (!targetDate || !state || !Array.isArray(state.mandatoryPayments)) {
-      return totalCalendar;
+    return state?.safeBuckets?.find((bucket) => bucket.id === bucketId) || null;
+  }
+
+  function getLinkedSafeBalance(bucketId) {
+    if (!bucketId) return 0;
+
+    const bridgeValue = window.FinanceAppSavingsBridge?.getSafeBucketBalance?.(bucketId);
+
+    if (Number.isFinite(Number(bridgeValue))) {
+      return Math.max(0, roundMoney(bridgeValue));
     }
 
-    let hasAnyDatedPayment = false;
-    let amountBeforeTarget = 0;
+    return 0;
+  }
 
-    state.mandatoryPayments.forEach((payment) => {
-      if (!payment || payment.enabled === false) return;
-      if (isPaymentPaidInCurrentMonth(payment)) return;
+  function getUnpaidMandatoryPayments(monthKey = getCurrentMonthValue()) {
+    const state = getState();
 
-      const paymentDate = getPaymentDateInCurrentMonth(payment);
+    if (!state || !Array.isArray(state.mandatoryPayments)) {
+      return [];
+    }
 
-      if (!paymentDate) return;
+    return state.mandatoryPayments
+      .filter((payment) => {
+        if (!isPaymentVisibleInMonth(payment, monthKey)) return false;
+        return !isPaymentPaidInMonth(payment, monthKey);
+      })
+      .sort((a, b) => {
+        const dateA = getPaymentDateInMonth(a, monthKey);
+        const dateB = getPaymentDateInMonth(b, monthKey);
 
-      hasAnyDatedPayment = true;
+        const timeA = dateA ? dateA.getTime() : Number.MAX_SAFE_INTEGER;
+        const timeB = dateB ? dateB.getTime() : Number.MAX_SAFE_INTEGER;
 
-      if (paymentDate.getTime() <= targetDate.getTime()) {
-        amountBeforeTarget += getPaymentAmount(payment);
+        return timeA - timeB;
+      });
+  }
+
+  function getMandatoryChargeStats({ untilDateValue = "" } = {}) {
+    const monthKey = getCurrentMonthValue();
+    const untilDate = getDateFromValue(untilDateValue);
+    const safeBalanceLeftById = new Map();
+
+    let total = 0;
+    let coveredByLinkedSafes = 0;
+    let chargeToFreeMoney = 0;
+    let hasStateData = false;
+
+    getUnpaidMandatoryPayments(monthKey).forEach((payment) => {
+      const paymentDate = getPaymentDateInMonth(payment, monthKey);
+
+      if (untilDate && paymentDate && paymentDate.getTime() > untilDate.getTime()) {
+        return;
       }
+
+      const amount = getPaymentAmount(payment);
+      if (amount <= 0) return;
+
+      hasStateData = true;
+      total += amount;
+
+      const linkedSafeId = payment.linked_safe_bucket_id || "";
+      let covered = 0;
+
+      if (linkedSafeId) {
+        if (!safeBalanceLeftById.has(linkedSafeId)) {
+          safeBalanceLeftById.set(linkedSafeId, getLinkedSafeBalance(linkedSafeId));
+        }
+
+        const balanceLeft = safeBalanceLeftById.get(linkedSafeId) || 0;
+        covered = Math.min(amount, balanceLeft);
+        safeBalanceLeftById.set(linkedSafeId, roundMoney(balanceLeft - covered));
+      }
+
+      coveredByLinkedSafes += covered;
+      chargeToFreeMoney += Math.max(0, roundMoney(amount - covered));
     });
 
-    if (!hasAnyDatedPayment) {
-      return totalCalendar;
+    return {
+      hasStateData,
+      total: roundMoney(total),
+      coveredByLinkedSafes: roundMoney(coveredByLinkedSafes),
+      chargeToFreeMoney: roundMoney(chargeToFreeMoney),
+    };
+  }
+
+  function getTransactionDateKey(transaction) {
+    const rawValue =
+      transaction?.date ||
+      transaction?.transaction_date ||
+      transaction?.operation_date ||
+      transaction?.created_date ||
+      transaction?.created_at ||
+      transaction?.createdAt ||
+      "";
+
+    if (!rawValue) return "";
+
+    const rawText = String(rawValue);
+
+    if (/^\d{4}-\d{2}-\d{2}/.test(rawText)) {
+      return rawText.slice(0, 10);
     }
 
-    return Math.min(totalCalendar, Math.max(0, amountBeforeTarget));
+    const parsed = new Date(rawText);
+
+    if (Number.isNaN(parsed.getTime())) return "";
+
+    return `${parsed.getFullYear()}-${String(parsed.getMonth() + 1).padStart(2, "0")}-${String(parsed.getDate()).padStart(2, "0")}`;
+  }
+
+  function isRequiredCategory(categoryId) {
+    const state = getState();
+    const category = state?.categories?.find((item) => item.id === categoryId);
+
+    return Boolean(category?.is_required);
+  }
+
+  function getRemainingFlexibleBudgetsFromState() {
+    const state = getState();
+
+    if (!state || !Array.isArray(state.budgetLimits)) {
+      return {
+        hasBudgetLimits: false,
+        remaining: 0,
+      };
+    }
+
+    const monthKey = getCurrentMonthValue();
+    const spentByCategory = new Map();
+
+    (state.transactions || []).forEach((transaction) => {
+      if (transaction.type !== "expense") return;
+
+      const dateKey = getTransactionDateKey(transaction);
+      if (!dateKey || dateKey.slice(0, 7) !== monthKey) return;
+
+      const categoryId = transaction.category_id || "__uncategorized__";
+      const current = spentByCategory.get(categoryId) || 0;
+
+      spentByCategory.set(
+        categoryId,
+        roundMoney(current + (Number(transaction.amount) || 0))
+      );
+    });
+
+    let hasBudgetLimits = false;
+    let remaining = 0;
+
+    state.budgetLimits.forEach((limit) => {
+      const categoryId = limit.category_id;
+      const limitAmount = Number(limit.monthly_limit) || 0;
+
+      if (limitAmount <= 0) return;
+      if (isRequiredCategory(categoryId)) return;
+
+      hasBudgetLimits = true;
+
+      const spent = spentByCategory.get(categoryId) || 0;
+      remaining += Math.max(0, roundMoney(limitAmount - spent));
+    });
+
+    return {
+      hasBudgetLimits,
+      remaining: roundMoney(remaining),
+    };
   }
 
   function getLimitsUntilDate(totalLimits, daysUntilIncome, daysLeftMonth) {
@@ -189,7 +360,7 @@
 
     const ratio = Math.min(1, Math.max(0, daysUntilIncome / daysLeftMonth));
 
-    return Math.round(totalLimits * ratio * 100) / 100;
+    return roundMoney(totalLimits * ratio);
   }
 
   function setPressureLabels(calendarLabel, limitsLabel) {
@@ -628,133 +799,163 @@
       expected && isDateInCurrentMonth(expected.date)
     );
 
-    const freeMoney = parseMoney(document.getElementById("balanceFreeMoneyValue")?.textContent);
-    const calendar = parseMoney(document.getElementById("analyticsPendingMandatoryValue")?.textContent);
-    const limits = parseMoney(document.getElementById("analyticsRemainingBudgetsValue")?.textContent);
+    const freeMoney = parseMoney(
+      document.getElementById("balanceFreeMoneyValue")?.textContent
+    );
+
+    const mandatoryStats = getMandatoryChargeStats();
+    const mandatoryFromDom = parseMoney(
+      document.getElementById("analyticsPendingMandatoryValue")?.textContent
+    );
+    const mandatoryToFreeMoney = mandatoryStats.hasStateData
+      ? mandatoryStats.chargeToFreeMoney
+      : mandatoryFromDom;
+
+    const budgetStats = getRemainingFlexibleBudgetsFromState();
+    const remainingBudgetsFromDom = parseMoney(
+      document.getElementById("analyticsRemainingBudgetsValue")?.textContent
+    );
+    const remainingBudgets = budgetStats.hasBudgetLimits
+      ? budgetStats.remaining
+      : remainingBudgetsFromDom;
+
+    const hasFlexibleBudgetLimit = budgetStats.hasBudgetLimits || remainingBudgets > 0;
 
     const daysLeftMonth = getDaysLeftInMonth();
     const daysUntilIncome = expectedInCurrentMonth
       ? getDaysUntilDate(expected.date)
       : daysLeftMonth;
 
-    const calendarUntilIncome = expectedInCurrentMonth
-      ? getCalendarUntilDate(calendar, expected.date)
-      : calendar;
+    const expectedAmount = expectedInCurrentMonth ? roundMoney(expected.amount) : 0;
+    const moneyToMonthEnd = roundMoney(freeMoney + expectedAmount);
+    const cashAfterMandatory = roundMoney(moneyToMonthEnd - mandatoryToFreeMoney);
 
-    const limitsUntilIncome = expectedInCurrentMonth
-      ? getLimitsUntilDate(limits, daysUntilIncome, daysLeftMonth)
-      : limits;
+    const spendPool = hasFlexibleBudgetLimit
+      ? Math.min(cashAfterMandatory, remainingBudgets)
+      : cashAfterMandatory;
 
-    const factPoolToMonthEnd = roundMoney(freeMoney - calendar - limits);
-    const factPoolUntilIncome = roundMoney(
-      freeMoney - calendarUntilIncome - limitsUntilIncome
+    const safeSpendPool = Math.max(0, roundMoney(spendPool));
+    const dailyToMonthEnd = safeSpendPool / daysLeftMonth;
+
+    const mandatoryUntilIncomeStats = expectedInCurrentMonth
+      ? getMandatoryChargeStats({ untilDateValue: expected.date })
+      : mandatoryStats;
+
+    const mandatoryUntilIncome = mandatoryUntilIncomeStats.hasStateData
+      ? mandatoryUntilIncomeStats.chargeToFreeMoney
+      : mandatoryToFreeMoney;
+
+    const budgetsUntilIncome = expectedInCurrentMonth && hasFlexibleBudgetLimit
+      ? getLimitsUntilDate(remainingBudgets, daysUntilIncome, daysLeftMonth)
+      : remainingBudgets;
+
+    const cashUntilIncome = roundMoney(freeMoney - mandatoryUntilIncome);
+    const spendPoolUntilIncome = hasFlexibleBudgetLimit
+      ? Math.min(cashUntilIncome, budgetsUntilIncome)
+      : cashUntilIncome;
+    const dailyUntilIncome = Math.max(0, spendPoolUntilIncome / daysUntilIncome);
+
+    const meterBase = Math.max(
+      hasFlexibleBudgetLimit ? remainingBudgets : moneyToMonthEnd,
+      moneyToMonthEnd,
+      1
     );
-
-    const factTodayUntilIncome = Math.max(0, factPoolUntilIncome / daysUntilIncome);
-    const factTodayToMonthEnd = Math.max(0, factPoolToMonthEnd / daysLeftMonth);
-
-    const expectedAmount = expectedInCurrentMonth ? expected.amount : 0;
-    const monthScenarioPool = roundMoney(factPoolToMonthEnd + expectedAmount);
-    const monthScenarioToday = Math.max(0, monthScenarioPool / daysLeftMonth);
-
-    const visibleTodayCan = expectedInCurrentMonth
-      ? monthScenarioToday
-      : factTodayToMonthEnd;
-
-    const visiblePool = expectedInCurrentMonth
-      ? monthScenarioPool
-      : factPoolToMonthEnd;
-
-    const meterBase = Math.max(freeMoney + expectedAmount, 1);
     const meterValue = Math.max(
       0,
-      Math.min(100, (visiblePool / meterBase) * 100)
+      Math.min(100, (safeSpendPool / meterBase) * 100)
     );
 
-    setPressureLabels("Календарь", "Лимиты");
-    setText("walletCalendarPressureValue", formatMoney(calendar));
-    setText("walletLimitsPressureValue", formatMoney(limits));
+    setPressureLabels("К списанию", "Лимиты");
+    setText("walletCalendarPressureValue", formatMoney(mandatoryToFreeMoney));
+    setText("walletLimitsPressureValue", formatMoney(remainingBudgets));
 
     setHeroEyebrow("До конца месяца");
     setHeroTitle("Можно тратить");
     setFirstStatLabel("До конца");
     setText("walletDaysLeftValue", `${daysLeftMonth} дн.`);
 
-    todayValue.textContent = formatMoney(visibleTodayCan);
+    todayValue.textContent = formatMoney(dailyToMonthEnd);
     meter.style.width = `${meterValue}%`;
 
     updateExpectedIncomeCard(expected);
 
-    let statusName = getSpendStatus(visibleTodayCan, visiblePool);
+    let statusName = getSpendStatus(dailyToMonthEnd, safeSpendPool);
 
-    if (expectedInCurrentMonth && factPoolUntilIncome < 0) {
+    if (cashAfterMandatory < 0) {
       statusName = "bad";
     }
 
     applyHeroStatus(hero, statusName);
 
+    const dailyMonthLabel = formatMoney(dailyToMonthEnd);
+    const expectedLabel = expectedInCurrentMonth ? formatMoney(expectedAmount) : "";
+
+    if (cashAfterMandatory < 0) {
+      status.textContent = "Обязательные не закрыты";
+      hint.textContent = expectedInCurrentMonth
+        ? `Даже с ожидаемыми ${expectedLabel} не хватает ${formatMoney(Math.abs(cashAfterMandatory))} на обязательные платежи.`
+        : `Не хватает ${formatMoney(Math.abs(cashAfterMandatory))} на обязательные платежи до конца месяца.`;
+      return;
+    }
+
+    if (hasFlexibleBudgetLimit && remainingBudgets <= 0) {
+      status.textContent = "Лимиты закончились";
+      hint.textContent = `По лимитным категориям на этот месяц уже нет свободного остатка.`;
+      return;
+    }
+
+    if (safeSpendPool <= 0) {
+      status.textContent = "Тратить нельзя";
+      hint.textContent = `После обязательных платежей свободного дневного лимита до конца месяца нет.`;
+      return;
+    }
+
     if (expectedInCurrentMonth) {
-      const expectedLabel = formatMoney(expected.amount);
-      const monthRate = formatMoney(monthScenarioToday);
-      const beforeIncomeRate = formatMoney(factTodayUntilIncome);
+      const beforeIncomeRate = formatMoney(dailyUntilIncome);
 
-      if (monthScenarioPool < 0) {
-        status.textContent = "Месяц не сходится";
-        hint.textContent = `Даже с ожидаемыми ${expectedLabel} до конца месяца не хватает ${formatMoney(Math.abs(monthScenarioPool))}.`;
-        return;
-      }
-
-      if (factPoolUntilIncome < 0) {
+      if (cashUntilIncome < 0) {
         status.textContent = "До поступления стоп";
-        hint.textContent = `До ${formatDateHuman(expected.date)} не хватает ${formatMoney(Math.abs(factPoolUntilIncome))}. После ожидаемых ${expectedLabel} до конца месяца — ${monthRate}/день.`;
+        hint.textContent = `До ${formatDateHuman(expected.date)} не хватает ${formatMoney(Math.abs(cashUntilIncome))}. После ожидаемых ${expectedLabel}: ${dailyMonthLabel}/день до конца месяца.`;
         return;
       }
 
-      if (monthScenarioToday < 300) {
+      if (dailyToMonthEnd < 300) {
         status.textContent = "Режим выживания";
-        hint.textContent = `С учётом ожидаемых ${expectedLabel} до конца месяца — ${monthRate}/день. До ${formatDateHuman(expected.date)} без поступления — ${beforeIncomeRate}/день.`;
+        hint.textContent = `С учётом ожидаемых ${expectedLabel}: ${dailyMonthLabel}/день до конца месяца. До ${formatDateHuman(expected.date)}: ${beforeIncomeRate}/день.`;
         return;
       }
 
-      if (monthScenarioToday < 700) {
+      if (dailyToMonthEnd < 700) {
         status.textContent = "Осторожно можно";
-        hint.textContent = `С учётом ожидаемых ${expectedLabel} до конца месяца — ${monthRate}/день. До ${formatDateHuman(expected.date)} без поступления — ${beforeIncomeRate}/день.`;
+        hint.textContent = `С учётом ожидаемых ${expectedLabel}: ${dailyMonthLabel}/день до конца месяца. До ${formatDateHuman(expected.date)}: ${beforeIncomeRate}/день.`;
         return;
       }
 
       status.textContent = "Месяц держится";
-      hint.textContent = `С учётом ожидаемых ${expectedLabel} до конца месяца — ${monthRate}/день. До ${formatDateHuman(expected.date)} без поступления — ${beforeIncomeRate}/день.`;
+      hint.textContent = `С учётом ожидаемых ${expectedLabel}: ${dailyMonthLabel}/день до конца месяца. До ${formatDateHuman(expected.date)}: ${beforeIncomeRate}/день.`;
       return;
     }
 
     if (expected && !expectedInCurrentMonth) {
-      status.textContent = factPoolToMonthEnd < 0
-        ? "По месяцу стоп"
-        : "Без учёта будущих";
-      hint.textContent = `Ожидаемые ${formatMoney(expected.amount)} не в текущем месяце, поэтому тут не учитываются. До конца месяца — ${formatMoney(factTodayToMonthEnd)}/день.`;
+      status.textContent = "Без учёта будущих";
+      hint.textContent = `Ожидаемые ${formatMoney(expected.amount)} не в текущем месяце, поэтому не входят в расчёт. До конца месяца: ${dailyMonthLabel}/день.`;
       return;
     }
 
-    if (factPoolToMonthEnd < 0) {
-      status.textContent = "По факту стоп";
-      hint.textContent = `Без будущих денег дыра ${formatMoney(Math.abs(factPoolToMonthEnd))}. Ждёшь ЗП — добавь ожидание ниже.`;
-      return;
-    }
-
-    if (factTodayToMonthEnd < 300) {
+    if (dailyToMonthEnd < 300) {
       status.textContent = "Режим выживания";
-      hint.textContent = `До конца месяца безопасно: ${formatMoney(factTodayToMonthEnd)}/день. Будущие деньги пока не учитываются.`;
+      hint.textContent = `До конца месяца безопасно: ${dailyMonthLabel}/день. Будущие деньги пока не учитываются.`;
       return;
     }
 
-    if (factTodayToMonthEnd < 700) {
+    if (dailyToMonthEnd < 700) {
       status.textContent = "Не разгоняйся";
-      hint.textContent = `Запас тонкий. До конца месяца безопасно: ${formatMoney(factTodayToMonthEnd)}/день.`;
+      hint.textContent = `Запас тонкий. До конца месяца безопасно: ${dailyMonthLabel}/день.`;
       return;
     }
 
     status.textContent = "Держишься";
-    hint.textContent = `Можно жить спокойнее. До конца месяца безопасно: ${formatMoney(factTodayToMonthEnd)}/день.`;
+    hint.textContent = `Можно жить спокойнее. До конца месяца безопасно: ${dailyMonthLabel}/день.`;
   }
 
   function bindExpectedIncomeEvents() {
