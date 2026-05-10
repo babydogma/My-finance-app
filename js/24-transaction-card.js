@@ -14,10 +14,10 @@
       const text = String(value || "");
 
       return (
-        /[ĐÐÑŃ�]/.test(text) ||
-        text.includes("â") ||
-        text.includes("ð") ||
-        text.includes("ñ")
+        /[\u0110\u00d0\u00d1\u0143\ufffd]/.test(text) ||
+        text.includes("\u00e2") ||
+        text.includes("\u00f0") ||
+        text.includes("\u00f1")
       );
     }
 
