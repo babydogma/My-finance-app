@@ -34,7 +34,7 @@
 
       const safeInterest = roundToTwo(
         state.transactions
-          .filter((item) => item.type === "income" && item.title === "ÐÑÐ¾ÑÐµÐ½ÑÑ Ð¿Ð¾ Ð½Ð°ÐºÐ¾Ð¿Ð»ÐµÐ½Ð¸Ñ")
+          .filter((item) => item.type === "income" && item.title === "Проценты по накоплению")
           .reduce((sum, item) => sum + (Number(item.amount) || 0), 0)
       );
 
@@ -102,12 +102,12 @@
 
       if (summary.canSaveNow > 0) {
         if (analyticsCanSaveNowStatus) {
-          analyticsCanSaveNowStatus.textContent = "ÐÐ¾Ð¶Ð½Ð¾";
+          analyticsCanSaveNowStatus.textContent = "Можно";
         }
 
         if (analyticsCanSaveNowHint) {
           analyticsCanSaveNowHint.textContent =
-            `ÐÐ¾ÑÐ»Ðµ Ð¾Ð±ÑÐ·Ð°ÑÐµÐ»ÑÐ½ÑÑ Ð¿Ð»Ð°ÑÐµÐ¶ÐµÐ¹ Ð¸ Ð»Ð¸Ð¼Ð¸ÑÐ¾Ð² Ð¾ÑÑÐ°ÑÑÑÑ ${formatMoney(summary.canSaveNow)}.`;
+            `После обязательных платежей и лимитов остаётся ${formatMoney(summary.canSaveNow)}.`;
         }
       } else {
         const deficit = Math.abs(
@@ -122,12 +122,12 @@
         );
 
         if (analyticsCanSaveNowStatus) {
-          analyticsCanSaveNowStatus.textContent = "Ð¡ÐµÐ¹ÑÐ°Ñ ÑÐ°Ð½Ð¾";
+          analyticsCanSaveNowStatus.textContent = "Сейчас рано";
         }
 
         if (analyticsCanSaveNowHint) {
           analyticsCanSaveNowHint.textContent =
-            `ÐÐµ ÑÐ²Ð°ÑÐ°ÐµÑ ${formatMoney(deficit)} Ð¿Ð¾ÑÐ»Ðµ ÑÑÑÑÐ° Ð¾Ð±ÑÐ·Ð°ÑÐµÐ»ÑÐ½ÑÑ Ð¸ Ð»Ð¸Ð¼Ð¸ÑÐ¾Ð².`;
+            `Не хватает ${formatMoney(deficit)} после учёта обязательных и лимитов.`;
         }
       }
     }
