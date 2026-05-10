@@ -44,12 +44,12 @@
             linked_safe_bucket_id: item.linked_safe_bucket_id || "",
             enabled: item.enabled !== false,
 
-            // legacy, чтобы старые данные не развалились
+            // legacy, ÑÑÐ¾Ð±Ñ ÑÑÐ°ÑÑÐµ Ð´Ð°Ð½Ð½ÑÐµ Ð½Ðµ ÑÐ°Ð·Ð²Ð°Ð»Ð¸Ð»Ð¸ÑÑ
             last_paid_period: legacyLastPaidPeriod,
           };
         });
       } catch (error) {
-        console.error("Ошибка mandatory_payments", error);
+        console.error("ÐÑÐ¸Ð±ÐºÐ° mandatory_payments", error);
         return [];
       }
     }
@@ -96,40 +96,40 @@
     }
 
     function buildMandatoryPaymentDate(monthKey, dueDay) {
-  const [rawYear, rawMonth] = String(monthKey || getCurrentMonthValue()).split("-");
+      const [rawYear, rawMonth] = String(monthKey || getCurrentMonthValue()).split("-");
 
-  const parsedYear = Number(rawYear);
-  const parsedMonth = Number(rawMonth);
+      const parsedYear = Number(rawYear);
+      const parsedMonth = Number(rawMonth);
 
-  const now = new Date();
-  const year = Number.isFinite(parsedYear) && parsedYear > 0
-    ? parsedYear
-    : now.getFullYear();
+      const now = new Date();
+      const year = Number.isFinite(parsedYear) && parsedYear > 0
+        ? parsedYear
+        : now.getFullYear();
 
-  const month = Number.isFinite(parsedMonth) && parsedMonth >= 1 && parsedMonth <= 12
-    ? parsedMonth
-    : now.getMonth() + 1;
+      const month = Number.isFinite(parsedMonth) && parsedMonth >= 1 && parsedMonth <= 12
+        ? parsedMonth
+        : now.getMonth() + 1;
 
-  const lastDayOfMonth = new Date(year, month, 0).getDate();
-  const safeDay = String(
-    Math.min(lastDayOfMonth, Math.max(1, Number(dueDay) || 1))
-  ).padStart(2, "0");
+      const lastDayOfMonth = new Date(year, month, 0).getDate();
+      const safeDay = String(
+        Math.min(lastDayOfMonth, Math.max(1, Number(dueDay) || 1))
+      ).padStart(2, "0");
 
-  return `${year}-${String(month).padStart(2, "0")}-${safeDay}`;
-}
+      return `${year}-${String(month).padStart(2, "0")}-${safeDay}`;
+    }
 
     function buildMandatoryPaymentTransactionCreatedAt() {
-  const now = new Date();
+      const now = new Date();
 
-  const year = now.getFullYear();
-  const month = String(now.getMonth() + 1).padStart(2, "0");
-  const day = String(now.getDate()).padStart(2, "0");
-  const hours = String(now.getHours()).padStart(2, "0");
-  const minutes = String(now.getMinutes()).padStart(2, "0");
-  const seconds = String(now.getSeconds()).padStart(2, "0");
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, "0");
+      const day = String(now.getDate()).padStart(2, "0");
+      const hours = String(now.getHours()).padStart(2, "0");
+      const minutes = String(now.getMinutes()).padStart(2, "0");
+      const seconds = String(now.getSeconds()).padStart(2, "0");
 
-  return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
-}
+      return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
+    }
 
     function buildDateFromDueDay(dueDay, monthKey = getMandatoryPaymentsActiveMonthKey()) {
       return buildMandatoryPaymentDate(monthKey, dueDay);
@@ -153,24 +153,24 @@
     }
 
     function isProtectedSafeBucket(bucketId) {
-  const bucket = getSafeBucketById(bucketId);
+      const bucket = getSafeBucketById(bucketId);
 
-  if (!bucket) return false;
+      if (!bucket) return false;
 
-  if (typeof bucket.include_in_protected === "boolean") {
-    return bucket.include_in_protected;
-  }
+      if (typeof bucket.include_in_protected === "boolean") {
+        return bucket.include_in_protected;
+      }
 
-  if (typeof bucket.is_protected === "boolean") {
-    return bucket.is_protected;
-  }
+      if (typeof bucket.is_protected === "boolean") {
+        return bucket.is_protected;
+      }
 
-  const legacyKind = String(bucket.kind || bucket.bucket_kind || "")
-    .trim()
-    .toLowerCase();
+      const legacyKind = String(bucket.kind || bucket.bucket_kind || "")
+        .trim()
+        .toLowerCase();
 
-  return ["tax", "housing", "reserve"].includes(legacyKind);
-}
+      return ["tax", "housing", "reserve"].includes(legacyKind);
+    }
 
     function getMandatoryPaymentsCoverageStats(monthKey = getCurrentMonthKey()) {
       const unpaidItems = state.mandatoryPayments.filter((item) => {
