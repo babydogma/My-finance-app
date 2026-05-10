@@ -152,9 +152,12 @@ function filterTransactionsByPeriod(items, period, selectedMonth, rangeStart, ra
     }
 
     if (period === "range") {
-      if (!rangeStart || !rangeEnd) return true;
-      return dateKey >= rangeStart && dateKey <= rangeEnd;
-    }
+  if (!rangeStart && !rangeEnd) return true;
+  if (rangeStart && !rangeEnd) return dateKey >= rangeStart;
+  if (!rangeStart && rangeEnd) return dateKey <= rangeEnd;
+
+  return dateKey >= rangeStart && dateKey <= rangeEnd;
+}
 
     return true;
   });
