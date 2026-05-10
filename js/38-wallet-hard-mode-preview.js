@@ -563,22 +563,11 @@ function syncHardMonthOverview() {
     parseHardMoney(getTextById("walletLimitsPressureValue", ""))
   );
 
-  const pendingMandatory = Math.max(
-    0,
-    parseHardMoney(getTextById("analyticsPendingMandatoryValue", "")) ||
-    parseHardMoney(getTextById("walletCalendarPressureValue", ""))
-  );
+  const budgetSpent = currentTotals.flexibleExpense;
 
-  const flexibleTotal = flexibleBudgetTotal > 0
+  const budgetTotal = flexibleBudgetTotal > 0
     ? flexibleBudgetTotal
-    : currentTotals.flexibleExpense + remainingFlexible;
-
-  const budgetSpent = currentTotals.expense;
-
-  const budgetTotal = Math.max(
-    budgetSpent,
-    flexibleTotal + pendingMandatory + currentTotals.mandatoryExpense
-  );
+    : Math.max(budgetSpent, budgetSpent + remainingFlexible);
 
   const percent = budgetTotal > 0
     ? Math.min(100, Math.round((budgetSpent / budgetTotal) * 100))
