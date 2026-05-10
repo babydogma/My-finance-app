@@ -463,16 +463,12 @@
     }
 
     function closeMandatoryPaymentsModal() {
-      closeModalIfOpen(getBucketPickerModal());
-      closeModalIfOpen(getEditorModal());
-      closeModalIfOpen(getCalendarModal());
+  closeModalIfOpen(getBucketPickerModal());
+  closeModalIfOpen(getEditorModal());
+  closeModalIfOpen(getCalendarModal());
 
-      resetMandatoryPaymentForm();
-
-      window.setTimeout(() => {
-        forceUnlockBodyScroll();
-      }, (window.FinanceAppModalCore?.MODAL_ANIMATION_MS || 440) + 40);
-    }
+  resetMandatoryPaymentForm();
+}
 
     function bindButton(button, key, handler) {
       if (!button) return;
