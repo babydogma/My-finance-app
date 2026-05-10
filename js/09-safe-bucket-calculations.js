@@ -47,6 +47,10 @@
         return bucket.include_in_protected;
       }
 
+      if (typeof bucket?.is_protected === "boolean") {
+        return bucket.is_protected;
+      }
+
       const legacyKind = getLegacyBucketKind(bucket);
 
       return ["tax", "housing", "reserve"].includes(legacyKind);
