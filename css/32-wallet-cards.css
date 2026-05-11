@@ -196,11 +196,28 @@ body.wallet-cards-v1-enabled.wallet-mode-hard #mainView {
 
 .wallet-card-v1__row span {
   min-width: 0;
-  color: rgba(255, 255, 255, 0.62);
+  color: rgba(255, 255, 255, 0.68);
   font-size: 13px;
   line-height: 1.1;
-  font-weight: 520;
+  font-weight: 560;
   letter-spacing: -0.012em;
+}
+
+.wallet-card-v1__row--button span {
+  width: fit-content;
+  max-width: 100%;
+  min-height: 30px;
+  padding: 0 11px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  color: rgba(255, 255, 255, 0.78);
+  background: rgba(255, 255, 255, 0.10);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.13),
+    0 6px 14px rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
 }
 
 .wallet-card-v1__row strong {
@@ -218,19 +235,7 @@ body.wallet-cards-v1-enabled.wallet-mode-hard #mainView {
 .wallet-card-v1__row--button {
   position: relative;
   cursor: pointer;
-}
-
-.wallet-card-v1__row--button::after {
-  content: "›";
-  margin-left: 2px;
-  color: rgba(255, 255, 255, 0.38);
-  font-size: 25px;
-  line-height: 1;
-  font-weight: 360;
-}
-
-.wallet-card-v1__row--button strong {
-  max-width: 150px;
+  border-radius: 14px;
 }
 
 .wallet-card-v1__row--button:active {
