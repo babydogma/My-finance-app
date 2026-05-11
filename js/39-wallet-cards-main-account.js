@@ -42,6 +42,7 @@
 
   let uiMetaCache = null;
   let isSavingDraft = false;
+  let activeCustomCardKey = null;
 
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
@@ -957,9 +958,10 @@
 
   function cardHtml(card) {
     const color = colorOf(card.color).value;
+    const isActive = activeCustomCardKey === card.entityKey;
 
     return `
-      <article class="wallet-card-v1 wallet-card-v1--custom wallet-card-v1--theme-${html(color)}" data-wallet-custom-card="true" data-wallet-card-id="${html(card.id)}" data-wallet-entity-key="${html(card.entityKey)}" role="button" tabindex="0" aria-expanded="false">
+      <article class="wallet-card-v1 wallet-card-v1--custom wallet-card-v1--theme-${html(color)} ${isActive ? "is-open" : ""}" data-wallet-custom-card="true" data-wallet-card-id="${html(card.id)}" data-wallet-entity-key="${html(card.entityKey)}" role="button" tabindex="0" aria-expanded="${isActive ? "true" : "false"}">
         <div class="wallet-card-v1__summary">
           <div class="wallet-card-v1__name">
             <strong>${html(getEntityTitle(card))}</strong>
@@ -1000,12 +1002,14 @@
 
     const draft = byId(DRAFT_CARD_ID);
 
-    buildEntityCards().forEach((card) => {
+    buildEntityCards().forEach((card, index) => {
       const wrapper = document.createElement("div");
       wrapper.innerHTML = cardHtml(card).trim();
 
       const element = wrapper.firstElementChild;
       if (!element) return;
+
+      element.style.zIndex = activeCustomCardKey === card.entityKey ? "1000" : String(10 + index);
 
       if (draft) {
         node.insertBefore(element, draft);
@@ -1119,6 +1123,7 @@
     const node = deck();
     if (!node) return;
 
+    activeCustomCardKey = null;
     byId(DRAFT_CARD_ID)?.remove();
 
     node.insertAdjacentHTML("beforeend", draftHtml("create"));
@@ -1131,6 +1136,9 @@
   function startEdit(cardKey) {
     const node = deck();
     if (!node) return;
+
+    activeCustomCardKey = cardKey;
+    renderCards();
 
     const card = findEntityCardByKey(cardKey);
     if (!card) return;
@@ -1214,6 +1222,7 @@
       }
 
       cancelDraft();
+      activeCustomCardKey = null;
       renderCards();
       syncMain();
 
@@ -1234,6 +1243,10 @@
   async function removeCard(entityKeyToHide) {
     const meta = getUiMeta();
 
+    if (activeCustomCardKey === entityKeyToHide) {
+      activeCustomCardKey = null;
+    }
+
     if (!meta.hidden.includes(entityKeyToHide)) {
       meta.hidden.push(entityKeyToHide);
     }
@@ -1244,6 +1257,15 @@
 
   function toggleCard(card) {
     if (!card) return;
+
+    if (card.matches("[data-wallet-custom-card]")) {
+      const key = card.dataset.walletEntityKey || card.dataset.walletCardId || "";
+
+      activeCustomCardKey = activeCustomCardKey === key ? null : key;
+      byId(DRAFT_CARD_ID)?.remove();
+      renderCards();
+      return;
+    }
 
     const isOpen = card.classList.toggle("is-open");
     card.setAttribute("aria-expanded", String(isOpen));
