@@ -1,10 +1,3 @@
-// ===== js/39-wallet-cards-main-account.js (reworked) =====
-// js/39-wallet-cards-main-account.js
-// Wallet Cards v1
-// Главная логика: на главный экран автоматически выводятся ВСЕ текущие accounts и safe_buckets.
-// + создаёт новую финансовую сущность, после чего она тоже автоматически появляется как карта.
-// app_meta.wallet_cards хранит только UI-настройки: цвет, порядок, скрытие, fallback суммы.
-
 (() => {
   const ROOT_ID = "walletCardsV1";
   const DECK_ID = "walletCardsDeck";
@@ -247,6 +240,23 @@
     };
   }
 
+  function readMetaFromLocalStorage(key) {
+    try {
+      return window.localStorage?.getItem(`finance_app_${key}`) || "";
+    } catch {
+      return "";
+    }
+  }
+
+  function writeMetaToLocalStorage(key, value) {
+    try {
+      window.localStorage?.setItem(`finance_app_${key}`, value);
+    } catch {
+      // localStorage может быть недоступен в приватном режиме. Это не должно ломать приложение.
+    }
+  }
+
+
   function readMetaFromState(key) {
     const meta = state()?.appMeta || state()?.app_meta || state()?.meta || null;
 
@@ -350,7 +360,10 @@
   function getUiMeta() {
     if (uiMetaCache) return uiMetaCache;
 
-    uiMetaCache = parseRawMeta(readMetaFromState(META_KEY));
+    const stateMeta = readMetaFromState(META_KEY);
+    const storageMeta = readMetaFromLocalStorage(META_KEY);
+
+    uiMetaCache = parseRawMeta(stateMeta || storageMeta);
 
     return uiMetaCache;
   }
@@ -359,7 +372,7 @@
     const client = supabase();
 
     if (!client?.from) {
-      uiMetaCache = parseRawMeta(readMetaFromState(META_KEY));
+      uiMetaCache = parseRawMeta(readMetaFromState(META_KEY) || readMetaFromLocalStorage(META_KEY));
       renderCards();
       return;
     }
@@ -381,7 +394,7 @@
       }
     }
 
-    uiMetaCache = parseRawMeta(readMetaFromState(META_KEY));
+    uiMetaCache = parseRawMeta(readMetaFromState(META_KEY) || readMetaFromLocalStorage(META_KEY));
     renderCards();
   }
 
@@ -390,6 +403,7 @@
     const value = JSON.stringify(normalized);
 
     uiMetaCache = normalized;
+    writeMetaToLocalStorage(META_KEY, value);
     bridge()?.setAppMetaLocalValue?.(META_KEY, value);
 
     const client = supabase();
@@ -982,14 +996,14 @@
           <div class="wallet-card-v1__details-inner">
             <div class="wallet-card-v1__details-content">
               <div class="wallet-card-v1__edit-panel">
-                <button class="wallet-card-v1__edit-btn" type="button" data-wallet-edit-card="${html(card.entityKey)}" aria-label="Редактировать карту">
+                <button class="wallet-card-v1__edit-btn" type="button" data-wallet-edit-card="${html(card.entityKey)}" aria-label="Редактировать карту" onclick="event.preventDefault(); event.stopPropagation(); window.FinanceAppWalletCardsV1?.editCard(this.dataset.walletEditCard); return false;">
                   <svg viewBox="0 0 24 24" aria-hidden="true">
                     <path d="M4 20h4.5L19.2 9.3a2.1 2.1 0 0 0 0-3l-1.5-1.5a2.1 2.1 0 0 0-3 0L4 15.5V20z"></path>
                     <path d="M13.5 6.2l4.3 4.3"></path>
                   </svg>
                 </button>
 
-                <button class="wallet-card-v1__delete-btn" type="button" data-wallet-remove-card="${html(card.entityKey)}">
+                <button class="wallet-card-v1__delete-btn" type="button" data-wallet-remove-card="${html(card.entityKey)}" onclick="event.preventDefault(); event.stopPropagation(); window.FinanceAppWalletCardsV1?.removeCard(this.dataset.walletRemoveCard); return false;">
                   Удалить с главной
                 </button>
               </div>
@@ -1180,9 +1194,7 @@
     }
 
     requestAnimationFrame(() => {
-      const input = byId("walletDraftTitleInput");
-      input?.focus();
-      input?.scrollIntoView?.({ block: "center", behavior: "smooth" });
+      byId(DRAFT_CARD_ID)?.scrollIntoView?.({ block: "center", behavior: "smooth" });
     });
   }
 
@@ -1329,10 +1341,6 @@
   function safeStop(event) {
     event.preventDefault();
     event.stopPropagation();
-
-    if (typeof event.stopImmediatePropagation === "function") {
-      event.stopImmediatePropagation();
-    }
   }
 
   function handleRootClick(event) {
@@ -1450,12 +1458,48 @@
     }
   }
 
+  function exposeWalletCardApi() {
+    window.FinanceAppWalletCardsV1 = {
+      editCard(cardKey) {
+        try {
+          startEdit(cardKey);
+        } catch (error) {
+          console.error("[Wallet Cards] inline edit failed:", error);
+        }
+      },
+      removeCard(cardKey) {
+        try {
+          removeCard(cardKey).catch((error) => {
+            console.error("[Wallet Cards] inline remove failed:", error);
+          });
+        } catch (error) {
+          console.error("[Wallet Cards] inline remove failed:", error);
+        }
+      },
+    };
+  }
+
   function bindEvents() {
     const root = byId(ROOT_ID);
 
     if (!root || root.dataset.walletEventsBound === "true") return;
 
     root.dataset.walletEventsBound = "true";
+
+    root.addEventListener("pointerup", (event) => {
+      const edit = closestTarget(event, "[data-wallet-edit-card]");
+      if (edit) {
+        safeStop(event);
+        window.FinanceAppWalletCardsV1?.editCard(edit.dataset.walletEditCard || edit.closest("[data-wallet-entity-key]")?.dataset.walletEntityKey || "");
+        return;
+      }
+
+      const remove = closestTarget(event, "[data-wallet-remove-card]");
+      if (remove) {
+        safeStop(event);
+        window.FinanceAppWalletCardsV1?.removeCard(remove.dataset.walletRemoveCard || remove.closest("[data-wallet-entity-key]")?.dataset.walletEntityKey || "");
+      }
+    }, true);
 
     root.addEventListener("click", (event) => {
       try {
@@ -1515,6 +1559,7 @@
 
   function start() {
     createRoot();
+    exposeWalletCardApi();
     bindEvents();
 
     [
