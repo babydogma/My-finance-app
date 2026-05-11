@@ -175,11 +175,18 @@ body.wallet-cards-v1-enabled.wallet-mode-hard #mainView {
 }
 
 .wallet-card-v1__row {
+  width: 100%;
   min-height: 42px;
+  padding: 0;
+  border: 0;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
   gap: 12px;
+  text-align: left;
+  color: inherit;
+  background: transparent;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .wallet-card-v1__row + .wallet-card-v1__row {
@@ -206,6 +213,28 @@ body.wallet-cards-v1-enabled.wallet-mode-hard #mainView {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.wallet-card-v1__row--button {
+  position: relative;
+  cursor: pointer;
+}
+
+.wallet-card-v1__row--button::after {
+  content: "›";
+  margin-left: 2px;
+  color: rgba(255, 255, 255, 0.38);
+  font-size: 25px;
+  line-height: 1;
+  font-weight: 360;
+}
+
+.wallet-card-v1__row--button strong {
+  max-width: 150px;
+}
+
+.wallet-card-v1__row--button:active {
+  opacity: 0.72;
 }
 
 .wallet-card-v1__hint {
