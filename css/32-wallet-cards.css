@@ -81,6 +81,10 @@ body.wallet-cards-v1-enabled.wallet-mode-hard #mainView {
   margin-top: -56px;
 }
 
+.wallet-cards-v1__stack--deck .wallet-card-v1.is-open + .wallet-card-v1 {
+  margin-top: 18px;
+}
+
 .wallet-cards-v1__stack--deck .wallet-card-v1 {
   position: relative;
   transform: translateZ(0);
@@ -103,7 +107,7 @@ body.wallet-cards-v1-enabled.wallet-mode-hard #mainView {
 }
 
 .wallet-cards-v1__stack--deck .wallet-card-v1.is-open {
-  z-index: 20;
+  z-index: 10;
 }
 
 .wallet-card-v1 {
@@ -131,6 +135,11 @@ body.wallet-cards-v1-enabled.wallet-mode-hard #mainView {
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: start;
   gap: 16px;
+}
+
+.wallet-card-v1.is-open .wallet-card-v1__summary {
+  min-height: 92px;
+  padding: 26px 26px 8px;
 }
 
 .wallet-card-v1__name {
