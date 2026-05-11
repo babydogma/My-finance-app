@@ -1,6 +1,3 @@
-// js/39-wallet-cards-main-account.js
-// Wallet Cards v1 — основной счёт. Математику не считает, только читает уже готовые значения.
-
 (() => {
   const ROOT_ID = "walletCardsV1";
   const MAIN_CARD_ID = "walletMainAccountCard";
@@ -8,23 +5,16 @@
   function getTextById(id, fallback = "") {
     const node = document.getElementById(id);
     const text = node?.textContent?.trim();
-
     return text || fallback;
   }
 
   function setTextById(id, value) {
     const node = document.getElementById(id);
-    if (!node) return;
-
-    node.textContent = value;
+    if (node) node.textContent = value;
   }
 
   function getMainAccountValue() {
-    return (
-      getTextById("balanceFreeMoneyValue") ||
-      getTextById("walletLightFreeValue") ||
-      "0 ₽"
-    );
+    return getTextById("balanceFreeMoneyValue") || getTextById("walletLightFreeValue") || "0 ₽";
   }
 
   function getDailyValue() {
@@ -32,18 +22,11 @@
   }
 
   function getHeroHint() {
-    return getTextById(
-      "walletGameHint",
-      "Данные обновятся после загрузки операций."
-    );
+    return getTextById("walletGameHint", "Данные обновятся после загрузки операций.");
   }
 
   function getMandatoryValue() {
-    return (
-      getTextById("analyticsPendingMandatoryValue") ||
-      getTextById("walletCalendarPressureValue") ||
-      "0 ₽"
-    );
+    return getTextById("analyticsPendingMandatoryValue") || getTextById("walletCalendarPressureValue") || "0 ₽";
   }
 
   function getBudgetSpentValue() {
@@ -56,22 +39,13 @@
 
   function getExpectedIncomeValue() {
     const value = getTextById("walletExpectedIncomeValue", "");
-
-    if (!value || value.toLowerCase().includes("ожидание пока не добавлено")) {
-      return "не добавлено";
-    }
-
+    if (!value || value.toLowerCase().includes("ожидание пока не добавлено")) return "не добавлено";
     return value;
   }
 
-    function isModalVisible(modalId) {
+  function isModalVisible(modalId) {
     const modal = document.getElementById(modalId);
-
-    return Boolean(
-      modal &&
-      !modal.classList.contains("hidden") &&
-      !modal.classList.contains("is-closing")
-    );
+    return Boolean(modal && !modal.classList.contains("hidden") && !modal.classList.contains("is-closing"));
   }
 
   function openModalFallback(modalId) {
@@ -86,23 +60,18 @@
     }
 
     modal.classList.remove("hidden", "is-closing");
-
-    requestAnimationFrame(() => {
-      modal.classList.add("is-visible");
-    });
+    requestAnimationFrame(() => modal.classList.add("is-visible"));
   }
 
   function clickById(id) {
     const node = document.getElementById(id);
     if (!node) return false;
 
-    node.dispatchEvent(
-      new MouseEvent("click", {
-        bubbles: true,
-        cancelable: true,
-        view: window,
-      })
-    );
+    node.dispatchEvent(new MouseEvent("click", {
+      bubbles: true,
+      cancelable: true,
+      view: window,
+    }));
 
     return true;
   }
@@ -113,7 +82,7 @@
     window.setTimeout(() => {
       if (isModalVisible(modalId)) return;
       openModalFallback(modalId);
-    }, 40);
+    }, 60);
   }
 
   function createWalletCardsRoot() {
@@ -121,7 +90,6 @@
 
     const mainView = document.getElementById("mainView");
     const oldHeroSection = document.querySelector(".balance--game");
-
     if (!mainView || !oldHeroSection) return;
 
     const section = document.createElement("section");
@@ -133,24 +101,14 @@
         <h1 class="wallet-cards-v1__title">Wallet</h1>
 
         <div class="wallet-cards-v1__actions">
-          <button
-            class="wallet-cards-v1__icon-btn"
-            type="button"
-            id="walletCardsAddBtn"
-            aria-label="Добавить операцию"
-          >
+          <button class="wallet-cards-v1__icon-btn" type="button" id="walletCardsAddBtn" aria-label="Добавить операцию">
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="M12 5v14" />
               <path d="M5 12h14" />
             </svg>
           </button>
 
-          <button
-            class="wallet-cards-v1__icon-btn"
-            type="button"
-            id="walletCardsReportBtn"
-            aria-label="Открыть итоги"
-          >
+          <button class="wallet-cards-v1__icon-btn" type="button" id="walletCardsReportBtn" aria-label="Открыть итоги">
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="M6 19V5" />
               <path d="M6 19h13" />
@@ -163,89 +121,47 @@
       </div>
 
       <div class="wallet-cards-v1__stack">
-        <article
-          class="wallet-card-v1"
-          id="${MAIN_CARD_ID}"
-          role="button"
-          tabindex="0"
-          aria-expanded="false"
-        >
+        <article class="wallet-card-v1" id="${MAIN_CARD_ID}" role="button" tabindex="0" aria-expanded="false">
           <div class="wallet-card-v1__summary">
             <div class="wallet-card-v1__name">
               <strong>Основной счёт</strong>
               <span>Свободные деньги</span>
             </div>
 
-            <strong class="wallet-card-v1__amount" id="walletMainAccountValue">
-              0 ₽
-            </strong>
+            <strong class="wallet-card-v1__amount" id="walletMainAccountValue">0 ₽</strong>
           </div>
 
           <div class="wallet-card-v1__details">
             <div class="wallet-card-v1__details-inner">
               <div class="wallet-card-v1__details-content">
                 <div class="wallet-card-v1__panel">
-                                    <div class="wallet-card-v1__row">
+                  <div class="wallet-card-v1__row">
                     <span>Можно тратить</span>
                     <strong id="walletMainDailyValue">0 ₽/день</strong>
                   </div>
 
-                  <button
-                    class="wallet-card-v1__row wallet-card-v1__row--button"
-                    type="button"
-                    id="walletMainMandatoryRowBtn"
-                  >
+                  <button class="wallet-card-v1__row wallet-card-v1__row--button" type="button" id="walletMainMandatoryRowBtn" data-wallet-card-action="mandatory">
                     <span>К списанию</span>
                     <strong id="walletMainMandatoryValue">0 ₽</strong>
                   </button>
 
-                  <button
-                    class="wallet-card-v1__row wallet-card-v1__row--button"
-                    type="button"
-                    id="walletMainBudgetRowBtn"
-                  >
+                  <button class="wallet-card-v1__row wallet-card-v1__row--button" type="button" id="walletMainBudgetRowBtn" data-wallet-card-action="budget">
                     <span>Бюджет месяца</span>
                     <strong id="walletMainBudgetValue">0 ₽ из 0 ₽</strong>
                   </button>
 
-                  <button
-                    class="wallet-card-v1__row wallet-card-v1__row--button"
-                    type="button"
-                    id="walletMainExpectedRowBtn"
-                  >
+                  <button class="wallet-card-v1__row wallet-card-v1__row--button" type="button" id="walletMainExpectedRowBtn" data-wallet-card-action="expected">
                     <span>Ожидаемые деньги</span>
                     <strong id="walletMainExpectedValue">не добавлено</strong>
                   </button>
 
-                  <p class="wallet-card-v1__hint" id="walletMainHint">
-                    Данные обновятся после загрузки операций.
-                  </p>
+                  <p class="wallet-card-v1__hint" id="walletMainHint">Данные обновятся после загрузки операций.</p>
                 </div>
 
                 <div class="wallet-card-v1__quick-actions">
-                  <button
-                    class="wallet-card-v1__action wallet-card-v1__action--danger"
-                    type="button"
-                    id="walletMainExpenseBtn"
-                  >
-                    Расход
-                  </button>
-
-                  <button
-                    class="wallet-card-v1__action wallet-card-v1__action--good"
-                    type="button"
-                    id="walletMainIncomeBtn"
-                  >
-                    Доход
-                  </button>
-
-                  <button
-                    class="wallet-card-v1__action"
-                    type="button"
-                    id="walletMainReportBtn"
-                  >
-                    Итоги
-                  </button>
+                  <button class="wallet-card-v1__action wallet-card-v1__action--danger" type="button" id="walletMainExpenseBtn">Расход</button>
+                  <button class="wallet-card-v1__action wallet-card-v1__action--good" type="button" id="walletMainIncomeBtn">Доход</button>
+                  <button class="wallet-card-v1__action" type="button" id="walletMainReportBtn">Итоги</button>
                 </div>
               </div>
             </div>
@@ -264,10 +180,7 @@
     setTextById("walletMainAccountValue", getMainAccountValue());
     setTextById("walletMainDailyValue", `${getDailyValue()}/день`);
     setTextById("walletMainMandatoryValue", getMandatoryValue());
-    setTextById(
-      "walletMainBudgetValue",
-      `${getBudgetSpentValue()} ${getBudgetTotalValue()}`
-    );
+    setTextById("walletMainBudgetValue", `${getBudgetSpentValue()} ${getBudgetTotalValue()}`);
     setTextById("walletMainExpectedValue", getExpectedIncomeValue());
     setTextById("walletMainHint", getHeroHint());
   }
@@ -278,6 +191,22 @@
 
     const isOpen = card.classList.toggle("is-open");
     card.setAttribute("aria-expanded", String(isOpen));
+  }
+
+  function handleWalletCardAction(action) {
+    if (action === "mandatory") {
+      openWalletTarget("openMandatoryPaymentsModalBtn", "mandatoryPaymentsModal");
+      return;
+    }
+
+    if (action === "budget") {
+      openWalletTarget("openBudgetAnalyticsModalBtn", "budgetAnalyticsModal");
+      return;
+    }
+
+    if (action === "expected") {
+      openWalletTarget("openExpectedIncomeModalBtn", "expectedIncomeModal");
+    }
   }
 
   function bindWalletCardEvents() {
@@ -291,59 +220,55 @@
 
     card.addEventListener("keydown", (event) => {
       if (event.key !== "Enter" && event.key !== " ") return;
-
+      if (event.target.closest("button")) return;
       event.preventDefault();
       toggleMainCard();
     });
 
-    document.getElementById("walletCardsAddBtn")?.addEventListener("click", () => {
+    document.getElementById("walletCardsAddBtn")?.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
       clickById("openExpenseModal");
     });
 
-    document.getElementById("walletCardsReportBtn")?.addEventListener("click", () => {
+    document.getElementById("walletCardsReportBtn")?.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
       clickById("openMonthlyReportBtn");
     });
 
-    document.getElementById("walletMainExpenseBtn")?.addEventListener("click", () => {
+    document.getElementById("walletMainExpenseBtn")?.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
       clickById("openExpenseModal");
     });
 
-    document.getElementById("walletMainIncomeBtn")?.addEventListener("click", () => {
+    document.getElementById("walletMainIncomeBtn")?.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
       clickById("openIncomeModal");
     });
 
-    document.getElementById("walletMainReportBtn")?.addEventListener("click", () => {
+    document.getElementById("walletMainReportBtn")?.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
       clickById("openMonthlyReportBtn");
     });
+
+    document.querySelectorAll("[data-wallet-card-action]").forEach((button) => {
+      button.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        handleWalletCardAction(button.dataset.walletCardAction || "");
+      });
+    });
   }
-  
-      document.getElementById("walletMainMandatoryRowBtn")?.addEventListener("click", (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-
-      openWalletTarget("openMandatoryPaymentsModalBtn", "mandatoryPaymentsModal");
-    });
-
-    document.getElementById("walletMainBudgetRowBtn")?.addEventListener("click", (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-
-      openWalletTarget("openBudgetAnalyticsModalBtn", "budgetAnalyticsModal");
-    });
-
-    document.getElementById("walletMainExpectedRowBtn")?.addEventListener("click", (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-
-      openWalletTarget("openExpectedIncomeModalBtn", "expectedIncomeModal");
-    });
 
   function observeSource(id) {
     const node = document.getElementById(id);
     if (!node) return;
 
     const observer = new MutationObserver(syncWalletMainCard);
-
     observer.observe(node, {
       childList: true,
       characterData: true,
@@ -353,7 +278,6 @@
 
   function startSync() {
     syncWalletMainCard();
-
     window.setTimeout(syncWalletMainCard, 100);
     window.setTimeout(syncWalletMainCard, 350);
     window.setTimeout(syncWalletMainCard, 900);
