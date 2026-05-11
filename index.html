@@ -94,215 +94,47 @@
     </div>
   </section>
   
-  <!-- HARD MONTH OVERVIEW -->
-<section class="hard-month-overview" id="hardMonthOverview">
-  <div class="hard-month-overview__cards">
-    <button
-  class="hard-month-stat hard-month-stat--income hard-month-stat--clickable"
-  type="button"
-  id="openIncomeModal"
-  aria-label="Добавить доход"
->
-  <div class="hard-month-stat__head">
-    <span class="hard-month-stat__icon" aria-hidden="true">
-      <svg viewBox="0 0 24 24">
-        <path d="M12 5v14" />
-        <path d="M7 10l5-5 5 5" />
-      </svg>
-    </span>
-    <span>Доход</span>
-  </div>
+<!-- LEGACY WALLET ANCHORS
+  Эти id пока нужны старому script.js:
+  - сюда пишутся расчёты;
+  - через эти кнопки открываются старые модалки;
+  - визуально этот блок не отображается.
+-->
+<div class="legacy-wallet-anchors" aria-hidden="true">
+  <!-- income / expense triggers -->
+  <button type="button" id="openIncomeModal" tabindex="-1"></button>
+  <button type="button" id="openExpenseModal" tabindex="-1"></button>
 
-  <strong id="hardMonthIncomeValue">0 ₽</strong>
+  <!-- monthly budget trigger + values -->
+  <button type="button" id="openBudgetAnalyticsModalBtn" tabindex="-1"></button>
+  <span id="hardMonthIncomeValue">0 ₽</span>
+  <span id="hardMonthIncomeDelta">0%</span>
+  <span id="hardMonthExpenseValue">0 ₽</span>
+  <span id="hardMonthExpenseDelta">0%</span>
+  <span id="hardMonthBudgetSpentValue">0 ₽</span>
+  <span id="hardMonthBudgetTotalValue">из 0 ₽</span>
+  <span id="hardMonthBudgetFill"></span>
+  <span id="hardMonthBudgetPercent">0%</span>
 
-  <small
-    class="hard-month-stat__delta hard-month-stat__delta--neutral"
-    id="hardMonthIncomeDelta"
-  >
-    0%
-  </small>
-</button>
+  <!-- expected income / mandatory payments triggers -->
+  <button type="button" id="walletExpectedIncomeCard" tabindex="-1"></button>
+  <button type="button" id="openExpectedIncomeModalBtn" tabindex="-1"></button>
+  <button type="button" id="openMandatoryPaymentsModalBtn" tabindex="-1"></button>
 
-    <button
-  class="hard-month-stat hard-month-stat--expense hard-month-stat--clickable"
-  type="button"
-  id="openExpenseModal"
-  aria-label="Добавить расход"
->
-  <div class="hard-month-stat__head">
-    <span class="hard-month-stat__icon" aria-hidden="true">
-      <svg viewBox="0 0 24 24">
-        <path d="M12 5v14" />
-        <path d="M7 14l5 5 5-5" />
-      </svg>
-    </span>
-    <span>Расход</span>
-  </div>
+  <!-- upcoming / analytics values -->
+  <span id="walletExpectedIncomeLabel">Ждёшь деньги</span>
+  <span id="walletExpectedIncomeValue">Ожидание пока не добавлено</span>
+  <span id="analyticsPendingMandatoryValue">0 ₽</span>
+  <span id="analyticsMandatoryTotalValue">0 ₽</span>
+  <span id="analyticsMandatoryCoveredValue">0 ₽</span>
+  <span id="analyticsRemainingBudgetsValue">0 ₽</span>
+  <span id="walletMandatoryControlValue">0%</span>
 
-  <strong id="hardMonthExpenseValue">0 ₽</strong>
-
-  <small
-    class="hard-month-stat__delta hard-month-stat__delta--neutral"
-    id="hardMonthExpenseDelta"
-  >
-    0%
-  </small>
-</button>
-  </div>
-
-  <article
-  class="hard-month-budget hard-month-budget--clickable"
-  id="openBudgetAnalyticsModalBtn"
-  role="button"
-  tabindex="0"
-  aria-label="Открыть аналитику бюджета месяца"
->
-    <div class="hard-month-budget__top">
-      <div>
-        <strong>Бюджет месяца</strong>
-        <span>лимитные категории</span>
-      </div>
-
-      <div class="hard-month-budget__money">
-        <strong id="hardMonthBudgetSpentValue">0 ₽</strong>
-        <span id="hardMonthBudgetTotalValue">из 0 ₽</span>
-      </div>
-    </div>
-
-    <div class="hard-month-budget__bar" aria-hidden="true">
-      <span id="hardMonthBudgetFill"></span>
-    </div>
-
-    <div class="hard-month-budget__bottom">
-      <span>Потрачено</span>
-      <strong id="hardMonthBudgetPercent">0%</strong>
-    </div>
-  </article>
-</section>
-
-<!-- HARD UPCOMING -->
-<section class="section hard-plan-section hard-upcoming-section">
-  <div class="hard-section-head">
-    <h2 class="hard-section-title">Ближайшее</h2>
-  </div>
-
-  <div
-    class="hard-plan-card hard-upcoming-card"
-    role="button"
-    tabindex="0"
-    aria-label="Открыть ближайшее"
-  >
-    <div class="hard-plan-row hard-upcoming-row hard-upcoming-row--income" id="walletExpectedIncomeCard">
-      <div class="hard-plan-row__icon hard-plan-row__icon--blue" aria-hidden="true">
-        <svg viewBox="0 0 24 24">
-          <path d="M7 4v3" />
-          <path d="M17 4v3" />
-          <rect x="4" y="6" width="16" height="14" rx="4" />
-          <path d="M8 11h8" />
-        </svg>
-      </div>
-
-      <div class="hard-plan-row__body">
-        <span id="walletExpectedIncomeLabel">Ждёшь деньги</span>
-        <strong id="walletExpectedIncomeValue">Ожидание пока не добавлено</strong>
-      </div>
-
-      <span class="hard-upcoming-chip">
-        Детали
-      </span>
-    </div>
-
-    <div class="hard-plan-row hard-upcoming-row hard-upcoming-row--mandatory">
-      <div class="hard-plan-row__icon hard-plan-row__icon--red" aria-hidden="true">
-        <svg viewBox="0 0 24 24">
-          <path d="M12 7v6" />
-          <circle cx="12" cy="17" r="1" />
-        </svg>
-      </div>
-
-      <div class="hard-plan-row__body">
-        <span>К списанию</span>
-        <strong>Календарные платежи до ближайших денег</strong>
-      </div>
-
-      <strong class="hard-plan-row__value hard-plan-row__value--danger" id="analyticsPendingMandatoryValue">
-        0 ₽
-      </strong>
-
-      <span class="hard-plan-row__chevron" aria-hidden="true">›</span>
-    </div>
-  </div>
-
-  <!-- Hidden proxy buttons. Нужны для старых обработчиков JS. Не удалять. -->
-  <div class="hard-upcoming-proxy-actions" aria-hidden="true">
-    <button
-      type="button"
-      id="openExpectedIncomeModalBtn"
-      tabindex="-1"
-    ></button>
-
-    <button
-      type="button"
-      id="openMandatoryPaymentsModalBtn"
-      tabindex="-1"
-    ></button>
-  </div>
-
-  <div class="hard-important-grid">
-    <div class="hard-important-card">
-      <span>Обязательные всего</span>
-      <strong id="analyticsMandatoryTotalValue">0 ₽</strong>
-    </div>
-
-    <div class="hard-important-card">
-      <span>Покрыто накоплениями</span>
-      <strong id="analyticsMandatoryCoveredValue">0 ₽</strong>
-    </div>
-
-    <div class="hard-important-card">
-      <span>Остаток лимитов</span>
-      <strong id="analyticsRemainingBudgetsValue">0 ₽</strong>
-    </div>
-
-    <div class="hard-important-card hard-important-card--control">
-      <span>Под контролем</span>
-      <strong id="walletMandatoryControlValue">0%</strong>
-    </div>
-  </div>
-</section>
-
-  <!-- ACCOUNTS -->
-  <section class="section accounts-section">
-    <div class="section-head accounts-section-head">
-      <h2 class="section-title">Счета</h2>
-
-      <div class="accounts-section-head__right">
-        <div class="section-note accounts-total-note" id="accountsTotal">Всего: 0 ₽</div>
-
-        <button
-          class="icon-action-btn icon-action-btn--primary accounts-add-btn"
-          type="button"
-          id="openCreateAccountModalBtn"
-          aria-label="Добавить счёт"
-          title="Добавить счёт"
-        >
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M12 5v14M5 12h14" />
-          </svg>
-        </button>
-      </div>
-    </div>
-
-    <div class="list accounts-list" id="accountsList"></div>
-
-    <div class="accounts-carousel-dots" aria-hidden="true">
-      <span class="is-active"></span>
-      <span></span>
-      <span></span>
-      <span></span>
-      <span></span>
-    </div>
-  </section>
+  <!-- old accounts render targets -->
+  <button type="button" id="openCreateAccountModalBtn" tabindex="-1"></button>
+  <span id="accountsTotal">Всего: 0 ₽</span>
+  <div id="accountsList"></div>
+</div>
 
  <!-- TRANSACTIONS -->
   <section class="section transactions-preview-section">
