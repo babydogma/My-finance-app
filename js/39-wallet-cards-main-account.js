@@ -51,6 +51,19 @@
     if (window.crypto?.randomUUID) return `${prefix}_${window.crypto.randomUUID()}`;
     return `${prefix}_${Date.now()}_${Math.random().toString(16).slice(2)}`;
   }
+  
+  function makeDbId() {
+  if (window.crypto?.randomUUID) {
+    return window.crypto.randomUUID();
+  }
+
+  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (char) => {
+    const random = Math.random() * 16 | 0;
+    const value = char === "x" ? random : (random & 0x3) | 0x8;
+
+    return value.toString(16);
+  });
+}
 
   function bridge() {
     return window.FinanceAppSavingsBridge || null;
@@ -261,7 +274,7 @@
     const client = supabase();
     if (!client?.from) throw new Error("Supabase ещё не готов. Обнови страницу и попробуй снова.");
 
-    const id = makeId("account");
+    const id = makeDbId();
     const type = typeOf(draft.type);
     const now = new Date().toISOString();
 
@@ -277,7 +290,7 @@
     const client = supabase();
     if (!client?.from) throw new Error("Supabase ещё не готов. Обнови страницу и попробуй снова.");
 
-    const id = makeId("bucket");
+    const id = makeDbId();
     const now = new Date().toISOString();
 
     return tryDb([
