@@ -43,3 +43,14 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .list-icon--neutral {
   background: rgba(108, 113, 132, 0.5) !important;
 }
+
+.legacy-wallet-anchors {
+  position: absolute !important;
+  left: -9999px !important;
+  top: auto !important;
+  width: 1px !important;
+  height: 1px !important;
+  overflow: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
