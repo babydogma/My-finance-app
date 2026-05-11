@@ -1,4 +1,4 @@
-/* css/32-wallet-cards.css */
+д/* css/32-wallet-cards.css */
 /* Wallet Cards v1 — основной счёт */
 
 body.wallet-cards-v1-enabled.wallet-mode-hard .balance--game,
@@ -773,5 +773,28 @@ body.wallet-cards-v1-enabled.wallet-mode-hard #mainView {
 
 .wallet-draft-status[data-status="success"] {
   color: #15835f;
+}
+
+/* Wallet draft editor must stay neutral while choosing card color */
+
+.wallet-card-v1--draft,
+.wallet-card-v1--draft.wallet-card-v1--theme-graphite,
+.wallet-card-v1--draft.wallet-card-v1--theme-sand,
+.wallet-card-v1--draft.wallet-card-v1--theme-sky,
+.wallet-card-v1--draft.wallet-card-v1--theme-sage,
+.wallet-card-v1--draft.wallet-card-v1--theme-pearl {
+  color: #172033 !important;
+  background:
+    radial-gradient(circle at 82% 24%, rgba(255, 255, 255, 0.9), transparent 0 96px),
+    linear-gradient(135deg, #ffffff 0%, #eef2f8 100%) !important;
+}
+
+.wallet-card-v1--draft .wallet-card-v1__name strong,
+.wallet-card-v1--draft .wallet-card-v1__amount {
+  color: #172033 !important;
+}
+
+.wallet-card-v1--draft .wallet-card-v1__name span {
+  color: rgba(23, 32, 51, 0.58) !important;
 }
 
