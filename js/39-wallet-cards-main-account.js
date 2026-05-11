@@ -6,9 +6,30 @@
   const META_KEY = "wallet_cards";
 
   const TYPES = [
-    { value: "account", label: "Счёт", subtitle: "Счёт", entityType: "account", accountKind: "default" },
-    { value: "cash", label: "Наличные", subtitle: "Наличные деньги", entityType: "account", accountKind: "cash" },
-    { value: "saving", label: "Накопления", subtitle: "Накопления", entityType: "safe_bucket", bucketKind: "saving" },
+    {
+      value: "account",
+      label: "Счёт",
+      subtitle: "Счёт",
+      entityType: "account",
+      accountKind: "default",
+      defaultColor: "graphite",
+    },
+    {
+      value: "cash",
+      label: "Наличные",
+      subtitle: "Наличные деньги",
+      entityType: "account",
+      accountKind: "cash",
+      defaultColor: "sand",
+    },
+    {
+      value: "saving",
+      label: "Накопления",
+      subtitle: "Накопления",
+      entityType: "safe_bucket",
+      bucketKind: "saving",
+      defaultColor: "sky",
+    },
   ];
 
   const COLORS = [
@@ -19,7 +40,7 @@
     { value: "pearl", label: "Жемчуг" },
   ];
 
-  let cardsCache = null;
+  let uiMetaCache = null;
   let isSavingDraft = false;
 
   const $ = (selector, root = document) => root.querySelector(selector);
@@ -47,23 +68,26 @@
       .replaceAll("'", "&#039;");
   }
 
-  function makeId(prefix) {
-    if (window.crypto?.randomUUID) return `${prefix}_${window.crypto.randomUUID()}`;
+  function makeUiId(prefix) {
+    if (window.crypto?.randomUUID) {
+      return `${prefix}_${window.crypto.randomUUID()}`;
+    }
+
     return `${prefix}_${Date.now()}_${Math.random().toString(16).slice(2)}`;
   }
-  
+
   function makeDbId() {
-  if (window.crypto?.randomUUID) {
-    return window.crypto.randomUUID();
+    if (window.crypto?.randomUUID) {
+      return window.crypto.randomUUID();
+    }
+
+    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (char) => {
+      const random = Math.random() * 16 | 0;
+      const value = char === "x" ? random : (random & 0x3) | 0x8;
+
+      return value.toString(16);
+    });
   }
-
-  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (char) => {
-    const random = Math.random() * 16 | 0;
-    const value = char === "x" ? random : (random & 0x3) | 0x8;
-
-    return value.toString(16);
-  });
-}
 
   function bridge() {
     return window.FinanceAppSavingsBridge || null;
@@ -79,20 +103,38 @@
 
   function roundMoney(value) {
     const amount = Number(value) || 0;
-    return typeof bridge()?.roundToTwo === "function"
-      ? bridge().roundToTwo(amount)
-      : Math.round(amount * 100) / 100;
+
+    if (typeof bridge()?.roundToTwo === "function") {
+      return bridge().roundToTwo(amount);
+    }
+
+    return Math.round(amount * 100) / 100;
   }
 
   function parseMoney(value) {
-    const normalized = String(value || "").replace(/\s+/g, "").replace(",", ".").replace(/[^\d.-]/g, "");
+    const normalized = String(value || "")
+      .replace(/\s+/g, "")
+      .replace(",", ".")
+      .replace(/[^\d.-]/g, "");
+
     return roundMoney(Number(normalized) || 0);
   }
 
   function formatMoney(value) {
     const amount = roundMoney(value);
-    if (typeof bridge()?.formatMoney === "function") return bridge().formatMoney(amount);
-    return `${new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 2 }).format(amount)} ₽`;
+
+    if (typeof bridge()?.formatMoney === "function") {
+      return bridge().formatMoney(amount);
+    }
+
+    return `${new Intl.NumberFormat("ru-RU", {
+      minimumFractionDigits: amount % 1 ? 2 : 0,
+      maximumFractionDigits: 2,
+    }).format(amount)} ₽`;
+  }
+
+  function normalizeText(value) {
+    return String(value || "").trim().toLowerCase();
   }
 
   function typeOf(value) {
@@ -103,6 +145,10 @@
     return COLORS.find((item) => item.value === value) || COLORS[0];
   }
 
+  function entityKey(entityType, entityId) {
+    return `${entityType}:${entityId}`;
+  }
+
   function deck() {
     return byId(DECK_ID);
   }
@@ -110,108 +156,194 @@
   function clickById(id) {
     const node = byId(id);
     if (!node) return false;
-    node.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true, view: window }));
+
+    node.dispatchEvent(
+      new MouseEvent("click", {
+        bubbles: true,
+        cancelable: true,
+        view: window,
+      })
+    );
+
     return true;
   }
 
   function openModalFallback(modalId) {
     const modal = byId(modalId);
     if (!modal) return;
+
     modal.classList.add("modal");
+
     if (window.FinanceAppModalCore?.openAnimatedModal) {
       window.FinanceAppModalCore.openAnimatedModal(modal);
       return;
     }
+
     modal.classList.remove("hidden", "is-closing");
-    requestAnimationFrame(() => modal.classList.add("is-visible"));
+
+    requestAnimationFrame(() => {
+      modal.classList.add("is-visible");
+    });
   }
 
   function isModalVisible(modalId) {
     const modal = byId(modalId);
-    return Boolean(modal && !modal.classList.contains("hidden") && !modal.classList.contains("is-closing"));
+
+    return Boolean(
+      modal &&
+      !modal.classList.contains("hidden") &&
+      !modal.classList.contains("is-closing")
+    );
   }
 
   function openTarget(triggerId, modalId) {
     clickById(triggerId);
+
     window.setTimeout(() => {
-      if (!isModalVisible(modalId)) openModalFallback(modalId);
+      if (!isModalVisible(modalId)) {
+        openModalFallback(modalId);
+      }
     }, 60);
   }
 
   function mainAction(action) {
-    if (action === "mandatory") return openTarget("openMandatoryPaymentsModalBtn", "mandatoryPaymentsModal");
-    if (action === "budget") return openTarget("openBudgetAnalyticsModalBtn", "budgetAnalyticsModal");
-    if (action === "expected") return openTarget("openExpectedIncomeModalBtn", "expectedIncomeModal");
+    if (action === "mandatory") {
+      openTarget("openMandatoryPaymentsModalBtn", "mandatoryPaymentsModal");
+      return;
+    }
+
+    if (action === "budget") {
+      openTarget("openBudgetAnalyticsModalBtn", "budgetAnalyticsModal");
+      return;
+    }
+
+    if (action === "expected") {
+      openTarget("openExpectedIncomeModalBtn", "expectedIncomeModal");
+    }
+  }
+
+  function emptyMeta() {
+    return {
+      hidden: [],
+      colors: {},
+      order: [],
+      amounts: {},
+    };
   }
 
   function readMetaFromState(key) {
     const meta = state()?.appMeta || state()?.app_meta || state()?.meta || null;
+
     if (!meta) return "";
 
     if (Array.isArray(meta)) {
-      const row = meta.find((item) => item?.id === key || item?.key === key || item?.name === key || item?.meta_key === key);
+      const row = meta.find((item) => {
+        return item?.id === key || item?.key === key || item?.name === key || item?.meta_key === key;
+      });
+
       return row?.value ?? row?.meta_value ?? row?.json_value ?? row?.data ?? "";
     }
 
     if (typeof meta === "object") {
       const value = meta[key];
+
       if (typeof value === "string") return value;
-      if (value && typeof value === "object") return value.value ?? value.meta_value ?? value.json_value ?? value.data ?? "";
+
+      if (value && typeof value === "object") {
+        return value.value ?? value.meta_value ?? value.json_value ?? value.data ?? "";
+      }
+
       return value ?? "";
     }
 
     return "";
   }
 
-  function parseCards(raw) {
-    if (!raw) return [];
-    if (Array.isArray(raw)) return raw;
-    if (typeof raw === "object") return Array.isArray(raw.cards) ? raw.cards : [];
+  function parseRawMeta(raw) {
+    if (!raw) return emptyMeta();
+
+    if (typeof raw === "object" && !Array.isArray(raw)) {
+      return normalizeMeta(raw);
+    }
+
     try {
-      const parsed = JSON.parse(String(raw));
-      if (Array.isArray(parsed)) return parsed;
-      return Array.isArray(parsed.cards) ? parsed.cards : [];
+      return normalizeMeta(JSON.parse(String(raw)));
     } catch {
-      return [];
+      return emptyMeta();
     }
   }
 
-  function normalizeCards(cards) {
-    if (!Array.isArray(cards)) return [];
-    return cards
-      .filter((card) => card && card.id && card.entityId)
-      .map((card, index) => {
-        const type = typeOf(card.type || card.kind).value;
-        const color = colorOf(card.color || card.theme).value;
-        return {
-          id: String(card.id),
-          entityType: card.entityType === "safe_bucket" ? "safe_bucket" : "account",
-          entityId: String(card.entityId),
-          type,
-          color,
-          title: String(card.title || "").trim(),
-          subtitle: String(card.subtitle || typeOf(type).subtitle).trim(),
-          initialAmount: Number(card.initialAmount) || 0,
-          order: Number.isFinite(Number(card.order)) ? Number(card.order) : index,
-        };
-      })
-      .sort((a, b) => a.order - b.order);
-  }
+  function normalizeMeta(raw) {
+    const meta = emptyMeta();
 
-  function getCards() {
-    if (Array.isArray(cardsCache)) return cardsCache;
-    cardsCache = normalizeCards(parseCards(readMetaFromState(META_KEY)));
-    return cardsCache;
+    if (!raw || typeof raw !== "object") {
+      return meta;
+    }
+
+    if (Array.isArray(raw.hidden)) {
+      meta.hidden = raw.hidden.map(String);
+    }
+
+    if (raw.colors && typeof raw.colors === "object") {
+      Object.entries(raw.colors).forEach(([key, value]) => {
+        meta.colors[String(key)] = colorOf(value).value;
+      });
+    }
+
+    if (Array.isArray(raw.order)) {
+      meta.order = raw.order.map(String);
+    }
+
+    if (raw.amounts && typeof raw.amounts === "object") {
+      Object.entries(raw.amounts).forEach(([key, value]) => {
+        meta.amounts[String(key)] = roundMoney(value);
+      });
+    }
+
+    // Миграция старого формата { cards: [...] }, который был в предыдущей версии.
+    if (Array.isArray(raw.cards)) {
+      raw.cards.forEach((card) => {
+        if (!card?.entityId) return;
+
+        const key = entityKey(
+          card.entityType === "safe_bucket" ? "safe_bucket" : "account",
+          card.entityId
+        );
+
+        if (card.color || card.theme) {
+          meta.colors[key] = colorOf(card.color || card.theme).value;
+        }
+
+        if (Number(card.initialAmount)) {
+          meta.amounts[key] = roundMoney(card.initialAmount);
+        }
+
+        if (!meta.order.includes(key)) {
+          meta.order.push(key);
+        }
+      });
+    }
+
+    return meta;
   }
 
   function metaValueFromRow(row) {
     return row?.value ?? row?.meta_value ?? row?.json_value ?? row?.data ?? "";
   }
 
-  async function loadCardsFromSupabase() {
+  function getUiMeta() {
+    if (uiMetaCache) return uiMetaCache;
+
+    uiMetaCache = parseRawMeta(readMetaFromState(META_KEY));
+
+    return uiMetaCache;
+  }
+
+  async function loadUiMetaFromSupabase() {
     const client = supabase();
+
     if (!client?.from) {
-      cardsCache = normalizeCards(parseCards(readMetaFromState(META_KEY)));
+      uiMetaCache = parseRawMeta(readMetaFromState(META_KEY));
       renderCards();
       return;
     }
@@ -225,24 +357,27 @@
 
     for (const attempt of attempts) {
       const { data, error } = await attempt();
+
       if (!error) {
-        cardsCache = normalizeCards(parseCards(metaValueFromRow(data)));
+        uiMetaCache = parseRawMeta(metaValueFromRow(data));
         renderCards();
         return;
       }
     }
 
-    cardsCache = normalizeCards(parseCards(readMetaFromState(META_KEY)));
+    uiMetaCache = parseRawMeta(readMetaFromState(META_KEY));
     renderCards();
   }
 
-  async function saveCards(cards) {
-    const normalized = normalizeCards(cards);
-    const value = JSON.stringify({ cards: normalized });
-    cardsCache = normalized;
+  async function saveUiMeta(meta) {
+    const normalized = normalizeMeta(meta);
+    const value = JSON.stringify(normalized);
+
+    uiMetaCache = normalized;
     bridge()?.setAppMetaLocalValue?.(META_KEY, value);
 
     const client = supabase();
+
     if (!client?.from) return;
 
     const attempts = [
@@ -252,182 +387,480 @@
     ];
 
     let lastError = null;
+
     for (const attempt of attempts) {
       const { error } = await attempt();
+
       if (!error) return;
+
       lastError = error;
     }
+
     throw lastError || new Error("Не удалось сохранить настройки карточек.");
   }
 
   async function tryDb(attempts, message) {
     let lastError = null;
+
     for (const attempt of attempts) {
       const { data, error } = await attempt();
-      if (!error) return Array.isArray(data) ? data[0] || null : data || null;
+
+      if (!error) {
+        if (Array.isArray(data)) return data[0] || null;
+        return data || null;
+      }
+
       lastError = error;
     }
+
     throw lastError || new Error(message);
   }
 
   async function createAccount(draft) {
     const client = supabase();
-    if (!client?.from) throw new Error("Supabase ещё не готов. Обнови страницу и попробуй снова.");
+
+    if (!client?.from) {
+      throw new Error("Supabase ещё не готов. Обнови страницу и попробуй снова.");
+    }
 
     const id = makeDbId();
     const type = typeOf(draft.type);
     const now = new Date().toISOString();
 
-    return tryDb([
-      () => client.from("accounts").insert({ id, name: draft.title, role: type.accountKind, account_role: type.accountKind, account_kind: type.accountKind, kind: type.accountKind, primary_spend: false, is_primary_spend: false, balance: draft.amount, initial_balance: draft.amount, created_at: now }).select("*").single(),
-      () => client.from("accounts").insert({ id, name: draft.title, role: type.accountKind, account_kind: type.accountKind, balance: draft.amount, created_at: now }).select("*").single(),
-      () => client.from("accounts").insert({ id, name: draft.title, role: type.accountKind, created_at: now }).select("*").single(),
-      () => client.from("accounts").insert({ id, name: draft.title, created_at: now }).select("*").single(),
-    ], "Не удалось создать счёт.");
+    return tryDb(
+      [
+        () => client
+          .from("accounts")
+          .insert({
+            id,
+            name: draft.title,
+            role: type.accountKind,
+            account_role: type.accountKind,
+            account_kind: type.accountKind,
+            kind: type.accountKind,
+            primary_spend: false,
+            is_primary_spend: false,
+            balance: draft.amount,
+            initial_balance: draft.amount,
+            created_at: now,
+          })
+          .select("*")
+          .single(),
+
+        () => client
+          .from("accounts")
+          .insert({
+            id,
+            name: draft.title,
+            role: type.accountKind,
+            account_kind: type.accountKind,
+            balance: draft.amount,
+            created_at: now,
+          })
+          .select("*")
+          .single(),
+
+        () => client
+          .from("accounts")
+          .insert({
+            id,
+            name: draft.title,
+            role: type.accountKind,
+            created_at: now,
+          })
+          .select("*")
+          .single(),
+
+        () => client
+          .from("accounts")
+          .insert({
+            id,
+            name: draft.title,
+            created_at: now,
+          })
+          .select("*")
+          .single(),
+      ],
+      "Не удалось создать счёт."
+    );
   }
 
   async function createBucket(draft) {
     const client = supabase();
-    if (!client?.from) throw new Error("Supabase ещё не готов. Обнови страницу и попробуй снова.");
+
+    if (!client?.from) {
+      throw new Error("Supabase ещё не готов. Обнови страницу и попробуй снова.");
+    }
 
     const id = makeDbId();
     const now = new Date().toISOString();
 
-    return tryDb([
-      () => client.from("safe_buckets").insert({ id, name: draft.title, kind: "saving", bucket_kind: "saving", amount: draft.amount, balance: draft.amount, current_amount: draft.amount, created_at: now }).select("*").single(),
-      () => client.from("safe_buckets").insert({ id, name: draft.title, kind: "saving", amount: draft.amount, created_at: now }).select("*").single(),
-      () => client.from("safe_buckets").insert({ id, name: draft.title, created_at: now }).select("*").single(),
-    ], "Не удалось создать накопление.");
+    return tryDb(
+      [
+        () => client
+          .from("safe_buckets")
+          .insert({
+            id,
+            name: draft.title,
+            kind: "saving",
+            bucket_kind: "saving",
+            amount: draft.amount,
+            balance: draft.amount,
+            current_amount: draft.amount,
+            created_at: now,
+          })
+          .select("*")
+          .single(),
+
+        () => client
+          .from("safe_buckets")
+          .insert({
+            id,
+            name: draft.title,
+            kind: "saving",
+            amount: draft.amount,
+            created_at: now,
+          })
+          .select("*")
+          .single(),
+
+        () => client
+          .from("safe_buckets")
+          .insert({
+            id,
+            name: draft.title,
+            created_at: now,
+          })
+          .select("*")
+          .single(),
+      ],
+      "Не удалось создать накопление."
+    );
   }
 
   async function createEntity(draft) {
     if (draft.type === "saving") {
       const bucket = await createBucket(draft);
-      return { entityType: "safe_bucket", entityId: bucket.id };
+
+      return {
+        entityType: "safe_bucket",
+        row: bucket,
+      };
     }
+
     const account = await createAccount(draft);
-    return { entityType: "account", entityId: account.id };
+
+    return {
+      entityType: "account",
+      row: account,
+    };
   }
 
-  function findAccount(id) {
-    const accounts = Array.isArray(state()?.accounts) ? state().accounts : [];
-    return accounts.find((account) => String(account.id) === String(id)) || null;
-  }
+  function insertEntityIntoLocalState(entityType, row) {
+    const appState = state();
+    if (!appState || !row?.id) return;
 
-  function findBucket(id) {
-    if (typeof bridge()?.getSafeBucketById === "function") {
-      const bucket = bridge().getSafeBucketById(id);
-      if (bucket) return bucket;
-    }
-    const buckets = Array.isArray(state()?.safeBuckets) ? state().safeBuckets : [];
-    return buckets.find((bucket) => String(bucket.id) === String(id)) || null;
-  }
-
-  function entityTitle(card) {
-    if (card.entityType === "safe_bucket") return findBucket(card.entityId)?.name || card.title || "Карта";
-    return findAccount(card.entityId)?.name || card.title || "Карта";
-  }
-
-  function entityAmount(card) {
-    if (card.entityType === "safe_bucket") {
-      const bucket = findBucket(card.entityId);
-      if (typeof bridge()?.getSafeBucketBalance === "function") {
-        const value = roundMoney(bridge().getSafeBucketBalance(card.entityId));
-        if (value || bucket) return value;
+    if (entityType === "safe_bucket") {
+      if (!Array.isArray(appState.safeBuckets)) {
+        appState.safeBuckets = [];
       }
-      return roundMoney(bucket?.amount ?? bucket?.balance ?? bucket?.current_amount ?? card.initialAmount);
+
+      if (!appState.safeBuckets.some((item) => String(item.id) === String(row.id))) {
+        appState.safeBuckets.push(row);
+      }
+
+      return;
     }
 
-    const account = findAccount(card.entityId);
-    if (typeof bridge()?.getRawAccountBalance === "function") {
-      const value = roundMoney(bridge().getRawAccountBalance(card.entityId));
-      if (value || account) return value;
+    if (!Array.isArray(appState.accounts)) {
+      appState.accounts = [];
     }
-    return roundMoney(account?.balance ?? account?.amount ?? account?.initial_balance ?? card.initialAmount);
+
+    if (!appState.accounts.some((item) => String(item.id) === String(row.id))) {
+      appState.accounts.push(row);
+    }
+  }
+
+  function getAccounts() {
+    const accounts = state()?.accounts;
+
+    return Array.isArray(accounts) ? accounts : [];
+  }
+
+  function getBuckets() {
+    const buckets = state()?.safeBuckets;
+
+    return Array.isArray(buckets) ? buckets : [];
+  }
+
+  function isProbablyCashAccount(account) {
+    const text = normalizeText([
+      account?.name,
+      account?.role,
+      account?.account_role,
+      account?.account_kind,
+      account?.kind,
+    ].filter(Boolean).join(" "));
+
+    return text.includes("cash") || text.includes("налич") || text.includes("налик");
+  }
+
+  function getAccountCardType(account) {
+    return isProbablyCashAccount(account) ? "cash" : "account";
+  }
+
+  function getBucketCardType() {
+    return "saving";
+  }
+
+  function getEntityTitle(card) {
+    return card.title || "Карта";
+  }
+
+  function getAccountAmount(account, fallback = 0) {
+    const direct = roundMoney(
+      account?.balance ??
+      account?.amount ??
+      account?.initial_balance ??
+      0
+    );
+
+    if (direct > 0) return direct;
+
+    if (typeof bridge()?.getRawAccountBalance === "function" && account?.id) {
+      const calculated = roundMoney(bridge().getRawAccountBalance(account.id));
+
+      if (calculated > 0) return calculated;
+    }
+
+    return roundMoney(fallback);
+  }
+
+  function getBucketAmount(bucket, fallback = 0) {
+    const direct = roundMoney(
+      bucket?.amount ??
+      bucket?.balance ??
+      bucket?.current_amount ??
+      0
+    );
+
+    if (direct > 0) return direct;
+
+    if (typeof bridge()?.getSafeBucketBalance === "function" && bucket?.id) {
+      const calculated = roundMoney(bridge().getSafeBucketBalance(bucket.id));
+
+      if (calculated > 0) return calculated;
+    }
+
+    return roundMoney(fallback);
+  }
+
+  function buildEntityCards() {
+    const meta = getUiMeta();
+    const hidden = new Set(meta.hidden);
+    const orderIndex = new Map(meta.order.map((key, index) => [key, index]));
+    const cards = [];
+
+    getAccounts().forEach((account, index) => {
+      if (!account?.id) return;
+
+      const key = entityKey("account", account.id);
+      if (hidden.has(key)) return;
+
+      const type = getAccountCardType(account);
+      const typeConfig = typeOf(type);
+
+      cards.push({
+        id: key,
+        entityType: "account",
+        entityId: String(account.id),
+        entityKey: key,
+        type,
+        color: colorOf(meta.colors[key] || typeConfig.defaultColor).value,
+        title: String(account.name || "Счёт").trim(),
+        subtitle: typeConfig.subtitle,
+        amount: getAccountAmount(account, meta.amounts[key]),
+        order: orderIndex.has(key) ? orderIndex.get(key) : 1000 + index,
+      });
+    });
+
+    getBuckets().forEach((bucket, index) => {
+      if (!bucket?.id) return;
+
+      const key = entityKey("safe_bucket", bucket.id);
+      if (hidden.has(key)) return;
+
+      const type = getBucketCardType(bucket);
+      const typeConfig = typeOf(type);
+
+      cards.push({
+        id: key,
+        entityType: "safe_bucket",
+        entityId: String(bucket.id),
+        entityKey: key,
+        type,
+        color: colorOf(meta.colors[key] || typeConfig.defaultColor).value,
+        title: String(bucket.name || "Накопления").trim(),
+        subtitle: typeConfig.subtitle,
+        amount: getBucketAmount(bucket, meta.amounts[key]),
+        order: orderIndex.has(key) ? orderIndex.get(key) : 2000 + index,
+      });
+    });
+
+    return cards.sort((a, b) => a.order - b.order);
   }
 
   function createRoot() {
     if (byId(ROOT_ID)) return;
+
     const mainView = byId("mainView");
     const oldHero = $(".balance--game");
+
     if (!mainView || !oldHero) return;
 
     const section = document.createElement("section");
     section.className = "wallet-cards-v1";
     section.id = ROOT_ID;
+
     section.innerHTML = `
       <div class="wallet-cards-v1__head">
         <h1 class="wallet-cards-v1__title">Wallet</h1>
+
         <div class="wallet-cards-v1__actions">
           <button class="wallet-cards-v1__icon-btn" type="button" id="walletCardsAddBtn" aria-label="Добавить карту">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 5v14"></path>
+              <path d="M5 12h14"></path>
+            </svg>
           </button>
+
           <button class="wallet-cards-v1__icon-btn" type="button" id="walletCardsReportBtn" aria-label="Открыть итоги">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 19V5"></path><path d="M6 19h13"></path><path d="M10 15v-4"></path><path d="M14 15V8"></path><path d="M18 15v-6"></path></svg>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M6 19V5"></path>
+              <path d="M6 19h13"></path>
+              <path d="M10 15v-4"></path>
+              <path d="M14 15V8"></path>
+              <path d="M18 15v-6"></path>
+            </svg>
           </button>
         </div>
       </div>
+
       <div class="wallet-cards-v1__stack wallet-cards-v1__stack--deck" id="${DECK_ID}">
         <article class="wallet-card-v1 wallet-card-v1--main" id="${MAIN_CARD_ID}" role="button" tabindex="0" aria-expanded="false">
           <div class="wallet-card-v1__summary">
-            <div class="wallet-card-v1__name"><strong>Основной счёт</strong><span>Свободные деньги</span></div>
+            <div class="wallet-card-v1__name">
+              <strong>Основной счёт</strong>
+              <span>Свободные деньги</span>
+            </div>
+
             <strong class="wallet-card-v1__amount" id="walletMainAccountValue">0 ₽</strong>
           </div>
-          <div class="wallet-card-v1__details"><div class="wallet-card-v1__details-inner"><div class="wallet-card-v1__details-content">
-            <div class="wallet-card-v1__panel">
-              <div class="wallet-card-v1__row"><span>Можно тратить</span><strong id="walletMainDailyValue">0 ₽/день</strong></div>
-              <button class="wallet-card-v1__row wallet-card-v1__row--button" type="button" data-wallet-card-action="mandatory"><span>К списанию</span><strong id="walletMainMandatoryValue">0 ₽</strong></button>
-              <button class="wallet-card-v1__row wallet-card-v1__row--button" type="button" data-wallet-card-action="budget"><span>Бюджет месяца</span><strong id="walletMainBudgetValue">0 ₽ из 0 ₽</strong></button>
-              <button class="wallet-card-v1__row wallet-card-v1__row--button" type="button" data-wallet-card-action="expected"><span>Ожидаемые деньги</span><strong id="walletMainExpectedValue">не добавлено</strong></button>
-              <p class="wallet-card-v1__hint" id="walletMainHint">Данные обновятся после загрузки операций.</p>
+
+          <div class="wallet-card-v1__details">
+            <div class="wallet-card-v1__details-inner">
+              <div class="wallet-card-v1__details-content">
+                <div class="wallet-card-v1__panel">
+                  <div class="wallet-card-v1__row">
+                    <span>Можно тратить</span>
+                    <strong id="walletMainDailyValue">0 ₽/день</strong>
+                  </div>
+
+                  <button class="wallet-card-v1__row wallet-card-v1__row--button" type="button" data-wallet-card-action="mandatory">
+                    <span>К списанию</span>
+                    <strong id="walletMainMandatoryValue">0 ₽</strong>
+                  </button>
+
+                  <button class="wallet-card-v1__row wallet-card-v1__row--button" type="button" data-wallet-card-action="budget">
+                    <span>Бюджет месяца</span>
+                    <strong id="walletMainBudgetValue">0 ₽ из 0 ₽</strong>
+                  </button>
+
+                  <button class="wallet-card-v1__row wallet-card-v1__row--button" type="button" data-wallet-card-action="expected">
+                    <span>Ожидаемые деньги</span>
+                    <strong id="walletMainExpectedValue">не добавлено</strong>
+                  </button>
+
+                  <p class="wallet-card-v1__hint" id="walletMainHint">Данные обновятся после загрузки операций.</p>
+                </div>
+
+                <div class="wallet-card-v1__quick-actions">
+                  <button class="wallet-card-v1__action wallet-card-v1__action--danger" type="button" id="walletMainExpenseBtn">Расход</button>
+                  <button class="wallet-card-v1__action wallet-card-v1__action--good" type="button" id="walletMainIncomeBtn">Доход</button>
+                  <button class="wallet-card-v1__action" type="button" id="walletMainReportBtn">Итоги</button>
+                </div>
+              </div>
             </div>
-            <div class="wallet-card-v1__quick-actions">
-              <button class="wallet-card-v1__action wallet-card-v1__action--danger" type="button" id="walletMainExpenseBtn">Расход</button>
-              <button class="wallet-card-v1__action wallet-card-v1__action--good" type="button" id="walletMainIncomeBtn">Доход</button>
-              <button class="wallet-card-v1__action" type="button" id="walletMainReportBtn">Итоги</button>
-            </div>
-          </div></div></div>
+          </div>
         </article>
-      </div>`;
+      </div>
+    `;
 
     mainView.insertBefore(section, oldHero);
     document.body.classList.add("wallet-cards-v1-enabled", "wallet-mode-hard");
   }
 
   function cardHtml(card) {
-    const type = typeOf(card.type);
     const color = colorOf(card.color).value;
+
     return `
       <article class="wallet-card-v1 wallet-card-v1--custom wallet-card-v1--theme-${html(color)}" data-wallet-custom-card="true" data-wallet-card-id="${html(card.id)}" role="button" tabindex="0" aria-expanded="false">
         <div class="wallet-card-v1__summary">
-          <div class="wallet-card-v1__name"><strong>${html(entityTitle(card))}</strong><span>${html(card.subtitle || type.subtitle)}</span></div>
-          <strong class="wallet-card-v1__amount">${html(formatMoney(entityAmount(card)))}</strong>
+          <div class="wallet-card-v1__name">
+            <strong>${html(getEntityTitle(card))}</strong>
+            <span>${html(card.subtitle)}</span>
+          </div>
+
+          <strong class="wallet-card-v1__amount">${html(formatMoney(card.amount))}</strong>
         </div>
-        <div class="wallet-card-v1__details"><div class="wallet-card-v1__details-inner"><div class="wallet-card-v1__details-content">
-          <div class="wallet-card-v1__panel wallet-card-v1__panel--quiet">
-            <div class="wallet-card-v1__row"><span>Тип</span><strong>${html(type.label)}</strong></div>
-            <div class="wallet-card-v1__row"><span>Цвет</span><strong>${html(colorOf(color).label)}</strong></div>
-            <p class="wallet-card-v1__hint">Карта связана с финансовой сущностью. Цвет — только внешний вид.</p>
+
+        <div class="wallet-card-v1__details">
+          <div class="wallet-card-v1__details-inner">
+            <div class="wallet-card-v1__details-content">
+              <div class="wallet-card-v1__panel wallet-card-v1__panel--quiet">
+                <div class="wallet-card-v1__row">
+                  <span>Тип</span>
+                  <strong>${html(typeOf(card.type).label)}</strong>
+                </div>
+
+                <div class="wallet-card-v1__row">
+                  <span>Цвет</span>
+                  <strong>${html(colorOf(color).label)}</strong>
+                </div>
+
+                <p class="wallet-card-v1__hint">Это текущая финансовая сущность из accounts / safe_buckets.</p>
+              </div>
+
+              <div class="wallet-card-v1__quick-actions wallet-card-v1__quick-actions--single">
+                <button class="wallet-card-v1__action wallet-card-v1__action--danger" type="button" data-wallet-remove-card="${html(card.entityKey)}">Удалить карту с главной</button>
+              </div>
+            </div>
           </div>
-          <div class="wallet-card-v1__quick-actions wallet-card-v1__quick-actions--single">
-            <button class="wallet-card-v1__action wallet-card-v1__action--danger" type="button" data-wallet-remove-card="${html(card.id)}">Удалить карту</button>
-          </div>
-        </div></div></div>
-      </article>`;
+        </div>
+      </article>
+    `;
   }
 
   function renderCards() {
     const node = deck();
     if (!node) return;
-    $$('[data-wallet-custom-card]', node).forEach((card) => card.remove());
+
+    $$("[data-wallet-custom-card]", node).forEach((card) => card.remove());
+
     const draft = byId(DRAFT_CARD_ID);
-    getCards().forEach((card) => {
+
+    buildEntityCards().forEach((card) => {
       const wrapper = document.createElement("div");
       wrapper.innerHTML = cardHtml(card).trim();
+
       const element = wrapper.firstElementChild;
       if (!element) return;
-      if (draft) node.insertBefore(element, draft);
-      else node.appendChild(element);
+
+      if (draft) {
+        node.insertBefore(element, draft);
+      } else {
+        node.appendChild(element);
+      }
     });
   }
 
@@ -435,32 +868,68 @@
     return `
       <article class="wallet-card-v1 wallet-card-v1--draft wallet-card-v1--theme-pearl is-open" id="${DRAFT_CARD_ID}" aria-expanded="true">
         <div class="wallet-card-v1__summary wallet-draft-card__summary">
-          <div class="wallet-card-v1__name"><strong>Новая карта</strong><span>Заполни данные и сохрани</span></div>
+          <div class="wallet-card-v1__name">
+            <strong>Новая карта</strong>
+            <span>Создай новый счёт или накопление</span>
+          </div>
+
           <strong class="wallet-card-v1__amount">0 ₽</strong>
         </div>
-        <div class="wallet-card-v1__details"><div class="wallet-card-v1__details-inner"><div class="wallet-card-v1__details-content">
-          <div class="wallet-card-v1__panel wallet-draft-card__panel">
-            <label class="wallet-draft-field"><span>Название</span><input class="wallet-draft-input" id="walletDraftTitleInput" type="text" placeholder="Например: Наличка" autocomplete="off"></label>
-            <label class="wallet-draft-field"><span>Сумма</span><input class="wallet-draft-input" id="walletDraftAmountInput" type="text" inputmode="decimal" placeholder="0 ₽"></label>
-            <div class="wallet-draft-field"><span>Тип</span><div class="wallet-draft-segment" role="radiogroup" aria-label="Тип карты">
-              ${TYPES.map((type) => `<button class="wallet-draft-chip ${type.value === "account" ? "is-active" : ""}" type="button" data-wallet-draft-type="${type.value}">${type.label}</button>`).join("")}
-            </div></div>
-            <div class="wallet-draft-field"><span>Цвет</span><div class="wallet-draft-palette" role="radiogroup" aria-label="Цвет карты">
-              ${COLORS.map((color) => `<button class="wallet-draft-color wallet-draft-color--${color.value} ${color.value === "pearl" ? "is-active" : ""}" type="button" data-wallet-draft-color="${color.value}" aria-label="${color.label}"></button>`).join("")}
-            </div></div>
-            <p class="wallet-draft-status" id="walletDraftStatus"></p>
+
+        <div class="wallet-card-v1__details">
+          <div class="wallet-card-v1__details-inner">
+            <div class="wallet-card-v1__details-content">
+              <div class="wallet-card-v1__panel wallet-draft-card__panel">
+                <label class="wallet-draft-field">
+                  <span>Название</span>
+                  <input class="wallet-draft-input" id="walletDraftTitleInput" type="text" placeholder="Например: Наличка" autocomplete="off">
+                </label>
+
+                <label class="wallet-draft-field">
+                  <span>Сумма</span>
+                  <input class="wallet-draft-input" id="walletDraftAmountInput" type="text" inputmode="decimal" placeholder="0 ₽">
+                </label>
+
+                <div class="wallet-draft-field">
+                  <span>Тип</span>
+
+                  <div class="wallet-draft-segment" role="radiogroup" aria-label="Тип карты">
+                    ${TYPES.map((type) => `
+                      <button class="wallet-draft-chip ${type.value === "account" ? "is-active" : ""}" type="button" data-wallet-draft-type="${type.value}">
+                        ${type.label}
+                      </button>
+                    `).join("")}
+                  </div>
+                </div>
+
+                <div class="wallet-draft-field">
+                  <span>Цвет</span>
+
+                  <div class="wallet-draft-palette" role="radiogroup" aria-label="Цвет карты">
+                    ${COLORS.map((color) => `
+                      <button class="wallet-draft-color wallet-draft-color--${color.value} ${color.value === "pearl" ? "is-active" : ""}" type="button" data-wallet-draft-color="${color.value}" aria-label="${color.label}"></button>
+                    `).join("")}
+                  </div>
+                </div>
+
+                <p class="wallet-draft-status" id="walletDraftStatus"></p>
+              </div>
+
+              <div class="wallet-card-v1__quick-actions">
+                <button class="wallet-card-v1__action" type="button" id="walletDraftCancelBtn">Отмена</button>
+                <button class="wallet-card-v1__action wallet-card-v1__action--good" type="button" id="walletDraftSaveBtn">Сохранить</button>
+              </div>
+            </div>
           </div>
-          <div class="wallet-card-v1__quick-actions">
-            <button class="wallet-card-v1__action" type="button" id="walletDraftCancelBtn">Отмена</button>
-            <button class="wallet-card-v1__action wallet-card-v1__action--good" type="button" id="walletDraftSaveBtn">Сохранить</button>
-          </div>
-        </div></div></div>
-      </article>`;
+        </div>
+      </article>
+    `;
   }
 
   function setDraftStatus(text, status = "neutral") {
     const node = byId("walletDraftStatus");
     if (!node) return;
+
     node.textContent = text || "";
     node.dataset.status = status;
   }
@@ -468,7 +937,11 @@
   function setDraftColor(color) {
     const draft = byId(DRAFT_CARD_ID);
     if (!draft) return;
-    COLORS.forEach((item) => draft.classList.remove(`wallet-card-v1--theme-${item.value}`));
+
+    COLORS.forEach((item) => {
+      draft.classList.remove(`wallet-card-v1--theme-${item.value}`);
+    });
+
     draft.classList.add(`wallet-card-v1--theme-${colorOf(color).value}`);
   }
 
@@ -484,12 +957,17 @@
   function startDraft() {
     const node = deck();
     if (!node) return;
+
     if (byId(DRAFT_CARD_ID)) {
       byId("walletDraftTitleInput")?.focus();
       return;
     }
+
     node.insertAdjacentHTML("beforeend", draftHtml());
-    requestAnimationFrame(() => byId("walletDraftTitleInput")?.focus());
+
+    requestAnimationFrame(() => {
+      byId("walletDraftTitleInput")?.focus();
+    });
   }
 
   function cancelDraft() {
@@ -498,7 +976,9 @@
 
   async function saveDraft() {
     if (isSavingDraft) return;
+
     const draft = draftValue();
+
     if (!draft.title) {
       setDraftStatus("Название обязательно.", "error");
       byId("walletDraftTitleInput")?.focus();
@@ -506,19 +986,38 @@
     }
 
     const button = byId("walletDraftSaveBtn");
+
     isSavingDraft = true;
     if (button) button.disabled = true;
     setDraftStatus("Сохраняю…");
 
     try {
-      const entity = await createEntity(draft);
-      const cards = getCards();
-      cards.push({ id: makeId("wallet_card"), entityType: entity.entityType, entityId: entity.entityId, type: draft.type, color: draft.color, title: draft.title, subtitle: typeOf(draft.type).subtitle, initialAmount: draft.amount, order: cards.length });
-      await saveCards(cards);
+      const created = await createEntity(draft);
+      const row = created.row;
+      const key = entityKey(created.entityType, row.id);
+      const meta = getUiMeta();
+
+      meta.colors[key] = draft.color;
+      meta.amounts[key] = draft.amount;
+
+      if (!meta.order.includes(key)) {
+        meta.order.push(key);
+      }
+
+      meta.hidden = meta.hidden.filter((hiddenKey) => hiddenKey !== key);
+
+      await saveUiMeta(meta);
+
+      insertEntityIntoLocalState(created.entityType, row);
+
       cancelDraft();
       renderCards();
       syncMain();
-      window.setTimeout(() => { bridge()?.loadDataFromSupabase?.(); loadCardsFromSupabase(); }, 500);
+
+      window.setTimeout(() => {
+        bridge()?.loadDataFromSupabase?.();
+        loadUiMetaFromSupabase();
+      }, 500);
     } catch (error) {
       console.error("[Wallet Cards] saveDraft failed:", error);
       setDraftStatus(error?.message || "Не удалось сохранить карту.", "error");
@@ -528,30 +1027,47 @@
     }
   }
 
-  async function removeCard(cardId) {
-    await saveCards(getCards().filter((card) => card.id !== cardId));
+  async function removeCard(entityKeyToHide) {
+    const meta = getUiMeta();
+
+    if (!meta.hidden.includes(entityKeyToHide)) {
+      meta.hidden.push(entityKeyToHide);
+    }
+
+    await saveUiMeta(meta);
     renderCards();
   }
 
   function toggleCard(card) {
     if (!card) return;
+
     const isOpen = card.classList.toggle("is-open");
     card.setAttribute("aria-expanded", String(isOpen));
   }
 
   function bindEvents() {
     const root = byId(ROOT_ID);
+
     if (!root || root.dataset.walletEventsBound === "true") return;
+
     root.dataset.walletEventsBound = "true";
 
     root.addEventListener("click", (event) => {
       const add = event.target.closest("#walletCardsAddBtn");
-      if (add) { event.preventDefault(); startDraft(); return; }
+      if (add) {
+        event.preventDefault();
+        startDraft();
+        return;
+      }
 
       const typeButton = event.target.closest("[data-wallet-draft-type]");
       if (typeButton) {
         event.preventDefault();
-        $$('[data-wallet-draft-type]', root).forEach((button) => button.classList.remove("is-active"));
+
+        $$("[data-wallet-draft-type]", root).forEach((button) => {
+          button.classList.remove("is-active");
+        });
+
         typeButton.classList.add("is-active");
         return;
       }
@@ -559,39 +1075,81 @@
       const colorButton = event.target.closest("[data-wallet-draft-color]");
       if (colorButton) {
         event.preventDefault();
-        $$('[data-wallet-draft-color]', root).forEach((button) => button.classList.remove("is-active"));
+
+        $$("[data-wallet-draft-color]", root).forEach((button) => {
+          button.classList.remove("is-active");
+        });
+
         colorButton.classList.add("is-active");
         setDraftColor(colorButton.dataset.walletDraftColor);
         return;
       }
 
-      if (event.target.closest("#walletDraftCancelBtn")) { event.preventDefault(); cancelDraft(); return; }
-      if (event.target.closest("#walletDraftSaveBtn")) { event.preventDefault(); saveDraft(); return; }
+      if (event.target.closest("#walletDraftCancelBtn")) {
+        event.preventDefault();
+        cancelDraft();
+        return;
+      }
+
+      if (event.target.closest("#walletDraftSaveBtn")) {
+        event.preventDefault();
+        saveDraft();
+        return;
+      }
 
       const remove = event.target.closest("[data-wallet-remove-card]");
-      if (remove) { event.preventDefault(); removeCard(remove.dataset.walletRemoveCard); return; }
+      if (remove) {
+        event.preventDefault();
+        removeCard(remove.dataset.walletRemoveCard);
+        return;
+      }
 
-      if (event.target.closest("#walletCardsReportBtn, #walletMainReportBtn")) { event.preventDefault(); clickById("openMonthlyReportBtn"); return; }
-      if (event.target.closest("#walletMainExpenseBtn")) { event.preventDefault(); clickById("openExpenseModal"); return; }
-      if (event.target.closest("#walletMainIncomeBtn")) { event.preventDefault(); clickById("openIncomeModal"); return; }
+      if (event.target.closest("#walletCardsReportBtn, #walletMainReportBtn")) {
+        event.preventDefault();
+        clickById("openMonthlyReportBtn");
+        return;
+      }
+
+      if (event.target.closest("#walletMainExpenseBtn")) {
+        event.preventDefault();
+        clickById("openExpenseModal");
+        return;
+      }
+
+      if (event.target.closest("#walletMainIncomeBtn")) {
+        event.preventDefault();
+        clickById("openIncomeModal");
+        return;
+      }
 
       const action = event.target.closest("[data-wallet-card-action]");
-      if (action) { event.preventDefault(); mainAction(action.dataset.walletCardAction || ""); return; }
+      if (action) {
+        event.preventDefault();
+        mainAction(action.dataset.walletCardAction || "");
+        return;
+      }
 
       if (event.target.closest("button, input, textarea, select, label")) return;
 
       const customCard = event.target.closest("[data-wallet-custom-card]");
-      if (customCard) { toggleCard(customCard); return; }
+      if (customCard) {
+        toggleCard(customCard);
+        return;
+      }
 
       const mainCard = event.target.closest(`#${MAIN_CARD_ID}`);
-      if (mainCard) toggleCard(mainCard);
+      if (mainCard) {
+        toggleCard(mainCard);
+      }
     });
 
     root.addEventListener("keydown", (event) => {
       if (event.key !== "Enter" && event.key !== " ") return;
       if (event.target.closest("button, input, textarea, select")) return;
+
       const card = event.target.closest(`#${MAIN_CARD_ID}, [data-wallet-custom-card]`);
       if (!card) return;
+
       event.preventDefault();
       toggleCard(card);
     });
@@ -599,33 +1157,80 @@
 
   function syncMain() {
     if (!byId(ROOT_ID)) return;
+
     setText("walletMainAccountValue", textById("balanceFreeMoneyValue") || textById("walletLightFreeValue") || "0 ₽");
     setText("walletMainDailyValue", `${textById("walletTodayCanValue", "0 ₽")}/день`);
     setText("walletMainMandatoryValue", textById("analyticsPendingMandatoryValue") || textById("walletCalendarPressureValue") || "0 ₽");
     setText("walletMainBudgetValue", `${textById("hardMonthBudgetSpentValue", "0 ₽")} ${textById("hardMonthBudgetTotalValue", "из 0 ₽")}`);
-    setText("walletMainExpectedValue", textById("walletExpectedIncomeValue", "").toLowerCase().includes("ожидание пока не добавлено") ? "не добавлено" : textById("walletExpectedIncomeValue", "не добавлено"));
+
+    const expectedIncomeText = textById("walletExpectedIncomeValue", "");
+    setText(
+      "walletMainExpectedValue",
+      expectedIncomeText.toLowerCase().includes("ожидание пока не добавлено")
+        ? "не добавлено"
+        : expectedIncomeText || "не добавлено"
+    );
+
     setText("walletMainHint", textById("walletGameHint", "Данные обновятся после загрузки операций."));
+
     renderCards();
   }
 
   function observe(id) {
     const node = byId(id);
     if (!node) return;
-    new MutationObserver(syncMain).observe(node, { childList: true, characterData: true, subtree: true });
+
+    new MutationObserver(syncMain).observe(node, {
+      childList: true,
+      characterData: true,
+      subtree: true,
+    });
   }
 
   function start() {
     createRoot();
     bindEvents();
-    ["balanceFreeMoneyValue", "walletLightFreeValue", "walletTodayCanValue", "walletGameHint", "analyticsPendingMandatoryValue", "walletCalendarPressureValue", "hardMonthBudgetSpentValue", "hardMonthBudgetTotalValue", "walletExpectedIncomeValue"].forEach(observe);
+
+    [
+      "balanceFreeMoneyValue",
+      "walletLightFreeValue",
+      "walletTodayCanValue",
+      "walletGameHint",
+      "analyticsPendingMandatoryValue",
+      "walletCalendarPressureValue",
+      "hardMonthBudgetSpentValue",
+      "hardMonthBudgetTotalValue",
+      "walletExpectedIncomeValue",
+    ].forEach(observe);
+
     syncMain();
-    loadCardsFromSupabase();
-    [100, 350, 900, 1600, 3000].forEach((ms) => window.setTimeout(syncMain, ms));
-    [700, 1800].forEach((ms) => window.setTimeout(loadCardsFromSupabase, ms));
-    window.addEventListener("focus", () => { syncMain(); loadCardsFromSupabase(); });
-    document.addEventListener("visibilitychange", () => { if (!document.hidden) { syncMain(); loadCardsFromSupabase(); } });
+    loadUiMetaFromSupabase();
+
+    window.setTimeout(syncMain, 100);
+    window.setTimeout(syncMain, 350);
+    window.setTimeout(syncMain, 900);
+    window.setTimeout(syncMain, 1600);
+    window.setTimeout(syncMain, 3000);
+
+    window.setTimeout(loadUiMetaFromSupabase, 700);
+    window.setTimeout(loadUiMetaFromSupabase, 1800);
+
+    window.addEventListener("focus", () => {
+      syncMain();
+      loadUiMetaFromSupabase();
+    });
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) return;
+
+      syncMain();
+      loadUiMetaFromSupabase();
+    });
   }
 
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start);
-  else start();
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", start);
+  } else {
+    start();
+  }
 })();
