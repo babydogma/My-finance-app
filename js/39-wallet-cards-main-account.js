@@ -5,40 +5,31 @@
   const DECK_ID = "walletCardsDeck";
   const WALLET_CARDS_META_KEY = "wallet_cards";
 
-  const CARD_KINDS = [
+  const CARD_TYPES = [
     {
       value: "account",
       label: "Счёт",
-      subtitle: "Обычный счёт",
+      subtitle: "Счёт",
       entityType: "account",
+      accountRole: "default",
     },
     {
       value: "cash",
-      label: "Наличка",
-      subtitle: "Физические деньги",
+      label: "Наличные",
+      subtitle: "Наличные деньги",
       entityType: "account",
+      accountRole: "cash",
     },
     {
       value: "saving",
-      label: "Накопление",
-      subtitle: "Цель / накопления",
+      label: "Накопления",
+      subtitle: "Накопления",
       entityType: "safe_bucket",
-    },
-    {
-      value: "tax",
-      label: "Налоги",
-      subtitle: "Отложенные платежи",
-      entityType: "safe_bucket",
-    },
-    {
-      value: "reserve",
-      label: "Резерв",
-      subtitle: "Запас безопасности",
-      entityType: "safe_bucket",
+      bucketKind: "saving",
     },
   ];
 
-  const CARD_THEMES = [
+  const CARD_COLORS = [
     { value: "graphite", label: "Графит" },
     { value: "sand", label: "Песок" },
     { value: "sky", label: "Небо" },
@@ -70,6 +61,16 @@
       .replaceAll(">", "&gt;")
       .replaceAll('"', "&quot;")
       .replaceAll("'", "&#039;");
+  }
+
+  function makeId(prefix) {
+    const cryptoId = window.crypto?.randomUUID?.();
+
+    if (cryptoId) {
+      return `${prefix}_${cryptoId}`;
+    }
+
+    return `${prefix}_${Date.now()}_${Math.random().toString(16).slice(2)}`;
   }
 
   function getMainAccountValue() {
@@ -167,19 +168,15 @@
     }).format(amount)} ₽`;
   }
 
-  function normalizeText(value) {
-    return String(value || "").trim().toLowerCase();
+  function getCardType(type) {
+    return CARD_TYPES.find((item) => item.value === type) || CARD_TYPES[0];
   }
 
-  function getKindConfig(kind) {
-    return CARD_KINDS.find((item) => item.value === kind) || CARD_KINDS[0];
+  function getCardColor(color) {
+    return CARD_COLORS.find((item) => item.value === color) || CARD_COLORS[0];
   }
 
-  function getThemeConfig(theme) {
-    return CARD_THEMES.find((item) => item.value === theme) || CARD_THEMES[4];
-  }
-
-  function getWalletDeck() {
+  function getDeck() {
     return document.getElementById(DECK_ID);
   }
 
@@ -235,20 +232,15 @@
     }, 60);
   }
 
-  function getStateMetaSource() {
-    const state = getWalletState();
-
-    return state?.appMeta || state?.app_meta || state?.meta || null;
-  }
-
   function readAppMetaValue(key) {
-    const meta = getStateMetaSource();
+    const state = getWalletState();
+    const meta = state?.appMeta || state?.app_meta || state?.meta || null;
 
     if (!meta) return "";
 
     if (Array.isArray(meta)) {
       const item = meta.find((entry) => {
-        return entry?.key === key || entry?.name === key || entry?.meta_key === key;
+        return entry?.key === key || entry?.name === key || entry?.meta_key === key || entry?.id === key;
       });
 
       return (
@@ -264,7 +256,6 @@
       const item = meta[key];
 
       if (typeof item === "string") return item;
-
       if (item && typeof item === "object") {
         return item.value ?? item.meta_value ?? item.json_value ?? item.data ?? "";
       }
@@ -275,12 +266,10 @@
     return "";
   }
 
-  function parseWalletCardsMetaValue(rawValue) {
+  function parseWalletCardsMeta(rawValue) {
     if (!rawValue) return [];
 
-    if (Array.isArray(rawValue)) {
-      return rawValue;
-    }
+    if (Array.isArray(rawValue)) return rawValue;
 
     if (typeof rawValue === "object") {
       if (Array.isArray(rawValue.cards)) return rawValue.cards;
@@ -305,17 +294,17 @@
     return cards
       .filter((card) => card && card.id && card.entityId)
       .map((card, index) => {
-        const kind = getKindConfig(card.kind).value;
-        const theme = getThemeConfig(card.theme).value;
+        const type = getCardType(card.type || card.kind).value;
+        const color = getCardColor(card.color || card.theme).value;
 
         return {
           id: String(card.id),
           entityType: card.entityType === "safe_bucket" ? "safe_bucket" : "account",
           entityId: String(card.entityId),
-          kind,
-          theme,
+          type,
+          color,
           title: String(card.title || "").trim(),
-          subtitle: String(card.subtitle || getKindConfig(kind).subtitle).trim(),
+          subtitle: String(card.subtitle || getCardType(type).subtitle).trim(),
           initialAmount: Number(card.initialAmount) || 0,
           order: Number.isFinite(Number(card.order)) ? Number(card.order) : index,
         };
@@ -326,46 +315,40 @@
   function getWalletCardsMeta() {
     if (walletCardsMetaCache) return walletCardsMetaCache;
 
-    const rawValue = readAppMetaValue(WALLET_CARDS_META_KEY);
-    walletCardsMetaCache = normalizeWalletCardsMeta(parseWalletCardsMetaValue(rawValue));
+    walletCardsMetaCache = normalizeWalletCardsMeta(
+      parseWalletCardsMeta(readAppMetaValue(WALLET_CARDS_META_KEY))
+    );
 
     return walletCardsMetaCache;
   }
 
-  function setMetaCacheAndLocalValue(cards) {
+  async function saveWalletCardsMeta(cards) {
     const normalizedCards = normalizeWalletCardsMeta(cards);
     const value = JSON.stringify({ cards: normalizedCards });
 
     walletCardsMetaCache = normalizedCards;
     getSavingsBridge()?.setAppMetaLocalValue?.(WALLET_CARDS_META_KEY, value);
 
-    return { normalizedCards, value };
-  }
-
-  async function saveWalletCardsMeta(cards) {
-    const { normalizedCards, value } = setMetaCacheAndLocalValue(cards);
     const client = getSupabaseClient();
 
-    if (!client?.from) {
-      throw new Error("Supabase ещё не готов. Обнови страницу и попробуй снова.");
-    }
+    if (!client?.from) return;
 
     const attempts = [
+      () => client
+        .from("app_meta")
+        .upsert({ id: WALLET_CARDS_META_KEY, key: WALLET_CARDS_META_KEY, value }, { onConflict: "key" }),
+
       () => client
         .from("app_meta")
         .upsert({ key: WALLET_CARDS_META_KEY, value }, { onConflict: "key" }),
 
       () => client
         .from("app_meta")
-        .upsert({ name: WALLET_CARDS_META_KEY, value }, { onConflict: "name" }),
+        .upsert({ id: WALLET_CARDS_META_KEY, name: WALLET_CARDS_META_KEY, value }, { onConflict: "name" }),
 
       () => client
         .from("app_meta")
-        .upsert({ meta_key: WALLET_CARDS_META_KEY, meta_value: value }, { onConflict: "meta_key" }),
-
-      () => client
-        .from("app_meta")
-        .upsert({ key: WALLET_CARDS_META_KEY, json_value: { cards: normalizedCards } }, { onConflict: "key" }),
+        .upsert({ id: WALLET_CARDS_META_KEY, meta_key: WALLET_CARDS_META_KEY, meta_value: value }, { onConflict: "meta_key" }),
     ];
 
     let lastError = null;
@@ -379,6 +362,258 @@
     }
 
     throw lastError || new Error("Не удалось сохранить настройки карточек.");
+  }
+
+  async function runSupabaseAttempts(attempts, message) {
+    let lastError = null;
+
+    for (const attempt of attempts) {
+      const { data, error } = await attempt();
+
+      if (!error) {
+        if (Array.isArray(data)) return data[0] || null;
+        return data || null;
+      }
+
+      lastError = error;
+    }
+
+    throw lastError || new Error(message);
+  }
+
+  async function createAccountEntity({ title, type }) {
+    const client = getSupabaseClient();
+
+    if (!client?.from) {
+      throw new Error("Supabase ещё не готов. Обнови страницу и попробуй снова.");
+    }
+
+    const id = makeId("account");
+    const cardType = getCardType(type);
+    const createdAt = new Date().toISOString();
+
+    return runSupabaseAttempts(
+      [
+        () => client
+          .from("accounts")
+          .insert({
+            id,
+            name: title,
+            role: cardType.accountRole,
+            account_role: cardType.accountRole,
+            account_kind: cardType.accountRole,
+            kind: cardType.accountRole,
+            is_primary_spend: false,
+            primary_spend: false,
+            created_at: createdAt,
+          })
+          .select("*")
+          .single(),
+
+        () => client
+          .from("accounts")
+          .insert({
+            id,
+            name: title,
+            role: cardType.accountRole,
+            account_kind: cardType.accountRole,
+            primary_spend: false,
+            created_at: createdAt,
+          })
+          .select("*")
+          .single(),
+
+        () => client
+          .from("accounts")
+          .insert({
+            id,
+            name: title,
+            role: cardType.accountRole,
+            created_at: createdAt,
+          })
+          .select("*")
+          .single(),
+
+        () => client
+          .from("accounts")
+          .insert({
+            id,
+            name: title,
+            created_at: createdAt,
+          })
+          .select("*")
+          .single(),
+      ],
+      "Не удалось создать счёт."
+    );
+  }
+
+  async function createSafeBucketEntity({ title }) {
+    const client = getSupabaseClient();
+
+    if (!client?.from) {
+      throw new Error("Supabase ещё не готов. Обнови страницу и попробуй снова.");
+    }
+
+    const id = makeId("bucket");
+    const createdAt = new Date().toISOString();
+
+    return runSupabaseAttempts(
+      [
+        () => client
+          .from("safe_buckets")
+          .insert({
+            id,
+            name: title,
+            kind: "saving",
+            bucket_kind: "saving",
+            created_at: createdAt,
+          })
+          .select("*")
+          .single(),
+
+        () => client
+          .from("safe_buckets")
+          .insert({
+            id,
+            name: title,
+            kind: "saving",
+            created_at: createdAt,
+          })
+          .select("*")
+          .single(),
+
+        () => client
+          .from("safe_buckets")
+          .insert({
+            id,
+            name: title,
+            created_at: createdAt,
+          })
+          .select("*")
+          .single(),
+      ],
+      "Не удалось создать накопление."
+    );
+  }
+
+  async function applyInitialAccountAmount(accountId, amount) {
+    if (!amount) return;
+
+    const client = getSupabaseClient();
+    if (!client?.from) return;
+
+    const transactionId = makeId("transaction");
+    const createdAt = new Date().toISOString();
+
+    await runSupabaseAttempts(
+      [
+        () => client
+          .from("transactions")
+          .insert({
+            id: transactionId,
+            type: "income",
+            amount,
+            account_id: accountId,
+            created_at: createdAt,
+            comment: "Стартовая сумма",
+          }),
+
+        () => client
+          .from("transactions")
+          .insert({
+            id: transactionId,
+            transaction_type: "income",
+            amount,
+            account_id: accountId,
+            created_at: createdAt,
+            comment: "Стартовая сумма",
+          }),
+
+        () => client
+          .from("accounts")
+          .update({ balance: amount })
+          .eq("id", accountId),
+
+        () => client
+          .from("accounts")
+          .update({ initial_balance: amount })
+          .eq("id", accountId),
+      ],
+      "Счёт создан, но не удалось записать стартовую сумму."
+    );
+  }
+
+  async function applyInitialSafeBucketAmount(bucketId, amount) {
+    if (!amount) return;
+
+    const client = getSupabaseClient();
+    if (!client?.from) return;
+
+    const transactionId = makeId("transaction");
+    const createdAt = new Date().toISOString();
+
+    await runSupabaseAttempts(
+      [
+        () => client
+          .from("safe_buckets")
+          .update({ amount })
+          .eq("id", bucketId),
+
+        () => client
+          .from("safe_buckets")
+          .update({ balance: amount })
+          .eq("id", bucketId),
+
+        () => client
+          .from("safe_buckets")
+          .update({ current_amount: amount })
+          .eq("id", bucketId),
+
+        () => client
+          .from("transactions")
+          .insert({
+            id: transactionId,
+            type: "safe_deposit",
+            amount,
+            to_safe_bucket_id: bucketId,
+            created_at: createdAt,
+            comment: "Стартовая сумма",
+          }),
+
+        () => client
+          .from("transactions")
+          .insert({
+            id: transactionId,
+            type: "income",
+            amount,
+            safe_bucket_id: bucketId,
+            created_at: createdAt,
+            comment: "Стартовая сумма",
+          }),
+      ],
+      "Накопление создано, но не удалось записать стартовую сумму."
+    );
+  }
+
+  async function createFinancialEntity(draft) {
+    if (draft.type === "saving") {
+      const bucket = await createSafeBucketEntity(draft);
+      await applyInitialSafeBucketAmount(bucket.id, draft.amount);
+
+      return {
+        entityType: "safe_bucket",
+        entityId: bucket.id,
+      };
+    }
+
+    const account = await createAccountEntity(draft);
+    await applyInitialAccountAmount(account.id, draft.amount);
+
+    return {
+      entityType: "account",
+      entityId: account.id,
+    };
   }
 
   function findAccountById(accountId) {
@@ -402,41 +637,7 @@
     return buckets.find((bucket) => String(bucket.id) === String(bucketId)) || null;
   }
 
-  function getAccountBalance(accountId, fallback = 0) {
-    const bridge = getSavingsBridge();
-
-    if (typeof bridge?.getRawAccountBalance === "function") {
-      const amount = roundMoney(bridge.getRawAccountBalance(accountId));
-
-      if (amount) return amount;
-    }
-
-    const account = findAccountById(accountId);
-
-    return roundMoney(account?.balance ?? account?.amount ?? account?.initial_balance ?? fallback);
-  }
-
-  function getSafeBucketBalance(bucketId, fallback = 0) {
-    const bridge = getSavingsBridge();
-
-    if (typeof bridge?.getSafeBucketBalance === "function") {
-      const amount = roundMoney(bridge.getSafeBucketBalance(bucketId));
-
-      if (amount) return amount;
-    }
-
-    const bucket = findSafeBucketById(bucketId);
-
-    return roundMoney(
-      bucket?.balance ??
-      bucket?.amount ??
-      bucket?.current_amount ??
-      bucket?.initial_amount ??
-      fallback
-    );
-  }
-
-  function getWalletCardTitle(card) {
+  function getEntityTitle(card) {
     if (card.entityType === "safe_bucket") {
       return findSafeBucketById(card.entityId)?.name || card.title || "Карта";
     }
@@ -444,316 +645,36 @@
     return findAccountById(card.entityId)?.name || card.title || "Карта";
   }
 
-  function getWalletCardAmount(card) {
+  function getEntityAmount(card) {
+    const bridge = getSavingsBridge();
+
     if (card.entityType === "safe_bucket") {
-      return getSafeBucketBalance(card.entityId, card.initialAmount);
-    }
-
-    return getAccountBalance(card.entityId, card.initialAmount);
-  }
-
-  function getEntityPayloadKind(kind) {
-    if (kind === "cash") return "cash";
-    if (kind === "saving") return "saving";
-    if (kind === "tax") return "tax";
-    if (kind === "reserve") return "reserve";
-
-    return "account";
-  }
-
-  async function trySupabaseWrite(attempts, actionLabel) {
-    let lastError = null;
-
-    for (const attempt of attempts) {
-      const { data, error } = await attempt();
-
-      if (!error) {
-        if (Array.isArray(data)) return data[0] || null;
-        return data || null;
+      if (typeof bridge?.getSafeBucketBalance === "function") {
+        return roundMoney(bridge.getSafeBucketBalance(card.entityId));
       }
 
-      lastError = error;
+      const bucket = findSafeBucketById(card.entityId);
+
+      return roundMoney(
+        bucket?.amount ??
+        bucket?.balance ??
+        bucket?.current_amount ??
+        card.initialAmount
+      );
     }
 
-    throw lastError || new Error(`${actionLabel}: Supabase вернул ошибку.`);
-  }
-
-  async function insertAccountEntity({ title, amount, kind, theme }) {
-    const client = getSupabaseClient();
-
-    if (!client?.from) {
-      throw new Error("Supabase ещё не готов. Обнови страницу и попробуй снова.");
+    if (typeof bridge?.getRawAccountBalance === "function") {
+      return roundMoney(bridge.getRawAccountBalance(card.entityId));
     }
 
-    const accountKind = getEntityPayloadKind(kind);
-    const createdAt = new Date().toISOString();
+    const account = findAccountById(card.entityId);
 
-    const attempts = [
-      () => client
-        .from("accounts")
-        .insert({
-          name: title,
-          role: accountKind,
-          account_role: accountKind,
-          account_kind: accountKind,
-          kind: accountKind,
-          wallet_card_theme: theme,
-          balance: amount,
-          initial_balance: amount,
-          is_primary_spend: false,
-          primary_spend: false,
-          created_at: createdAt,
-        })
-        .select("*")
-        .single(),
-
-      () => client
-        .from("accounts")
-        .insert({
-          name: title,
-          role: accountKind,
-          account_kind: accountKind,
-          balance: amount,
-          primary_spend: false,
-          created_at: createdAt,
-        })
-        .select("*")
-        .single(),
-
-      () => client
-        .from("accounts")
-        .insert({
-          name: title,
-          role: accountKind,
-          initial_balance: amount,
-          created_at: createdAt,
-        })
-        .select("*")
-        .single(),
-
-      () => client
-        .from("accounts")
-        .insert({
-          name: title,
-          role: accountKind,
-          created_at: createdAt,
-        })
-        .select("*")
-        .single(),
-
-      () => client
-        .from("accounts")
-        .insert({
-          name: title,
-          created_at: createdAt,
-        })
-        .select("*")
-        .single(),
-    ];
-
-    return trySupabaseWrite(attempts, "Создание счёта");
-  }
-
-  async function insertSafeBucketEntity({ title, amount, kind, theme }) {
-    const client = getSupabaseClient();
-
-    if (!client?.from) {
-      throw new Error("Supabase ещё не готов. Обнови страницу и попробуй снова.");
-    }
-
-    const bucketKind = getEntityPayloadKind(kind);
-    const createdAt = new Date().toISOString();
-
-    const attempts = [
-      () => client
-        .from("safe_buckets")
-        .insert({
-          name: title,
-          kind: bucketKind,
-          bucket_kind: bucketKind,
-          wallet_card_theme: theme,
-          amount,
-          balance: amount,
-          current_amount: amount,
-          target_amount: 0,
-          created_at: createdAt,
-        })
-        .select("*")
-        .single(),
-
-      () => client
-        .from("safe_buckets")
-        .insert({
-          name: title,
-          kind: bucketKind,
-          amount,
-          target_amount: 0,
-          created_at: createdAt,
-        })
-        .select("*")
-        .single(),
-
-      () => client
-        .from("safe_buckets")
-        .insert({
-          name: title,
-          kind: bucketKind,
-          balance: amount,
-          created_at: createdAt,
-        })
-        .select("*")
-        .single(),
-
-      () => client
-        .from("safe_buckets")
-        .insert({
-          name: title,
-          kind: bucketKind,
-          created_at: createdAt,
-        })
-        .select("*")
-        .single(),
-
-      () => client
-        .from("safe_buckets")
-        .insert({
-          name: title,
-          created_at: createdAt,
-        })
-        .select("*")
-        .single(),
-    ];
-
-    return trySupabaseWrite(attempts, "Создание накопительной карты");
-  }
-
-  async function createInitialAccountAmount(accountId, amount) {
-    if (!amount) return;
-
-    const client = getSupabaseClient();
-    if (!client?.from) return;
-
-    const createdAt = new Date().toISOString();
-    const attempts = [
-      () => client
-        .from("transactions")
-        .insert({
-          type: "balance_adjustment",
-          amount,
-          account_id: accountId,
-          created_at: createdAt,
-          comment: "Стартовая сумма",
-        }),
-
-      () => client
-        .from("transactions")
-        .insert({
-          type: "income",
-          amount,
-          account_id: accountId,
-          created_at: createdAt,
-          comment: "Стартовая сумма",
-        }),
-
-      () => client
-        .from("transactions")
-        .insert({
-          transaction_type: "income",
-          amount,
-          account_id: accountId,
-          created_at: createdAt,
-          comment: "Стартовая сумма",
-        }),
-
-      () => client
-        .from("accounts")
-        .update({ balance: amount })
-        .eq("id", accountId),
-
-      () => client
-        .from("accounts")
-        .update({ initial_balance: amount })
-        .eq("id", accountId),
-    ];
-
-    try {
-      await trySupabaseWrite(attempts, "Стартовая сумма счёта");
-    } catch (error) {
-      console.warn("[Wallet Cards] start account amount fallback failed:", error);
-    }
-  }
-
-  async function createInitialSafeBucketAmount(bucketId, amount) {
-    if (!amount) return;
-
-    const client = getSupabaseClient();
-    if (!client?.from) return;
-
-    const createdAt = new Date().toISOString();
-    const attempts = [
-      () => client
-        .from("safe_buckets")
-        .update({ amount })
-        .eq("id", bucketId),
-
-      () => client
-        .from("safe_buckets")
-        .update({ balance: amount })
-        .eq("id", bucketId),
-
-      () => client
-        .from("safe_buckets")
-        .update({ current_amount: amount })
-        .eq("id", bucketId),
-
-      () => client
-        .from("transactions")
-        .insert({
-          type: "safe_deposit",
-          amount,
-          to_safe_bucket_id: bucketId,
-          created_at: createdAt,
-          comment: "Стартовая сумма",
-        }),
-
-      () => client
-        .from("transactions")
-        .insert({
-          type: "income",
-          amount,
-          safe_bucket_id: bucketId,
-          created_at: createdAt,
-          comment: "Стартовая сумма",
-        }),
-    ];
-
-    try {
-      await trySupabaseWrite(attempts, "Стартовая сумма накопления");
-    } catch (error) {
-      console.warn("[Wallet Cards] start safe bucket amount fallback failed:", error);
-    }
-  }
-
-  async function createWalletFinancialEntity({ title, amount, kind, theme }) {
-    const kindConfig = getKindConfig(kind);
-
-    if (kindConfig.entityType === "safe_bucket") {
-      const bucket = await insertSafeBucketEntity({ title, amount, kind, theme });
-      await createInitialSafeBucketAmount(bucket.id, amount);
-
-      return {
-        entityType: "safe_bucket",
-        entityId: bucket.id,
-      };
-    }
-
-    const account = await insertAccountEntity({ title, amount, kind, theme });
-    await createInitialAccountAmount(account.id, amount);
-
-    return {
-      entityType: "account",
-      entityId: account.id,
-    };
+    return roundMoney(
+      account?.balance ??
+      account?.amount ??
+      account?.initial_balance ??
+      card.initialAmount
+    );
   }
 
   function createWalletCardsRoot() {
@@ -902,14 +823,13 @@
   }
 
   function createCustomCardHtml(card) {
-    const title = getWalletCardTitle(card);
-    const amount = getWalletCardAmount(card);
-    const kindConfig = getKindConfig(card.kind);
-    const theme = getThemeConfig(card.theme).value;
+    const typeConfig = getCardType(card.type);
+    const color = getCardColor(card.color).value;
+    const amount = getEntityAmount(card);
 
     return `
       <article
-        class="wallet-card-v1 wallet-card-v1--custom wallet-card-v1--theme-${theme}"
+        class="wallet-card-v1 wallet-card-v1--custom wallet-card-v1--theme-${escapeHtml(color)}"
         data-wallet-custom-card="true"
         data-wallet-card-id="${escapeHtml(card.id)}"
         role="button"
@@ -918,8 +838,8 @@
       >
         <div class="wallet-card-v1__summary">
           <div class="wallet-card-v1__name">
-            <strong>${escapeHtml(title)}</strong>
-            <span>${escapeHtml(card.subtitle || kindConfig.subtitle)}</span>
+            <strong>${escapeHtml(getEntityTitle(card))}</strong>
+            <span>${escapeHtml(card.subtitle || typeConfig.subtitle)}</span>
           </div>
 
           <strong class="wallet-card-v1__amount">
@@ -933,16 +853,16 @@
               <div class="wallet-card-v1__panel wallet-card-v1__panel--quiet">
                 <div class="wallet-card-v1__row">
                   <span>Тип</span>
-                  <strong>${escapeHtml(kindConfig.label)}</strong>
+                  <strong>${escapeHtml(typeConfig.label)}</strong>
                 </div>
 
                 <div class="wallet-card-v1__row">
                   <span>Цвет</span>
-                  <strong>${escapeHtml(getThemeConfig(theme).label)}</strong>
+                  <strong>${escapeHtml(getCardColor(color).label)}</strong>
                 </div>
 
                 <p class="wallet-card-v1__hint">
-                  Карта связана с реальной финансовой сущностью. Удаление здесь убирает её с главной, но не удаляет деньги.
+                  Это обычная карта денег. Тип влияет только на базовую финансовую сущность, цвет выбирается отдельно.
                 </p>
               </div>
 
@@ -952,7 +872,7 @@
                   type="button"
                   data-wallet-remove-card="${escapeHtml(card.id)}"
                 >
-                  Убрать с главной
+                  Удалить карту
                 </button>
               </div>
             </div>
@@ -963,7 +883,7 @@
   }
 
   function renderWalletCustomCards() {
-    const deck = getWalletDeck();
+    const deck = getDeck();
     if (!deck) return;
 
     deck
@@ -971,9 +891,8 @@
       .forEach((node) => node.remove());
 
     const draft = document.getElementById(DRAFT_CARD_ID);
-    const cards = getWalletCardsMeta();
 
-    cards.forEach((card) => {
+    getWalletCardsMeta().forEach((card) => {
       const wrapper = document.createElement("div");
       wrapper.innerHTML = createCustomCardHtml(card).trim();
 
@@ -1036,13 +955,13 @@
                   <span>Тип</span>
 
                   <div class="wallet-draft-segment" role="radiogroup" aria-label="Тип карты">
-                    ${CARD_KINDS.map((kind) => `
+                    ${CARD_TYPES.map((type) => `
                       <button
-                        class="wallet-draft-chip ${kind.value === "account" ? "is-active" : ""}"
+                        class="wallet-draft-chip ${type.value === "account" ? "is-active" : ""}"
                         type="button"
-                        data-wallet-draft-kind="${kind.value}"
+                        data-wallet-draft-type="${type.value}"
                       >
-                        ${kind.label}
+                        ${type.label}
                       </button>
                     `).join("")}
                   </div>
@@ -1052,12 +971,12 @@
                   <span>Цвет</span>
 
                   <div class="wallet-draft-palette" role="radiogroup" aria-label="Цвет карты">
-                    ${CARD_THEMES.map((theme) => `
+                    ${CARD_COLORS.map((color) => `
                       <button
-                        class="wallet-draft-color wallet-draft-color--${theme.value} ${theme.value === "pearl" ? "is-active" : ""}"
+                        class="wallet-draft-color wallet-draft-color--${color.value} ${color.value === "pearl" ? "is-active" : ""}"
                         type="button"
-                        data-wallet-draft-theme="${theme.value}"
-                        aria-label="${theme.label}"
+                        data-wallet-draft-color="${color.value}"
+                        aria-label="${color.label}"
                       ></button>
                     `).join("")}
                   </div>
@@ -1093,14 +1012,14 @@
   function getDraftValue() {
     const title = document.getElementById("walletDraftTitleInput")?.value?.trim() || "";
     const amount = parseWalletMoney(document.getElementById("walletDraftAmountInput")?.value || "");
-    const kind = document.querySelector("[data-wallet-draft-kind].is-active")?.dataset.walletDraftKind || "account";
-    const theme = document.querySelector("[data-wallet-draft-theme].is-active")?.dataset.walletDraftTheme || "pearl";
+    const type = document.querySelector("[data-wallet-draft-type].is-active")?.dataset.walletDraftType || "account";
+    const color = document.querySelector("[data-wallet-draft-color].is-active")?.dataset.walletDraftColor || "pearl";
 
     return {
       title,
       amount,
-      kind: getKindConfig(kind).value,
-      theme: getThemeConfig(theme).value,
+      type: getCardType(type).value,
+      color: getCardColor(color).value,
     };
   }
 
@@ -1112,22 +1031,23 @@
     status.dataset.status = type;
   }
 
-  function setDraftTheme(theme) {
+  function setDraftColor(color) {
     const draft = document.getElementById(DRAFT_CARD_ID);
     if (!draft) return;
 
-    CARD_THEMES.forEach((item) => {
+    CARD_COLORS.forEach((item) => {
       draft.classList.remove(`wallet-card-v1--theme-${item.value}`);
     });
 
-    draft.classList.add(`wallet-card-v1--theme-${getThemeConfig(theme).value}`);
+    draft.classList.add(`wallet-card-v1--theme-${getCardColor(color).value}`);
   }
 
   function startWalletCardDraft() {
-    const deck = getWalletDeck();
+    const deck = getDeck();
     if (!deck) return;
 
     const existingDraft = document.getElementById(DRAFT_CARD_ID);
+
     if (existingDraft) {
       document.getElementById("walletDraftTitleInput")?.focus();
       return;
@@ -1163,30 +1083,28 @@
     if (saveBtn) saveBtn.disabled = true;
 
     try {
-      const entity = await createWalletFinancialEntity(draft);
+      const entity = await createFinancialEntity(draft);
       const cards = getWalletCardsMeta();
 
       cards.push({
-        id: `wallet_card_${Date.now()}`,
+        id: makeId("wallet_card"),
         entityType: entity.entityType,
         entityId: entity.entityId,
-        kind: draft.kind,
-        theme: draft.theme,
+        type: draft.type,
+        color: draft.color,
         title: draft.title,
-        subtitle: getKindConfig(draft.kind).subtitle,
+        subtitle: getCardType(draft.type).subtitle,
         initialAmount: draft.amount,
         order: cards.length + 1,
       });
 
       await saveWalletCardsMeta(cards);
 
-      setDraftStatus("Карта сохранена.", "success");
-
       await getSavingsBridge()?.loadDataFromSupabase?.();
       getSavingsBridge()?.renderAll?.();
 
-      walletCardsMetaCache = null;
       cancelWalletCardDraft();
+      walletCardsMetaCache = null;
       renderWalletCustomCards();
       syncWalletMainCard();
     } catch (error) {
@@ -1202,24 +1120,24 @@
     const draft = document.getElementById(DRAFT_CARD_ID);
     if (!draft) return;
 
-    draft.querySelectorAll("[data-wallet-draft-kind]").forEach((button) => {
+    draft.querySelectorAll("[data-wallet-draft-type]").forEach((button) => {
       button.addEventListener("click", () => {
         draft
-          .querySelectorAll("[data-wallet-draft-kind]")
+          .querySelectorAll("[data-wallet-draft-type]")
           .forEach((item) => item.classList.remove("is-active"));
 
         button.classList.add("is-active");
       });
     });
 
-    draft.querySelectorAll("[data-wallet-draft-theme]").forEach((button) => {
+    draft.querySelectorAll("[data-wallet-draft-color]").forEach((button) => {
       button.addEventListener("click", () => {
         draft
-          .querySelectorAll("[data-wallet-draft-theme]")
+          .querySelectorAll("[data-wallet-draft-color]")
           .forEach((item) => item.classList.remove("is-active"));
 
         button.classList.add("is-active");
-        setDraftTheme(button.dataset.walletDraftTheme);
+        setDraftColor(button.dataset.walletDraftColor);
       });
     });
 
@@ -1238,10 +1156,11 @@
     });
   }
 
-  async function removeWalletCardFromHome(cardId) {
+  async function removeWalletCard(cardId) {
     const cards = getWalletCardsMeta().filter((card) => card.id !== cardId);
 
     await saveWalletCardsMeta(cards);
+    walletCardsMetaCache = null;
     renderWalletCustomCards();
   }
 
@@ -1270,7 +1189,7 @@
         event.preventDefault();
         event.stopPropagation();
 
-        await removeWalletCardFromHome(button.dataset.walletRemoveCard);
+        await removeWalletCard(button.dataset.walletRemoveCard);
       });
     });
   }
@@ -1396,7 +1315,6 @@
     window.setTimeout(syncWalletMainCard, 1600);
     window.setTimeout(syncWalletMainCard, 3000);
     window.setTimeout(syncWalletMainCard, 5000);
-    window.setTimeout(syncWalletMainCard, 8000);
   }
 
   function start() {
@@ -1421,7 +1339,6 @@
 
     document.addEventListener("visibilitychange", () => {
       if (document.hidden) return;
-      walletCardsMetaCache = null;
       syncWalletMainCard();
     });
   }
