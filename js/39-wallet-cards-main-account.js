@@ -313,14 +313,84 @@
   }
 
   function getWalletCardsMeta() {
-    if (walletCardsMetaCache) return walletCardsMetaCache;
+  if (Array.isArray(walletCardsMetaCache)) return walletCardsMetaCache;
 
+  walletCardsMetaCache = normalizeWalletCardsMeta(
+    parseWalletCardsMeta(readAppMetaValue(WALLET_CARDS_META_KEY))
+  );
+
+  return walletCardsMetaCache;
+}
+
+function readAppMetaRowValue(row) {
+  if (!row) return "";
+
+  return (
+    row.value ??
+    row.meta_value ??
+    row.json_value ??
+    row.data ??
+    ""
+  );
+}
+
+async function loadWalletCardsMetaFromSupabase() {
+  const client = getSupabaseClient();
+
+  if (!client?.from) {
     walletCardsMetaCache = normalizeWalletCardsMeta(
       parseWalletCardsMeta(readAppMetaValue(WALLET_CARDS_META_KEY))
     );
 
-    return walletCardsMetaCache;
+    renderWalletCustomCards();
+    return;
   }
+
+  const attempts = [
+    () => client
+      .from("app_meta")
+      .select("*")
+      .eq("key", WALLET_CARDS_META_KEY)
+      .maybeSingle(),
+
+    () => client
+      .from("app_meta")
+      .select("*")
+      .eq("id", WALLET_CARDS_META_KEY)
+      .maybeSingle(),
+
+    () => client
+      .from("app_meta")
+      .select("*")
+      .eq("name", WALLET_CARDS_META_KEY)
+      .maybeSingle(),
+
+    () => client
+      .from("app_meta")
+      .select("*")
+      .eq("meta_key", WALLET_CARDS_META_KEY)
+      .maybeSingle(),
+  ];
+
+  for (const attempt of attempts) {
+    const { data, error } = await attempt();
+
+    if (!error) {
+      walletCardsMetaCache = normalizeWalletCardsMeta(
+        parseWalletCardsMeta(readAppMetaRowValue(data))
+      );
+
+      renderWalletCustomCards();
+      return;
+    }
+  }
+
+  walletCardsMetaCache = normalizeWalletCardsMeta(
+    parseWalletCardsMeta(readAppMetaValue(WALLET_CARDS_META_KEY))
+  );
+
+  renderWalletCustomCards();
+}
 
   async function saveWalletCardsMeta(cards) {
     const normalizedCards = normalizeWalletCardsMeta(cards);
@@ -819,7 +889,7 @@
     `;
 
     mainView.insertBefore(section, oldHeroSection);
-    document.body.classList.add("wallet-cards-v1-enabled");
+    document.body.classList.add("wallet-cards-v1-enabled", "wallet-mode-hard");
   }
 
   function createCustomCardHtml(card) {
@@ -1100,13 +1170,16 @@
 
       await saveWalletCardsMeta(cards);
 
-      await getSavingsBridge()?.loadDataFromSupabase?.();
-      getSavingsBridge()?.renderAll?.();
+cancelWalletCardDraft();
 
-      cancelWalletCardDraft();
-      walletCardsMetaCache = null;
-      renderWalletCustomCards();
-      syncWalletMainCard();
+walletCardsMetaCache = cards;
+renderWalletCustomCards();
+syncWalletMainCard();
+
+window.setTimeout(() => {
+  getSavingsBridge()?.loadDataFromSupabase?.();
+  loadWalletCardsMetaFromSupabase();
+}, 400);
     } catch (error) {
       console.error("[Wallet Cards] save draft failed:", error);
       setDraftStatus(error?.message || "Не удалось сохранить карту.", "error");
@@ -1248,12 +1321,19 @@
       toggleMainCard();
     });
 
-    document.getElementById("walletCardsAddBtn")?.addEventListener("click", (event) => {
-      event.preventDefault();
-      event.stopPropagation();
+    if (!document.body.dataset.walletAddCardBound) {
+  document.body.dataset.walletAddCardBound = "true";
 
-      startWalletCardDraft();
-    });
+  document.addEventListener("click", (event) => {
+    const addButton = event.target.closest("#walletCardsAddBtn");
+    if (!addButton) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+
+    startWalletCardDraft();
+  });
+}
 
     document.getElementById("walletCardsReportBtn")?.addEventListener("click", (event) => {
       event.preventDefault();
@@ -1307,15 +1387,19 @@
   }
 
   function startSync() {
-    syncWalletMainCard();
+  syncWalletMainCard();
+  loadWalletCardsMetaFromSupabase();
 
-    window.setTimeout(syncWalletMainCard, 100);
-    window.setTimeout(syncWalletMainCard, 350);
-    window.setTimeout(syncWalletMainCard, 900);
-    window.setTimeout(syncWalletMainCard, 1600);
-    window.setTimeout(syncWalletMainCard, 3000);
-    window.setTimeout(syncWalletMainCard, 5000);
-  }
+  window.setTimeout(syncWalletMainCard, 100);
+  window.setTimeout(syncWalletMainCard, 350);
+  window.setTimeout(syncWalletMainCard, 900);
+  window.setTimeout(syncWalletMainCard, 1600);
+  window.setTimeout(syncWalletMainCard, 3000);
+  window.setTimeout(syncWalletMainCard, 5000);
+
+  window.setTimeout(loadWalletCardsMetaFromSupabase, 700);
+  window.setTimeout(loadWalletCardsMetaFromSupabase, 1800);
+}
 
   function start() {
     createWalletCardsRoot();
