@@ -71,6 +71,35 @@ body.wallet-cards-v1-enabled.wallet-mode-hard #mainView {
   gap: 12px;
 }
 
+.wallet-cards-v1__stack--deck {
+  gap: 0;
+  isolation: isolate;
+}
+
+.wallet-cards-v1__stack--deck .wallet-card-v1 + .wallet-card-v1 {
+  margin-top: -12px;
+}
+
+.wallet-cards-v1__stack--deck .wallet-card-v1 {
+  position: relative;
+}
+
+.wallet-cards-v1__stack--deck .wallet-card-v1:nth-child(1) {
+  z-index: 4;
+}
+
+.wallet-cards-v1__stack--deck .wallet-card-v1:nth-child(2) {
+  z-index: 3;
+}
+
+.wallet-cards-v1__stack--deck .wallet-card-v1:nth-child(3) {
+  z-index: 2;
+}
+
+.wallet-cards-v1__stack--deck .wallet-card-v1:nth-child(4) {
+  z-index: 1;
+}
+
 .wallet-card-v1 {
   width: 100%;
   border: 0;
@@ -90,8 +119,8 @@ body.wallet-cards-v1-enabled.wallet-mode-hard #mainView {
 }
 
 .wallet-card-v1__summary {
-  min-height: 104px;
-  padding: 22px 22px 20px;
+  min-height: 118px;
+  padding: 24px 24px 22px;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: center;
@@ -129,15 +158,16 @@ body.wallet-cards-v1-enabled.wallet-mode-hard #mainView {
 
 .wallet-card-v1__amount {
   max-width: 170px;
-  color: #ffffff;
+  color: currentColor;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", Inter, system-ui, sans-serif;
-  font-size: 25px;
+  font-size: 19px;
   line-height: 1;
-  font-weight: 760;
-  letter-spacing: -0.055em;
+  font-weight: 640;
+  letter-spacing: -0.035em;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  opacity: 0.88;
 }
 
 .wallet-card-v1__details {
@@ -297,4 +327,74 @@ body.wallet-cards-v1-enabled.wallet-mode-hard #mainView {
   .wallet-card-v1__name strong {
     font-size: 21px;
   }
+}
+
+/* Wallet Cards v1 — card deck architecture */
+
+.wallet-card-v1--locked {
+  cursor: default;
+}
+
+.wallet-card-v1--main {
+  color: #ffffff;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.05), transparent 44%),
+    radial-gradient(circle at 88% 20%, rgba(255, 255, 255, 0.10), transparent 0 82px),
+    linear-gradient(135deg, #111827 0%, #151b26 52%, #090d13 100%);
+}
+
+.wallet-card-v1--cash {
+  color: #2f251b;
+  background:
+    radial-gradient(circle at 88% 50%, rgba(255, 255, 255, 0.30), transparent 0 92px),
+    linear-gradient(135deg, #f4e4ce 0%, #ead2b4 100%);
+}
+
+.wallet-card-v1--home {
+  color: #13233a;
+  background:
+    radial-gradient(circle at 82% 42%, rgba(255, 255, 255, 0.45), transparent 0 104px),
+    linear-gradient(135deg, #dceeff 0%, #bcd5ee 100%);
+}
+
+.wallet-card-v1--tax {
+  color: #232a25;
+  background:
+    radial-gradient(circle at 84% 42%, rgba(255, 255, 255, 0.34), transparent 0 90px),
+    linear-gradient(135deg, #e4e6de 0%, #cdd4ca 100%);
+}
+
+.wallet-card-v1--cash .wallet-card-v1__name span,
+.wallet-card-v1--home .wallet-card-v1__name span,
+.wallet-card-v1--tax .wallet-card-v1__name span {
+  color: currentColor;
+  opacity: 0.58;
+}
+
+.wallet-card-v1--cash .wallet-card-v1__name strong,
+.wallet-card-v1--home .wallet-card-v1__name strong,
+.wallet-card-v1--tax .wallet-card-v1__name strong {
+  color: currentColor;
+}
+
+.wallet-card-v1--cash .wallet-card-v1__amount,
+.wallet-card-v1--home .wallet-card-v1__amount,
+.wallet-card-v1--tax .wallet-card-v1__amount {
+  color: currentColor;
+}
+
+.wallet-card-v1__mini-progress {
+  height: 5px;
+  width: calc(100% - 48px);
+  margin: -18px 24px 22px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(19, 35, 58, 0.16);
+}
+
+.wallet-card-v1__mini-progress span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: rgba(45, 119, 218, 0.82);
 }
