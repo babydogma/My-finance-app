@@ -101,7 +101,7 @@
         <h1 class="wallet-cards-v1__title">Wallet</h1>
 
         <div class="wallet-cards-v1__actions">
-          <button class="wallet-cards-v1__icon-btn" type="button" id="walletCardsAddBtn" aria-label="Добавить операцию">
+                    <button class="wallet-cards-v1__icon-btn" type="button" id="walletCardsAddBtn" aria-label="Добавить карту">
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="M12 5v14" />
               <path d="M5 12h14" />
@@ -166,43 +166,6 @@
               </div>
             </div>
           </div>
-                </article>
-
-        <article class="wallet-card-v1 wallet-card-v1--cash wallet-card-v1--locked" aria-label="Наличка">
-          <div class="wallet-card-v1__summary">
-            <div class="wallet-card-v1__name">
-              <strong>Наличка</strong>
-              <span>Физические деньги</span>
-            </div>
-
-            <strong class="wallet-card-v1__amount">— ₽</strong>
-          </div>
-        </article>
-
-        <article class="wallet-card-v1 wallet-card-v1--home wallet-card-v1--locked" aria-label="Квартира">
-          <div class="wallet-card-v1__summary">
-            <div class="wallet-card-v1__name">
-              <strong>Квартира</strong>
-              <span>Накопления</span>
-            </div>
-
-            <strong class="wallet-card-v1__amount">— ₽</strong>
-          </div>
-
-          <div class="wallet-card-v1__mini-progress" aria-hidden="true">
-            <span style="width: 0%"></span>
-          </div>
-        </article>
-
-        <article class="wallet-card-v1 wallet-card-v1--tax wallet-card-v1--locked" aria-label="Налоги">
-          <div class="wallet-card-v1__summary">
-            <div class="wallet-card-v1__name">
-              <strong>Налоги</strong>
-              <span>Отложенные платежи</span>
-            </div>
-
-            <strong class="wallet-card-v1__amount">— ₽</strong>
-          </div>
         </article>
       </div>
     `;
@@ -262,10 +225,10 @@
       toggleMainCard();
     });
 
-    document.getElementById("walletCardsAddBtn")?.addEventListener("click", (event) => {
+        document.getElementById("walletCardsAddBtn")?.addEventListener("click", (event) => {
       event.preventDefault();
       event.stopPropagation();
-      clickById("openExpenseModal");
+      clickById("openCreateAccountModalBtn");
     });
 
     document.getElementById("walletCardsReportBtn")?.addEventListener("click", (event) => {
