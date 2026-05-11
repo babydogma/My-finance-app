@@ -64,8 +64,56 @@
     return value;
   }
 
+    function isModalVisible(modalId) {
+    const modal = document.getElementById(modalId);
+
+    return Boolean(
+      modal &&
+      !modal.classList.contains("hidden") &&
+      !modal.classList.contains("is-closing")
+    );
+  }
+
+  function openModalFallback(modalId) {
+    const modal = document.getElementById(modalId);
+    if (!modal) return;
+
+    modal.classList.add("modal");
+
+    if (window.FinanceAppModalCore?.openAnimatedModal) {
+      window.FinanceAppModalCore.openAnimatedModal(modal);
+      return;
+    }
+
+    modal.classList.remove("hidden", "is-closing");
+
+    requestAnimationFrame(() => {
+      modal.classList.add("is-visible");
+    });
+  }
+
   function clickById(id) {
-    document.getElementById(id)?.click();
+    const node = document.getElementById(id);
+    if (!node) return false;
+
+    node.dispatchEvent(
+      new MouseEvent("click", {
+        bubbles: true,
+        cancelable: true,
+        view: window,
+      })
+    );
+
+    return true;
+  }
+
+  function openWalletTarget(triggerId, modalId) {
+    clickById(triggerId);
+
+    window.setTimeout(() => {
+      if (isModalVisible(modalId)) return;
+      openModalFallback(modalId);
+    }, 40);
   }
 
   function createWalletCardsRoot() {
@@ -269,16 +317,25 @@
     });
   }
   
-      document.getElementById("walletMainMandatoryRowBtn")?.addEventListener("click", () => {
-      clickById("openMandatoryPaymentsModalBtn");
+      document.getElementById("walletMainMandatoryRowBtn")?.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+
+      openWalletTarget("openMandatoryPaymentsModalBtn", "mandatoryPaymentsModal");
     });
 
-    document.getElementById("walletMainBudgetRowBtn")?.addEventListener("click", () => {
-      clickById("openBudgetAnalyticsModalBtn");
+    document.getElementById("walletMainBudgetRowBtn")?.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+
+      openWalletTarget("openBudgetAnalyticsModalBtn", "budgetAnalyticsModal");
     });
 
-    document.getElementById("walletMainExpectedRowBtn")?.addEventListener("click", () => {
-      clickById("openExpectedIncomeModalBtn");
+    document.getElementById("walletMainExpectedRowBtn")?.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+
+      openWalletTarget("openExpectedIncomeModalBtn", "expectedIncomeModal");
     });
 
   function observeSource(id) {
