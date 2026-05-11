@@ -68,6 +68,14 @@
       .replaceAll("'", "&#039;");
   }
 
+  function cssEscape(value) {
+    if (window.CSS?.escape) {
+      return window.CSS.escape(String(value));
+    }
+
+    return String(value).replace(/["\\]/g, "\\$&");
+  }
+
   function makeUiId(prefix) {
     if (window.crypto?.randomUUID) {
       return `${prefix}_${window.crypto.randomUUID()}`;
@@ -581,6 +589,148 @@
     }
   }
 
+  function updateEntityInLocalState(entityType, entityId, patch) {
+    const appState = state();
+    if (!appState || !entityId) return;
+
+    const collectionName = entityType === "safe_bucket" ? "safeBuckets" : "accounts";
+    const collection = Array.isArray(appState[collectionName]) ? appState[collectionName] : [];
+
+    const row = collection.find((item) => String(item.id) === String(entityId));
+    if (!row) return;
+
+    Object.assign(row, patch);
+  }
+
+  async function updateAccountEntity(card, draft) {
+    const client = supabase();
+
+    if (!client?.from) {
+      throw new Error("Supabase ещё не готов. Обнови страницу и попробуй снова.");
+    }
+
+    const accountKind = draft.type === "cash" ? "cash" : "default";
+
+    const patchAttempts = [
+      {
+        name: draft.title,
+        role: accountKind,
+        account_role: accountKind,
+        account_kind: accountKind,
+        kind: accountKind,
+        balance: draft.amount,
+        initial_balance: draft.amount,
+      },
+      {
+        name: draft.title,
+        role: accountKind,
+        account_kind: accountKind,
+        balance: draft.amount,
+      },
+      {
+        name: draft.title,
+        role: accountKind,
+      },
+      {
+        name: draft.title,
+      },
+    ];
+
+    const attempts = patchAttempts.map((patch) => {
+      return () => client
+        .from("accounts")
+        .update(patch)
+        .eq("id", card.entityId)
+        .select("*")
+        .single();
+    });
+
+    const row = await tryDb(attempts, "Не удалось обновить счёт.");
+
+    updateEntityInLocalState("account", card.entityId, {
+      name: draft.title,
+      role: accountKind,
+      account_role: accountKind,
+      account_kind: accountKind,
+      kind: accountKind,
+      balance: draft.amount,
+      initial_balance: draft.amount,
+      ...(row || {}),
+    });
+
+    return row;
+  }
+
+  async function updateBucketEntity(card, draft) {
+    const client = supabase();
+
+    if (!client?.from) {
+      throw new Error("Supabase ещё не готов. Обнови страницу и попробуй снова.");
+    }
+
+    const patchAttempts = [
+      {
+        name: draft.title,
+        amount: draft.amount,
+        balance: draft.amount,
+        current_amount: draft.amount,
+        kind: "saving",
+        bucket_kind: "saving",
+      },
+      {
+        name: draft.title,
+        amount: draft.amount,
+        kind: "saving",
+      },
+      {
+        name: draft.title,
+      },
+    ];
+
+    const attempts = patchAttempts.map((patch) => {
+      return () => client
+        .from("safe_buckets")
+        .update(patch)
+        .eq("id", card.entityId)
+        .select("*")
+        .single();
+    });
+
+    const row = await tryDb(attempts, "Не удалось обновить накопление.");
+
+    updateEntityInLocalState("safe_bucket", card.entityId, {
+      name: draft.title,
+      amount: draft.amount,
+      balance: draft.amount,
+      current_amount: draft.amount,
+      kind: "saving",
+      bucket_kind: "saving",
+      ...(row || {}),
+    });
+
+    return row;
+  }
+
+  async function updateEntity(card, draft) {
+    if (!card) {
+      throw new Error("Карта для редактирования не найдена.");
+    }
+
+    const oldTypeConfig = typeOf(card.type);
+    const newTypeConfig = typeOf(draft.type);
+
+    if (oldTypeConfig.entityType !== newTypeConfig.entityType) {
+      throw new Error("Нельзя менять тип между счётом и накоплением. Создай новую карту нужного типа.");
+    }
+
+    if (card.entityType === "safe_bucket") {
+      return updateBucketEntity(card, draft);
+    }
+
+    return updateAccountEntity(card, draft);
+  }
+
+
   function getAccounts() {
     const accounts = state()?.accounts;
 
@@ -710,6 +860,11 @@
     return cards.sort((a, b) => a.order - b.order);
   }
 
+  function findEntityCardByKey(cardKey) {
+    return buildEntityCards().find((card) => card.entityKey === cardKey) || null;
+  }
+
+
   function createRoot() {
     if (byId(ROOT_ID)) return;
 
@@ -804,7 +959,7 @@
     const color = colorOf(card.color).value;
 
     return `
-      <article class="wallet-card-v1 wallet-card-v1--custom wallet-card-v1--theme-${html(color)}" data-wallet-custom-card="true" data-wallet-card-id="${html(card.id)}" role="button" tabindex="0" aria-expanded="false">
+      <article class="wallet-card-v1 wallet-card-v1--custom wallet-card-v1--theme-${html(color)}" data-wallet-custom-card="true" data-wallet-card-id="${html(card.id)}" data-wallet-entity-key="${html(card.entityKey)}" role="button" tabindex="0" aria-expanded="false">
         <div class="wallet-card-v1__summary">
           <div class="wallet-card-v1__name">
             <strong>${html(getEntityTitle(card))}</strong>
@@ -817,22 +972,17 @@
         <div class="wallet-card-v1__details">
           <div class="wallet-card-v1__details-inner">
             <div class="wallet-card-v1__details-content">
-              <div class="wallet-card-v1__panel wallet-card-v1__panel--quiet">
-                <div class="wallet-card-v1__row">
-                  <span>Тип</span>
-                  <strong>${html(typeOf(card.type).label)}</strong>
-                </div>
+              <div class="wallet-card-v1__edit-panel">
+                <button class="wallet-card-v1__edit-btn" type="button" data-wallet-edit-card="${html(card.entityKey)}" aria-label="Редактировать карту">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M4 20h4.5L19.2 9.3a2.1 2.1 0 0 0 0-3l-1.5-1.5a2.1 2.1 0 0 0-3 0L4 15.5V20z"></path>
+                    <path d="M13.5 6.2l4.3 4.3"></path>
+                  </svg>
+                </button>
 
-                <div class="wallet-card-v1__row">
-                  <span>Цвет</span>
-                  <strong>${html(colorOf(color).label)}</strong>
-                </div>
-
-                <p class="wallet-card-v1__hint">Это текущая финансовая сущность из accounts / safe_buckets.</p>
-              </div>
-
-              <div class="wallet-card-v1__quick-actions wallet-card-v1__quick-actions--single">
-                <button class="wallet-card-v1__action wallet-card-v1__action--danger" type="button" data-wallet-remove-card="${html(card.entityKey)}">Удалить карту с главной</button>
+                <button class="wallet-card-v1__delete-btn" type="button" data-wallet-remove-card="${html(card.entityKey)}">
+                  Удалить с главной
+                </button>
               </div>
             </div>
           </div>
@@ -840,6 +990,7 @@
       </article>
     `;
   }
+
 
   function renderCards() {
     const node = deck();
@@ -864,16 +1015,25 @@
     });
   }
 
-  function draftHtml() {
+  function draftHtml(mode = "create", card = null) {
+    const isEdit = mode === "edit" && card;
+    const title = isEdit ? card.title : "";
+    const amount = isEdit ? card.amount : 0;
+    const type = isEdit ? card.type : "account";
+    const color = isEdit ? card.color : "pearl";
+    const headerTitle = isEdit ? "Редактирование" : "Новая карта";
+    const headerSubtitle = isEdit ? "Измени данные и сохрани" : "Создай новый счёт или накопление";
+    const saveText = isEdit ? "Сохранить" : "Сохранить";
+
     return `
-      <article class="wallet-card-v1 wallet-card-v1--draft wallet-card-v1--theme-pearl is-open" id="${DRAFT_CARD_ID}" aria-expanded="true">
+      <article class="wallet-card-v1 wallet-card-v1--draft wallet-card-v1--theme-${html(color)} is-open" id="${DRAFT_CARD_ID}" data-wallet-draft-mode="${html(mode)}" data-wallet-edit-key="${html(card?.entityKey || "")}" aria-expanded="true">
         <div class="wallet-card-v1__summary wallet-draft-card__summary">
           <div class="wallet-card-v1__name">
-            <strong>Новая карта</strong>
-            <span>Создай новый счёт или накопление</span>
+            <strong>${html(headerTitle)}</strong>
+            <span>${html(headerSubtitle)}</span>
           </div>
 
-          <strong class="wallet-card-v1__amount">0 ₽</strong>
+          <strong class="wallet-card-v1__amount">${html(formatMoney(amount))}</strong>
         </div>
 
         <div class="wallet-card-v1__details">
@@ -882,21 +1042,21 @@
               <div class="wallet-card-v1__panel wallet-draft-card__panel">
                 <label class="wallet-draft-field">
                   <span>Название</span>
-                  <input class="wallet-draft-input" id="walletDraftTitleInput" type="text" placeholder="Например: Наличка" autocomplete="off">
+                  <input class="wallet-draft-input" id="walletDraftTitleInput" type="text" value="${html(title)}" placeholder="Например: Наличка" autocomplete="off">
                 </label>
 
                 <label class="wallet-draft-field">
                   <span>Сумма</span>
-                  <input class="wallet-draft-input" id="walletDraftAmountInput" type="text" inputmode="decimal" placeholder="0 ₽">
+                  <input class="wallet-draft-input" id="walletDraftAmountInput" type="text" inputmode="decimal" value="${html(amount ? String(amount).replace(".", ",") : "")}" placeholder="0 ₽">
                 </label>
 
                 <div class="wallet-draft-field">
                   <span>Тип</span>
 
                   <div class="wallet-draft-segment" role="radiogroup" aria-label="Тип карты">
-                    ${TYPES.map((type) => `
-                      <button class="wallet-draft-chip ${type.value === "account" ? "is-active" : ""}" type="button" data-wallet-draft-type="${type.value}">
-                        ${type.label}
+                    ${TYPES.map((item) => `
+                      <button class="wallet-draft-chip ${item.value === type ? "is-active" : ""}" type="button" data-wallet-draft-type="${item.value}">
+                        ${item.label}
                       </button>
                     `).join("")}
                   </div>
@@ -906,8 +1066,8 @@
                   <span>Цвет</span>
 
                   <div class="wallet-draft-palette" role="radiogroup" aria-label="Цвет карты">
-                    ${COLORS.map((color) => `
-                      <button class="wallet-draft-color wallet-draft-color--${color.value} ${color.value === "pearl" ? "is-active" : ""}" type="button" data-wallet-draft-color="${color.value}" aria-label="${color.label}"></button>
+                    ${COLORS.map((item) => `
+                      <button class="wallet-draft-color wallet-draft-color--${item.value} ${item.value === color ? "is-active" : ""}" type="button" data-wallet-draft-color="${item.value}" aria-label="${item.label}"></button>
                     `).join("")}
                   </div>
                 </div>
@@ -917,7 +1077,7 @@
 
               <div class="wallet-card-v1__quick-actions">
                 <button class="wallet-card-v1__action" type="button" id="walletDraftCancelBtn">Отмена</button>
-                <button class="wallet-card-v1__action wallet-card-v1__action--good" type="button" id="walletDraftSaveBtn">Сохранить</button>
+                <button class="wallet-card-v1__action wallet-card-v1__action--good" type="button" id="walletDraftSaveBtn">${html(saveText)}</button>
               </div>
             </div>
           </div>
@@ -925,6 +1085,7 @@
       </article>
     `;
   }
+
 
   function setDraftStatus(text, status = "neutral") {
     const node = byId("walletDraftStatus");
@@ -958,17 +1119,38 @@
     const node = deck();
     if (!node) return;
 
-    if (byId(DRAFT_CARD_ID)) {
-      byId("walletDraftTitleInput")?.focus();
-      return;
-    }
+    byId(DRAFT_CARD_ID)?.remove();
 
-    node.insertAdjacentHTML("beforeend", draftHtml());
+    node.insertAdjacentHTML("beforeend", draftHtml("create"));
 
     requestAnimationFrame(() => {
       byId("walletDraftTitleInput")?.focus();
     });
   }
+
+  function startEdit(cardKey) {
+    const node = deck();
+    if (!node) return;
+
+    const card = findEntityCardByKey(cardKey);
+    if (!card) return;
+
+    byId(DRAFT_CARD_ID)?.remove();
+
+    const cardNode = node.querySelector(`[data-wallet-entity-key="${cssEscape(cardKey)}"]`);
+    const htmlString = draftHtml("edit", card);
+
+    if (cardNode) {
+      cardNode.insertAdjacentHTML("afterend", htmlString);
+    } else {
+      node.insertAdjacentHTML("beforeend", htmlString);
+    }
+
+    requestAnimationFrame(() => {
+      byId("walletDraftTitleInput")?.focus();
+    });
+  }
+
 
   function cancelDraft() {
     byId(DRAFT_CARD_ID)?.remove();
@@ -985,6 +1167,9 @@
       return;
     }
 
+    const draftNode = byId(DRAFT_CARD_ID);
+    const mode = draftNode?.dataset.walletDraftMode || "create";
+    const editKey = draftNode?.dataset.walletEditKey || "";
     const button = byId("walletDraftSaveBtn");
 
     isSavingDraft = true;
@@ -992,23 +1177,41 @@
     setDraftStatus("Сохраняю…");
 
     try {
-      const created = await createEntity(draft);
-      const row = created.row;
-      const key = entityKey(created.entityType, row.id);
-      const meta = getUiMeta();
+      if (mode === "edit") {
+        const card = findEntityCardByKey(editKey);
 
-      meta.colors[key] = draft.color;
-      meta.amounts[key] = draft.amount;
+        await updateEntity(card, draft);
 
-      if (!meta.order.includes(key)) {
-        meta.order.push(key);
+        const meta = getUiMeta();
+        meta.colors[editKey] = draft.color;
+        meta.amounts[editKey] = draft.amount;
+
+        if (!meta.order.includes(editKey)) {
+          meta.order.push(editKey);
+        }
+
+        meta.hidden = meta.hidden.filter((hiddenKey) => hiddenKey !== editKey);
+
+        await saveUiMeta(meta);
+      } else {
+        const created = await createEntity(draft);
+        const row = created.row;
+        const key = entityKey(created.entityType, row.id);
+        const meta = getUiMeta();
+
+        meta.colors[key] = draft.color;
+        meta.amounts[key] = draft.amount;
+
+        if (!meta.order.includes(key)) {
+          meta.order.push(key);
+        }
+
+        meta.hidden = meta.hidden.filter((hiddenKey) => hiddenKey !== key);
+
+        await saveUiMeta(meta);
+
+        insertEntityIntoLocalState(created.entityType, row);
       }
-
-      meta.hidden = meta.hidden.filter((hiddenKey) => hiddenKey !== key);
-
-      await saveUiMeta(meta);
-
-      insertEntityIntoLocalState(created.entityType, row);
 
       cancelDraft();
       renderCards();
@@ -1026,6 +1229,7 @@
       if (button) button.disabled = false;
     }
   }
+
 
   async function removeCard(entityKeyToHide) {
     const meta = getUiMeta();
@@ -1094,6 +1298,13 @@
       if (event.target.closest("#walletDraftSaveBtn")) {
         event.preventDefault();
         saveDraft();
+        return;
+      }
+
+      const edit = event.target.closest("[data-wallet-edit-card]");
+      if (edit) {
+        event.preventDefault();
+        startEdit(edit.dataset.walletEditCard);
         return;
       }
 
