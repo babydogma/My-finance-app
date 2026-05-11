@@ -592,3 +592,23 @@ body.wallet-cards-v1-enabled #mainView {
     font-size: 12px;
   }
 }
+
+/* Wallet card opening fix: custom cards keep open state through rerenders */
+
+.wallet-card-v1--custom.is-open {
+  z-index: 1000 !important;
+}
+
+.wallet-card-v1--main.is-open {
+  z-index: 1000 !important;
+}
+
+.wallet-card-v1--custom.is-open .wallet-card-v1__details {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+.wallet-card-v1--custom.is-open .wallet-card-v1__summary {
+  min-height: 92px;
+  padding: 26px 26px 8px;
+}
