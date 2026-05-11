@@ -120,8 +120,8 @@
         </div>
       </div>
 
-      <div class="wallet-cards-v1__stack">
-        <article class="wallet-card-v1" id="${MAIN_CARD_ID}" role="button" tabindex="0" aria-expanded="false">
+            <div class="wallet-cards-v1__stack wallet-cards-v1__stack--deck">
+        <article class="wallet-card-v1 wallet-card-v1--main" id="${MAIN_CARD_ID}" role="button" tabindex="0" aria-expanded="false">
           <div class="wallet-card-v1__summary">
             <div class="wallet-card-v1__name">
               <strong>Основной счёт</strong>
@@ -165,6 +165,43 @@
                 </div>
               </div>
             </div>
+          </div>
+                </article>
+
+        <article class="wallet-card-v1 wallet-card-v1--cash wallet-card-v1--locked" aria-label="Наличка">
+          <div class="wallet-card-v1__summary">
+            <div class="wallet-card-v1__name">
+              <strong>Наличка</strong>
+              <span>Физические деньги</span>
+            </div>
+
+            <strong class="wallet-card-v1__amount">— ₽</strong>
+          </div>
+        </article>
+
+        <article class="wallet-card-v1 wallet-card-v1--home wallet-card-v1--locked" aria-label="Квартира">
+          <div class="wallet-card-v1__summary">
+            <div class="wallet-card-v1__name">
+              <strong>Квартира</strong>
+              <span>Накопления</span>
+            </div>
+
+            <strong class="wallet-card-v1__amount">— ₽</strong>
+          </div>
+
+          <div class="wallet-card-v1__mini-progress" aria-hidden="true">
+            <span style="width: 0%"></span>
+          </div>
+        </article>
+
+        <article class="wallet-card-v1 wallet-card-v1--tax wallet-card-v1--locked" aria-label="Налоги">
+          <div class="wallet-card-v1__summary">
+            <div class="wallet-card-v1__name">
+              <strong>Налоги</strong>
+              <span>Отложенные платежи</span>
+            </div>
+
+            <strong class="wallet-card-v1__amount">— ₽</strong>
           </div>
         </article>
       </div>
