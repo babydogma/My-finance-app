@@ -74,30 +74,36 @@ body.wallet-cards-v1-enabled.wallet-mode-hard #mainView {
 .wallet-cards-v1__stack--deck {
   gap: 0;
   isolation: isolate;
+  padding-bottom: 10px;
 }
 
 .wallet-cards-v1__stack--deck .wallet-card-v1 + .wallet-card-v1 {
-  margin-top: -12px;
+  margin-top: -56px;
 }
 
 .wallet-cards-v1__stack--deck .wallet-card-v1 {
   position: relative;
+  transform: translateZ(0);
 }
 
 .wallet-cards-v1__stack--deck .wallet-card-v1:nth-child(1) {
-  z-index: 4;
+  z-index: 1;
 }
 
 .wallet-cards-v1__stack--deck .wallet-card-v1:nth-child(2) {
-  z-index: 3;
-}
-
-.wallet-cards-v1__stack--deck .wallet-card-v1:nth-child(3) {
   z-index: 2;
 }
 
+.wallet-cards-v1__stack--deck .wallet-card-v1:nth-child(3) {
+  z-index: 3;
+}
+
 .wallet-cards-v1__stack--deck .wallet-card-v1:nth-child(4) {
-  z-index: 1;
+  z-index: 4;
+}
+
+.wallet-cards-v1__stack--deck .wallet-card-v1.is-open {
+  z-index: 20;
 }
 
 .wallet-card-v1 {
@@ -119,11 +125,11 @@ body.wallet-cards-v1-enabled.wallet-mode-hard #mainView {
 }
 
 .wallet-card-v1__summary {
-  min-height: 118px;
-  padding: 24px 24px 22px;
+  min-height: 154px;
+  padding: 28px 26px 26px;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
+  align-items: start;
   gap: 16px;
 }
 
@@ -138,10 +144,10 @@ body.wallet-cards-v1-enabled.wallet-mode-hard #mainView {
   max-width: 100%;
   color: #ffffff;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", Inter, system-ui, sans-serif;
-  font-size: 23px;
+  font-size: 20px;
   line-height: 1;
-  font-weight: 760;
-  letter-spacing: -0.045em;
+  font-weight: 720;
+  letter-spacing: -0.035em;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -150,24 +156,24 @@ body.wallet-cards-v1-enabled.wallet-mode-hard #mainView {
 .wallet-card-v1__name span {
   color: rgba(255, 255, 255, 0.58);
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", Inter, system-ui, sans-serif;
-  font-size: 13px;
+  font-size: 12px;
   line-height: 1;
   font-weight: 520;
-  letter-spacing: -0.012em;
+  letter-spacing: -0.01em;
 }
 
 .wallet-card-v1__amount {
-  max-width: 170px;
+  max-width: 165px;
   color: currentColor;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", Inter, system-ui, sans-serif;
-  font-size: 19px;
+  font-size: 17px;
   line-height: 1;
-  font-weight: 640;
-  letter-spacing: -0.035em;
+  font-weight: 620;
+  letter-spacing: -0.025em;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  opacity: 0.88;
+  opacity: 0.86;
 }
 
 .wallet-card-v1__details {
@@ -316,16 +322,17 @@ body.wallet-cards-v1-enabled.wallet-mode-hard #mainView {
   }
 
   .wallet-card-v1__summary {
-    padding: 20px 18px 18px;
+    min-height: 144px;
+    padding: 24px 20px 22px;
   }
 
   .wallet-card-v1__amount {
-    max-width: 145px;
-    font-size: 22px;
+    max-width: 132px;
+    font-size: 15.5px;
   }
 
   .wallet-card-v1__name strong {
-    font-size: 21px;
+    font-size: 18px;
   }
 }
 
