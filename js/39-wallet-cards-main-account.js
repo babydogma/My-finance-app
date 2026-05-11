@@ -137,25 +137,37 @@
             <div class="wallet-card-v1__details-inner">
               <div class="wallet-card-v1__details-content">
                 <div class="wallet-card-v1__panel">
-                  <div class="wallet-card-v1__row">
+                                    <div class="wallet-card-v1__row">
                     <span>Можно тратить</span>
                     <strong id="walletMainDailyValue">0 ₽/день</strong>
                   </div>
 
-                  <div class="wallet-card-v1__row">
+                  <button
+                    class="wallet-card-v1__row wallet-card-v1__row--button"
+                    type="button"
+                    id="walletMainMandatoryRowBtn"
+                  >
                     <span>К списанию</span>
                     <strong id="walletMainMandatoryValue">0 ₽</strong>
-                  </div>
+                  </button>
 
-                  <div class="wallet-card-v1__row">
+                  <button
+                    class="wallet-card-v1__row wallet-card-v1__row--button"
+                    type="button"
+                    id="walletMainBudgetRowBtn"
+                  >
                     <span>Бюджет месяца</span>
                     <strong id="walletMainBudgetValue">0 ₽ из 0 ₽</strong>
-                  </div>
+                  </button>
 
-                  <div class="wallet-card-v1__row">
+                  <button
+                    class="wallet-card-v1__row wallet-card-v1__row--button"
+                    type="button"
+                    id="walletMainExpectedRowBtn"
+                  >
                     <span>Ожидаемые деньги</span>
                     <strong id="walletMainExpectedValue">не добавлено</strong>
-                  </div>
+                  </button>
 
                   <p class="wallet-card-v1__hint" id="walletMainHint">
                     Данные обновятся после загрузки операций.
@@ -256,6 +268,18 @@
       clickById("openMonthlyReportBtn");
     });
   }
+  
+      document.getElementById("walletMainMandatoryRowBtn")?.addEventListener("click", () => {
+      clickById("openMandatoryPaymentsModalBtn");
+    });
+
+    document.getElementById("walletMainBudgetRowBtn")?.addEventListener("click", () => {
+      clickById("openBudgetAnalyticsModalBtn");
+    });
+
+    document.getElementById("walletMainExpectedRowBtn")?.addEventListener("click", () => {
+      clickById("openExpectedIncomeModalBtn");
+    });
 
   function observeSource(id) {
     const node = document.getElementById(id);
