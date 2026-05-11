@@ -1,0 +1,471 @@
+/* =========================================================
+   25. MANDATORY PAYMENTS MODAL
+   Light required payments list modal
+   ========================================================= */
+
+#mandatoryPaymentsModal {
+  z-index: 142;
+  touch-action: auto;
+}
+
+#mandatoryPaymentsModal .modal-sheet {
+  touch-action: pan-y;
+  overscroll-behavior: contain;
+}
+
+#mandatoryPaymentsModal .modal-sheet.mandatory-payments-sheet--premium {
+  width: min(480px, 100%);
+  max-height: calc(100dvh - 24px);
+  padding: 18px 16px calc(26px + env(safe-area-inset-bottom, 0px));
+  border-radius: 30px 30px 22px 22px;
+  background:
+    radial-gradient(circle at 18% 0%, rgba(47, 125, 246, 0.055), transparent 34%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99) 0%, rgba(248, 250, 253, 0.98) 100%);
+  border: 1px solid rgba(22, 30, 46, 0.075);
+  box-shadow:
+    0 -18px 50px rgba(30, 42, 68, 0.16),
+    0 4px 18px rgba(30, 42, 68, 0.055),
+    inset 0 1px 0 rgba(255, 255, 255, 0.94);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Header */
+
+.mandatory-payments-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.mandatory-payments-head__text {
+  min-width: 0;
+}
+
+.mandatory-payments-title {
+  margin: 0;
+  max-width: 260px;
+  color: var(--text);
+  font-size: 26px;
+  line-height: 1.02;
+  font-weight: 720;
+  letter-spacing: -0.045em;
+}
+
+.mandatory-payments-subtitle {
+  margin: 8px 0 0;
+  max-width: 310px;
+  color: rgba(20, 24, 33, 0.48);
+  font-size: 12.5px;
+  line-height: 1.18;
+  font-weight: 460;
+  letter-spacing: -0.006em;
+}
+
+.mandatory-payments-close-btn {
+  flex: 0 0 auto;
+  margin-top: 2px;
+}
+
+/* Month strip */
+
+.mandatory-payments-month-strip {
+  display: flex;
+  gap: 8px;
+  margin: 0 -2px 14px;
+  padding: 2px 2px 4px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.mandatory-payments-month-strip::-webkit-scrollbar {
+  display: none;
+}
+
+.mandatory-payments-month-chip {
+  flex: 0 0 auto;
+  min-width: 58px;
+  height: 40px;
+  padding: 0 11px;
+  border: 1px solid rgba(22, 30, 46, 0.07);
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(242, 246, 252, 0.97));
+  color: rgba(20, 24, 33, 0.52);
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  font-size: 12px;
+  line-height: 1;
+  font-weight: 620;
+  letter-spacing: -0.012em;
+  box-shadow:
+    0 7px 16px rgba(30, 42, 68, 0.052),
+    inset 0 1px 0 rgba(255, 255, 255, 0.94);
+}
+
+.mandatory-payments-month-chip small {
+  font-size: 8.5px;
+  line-height: 1;
+  font-weight: 520;
+  color: rgba(20, 24, 33, 0.34);
+}
+
+.mandatory-payments-month-chip.is-active {
+  color: var(--accent);
+  border-color: rgba(47, 125, 246, 0.18);
+  background:
+    linear-gradient(180deg, rgba(232, 240, 255, 0.99), rgba(218, 231, 255, 0.94));
+  box-shadow:
+    0 10px 22px rgba(47, 125, 246, 0.10),
+    inset 0 1px 0 rgba(255, 255, 255, 0.92);
+}
+
+.mandatory-payments-month-chip.is-active small {
+  color: rgba(47, 125, 246, 0.58);
+}
+
+/* Panel */
+
+#mandatoryPaymentsModal .mandatory-payments-panel {
+  padding: 0;
+  margin-top: 14px;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  overflow: visible;
+}
+
+#mandatoryPaymentsModal #mandatoryPaymentsList {
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+  padding: 0;
+  margin: 0;
+  overflow: visible;
+}
+
+/* Payment rows */
+
+#mandatoryPaymentsModal #mandatoryPaymentsList .mandatory-payment-card {
+  position: relative;
+  width: 100%;
+  min-height: 74px;
+  padding: 12px 13px;
+  border-radius: 21px;
+  border: 1px solid rgba(22, 30, 46, 0.065);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(250, 252, 255, 0.96));
+  box-shadow:
+    0 11px 25px rgba(30, 42, 68, 0.06),
+    0 3px 9px rgba(30, 42, 68, 0.028),
+    inset 0 1px 0 rgba(255, 255, 255, 0.94);
+}
+
+#mandatoryPaymentsModal #mandatoryPaymentsList .mandatory-payment-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.52) 0%, rgba(255,255,255,0) 40%);
+  pointer-events: none;
+}
+
+/* Unpaid = soft red */
+
+#mandatoryPaymentsModal #mandatoryPaymentsList .mandatory-payment-card[data-paid="false"] {
+  border-color: rgba(239, 91, 79, 0.13);
+  background:
+    radial-gradient(circle at 100% 50%, rgba(239, 91, 79, 0.055), transparent 44%),
+    linear-gradient(180deg, rgba(255, 252, 250, 0.99), rgba(255, 247, 244, 0.96));
+}
+
+/* Paid = soft green */
+
+#mandatoryPaymentsModal #mandatoryPaymentsList .mandatory-payment-card[data-paid="true"] {
+  border-color: rgba(21, 151, 107, 0.12);
+  background:
+    radial-gradient(circle at 100% 50%, rgba(21, 151, 107, 0.055), transparent 44%),
+    linear-gradient(180deg, rgba(250, 255, 253, 0.99), rgba(244, 252, 249, 0.96));
+}
+
+#mandatoryPaymentsModal #mandatoryPaymentsList .mandatory-payment-card .list-body,
+#mandatoryPaymentsModal #mandatoryPaymentsList .mandatory-payment-card .list-right,
+#mandatoryPaymentsModal #mandatoryPaymentsList .mandatory-payment-card .mandatory-payment-card__status-wrap {
+  position: relative;
+  z-index: 2;
+}
+
+#mandatoryPaymentsModal #mandatoryPaymentsList .list-body {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+#mandatoryPaymentsModal #mandatoryPaymentsList .list-title-row {
+  min-width: 0;
+  margin-bottom: 4px;
+}
+
+#mandatoryPaymentsModal #mandatoryPaymentsList .list-title {
+  margin: 0;
+  color: var(--text);
+  font-size: 14.5px;
+  font-weight: 620;
+  line-height: 1.1;
+  letter-spacing: -0.016em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#mandatoryPaymentsModal #mandatoryPaymentsList .list-subtitle {
+  margin: 0;
+  color: rgba(20, 24, 33, 0.45);
+  font-size: 10.8px;
+  font-weight: 440;
+  line-height: 1.18;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#mandatoryPaymentsModal #mandatoryPaymentsList .list-right,
+#mandatoryPaymentsModal #mandatoryPaymentsList .mandatory-payment-card__status-wrap {
+  flex: 0 0 auto;
+  min-width: 86px;
+  margin-left: auto;
+  padding-left: 8px;
+  text-align: right;
+}
+
+#mandatoryPaymentsModal #mandatoryPaymentsList .mandatory-payment-card__status {
+  margin: 0;
+  min-height: 28px;
+  padding: 0 9px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10.2px;
+  font-weight: 620;
+  line-height: 1;
+  letter-spacing: -0.006em;
+  white-space: nowrap;
+}
+
+#mandatoryPaymentsModal #mandatoryPaymentsList .mandatory-payment-card__status.is-paid {
+  color: var(--green);
+  background: rgba(21, 151, 107, 0.09);
+}
+
+#mandatoryPaymentsModal #mandatoryPaymentsList .mandatory-payment-card__status.is-unpaid {
+  color: var(--red);
+  background: rgba(239, 91, 79, 0.09);
+}
+
+/* Long press progress fill */
+
+#mandatoryPaymentsModal #mandatoryPaymentsList .mandatory-payment-card__progress {
+  display: block;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1;
+  border-radius: inherit;
+  transform: scaleX(0) translateZ(0);
+  will-change: transform, opacity;
+}
+
+#mandatoryPaymentsModal #mandatoryPaymentsList .mandatory-payment-card.mandatory-payment-card--hold-pay .mandatory-payment-card__progress {
+  opacity: 1;
+  transform-origin: left center;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(21, 151, 107, 0.22) 0%,
+      rgba(21, 151, 107, 0.13) 58%,
+      rgba(21, 151, 107, 0.04) 100%
+    );
+  animation: mandatoryHoldPayFill 1.35s linear forwards;
+}
+
+#mandatoryPaymentsModal #mandatoryPaymentsList .mandatory-payment-card.mandatory-payment-card--hold-unpay .mandatory-payment-card__progress {
+  opacity: 1;
+  transform-origin: right center;
+  background:
+    linear-gradient(
+      270deg,
+      rgba(239, 91, 79, 0.20) 0%,
+      rgba(239, 91, 79, 0.12) 58%,
+      rgba(239, 91, 79, 0.04) 100%
+    );
+  animation: mandatoryHoldUnpayFill 1.35s linear forwards;
+}
+
+@keyframes mandatoryHoldPayFill {
+  0% {
+    opacity: 0;
+    transform: scaleX(0) translateZ(0);
+  }
+
+  6% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 1;
+    transform: scaleX(1) translateZ(0);
+  }
+}
+
+@keyframes mandatoryHoldUnpayFill {
+  0% {
+    opacity: 0;
+    transform: scaleX(0) translateZ(0);
+  }
+
+  6% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 1;
+    transform: scaleX(1) translateZ(0);
+  }
+}
+
+/* Add button */
+
+#mandatoryPaymentsModal #openMandatoryPaymentEditorBtn.mandatory-payments-add-btn,
+#mandatoryPaymentsModal #openMandatoryPaymentEditorBtn {
+  width: min(100%, 300px);
+  min-width: 0;
+  height: 54px;
+  margin: 14px auto 0;
+  border: none;
+  border-radius: 19px;
+  color: #ffffff;
+  background:
+    linear-gradient(180deg, rgba(75, 146, 255, 1) 0%, rgba(47, 125, 246, 1) 100%);
+  box-shadow:
+    0 14px 28px rgba(47, 125, 246, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  font-size: 15px;
+  font-weight: 680;
+  letter-spacing: -0.02em;
+}
+
+#mandatoryPaymentsModal #openMandatoryPaymentEditorBtn.mandatory-payments-add-btn span,
+#mandatoryPaymentsModal #openMandatoryPaymentEditorBtn span {
+  font-size: 21px;
+  line-height: 1;
+  font-weight: 560;
+  transform: translateY(-1px);
+}
+
+#mandatoryPaymentsModal #openMandatoryPaymentEditorBtn.mandatory-payments-add-btn strong,
+#mandatoryPaymentsModal #openMandatoryPaymentEditorBtn strong {
+  font: inherit;
+}
+
+#mandatoryPaymentsModal #openMandatoryPaymentEditorBtn.mandatory-payments-add-btn:active,
+#mandatoryPaymentsModal #openMandatoryPaymentEditorBtn:active {
+  transform: scale(0.988);
+}
+
+/* Empty row */
+
+#mandatoryPaymentsModal #mandatoryPaymentsList > .list-card:not(.mandatory-payment-card) {
+  min-height: 76px;
+  padding: 12px 13px;
+  border-radius: 21px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(250, 252, 255, 0.96));
+}
+
+/* Touch safety */
+
+#mandatoryPaymentsModal #mandatoryPaymentsList .mandatory-payment-card,
+#mandatoryPaymentsModal #mandatoryPaymentsList .mandatory-payment-card * {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+#mandatoryPaymentsModal #mandatoryPaymentsList .mandatory-payment-card {
+  touch-action: manipulation;
+}
+
+@media (max-width: 420px) {
+  #mandatoryPaymentsModal .modal-sheet.mandatory-payments-sheet--premium {
+    padding: 18px 14px calc(26px + env(safe-area-inset-bottom, 0px));
+    border-radius: 30px 30px 22px 22px;
+  }
+
+  .mandatory-payments-title {
+    font-size: 24px;
+  }
+
+  .mandatory-payments-subtitle {
+    font-size: 12px;
+  }
+
+  .mandatory-payments-month-chip {
+    min-width: 54px;
+    height: 38px;
+    font-size: 11.5px;
+  }
+
+  #mandatoryPaymentsModal #mandatoryPaymentsList .mandatory-payment-card {
+    min-height: 72px;
+    padding: 11px 12px;
+    border-radius: 20px;
+    gap: 10px;
+  }
+
+  #mandatoryPaymentsModal #mandatoryPaymentsList .list-title {
+    font-size: 14px;
+  }
+
+  #mandatoryPaymentsModal #mandatoryPaymentsList .list-subtitle {
+    font-size: 10.5px;
+  }
+
+  #mandatoryPaymentsModal #mandatoryPaymentsList .list-right,
+  #mandatoryPaymentsModal #mandatoryPaymentsList .mandatory-payment-card__status-wrap {
+    min-width: 78px;
+    padding-left: 7px;
+  }
+
+  #mandatoryPaymentsModal #mandatoryPaymentsList .mandatory-payment-card__status {
+    min-height: 27px;
+    padding: 0 8px;
+    font-size: 10px;
+  }
+
+  #mandatoryPaymentsModal #openMandatoryPaymentEditorBtn.mandatory-payments-add-btn,
+  #mandatoryPaymentsModal #openMandatoryPaymentEditorBtn {
+    width: min(100%, 290px);
+    height: 52px;
+    border-radius: 18px;
+  }
+}

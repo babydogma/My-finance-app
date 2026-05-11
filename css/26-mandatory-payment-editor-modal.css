@@ -1,0 +1,494 @@
+/* =========================================================
+   26. CALENDAR PAYMENT EDITOR MODAL
+   Light add/edit calendar payment and linked safe picker
+   ========================================================= */
+
+#mandatoryPaymentEditorModal {
+  z-index: 145;
+}
+
+#mandatoryPaymentBucketPickerModal {
+  z-index: 148;
+}
+
+/* =========================================================
+   Editor modal sheet
+   ========================================================= */
+
+#mandatoryPaymentEditorModal .modal-sheet {
+  width: min(480px, 100%);
+  max-height: calc(100dvh - 20px);
+  padding: 18px 16px calc(18px + env(safe-area-inset-bottom, 0px));
+  border-radius: 30px 30px 22px 22px;
+  background:
+    radial-gradient(circle at top center, rgba(47, 125, 246, 0.055), transparent 34%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99) 0%, rgba(248, 250, 253, 0.98) 100%);
+  border: 1px solid rgba(22, 30, 46, 0.075);
+  box-shadow:
+    0 -18px 50px rgba(30, 42, 68, 0.16),
+    0 4px 18px rgba(30, 42, 68, 0.055),
+    inset 0 1px 0 rgba(255, 255, 255, 0.94);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+#mandatoryPaymentEditorModal .modal-handle {
+  margin-bottom: 16px;
+  background: rgba(20, 24, 33, 0.12);
+}
+
+/* Header */
+
+#mandatoryPaymentEditorModal .section-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+#mandatoryPaymentEditorModal .modal-title {
+  margin: 0 !important;
+  max-width: none;
+  text-align: left !important;
+  color: var(--text);
+  font-size: 24px;
+  line-height: 1.02;
+  font-weight: 720;
+  letter-spacing: -0.04em;
+}
+
+#mandatoryPaymentEditorModal .manager-back-btn {
+  min-width: 92px;
+  height: 42px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(241, 244, 249, 0.96));
+  border: 1px solid rgba(22, 30, 46, 0.07);
+  color: rgba(20, 24, 33, 0.68);
+  font-size: 13px;
+  font-weight: 620;
+  letter-spacing: -0.012em;
+  box-shadow:
+    0 7px 16px rgba(30, 42, 68, 0.052),
+    inset 0 1px 0 rgba(255, 255, 255, 0.94);
+}
+
+/* Form base */
+
+#mandatoryPaymentEditorModal .manager-card {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  overflow: visible;
+}
+
+#mandatoryPaymentEditorModal .field {
+  margin-bottom: 11px;
+}
+
+#mandatoryPaymentEditorModal .input,
+#mandatoryPaymentEditorModal .select,
+#mandatoryPaymentEditorModal .mandatory-linked-safe-btn {
+  width: 100%;
+  height: 50px;
+  padding: 0 15px;
+  border-radius: 18px;
+  border: 1px solid rgba(22, 30, 46, 0.075);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(246, 248, 252, 0.98));
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 620;
+  letter-spacing: -0.015em;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.94),
+    0 6px 16px rgba(30, 42, 68, 0.052);
+}
+
+#mandatoryPaymentEditorModal .input::placeholder {
+  color: rgba(20, 24, 33, 0.38);
+}
+
+#mandatoryPaymentEditorModal .input:focus,
+#mandatoryPaymentEditorModal .select:focus,
+#mandatoryPaymentEditorModal .mandatory-linked-safe-btn:focus {
+  outline: none;
+  border-color: rgba(47, 125, 246, 0.28);
+  box-shadow:
+    0 0 0 3px rgba(47, 125, 246, 0.08),
+    0 8px 20px rgba(30, 42, 68, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.94);
+}
+
+/* Title input */
+
+#mandatoryPaymentTitleInput {
+  font-size: 15px;
+  font-weight: 640;
+}
+
+/* Amount + date row */
+
+.mandatory-payment-main-row {
+  display: grid;
+  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+  gap: 9px;
+  margin-bottom: 11px;
+}
+
+.mandatory-payment-main-row__field {
+  margin-bottom: 0 !important;
+}
+
+.mandatory-payment-money-field {
+  position: relative;
+}
+
+.mandatory-payment-money-input {
+  padding-right: 38px !important;
+  font-weight: 680 !important;
+}
+
+.mandatory-payment-money-symbol {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(20, 24, 33, 0.42);
+  font-size: 14px;
+  font-weight: 650;
+  line-height: 1;
+  pointer-events: none;
+}
+
+/* Date field */
+
+.mandatory-payment-date-field {
+  position: relative;
+}
+
+#mandatoryPaymentDueDayInput {
+  position: relative;
+  z-index: 2;
+  padding-right: 12px;
+  color: var(--text);
+  font-size: 13.2px;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+
+#mandatoryPaymentDueDayInput:invalid {
+  color: transparent;
+}
+
+#mandatoryPaymentDueDayInput:valid {
+  color: var(--text);
+}
+
+#mandatoryPaymentDueDayInput::-webkit-datetime-edit {
+  color: inherit;
+}
+
+#mandatoryPaymentDueDayInput::-webkit-calendar-picker-indicator {
+  opacity: 0.58;
+  filter: none;
+}
+
+.mandatory-payment-date-placeholder {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  z-index: 3;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: rgba(20, 24, 33, 0.38);
+  font-size: 13.5px;
+  font-weight: 560;
+  letter-spacing: -0.012em;
+  white-space: nowrap;
+}
+
+#mandatoryPaymentDueDayInput:valid + .mandatory-payment-date-placeholder {
+  opacity: 0;
+}
+
+/* Category select */
+
+#mandatoryPaymentEditorModal .mandatory-payment-category-field {
+  position: relative;
+  display: block !important;
+  width: 100%;
+  margin-bottom: 11px;
+}
+
+#mandatoryPaymentCategorySelect {
+  display: block !important;
+  width: 100%;
+  padding-right: 42px;
+  appearance: none;
+  -webkit-appearance: none;
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 620;
+  letter-spacing: -0.015em;
+}
+
+#mandatoryPaymentCategorySelect option,
+#mandatoryPaymentAccountSelect option,
+#mandatoryPaymentLinkedSafeSelect option {
+  background: #ffffff;
+  color: var(--text);
+}
+
+#mandatoryPaymentEditorModal .mandatory-payment-category-field::after,
+#mandatoryPaymentEditorModal .field:has(#mandatoryPaymentAccountSelect)::after,
+#mandatoryPaymentEditorModal .field:has(#mandatoryPaymentLinkedSafeSelect)::after {
+  content: "";
+  position: absolute;
+  right: 17px;
+  top: 50%;
+  z-index: 3;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid rgba(20, 24, 33, 0.32);
+  border-bottom: 2px solid rgba(20, 24, 33, 0.32);
+  transform: translateY(-68%) rotate(45deg);
+  pointer-events: none;
+}
+
+/* Other selects / linked safe button */
+
+#mandatoryPaymentEditorModal .select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 42px;
+}
+
+#mandatoryPaymentAccountSelect,
+#mandatoryPaymentLinkedSafeSelect {
+  font-weight: 620;
+}
+
+#mandatoryPaymentEditorModal .field:has(#mandatoryPaymentAccountSelect),
+#mandatoryPaymentEditorModal .field:has(#mandatoryPaymentLinkedSafeSelect) {
+  position: relative;
+}
+
+#mandatoryPaymentEditorModal .mandatory-linked-safe-btn {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  text-align: left;
+  color: var(--text);
+  font-weight: 620;
+  cursor: pointer;
+}
+
+#mandatoryPaymentEditorModal .mandatory-linked-safe-btn:active {
+  transform: scale(0.99);
+}
+
+/* Actions */
+
+#mandatoryPaymentEditorModal .modal-actions {
+  margin-top: 15px;
+}
+
+.mandatory-editor-actions {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.mandatory-editor-actions .btn-danger,
+.mandatory-editor-actions .btn-primary {
+  width: 100%;
+  height: 52px;
+  border-radius: 18px;
+  font-size: 15px;
+  font-weight: 680;
+  letter-spacing: -0.02em;
+}
+
+#mandatoryPaymentEditorModal .btn-primary {
+  background:
+    linear-gradient(180deg, rgba(75, 146, 255, 1) 0%, rgba(47, 125, 246, 1) 100%);
+  color: #fff;
+  box-shadow:
+    0 14px 28px rgba(47, 125, 246, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+}
+
+#mandatoryPaymentEditorModal .btn-danger {
+  background:
+    linear-gradient(180deg, rgba(255, 236, 233, 0.98), rgba(255, 224, 220, 0.96));
+  color: var(--red);
+  box-shadow:
+    0 8px 18px rgba(239, 91, 79, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.88);
+}
+
+/* =========================================================
+   Bucket picker modal
+   ========================================================= */
+
+#mandatoryPaymentBucketPickerModal .modal-sheet {
+  width: min(480px, 100%);
+  max-height: calc(100dvh - 24px);
+  padding: 18px 16px calc(20px + env(safe-area-inset-bottom, 0px));
+  border-radius: 30px 30px 22px 22px;
+  background:
+    radial-gradient(circle at 18% 0%, rgba(47, 125, 246, 0.055), transparent 36%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99) 0%, rgba(248, 250, 253, 0.98) 100%);
+  border: 1px solid rgba(22, 30, 46, 0.075);
+  box-shadow:
+    0 -18px 50px rgba(30, 42, 68, 0.16),
+    0 4px 18px rgba(30, 42, 68, 0.055),
+    inset 0 1px 0 rgba(255, 255, 255, 0.94);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+#mandatoryPaymentBucketPickerModal .modal-handle {
+  margin-bottom: 16px;
+  background: rgba(20, 24, 33, 0.12);
+}
+
+#mandatoryPaymentBucketPickerModal .section-head {
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+#mandatoryPaymentBucketPickerModal .modal-title {
+  margin: 0 !important;
+  max-width: 245px;
+  text-align: left !important;
+  color: var(--text);
+  font-size: 24px;
+  line-height: 1.02;
+  font-weight: 720;
+  letter-spacing: -0.04em;
+}
+
+#mandatoryPaymentBucketPickerModal .manager-back-btn {
+  flex: 0 0 auto;
+  min-width: 96px;
+  height: 42px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(241, 244, 249, 0.96));
+  border: 1px solid rgba(22, 30, 46, 0.07);
+  color: rgba(20, 24, 33, 0.68);
+  font-size: 13px;
+  font-weight: 620;
+  letter-spacing: -0.012em;
+  box-shadow:
+    0 7px 16px rgba(30, 42, 68, 0.052),
+    inset 0 1px 0 rgba(255, 255, 255, 0.94);
+}
+
+#mandatoryPaymentBucketPickerModal .list {
+  gap: 11px;
+}
+
+#mandatoryPaymentBucketPickerModal .list-card {
+  min-height: 70px;
+  padding: 12px 13px;
+  border-radius: 21px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(250, 252, 255, 0.96));
+  border: 1px solid rgba(22, 30, 46, 0.065);
+  box-shadow:
+    0 11px 25px rgba(30, 42, 68, 0.06),
+    0 3px 9px rgba(30, 42, 68, 0.028),
+    inset 0 1px 0 rgba(255, 255, 255, 0.94);
+}
+
+#mandatoryPaymentBucketPickerModal .list-title {
+  color: var(--text);
+  font-size: 14.5px;
+  font-weight: 620;
+  letter-spacing: -0.016em;
+}
+
+#mandatoryPaymentBucketPickerModal .list-subtitle {
+  color: rgba(20, 24, 33, 0.45);
+  font-size: 10.8px;
+}
+
+#mandatoryPaymentBucketPickerModal .list-value {
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 620;
+}
+
+/* Mobile */
+
+@media (max-width: 420px) {
+  #mandatoryPaymentEditorModal .modal-sheet,
+  #mandatoryPaymentBucketPickerModal .modal-sheet {
+    padding: 18px 14px calc(18px + env(safe-area-inset-bottom, 0px));
+    border-radius: 30px 30px 22px 22px;
+  }
+
+  #mandatoryPaymentEditorModal .modal-title,
+  #mandatoryPaymentBucketPickerModal .modal-title {
+    font-size: 23px;
+  }
+
+  #mandatoryPaymentEditorModal .manager-back-btn,
+  #mandatoryPaymentBucketPickerModal .manager-back-btn {
+    min-width: 88px;
+    height: 40px;
+    font-size: 12.5px;
+  }
+
+  .mandatory-payment-main-row {
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: 8px;
+    margin-bottom: 11px;
+  }
+
+  #mandatoryPaymentEditorModal .input,
+  #mandatoryPaymentEditorModal .select,
+  #mandatoryPaymentEditorModal .mandatory-linked-safe-btn {
+    height: 49px;
+    border-radius: 17px;
+    font-size: 14px;
+  }
+
+  #mandatoryPaymentDueDayInput {
+    font-size: 12.8px;
+  }
+
+  .mandatory-payment-date-placeholder {
+    left: 14px;
+    font-size: 13px;
+  }
+
+  .mandatory-payment-money-symbol {
+    right: 13px;
+    font-size: 13.5px;
+  }
+
+  .mandatory-payment-money-input {
+    padding-right: 36px !important;
+  }
+
+  .mandatory-editor-actions .btn-danger,
+  .mandatory-editor-actions .btn-primary {
+    height: 52px;
+    border-radius: 18px;
+  }
+
+  #mandatoryPaymentBucketPickerModal .list-card {
+    min-height: 68px;
+    padding: 11px 12px;
+    border-radius: 20px;
+  }
+}

@@ -1,0 +1,142 @@
+/* =========================================================
+   19. ANALYTICS SAFES
+   Light savings analytics
+   ========================================================= */
+
+.analytics-safes-section {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
+
+.analytics-safes-section.hidden {
+  display: none;
+}
+
+.analytics-safes-can-save-card {
+  margin-top: 0;
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 0% 0%, rgba(47, 125, 246, 0.055), transparent 36%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99) 0%, rgba(250, 252, 255, 0.96) 100%);
+  border: 1px solid rgba(22, 30, 46, 0.07);
+  box-shadow:
+    0 12px 28px rgba(30, 42, 68, 0.065),
+    0 3px 10px rgba(30, 42, 68, 0.03),
+    inset 0 1px 0 rgba(255, 255, 255, 0.94);
+}
+
+.analytics-safes-interest-card {
+  min-height: 74px;
+  padding: 13px 15px;
+  border-radius: 23px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  background:
+    radial-gradient(circle at 0% 50%, rgba(21, 151, 107, 0.06), transparent 38%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99) 0%, rgba(248, 252, 250, 0.96) 100%);
+  border: 1px solid rgba(21, 151, 107, 0.09);
+  box-shadow:
+    0 12px 28px rgba(30, 42, 68, 0.06),
+    0 3px 10px rgba(30, 42, 68, 0.028),
+    inset 0 1px 0 rgba(255, 255, 255, 0.94);
+}
+
+.analytics-safes-interest-card__label {
+  color: rgba(20, 24, 33, 0.54);
+  font-size: 13px;
+  font-weight: 540;
+  line-height: 1.1;
+}
+
+.analytics-safes-interest-card__value {
+  flex: 0 0 auto;
+  text-align: right;
+  color: var(--green);
+  font-size: 23px;
+  font-weight: 720;
+  line-height: 1;
+  letter-spacing: -0.045em;
+}
+
+.analytics-safe-list {
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+
+.analytics-safe-list .list-card {
+  min-height: 78px;
+  padding: 12px 14px;
+  border-radius: 22px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99) 0%, rgba(250, 252, 255, 0.96) 100%);
+  border: 1px solid rgba(22, 30, 46, 0.07);
+  box-shadow:
+    0 11px 25px rgba(30, 42, 68, 0.06),
+    0 3px 9px rgba(30, 42, 68, 0.028),
+    inset 0 1px 0 rgba(255, 255, 255, 0.94);
+}
+
+.analytics-safe-list .list-title {
+  color: var(--text);
+  font-size: 15.5px;
+  font-weight: 640;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.analytics-safe-list .list-subtitle {
+  margin-top: 4px;
+  color: rgba(20, 24, 33, 0.45);
+  font-size: 11.5px;
+  font-weight: 460;
+}
+
+.analytics-safe-list .list-value {
+  color: var(--text);
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+@media (max-width: 420px) {
+  .analytics-safes-section {
+    gap: 12px;
+  }
+
+  .analytics-safes-can-save-card {
+    border-radius: 22px;
+  }
+
+  .analytics-safes-interest-card {
+    min-height: 70px;
+    padding: 12px 14px;
+    border-radius: 22px;
+  }
+
+  .analytics-safes-interest-card__label {
+    font-size: 12.5px;
+  }
+
+  .analytics-safes-interest-card__value {
+    font-size: 22px;
+  }
+
+  .analytics-safe-list .list-card {
+    min-height: 74px;
+    padding: 11px 13px;
+    border-radius: 21px;
+  }
+
+  .analytics-safe-list .list-title {
+    font-size: 15px;
+  }
+
+  .analytics-safe-list .list-value {
+    font-size: 18px;
+  }
+}

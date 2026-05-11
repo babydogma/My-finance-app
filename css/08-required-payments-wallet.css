@@ -1,0 +1,313 @@
+/* =========================================================
+   08. REQUIRED PAYMENTS — WALLET SECTION
+   Clean compact calendar payments overview
+   ========================================================= */
+
+.required-payments-section {
+  margin-top: 30px;
+}
+
+.required-payments-head {
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.required-payments-head .section-title {
+  max-width: 100%;
+  font-size: 22px;
+  font-weight: 720;
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+}
+
+.required-payments-add-btn {
+  display: none !important;
+}
+
+.required-payments-overview-label {
+  margin: 20px 0 11px;
+  color: rgba(20, 24, 33, 0.52);
+  font-size: 13.5px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.006em;
+}
+
+.required-payments-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 11px;
+}
+
+/* Base card */
+
+.required-payment-card {
+  position: relative;
+  min-width: 0;
+  width: 100%;
+  border-radius: 21px;
+  border: 1px solid rgba(22, 30, 46, 0.06);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99) 0%, rgba(250, 252, 255, 0.96) 100%);
+  box-shadow:
+    0 11px 25px rgba(30, 42, 68, 0.058),
+    0 3px 9px rgba(30, 42, 68, 0.028),
+    inset 0 1px 0 rgba(255, 255, 255, 0.94);
+  overflow: hidden;
+}
+
+.required-payment-card--clickable {
+  appearance: none;
+  -webkit-appearance: none;
+  border: 1px solid rgba(239, 91, 79, 0.11);
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.required-payment-card--clickable:active {
+  transform: scale(0.992);
+}
+
+.required-payment-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.52), rgba(255,255,255,0));
+  pointer-events: none;
+}
+
+/* Danger top card */
+
+.required-payment-card--danger {
+  min-height: 78px;
+  padding: 13px 16px 13px 62px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 10px;
+  background:
+    radial-gradient(circle at 10% 50%, rgba(239, 91, 79, 0.07), transparent 36%),
+    linear-gradient(180deg, rgba(255, 252, 250, 0.99), rgba(255, 247, 244, 0.96));
+  border-color: rgba(239, 91, 79, 0.11);
+  box-shadow:
+    0 12px 27px rgba(239, 91, 79, 0.04),
+    0 4px 11px rgba(30, 42, 68, 0.028),
+    inset 0 1px 0 rgba(255, 255, 255, 0.94);
+}
+
+/* Overview cards */
+
+.required-payment-card--overview {
+  min-height: 108px;
+  padding: 13px;
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr);
+  grid-template-rows: auto 1fr;
+  column-gap: 10px;
+  row-gap: 8px;
+  align-items: start;
+}
+
+.required-payment-card__icon {
+  position: relative;
+  z-index: 1;
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    0 8px 18px rgba(30, 42, 68, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.required-payment-card__icon svg {
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+  stroke-width: 1.95;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.required-payment-card--danger .required-payment-card__icon {
+  position: absolute;
+  left: 17px;
+  top: 50%;
+  width: 38px;
+  height: 38px;
+  transform: translateY(-50%);
+}
+
+.required-payment-card__icon--danger {
+  color: #ffffff;
+  background:
+    linear-gradient(180deg, #ff8a73 0%, #ef5b4f 100%);
+}
+
+.required-payment-card__icon--wallet {
+  color: #ef7a45;
+  background:
+    linear-gradient(180deg, rgba(255, 239, 229, 0.98), rgba(255, 225, 206, 0.94));
+}
+
+.required-payment-card__icon--shield {
+  color: #15976b;
+  background:
+    linear-gradient(180deg, rgba(226, 248, 240, 0.98), rgba(205, 240, 227, 0.94));
+}
+
+.required-payment-card__icon--limits {
+  color: #2f7df6;
+  background:
+    linear-gradient(180deg, rgba(232, 240, 255, 0.98), rgba(219, 231, 255, 0.94));
+}
+
+.required-payment-card__text {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  width: 100%;
+}
+
+.required-payment-card--overview .required-payment-card__text {
+  grid-column: 2;
+}
+
+.required-payment-card__title-row {
+  min-width: 0;
+  max-width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.required-payment-card__title {
+  min-width: 0;
+  max-width: 100%;
+  color: var(--text);
+  font-size: 13.4px;
+  font-weight: 540;
+  line-height: 1.18;
+  letter-spacing: -0.01em;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+}
+
+.required-payment-card--danger .required-payment-card__title {
+  font-size: 15.5px;
+  font-weight: 630;
+  line-height: 1.1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.required-payment-card__subtitle {
+  margin-top: 4px;
+  color: rgba(20, 24, 33, 0.47);
+  font-size: 11.6px;
+  font-weight: 450;
+  line-height: 1.16;
+  letter-spacing: -0.004em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.required-payment-card__value {
+  position: relative;
+  z-index: 1;
+  max-width: 100%;
+  color: var(--text);
+  font-size: 18.5px;
+  font-weight: 650;
+  line-height: 1;
+  letter-spacing: -0.038em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-variant-numeric: tabular-nums;
+}
+
+.required-payment-card--overview .required-payment-card__value {
+  grid-column: 2;
+  align-self: end;
+}
+
+.required-payment-card--danger .required-payment-card__value {
+  justify-self: end;
+  text-align: right;
+  color: var(--red);
+  font-size: 20px;
+  font-weight: 680;
+}
+
+.required-payment-card__value--danger {
+  color: var(--red);
+}
+
+.required-payment-card__value--blue {
+  color: var(--accent);
+}
+
+/* Control card */
+
+.required-payment-card--control {
+  background:
+    radial-gradient(circle at 0% 100%, rgba(47, 125, 246, 0.08), transparent 44%),
+    linear-gradient(180deg, rgba(244, 248, 255, 0.99), rgba(233, 241, 255, 0.94));
+  border-color: rgba(47, 125, 246, 0.10);
+}
+
+.required-payment-card__progress {
+  position: relative;
+  z-index: 1;
+  grid-row: 1 / span 2;
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  background:
+    conic-gradient(
+      var(--accent) 0 var(--mandatory-control-progress, 0%),
+      rgba(47, 125, 246, 0.12) var(--mandatory-control-progress, 0%) 100%
+    );
+  box-shadow:
+    0 8px 18px rgba(47, 125, 246, 0.09),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.required-payment-card__progress::after {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  border-radius: inherit;
+  background: rgba(245, 249, 255, 0.98);
+}
+
+/* FAQ */
+
+.faq-chip {
+  width: 21px;
+  height: 21px;
+  min-width: 21px;
+  border: none;
+  border-radius: 999px;
+  color: rgba(20, 24, 33, 0.38);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.98), rgba(241,244,249,0.96));
+  box-shadow:
+    0 6px 14px rgba(30, 42, 68, 0.065),
+    inset 0 1px 0 rgba(255, 255, 255, 0.92);
+  font-size: 11px;
+  font-weight: 620;
+  line-height: 1;
+}
