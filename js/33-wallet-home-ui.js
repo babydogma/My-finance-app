@@ -1,0 +1,645 @@
+(() => {
+  function normalizeFreeMoneyText(rawText) {
+    return String(rawText || "")
+      .replace(/^Свободно\s*:\s*/i, "")
+      .trim();
+  }
+
+  function syncFreeMoneyValue() {
+    const valueEl = document.getElementById("balanceFreeMoneyValue");
+
+    if (!valueEl) return;
+
+    const normalizedValue = normalizeFreeMoneyText(valueEl.textContent);
+
+    if (normalizedValue && normalizedValue !== valueEl.textContent.trim()) {
+      valueEl.textContent = normalizedValue;
+    }
+  }
+
+  function roundToTwo(value) {
+    return Math.round((Number(value) || 0) * 100) / 100;
+  }
+
+  function getDateOnlyString(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+  }
+
+  function getTransactionDateKey(transaction) {
+    const rawValue =
+      transaction.date ||
+      transaction.transaction_date ||
+      transaction.operation_date ||
+      transaction.created_date ||
+      transaction.created_at ||
+      transaction.createdAt ||
+      "";
+
+    if (!rawValue) return "";
+
+    const rawText = String(rawValue);
+
+    if (/^\d{4}-\d{2}-\d{2}/.test(rawText)) {
+      return rawText.slice(0, 10);
+    }
+
+    const parsedDate = new Date(rawText);
+
+    if (!Number.isNaN(parsedDate.getTime())) {
+      return getDateOnlyString(parsedDate);
+    }
+
+    return "";
+  }
+
+  function getCurrentMonthKey() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+
+    return `${year}-${month}`;
+  }
+
+  function getPreviousMonthKey() {
+    const now = new Date();
+    const previousMonthDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    const year = previousMonthDate.getFullYear();
+    const month = String(previousMonthDate.getMonth() + 1).padStart(2, "0");
+
+    return `${year}-${month}`;
+  }
+
+  function getComparableDayForMonth(monthKey) {
+    const now = new Date();
+    const currentDay = now.getDate();
+    const [year, month] = String(monthKey).split("-").map(Number);
+
+    if (!year || !month) return currentDay;
+
+    const lastDayOfTargetMonth = new Date(year, month, 0).getDate();
+
+    return Math.min(currentDay, lastDayOfTargetMonth);
+  }
+
+  function getMonthToDateTotal(type, monthKey) {
+    const state = window.FinanceAppState?.state;
+
+    if (!state || !Array.isArray(state.transactions)) return 0;
+
+    const dayLimit = getComparableDayForMonth(monthKey);
+
+    return roundToTwo(
+      state.transactions.reduce((sum, transaction) => {
+        if (transaction.type !== type) return sum;
+
+        const dateKey = getTransactionDateKey(transaction);
+
+        if (!dateKey) return sum;
+        if (dateKey.slice(0, 7) !== monthKey) return sum;
+
+        const day = Number(dateKey.slice(8, 10)) || 0;
+
+        if (day < 1 || day > dayLimit) return sum;
+
+        return sum + (Number(transaction.amount) || 0);
+      }, 0)
+    );
+  }
+
+  function getDeltaPercent(currentValue, previousValue) {
+    const current = Number(currentValue) || 0;
+    const previous = Number(previousValue) || 0;
+
+    if (previous === 0 && current === 0) return 0;
+    if (previous === 0 && current > 0) return 100;
+
+    return ((current - previous) / previous) * 100;
+  }
+
+  function formatDeltaValue(deltaPercent) {
+    const value = Math.abs(deltaPercent);
+
+    const formatted = value.toLocaleString("ru-RU", {
+      minimumFractionDigits: value % 1 === 0 ? 0 : 1,
+      maximumFractionDigits: 1,
+    });
+
+    if (deltaPercent > 0) return `↑ ${formatted}%`;
+    if (deltaPercent < 0) return `↓ ${formatted}%`;
+
+    return "0%";
+  }
+
+  function applyDeltaVisual(el, deltaPercent, type) {
+    if (!el) return;
+
+    el.classList.remove(
+      "hard-month-stat__delta--neutral",
+      "hard-month-stat__delta--good",
+      "hard-month-stat__delta--bad"
+    );
+
+    if (deltaPercent === 0) {
+      el.classList.add("hard-month-stat__delta--neutral");
+      el.style.color = "";
+      return;
+    }
+
+    const isGood =
+      type === "income"
+        ? deltaPercent > 0
+        : deltaPercent < 0;
+
+    el.classList.add(
+      isGood
+        ? "hard-month-stat__delta--good"
+        : "hard-month-stat__delta--bad"
+    );
+
+    el.style.color = isGood
+      ? "var(--hard-green, #15996c)"
+      : "var(--hard-red, #f24949)";
+  }
+
+  function setTextIfChanged(el, nextText) {
+    if (!el) return;
+
+    if (el.textContent.trim() !== nextText) {
+      el.textContent = nextText;
+    }
+  }
+
+  function syncHardMonthDeltasToDate() {
+    const incomeDeltaEl = document.getElementById("hardMonthIncomeDelta");
+    const expenseDeltaEl = document.getElementById("hardMonthExpenseDelta");
+
+    if (!incomeDeltaEl && !expenseDeltaEl) return;
+
+    const currentMonth = getCurrentMonthKey();
+    const previousMonth = getPreviousMonthKey();
+
+    const currentIncome = getMonthToDateTotal("income", currentMonth);
+    const previousIncome = getMonthToDateTotal("income", previousMonth);
+
+    const currentExpense = getMonthToDateTotal("expense", currentMonth);
+    const previousExpense = getMonthToDateTotal("expense", previousMonth);
+
+    const incomeDelta = getDeltaPercent(currentIncome, previousIncome);
+    const expenseDelta = getDeltaPercent(currentExpense, previousExpense);
+
+    if (incomeDeltaEl) {
+      setTextIfChanged(incomeDeltaEl, formatDeltaValue(incomeDelta));
+      applyDeltaVisual(incomeDeltaEl, incomeDelta, "income");
+    }
+
+    if (expenseDeltaEl) {
+      setTextIfChanged(expenseDeltaEl, formatDeltaValue(expenseDelta));
+      applyDeltaVisual(expenseDeltaEl, expenseDelta, "expense");
+    }
+  }
+  
+
+
+function openHardModal(modal) {
+  if (!modal) return;
+
+  modal.classList.remove("hidden", "is-closing");
+
+  requestAnimationFrame(() => {
+    modal.classList.add("is-visible");
+  });
+}
+
+function closeHardModal(modal) {
+  if (!modal) return;
+
+  modal.classList.remove("is-visible");
+  modal.classList.add("is-closing");
+
+  window.setTimeout(() => {
+    modal.classList.remove("is-closing");
+    modal.classList.add("hidden");
+  }, 260);
+}
+
+function getRenderedAccountCards() {
+  return Array.from(
+    document.querySelectorAll("#accountsList .list-card")
+  );
+}
+
+function getAccountCardText(card, selector, fallback = "") {
+  return card.querySelector(selector)?.textContent?.trim() || fallback;
+}
+
+function parseMoneyFromText(rawText) {
+  return Number(
+    String(rawText || "")
+      .replace(/\s/g, "")
+      .replace(",", ".")
+      .replace(/[^\d.-]/g, "")
+  ) || 0;
+}
+
+function formatMoneyCompact(value) {
+  const number = roundToTwo(value);
+
+  return `${number.toLocaleString("ru-RU", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+  })} ₽`;
+}
+
+function createMoneyAccountIcon(card, index = 0) {
+  const iconWrap = document.createElement("span");
+  iconWrap.className = "money-accounts-row__icon";
+  iconWrap.dataset.accountIndex = String(index);
+
+  const sourceSvg = card.querySelector(".list-icon--account svg");
+
+  if (sourceSvg) {
+    const svg = sourceSvg.cloneNode(true);
+    svg.removeAttribute("class");
+    iconWrap.appendChild(svg);
+    return iconWrap;
+  }
+
+  iconWrap.textContent = "₽";
+  return iconWrap;
+}
+
+function renderMoneyAccountsModalList() {
+  const list = document.getElementById("moneyAccountsList");
+  const totalEl = document.getElementById("moneyAccountsTotalValue");
+  const countEl = document.getElementById("moneyAccountsCountValue");
+
+  if (!list) return;
+
+  const cards = getRenderedAccountCards();
+
+  const total = cards.reduce((sum, card) => {
+    const value = getAccountCardText(card, ".list-value", "0 ₽");
+    return sum + parseMoneyFromText(value);
+  }, 0);
+
+  if (totalEl) {
+    totalEl.textContent = formatMoneyCompact(total);
+  }
+
+  if (countEl) {
+    countEl.textContent = String(cards.length);
+  }
+
+  if (!cards.length) {
+    list.innerHTML = `
+      <div class="money-accounts-empty">
+        Счета ещё не загрузились
+      </div>
+    `;
+    return;
+  }
+
+  list.innerHTML = "";
+
+  cards.forEach((card, index) => {
+    const title = getAccountCardText(card, ".list-title", "Счёт");
+    const subtitle = getAccountCardText(card, ".list-subtitle", "");
+    const value = getAccountCardText(card, ".list-value", "0 ₽");
+
+    const row = document.createElement("button");
+    row.type = "button";
+    row.className = "money-accounts-row";
+    row.dataset.accountIndex = String(index);
+
+    const icon = createMoneyAccountIcon(card, index);
+
+    const nameWrap = document.createElement("span");
+    nameWrap.className = "money-accounts-row__name";
+
+    const titleEl = document.createElement("strong");
+    titleEl.textContent = title;
+
+    nameWrap.appendChild(titleEl);
+
+    if (subtitle) {
+      const subtitleEl = document.createElement("span");
+      subtitleEl.textContent = subtitle;
+      nameWrap.appendChild(subtitleEl);
+    }
+
+    const valueEl = document.createElement("strong");
+    valueEl.className = "money-accounts-row__value";
+    valueEl.textContent = value;
+
+    const chevron = document.createElement("span");
+    chevron.className = "money-accounts-row__chevron";
+    chevron.setAttribute("aria-hidden", "true");
+    chevron.textContent = "›";
+
+    row.appendChild(icon);
+    row.appendChild(nameWrap);
+    row.appendChild(valueEl);
+    row.appendChild(chevron);
+
+    row.addEventListener("click", () => {
+      const modal = document.getElementById("moneyAccountsModal");
+
+      closeHardModal(modal);
+
+      window.setTimeout(() => {
+        const freshCards = getRenderedAccountCards();
+        const targetCard = freshCards[index];
+
+        if (targetCard) {
+          targetCard.click();
+        }
+      }, 180);
+    });
+
+    list.appendChild(row);
+  });
+}
+
+function initMoneyAccountsModal() {
+  const hero = document.getElementById("walletGameHero");
+  const modal = document.getElementById("moneyAccountsModal");
+  const closeBtn = document.getElementById("closeMoneyAccountsModalBtn");
+  const addBtn = document.getElementById("moneyAccountsAddBtn");
+  const accountsList = document.getElementById("accountsList");
+
+  if (!hero || !modal) return;
+
+  hero.setAttribute("role", "button");
+  hero.setAttribute("tabindex", "0");
+  hero.setAttribute("aria-label", "Открыть все деньги");
+
+  function openMoneyModal() {
+    renderMoneyAccountsModalList();
+    openHardModal(modal);
+  }
+
+  hero.addEventListener("click", (event) => {
+    if (event.target.closest("#openMonthlyReportBtn")) return;
+
+    openMoneyModal();
+  });
+
+  hero.addEventListener("keydown", (event) => {
+    if (event.key !== "Enter" && event.key !== " ") return;
+
+    event.preventDefault();
+    openMoneyModal();
+  });
+
+  closeBtn?.addEventListener("click", () => {
+    closeHardModal(modal);
+  });
+
+  modal.addEventListener("click", (event) => {
+    if (event.target === modal) {
+      closeHardModal(modal);
+    }
+  });
+
+  addBtn?.addEventListener("click", () => {
+    closeHardModal(modal);
+
+    window.setTimeout(() => {
+      document.getElementById("openCreateAccountModalBtn")?.click();
+    }, 180);
+  });
+
+  if (accountsList) {
+    const observer = new MutationObserver(() => {
+      if (!modal.classList.contains("hidden")) {
+        renderMoneyAccountsModalList();
+      }
+    });
+
+    observer.observe(accountsList, {
+      childList: true,
+      subtree: true,
+      characterData: true,
+    });
+  }
+}
+
+function splitExpectedIncomeDetails(rawText) {
+  const text = String(rawText || "").trim();
+
+  if (!text || text === "Ожидание пока не добавлено") {
+    return {
+      value: "0 ₽",
+      note: "Ожидание не добавлено",
+    };
+  }
+
+  const parts = text
+    .split(/\s*[·•]\s*/)
+    .map((part) => part.trim())
+    .filter(Boolean);
+
+  let value = parts[0] || text;
+  let note = parts.slice(1).join(" · ");
+
+  value = value
+    .replace(/^минимум\s+/i, "")
+    .replace(/^ожидается\s+минимум\s+/i, "")
+    .replace(/^жду\s+/i, "")
+    .trim();
+
+  if (!note) {
+    const dateMatch = text.match(/\b\d{1,2}\s+[а-яё]+\.?\b/i);
+
+    if (dateMatch) {
+      note = dateMatch[0].replace(".", "");
+    }
+  }
+
+  return {
+    value: value || "0 ₽",
+    note: note || "Ближайший ожидаемый доход",
+  };
+}
+
+function syncUpcomingDetailsModal() {
+  const incomeLabelSource = document.getElementById("walletExpectedIncomeLabel");
+  const incomeValueSource = document.getElementById("walletExpectedIncomeValue");
+  const mandatoryValueSource = document.getElementById("analyticsPendingMandatoryValue");
+  const mandatoryTotalSource = document.getElementById("analyticsMandatoryTotalValue");
+  const mandatoryCoveredSource = document.getElementById("analyticsMandatoryCoveredValue");
+  const remainingLimitsSource = document.getElementById("analyticsRemainingBudgetsValue");
+  const mandatoryControlSource = document.getElementById("walletMandatoryControlValue");
+
+  const incomeLabelTarget = document.getElementById("upcomingDetailsIncomeLabel");
+  const incomeValueTarget = document.getElementById("upcomingDetailsIncomeValue");
+  const mandatoryValueTarget = document.getElementById("upcomingDetailsMandatoryValue");
+  const mandatoryTotalTarget = document.getElementById("upcomingDetailsMandatoryTotalValue");
+  const mandatoryCoveredTarget = document.getElementById("upcomingDetailsMandatoryCoveredValue");
+  const remainingLimitsTarget = document.getElementById("upcomingDetailsRemainingLimitsValue");
+  const mandatoryControlTarget = document.getElementById("upcomingDetailsMandatoryControlValue");
+
+  if (incomeValueSource) {
+  const expectedDetails = splitExpectedIncomeDetails(incomeValueSource.textContent);
+
+  if (incomeValueTarget) {
+    incomeValueTarget.textContent = expectedDetails.value;
+  }
+
+  if (incomeLabelTarget) {
+    incomeLabelTarget.textContent = expectedDetails.note;
+  }
+}
+
+  if (mandatoryValueTarget && mandatoryValueSource) {
+    mandatoryValueTarget.textContent = mandatoryValueSource.textContent.trim() || "0 ₽";
+  }
+
+  if (mandatoryTotalTarget && mandatoryTotalSource) {
+    mandatoryTotalTarget.textContent = mandatoryTotalSource.textContent.trim() || "0 ₽";
+  }
+
+  if (mandatoryCoveredTarget && mandatoryCoveredSource) {
+    mandatoryCoveredTarget.textContent = mandatoryCoveredSource.textContent.trim() || "0 ₽";
+  }
+
+  if (remainingLimitsTarget && remainingLimitsSource) {
+    remainingLimitsTarget.textContent = remainingLimitsSource.textContent.trim() || "0 ₽";
+  }
+
+  if (mandatoryControlTarget && mandatoryControlSource) {
+    mandatoryControlTarget.textContent = mandatoryControlSource.textContent.trim() || "0%";
+  }
+}
+
+function initUpcomingDetailsModal() {
+  const upcomingCard = document.querySelector(".hard-upcoming-card");
+  const modal = document.getElementById("upcomingDetailsModal");
+  const closeBtn = document.getElementById("closeUpcomingDetailsModalBtn");
+  const incomeBtn = document.getElementById("upcomingDetailsIncomeBtn");
+  const mandatoryBtn = document.getElementById("upcomingDetailsMandatoryBtn");
+
+  if (!upcomingCard || !modal) return;
+
+  function openUpcomingModal() {
+    syncUpcomingDetailsModal();
+    openHardModal(modal);
+  }
+
+  upcomingCard.setAttribute("role", "button");
+  upcomingCard.setAttribute("tabindex", "0");
+  upcomingCard.setAttribute("aria-label", "Открыть ближайшее");
+
+  upcomingCard.addEventListener("click", () => {
+  openUpcomingModal();
+});
+
+  upcomingCard.addEventListener("keydown", (event) => {
+    if (event.key !== "Enter" && event.key !== " ") return;
+
+    event.preventDefault();
+    openUpcomingModal();
+  });
+
+  closeBtn?.addEventListener("click", () => {
+    closeHardModal(modal);
+  });
+
+  modal.addEventListener("click", (event) => {
+    if (event.target === modal) {
+      closeHardModal(modal);
+    }
+  });
+
+  incomeBtn?.addEventListener("click", () => {
+    closeHardModal(modal);
+
+    window.setTimeout(() => {
+      document.getElementById("openExpectedIncomeModalBtn")?.click();
+    }, 180);
+  });
+
+  mandatoryBtn?.addEventListener("click", () => {
+    closeHardModal(modal);
+
+    window.setTimeout(() => {
+      document.getElementById("openMandatoryPaymentsModalBtn")?.click();
+    }, 180);
+  });
+
+  const observedNodes = [
+    document.getElementById("walletExpectedIncomeLabel"),
+    document.getElementById("walletExpectedIncomeValue"),
+    document.getElementById("analyticsPendingMandatoryValue"),
+    document.getElementById("analyticsMandatoryTotalValue"),
+    document.getElementById("analyticsMandatoryCoveredValue"),
+    document.getElementById("analyticsRemainingBudgetsValue"),
+    document.getElementById("walletMandatoryControlValue"),
+  ].filter(Boolean);
+
+  const observer = new MutationObserver(() => {
+    if (!modal.classList.contains("hidden")) {
+      syncUpcomingDetailsModal();
+    }
+  });
+
+  observedNodes.forEach((node) => {
+    observer.observe(node, {
+      childList: true,
+      characterData: true,
+      subtree: true,
+    });
+  });
+}
+
+  document.addEventListener("DOMContentLoaded", () => {
+    syncFreeMoneyValue();
+    syncHardMonthDeltasToDate();
+    initMoneyAccountsModal();
+    initUpcomingDetailsModal();
+
+    const valueEl = document.getElementById("balanceFreeMoneyValue");
+
+    if (valueEl) {
+      const freeMoneyObserver = new MutationObserver(() => {
+        syncFreeMoneyValue();
+      });
+
+      freeMoneyObserver.observe(valueEl, {
+        childList: true,
+        characterData: true,
+        subtree: true,
+      });
+    }
+
+    /*
+      ВАЖНО:
+      Наблюдаем только за исходными суммами дохода/расхода.
+      НЕ наблюдаем за hardMonthIncomeDelta / hardMonthExpenseDelta,
+      потому что мы сами меняем их текст.
+    */
+    const sourceNodes = [
+      document.getElementById("hardMonthIncomeValue"),
+      document.getElementById("hardMonthExpenseValue"),
+    ].filter(Boolean);
+
+    const hardMonthObserver = new MutationObserver(() => {
+      syncHardMonthDeltasToDate();
+    });
+
+    sourceNodes.forEach((node) => {
+      hardMonthObserver.observe(node, {
+        childList: true,
+        characterData: true,
+        subtree: true,
+      });
+    });
+
+    window.setTimeout(syncHardMonthDeltasToDate, 300);
+    window.setTimeout(syncHardMonthDeltasToDate, 900);
+  });
+})();
